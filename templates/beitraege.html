@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Project Voting</title>
+</head>
+
+   <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f5f1e4;
+        color: black;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+    }
+
+        img {
+            border-radius: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo {
+            max-width: 1000px; /* Increase the max-width to make it bigger */
+            margin-bottom: 30px;
+        }
+
+        img:hover {
+            transform: scale(1.1);
+        }
+
+        .button {
+            border-radius: 30px;
+            padding: 15px;
+            background-color: white;
+            font-weight: bold;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+
+        .input-field {
+            border-radius: 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .form-container {
+            margin: auto;
+            width: 50%;
+            padding: 10px;
+        }
+
+        .project img {
+            max-width: 300px; /* Adjust the width as needed */
+            max-height: 200px; /* Adjust the height as needed */
+            height: auto; /* Maintain aspect ratio */
+            width: auto; /* Maintain aspect ratio */
+            border-radius: 30px; /* Optional: if you want rounded corners */
+        }
+
+        /* Added CSS for the top bar */
+.top-bar {
+            background-color: #003056 ; /* Background color of the top bar */
+            height: 80px; /* Height of the top bar */
+            width: 100%; /* Full width of the screen */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20 20px; /* Add padding to the left and right */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+    .top-bar img {
+        max-height: 100%; /* Ensure the logo fits within the bar's height */
+    }
+
+   .top-bar a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px; /* Add spacing between links */
+        font-size: 18px; /* Increase text size */
+        font-weight: bold; /* Make text bold */
+        transition: transform 0.3s, font-weight 0.3s; /* Add transition effect */
+    }
+    .top-bar a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -3px; /* Adjust the position of the underscore */
+        width: 100%;
+        height: 2px;
+        background-color: white;
+        transform: scaleX(0); /* Initially hide the underscore */
+        transform-origin: right;
+        transition: transform 0.3s; /* Add transition effect for underscore */
+    }
+
+    .top-bar a:hover {
+        transform: scale(1.1); /* Scale to 1.1x on hover */
+        font-weight: bolder; /* Make it bolder on hover */
+    }
+
+    .top-bar a:hover::after {
+        transform: scaleX(1); /* Show the underscore on hover */
+        transform-origin: left;
+    }
+    
+    .index-image {
+        width: 100%;
+        object-fit: cover; /* Crop the image when necessary */
+        max-height: 500px; /* Set a maximum height if needed */
+       border-radius: 0; /* Remove border-radius */
+    transition: none !important; /* Remove hover effect */
+	transform: none !important;
+}
+
+    .cover-text-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8); /* Black background with 70% opacity */
+        padding: 20px;
+        border-radius: 30px;
+        text-align: center;
+    }
+
+    .cover-text-container h1 {
+        font-size: 40px;
+        color: white;
+        margin: 0;
+        padding-bottom: 10px;
+    }
+
+    .cover-text-container p {
+        font-size: 30px;
+        color: white;
+        margin: 0;
+    }
+	
+	    .info-box-container {
+            display: flex;
+            justify-content: space-evenly;
+            padding: 20px;
+        }
+
+        .info-box {
+            background-color: #1b1b1b;
+            border-radius: 30px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            width: 30%; /* Set a fixed width for each box */
+        }
+
+        .info-box:hover {
+            transform: scale(1.03);
+        }
+        .info-box-icon {
+            max-width: 70px; /* Icon size */
+            border-radius: 50%; /* Make it circular */
+        }
+
+        .info-box-title {
+            color: white;
+            font-size: 30px;
+            margin: 10px 0;
+        }
+
+        .info-box-undertitle {
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Specific colors for each box */
+        .box-red {
+            background-color: #06467c ;
+        }
+
+        .box-blue {
+            background-color: #02569d ;
+        }
+
+        .box-green {
+            background-color: #2874A6 ;
+        }
+		
+	.info-text-field {
+            background-color: #F4F4F8; /* Light grey background */
+            width: 100%; /* Full width */
+            height: 400px; /* Specified height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        .info-text-container {
+            width: 50%; /* Width of the text container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .info-text-title {
+            font-size: 30px;
+            color: black;
+            margin-bottom: 10px;
+        }
+
+        .info-text-undertitle {
+            font-size: 20px;
+            color: black;
+            margin-top: 10px;
+        }
+
+    </style>
+
+
+{% if current_user.is_authenticated %}
+    <div class="logged-in-info">
+        Logged in as: {{ current_user.name }}, {{ current_user.surname }}
+        <a href="{{ url_for('logout') }}"><button>Logout</button></a>
+    </div>
+{% endif %}
+
+
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+		<a href="https://stimmungskartendemo.ermine.at">Map</a> <!-- Updated URL here -->
+        <a href="#">Suggestions</a>
+        <a href="#">Submit a project</a>
+        <a href="#">About participatory planning</a>
+        <a href="#">Contact</a>
+        <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
+    </div>
+    <img src="{{ url_for('static', filename='index_titleimage.png') }}" alt="Index Title Image" class="index-image">
+<div class="index-image">
+    <div class="cover-text-container">
+        <h1>Change your town for the better!</h1>
+        <p>Get involved in the development of your town and participate in its improvement!</p>
+    </div>
+</div>
+
+ <div class="info-box-container">
+        <!-- Box 1 -->
+        <div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer;">
+            <img src="{{ url_for('static', filename='index_icon_map.png') }}" alt="Map Icon" class="info-box-icon">
+            <p class="info-box-title">Stimmungskompass karte</p>
+            <p class="info-box-undertitle">Post how you feel about your town on a map, and see how other citizens feel about it!</p>
+        </div>
+        <!-- Box 2 -->
+        <div class="info-box box-blue">
+            <img src="{{ url_for('static', filename='index_icon_public.png') }}" alt="Public Icon" class="info-box-icon">
+            <p class="info-box-title">Suggest an idea</p>
+            <p class="info-box-undertitle">Tell the city, what it should do better or different!</p>
+			<p class="info-box-undertitle">Currently posted projects: 0 </p>
+        </div>
+
+        <!-- Box 3 -->
+        <div class="info-box box-green">
+            <img src="{{ url_for('static', filename='index_icon_list.png') }}" alt="List Icon" class="info-box-icon">
+            <p class="info-box-title">List of current suggestions</p>
+            <p class="info-box-undertitle">Vote on bereits suggested ideas to help bringing them to reality!</p>
+        </div>
+    </div>
+	
+   <!-- Info text field with wrapped text container -->
+    <div class="info-text-field">
+        <div class="info-text-container">
+            <p class="info-text-title">Together we can make this town beautiful!</p>
+            <p class="info-text-undertitle">Stimmungskompass is an all-encompassing tool of participatory planning.</p>
+            <p class="info-text-undertitle">This form of civic engagement helps influence town leadership and decision-making. Share your ideas, vote for improvements submitted by other citizens, and help send your town in the right direction.</p>
+			<p class="info-text-undertitle">The power to make this town better lies in your hands!</p>
+        </div>
+    </div>
+    <!-- Rest of your content -->
+    <div class="container">
+        {% if current_user.is_authenticated %}
+            <div class="logged-in-info">
+                Logged in as: {{ current_user.name }}, {{ current_user.surname }}
+                <a href="{{ url_for('logout') }}"><button>Logout</button></a>
+            </div>
+        {% endif %}
+
+
+     
+    </div>
+</body>
+</html>
+
+
+    <script>
+        // JavaScript function to handle redirection to Stimmungskarte
+        function redirectToStimmungskarte() {
+            window.location.href = 'https://stimmungskartendemo.ermine.at';
+        }
+
+        // JavaScript function to handle redirection to Suggest an Idea
+        function redirectToNeuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
+        }
+
+        // JavaScript function to handle redirection to List of Current Suggestions
+        function redirectToBeitraege() {
+            window.location.href = '/beitraege';
+        }
+    </script>
