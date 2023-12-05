@@ -1,18 +1,23 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
+from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from models import db, User, Project, Vote, Comment
+from models import db, User, Project, Vote, Comment, Downvote
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from datetime import datetime
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm, CommentForm  # Import CommentForm
 from random import randint
 from urllib.parse import quote, unquote
 from markupsafe import Markup
 from twilio.rest import Client
 import logging
+import shutil
+from pathlib import Path
 import os
 import random
 import string
+import json
+import zipfile
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,6 +38,9 @@ app.secret_key = os.urandom(24)
 
 # Configure the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project_voting.db'
+# Define the UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = 'static/usersubmissions'  # Specify the folder where uploaded files will be saved
+
 db.init_app(app)
 
 # Initialize Flask-Login
@@ -46,6 +54,51 @@ logging.basicConfig(level=logging.DEBUG)
 # Create the database tables before the first request
 def create_tables():
     db.create_all()
+
+def zip_user_submissions():
+    try:
+        # Path for the directory to be zipped
+        directory_to_zip = Path(app.root_path, 'static', 'usersubmissions')
+
+        # Path for the zip file
+        zip_path = Path(app.root_path, 'static', 'usersubmissions.zip')
+
+        # Check if directory exists and has files
+        if directory_to_zip.is_dir() and any(directory_to_zip.iterdir()):
+            # Create a zip file
+            shutil.make_archive(zip_path.stem, 'zip', directory_to_zip.parent, directory_to_zip.name)
+            logging.debug("Zip file created at: %s", zip_path)
+            return zip_path
+        else:
+            logging.debug("No directory or files to zip")
+            return None
+    except Exception as e:
+        logging.error("Error creating zip file: %s", e)
+        return None
+
+
+
+
+@app.route('/download_images')
+def download_images():
+    try:
+        zip_path = zip_user_submissions()
+        if zip_path and zip_path.is_file():
+            # Provide the full path to the file for direct download
+            full_path = zip_path.resolve()
+
+            # Create a JavaScript snippet to initiate the download
+            download_script = f'<script>window.location.href = "{url_for("static", filename="usersubmissions.zip")}";</script>'
+
+            # Return the script as an HTML response
+            return Response(download_script, mimetype='text/html')
+        else:
+            flash('No images available to download.', 'info')
+            return redirect(url_for('opendata'))
+    except Exception as e:
+        logging.error("Error in downloading images: %s", e)
+        flash('Error in downloading images.', 'danger')
+        return redirect(url_for('opendata'))
 
 
 @app.route('/')
@@ -200,6 +253,111 @@ def reset_password():
             flash('Invalid OTP. Please try again.', 'danger')
     return render_template('reset_password.html')
     
+@app.route('/beitraege')
+def beitraege():
+    return render_template('beitraege.html')
+    
+@app.route('/submit_project', methods=['POST'])
+@login_required
+def submit_project():
+    if request.method == 'POST':
+        name = request.form.get('title')
+        description = request.form.get('description')
+        image = request.files.get('image')
+        category = request.form.get('category')
+
+        # Check if an image file was uploaded
+        if image:
+            # Generate a unique filename for the uploaded image
+            image_filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))  # Save the image to the specified folder
+
+            # Create a new project record in the database
+            new_project = Project(name=name, description=description, image_file=image_filename, category=category, author=current_user.id)
+              # Save the project and add a debug log
+            db.session.add(new_project)
+            db.session.commit()
+            logging.debug(f"Project '{name}' submitted by user {current_user.id}")
+
+            # Use flash to send a success message
+            flash('Success! The project has been successfully submitted.', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Please upload an image for your project.', 'danger')
+            return redirect(url_for('index'))
+
+    return render_template('submit_project.html')
+
+@app.route('/list')
+def list_view():
+    query = Project.query
+
+    # Get parameters
+    category = request.args.get('category')
+    age = request.args.get('age')
+    score = request.args.get('score')
+    search = request.args.get('search')
+
+    # Apply filters
+    if category:
+        query = query.filter(Project.category == category)
+    if search:
+        query = query.filter(Project.name.contains(search))
+    if age == 'newest':
+        query = query.order_by(Project.date.desc())
+    elif age == 'oldest':
+        query = query.order_by(Project.date)
+
+    # Here, you need to fill in the logic for 'highest' and 'lowest' scores
+    if score == 'highest':
+        # Add logic to sort by highest score
+        pass  # Replace 'pass' with your logic
+    elif score == 'lowest':
+        # Add logic to sort by lowest score
+        pass  # Replace 'pass' with your logic
+
+    projects = query.all()
+    return render_template('list.html', projects=projects)
+
+
+    
+@app.route('/downvote/<int:project_id>', methods=['POST'])
+@login_required
+def downvote(project_id):
+    project = Project.query.get_or_404(project_id)
+    existing_downvote = Downvote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
+
+    if existing_downvote:
+        flash('You have already downvoted this project.', 'info')
+        return redirect(url_for('list_view'))
+
+    downvote = Downvote(user_id=current_user.id, project_id=project.id, ip_address=request.remote_addr)
+    db.session.add(downvote)
+    db.session.commit()
+    flash('Your downvote has been recorded!', 'success')
+    return redirect(url_for('list_view'))
+
+@app.route('/comment/<int:project_id>', methods=['POST'])
+@login_required
+def comment(project_id):
+    project = Project.query.get_or_404(project_id)
+    comment_text = request.form.get('comment')
+    
+    # Create a new Comment instance
+    new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=project_id)
+    
+    # Add and commit the new comment to the database
+    db.session.add(new_comment)
+    db.session.commit()
+    
+    flash('Your comment has been posted!', 'success')
+    return redirect(url_for('list_view'))
+
+@app.route('/opendata')
+def opendata():
+    # Additional logic can be added here if needed
+    return render_template('opendata.html')
+
 
 @app.route('/verify_otp', methods=['GET', 'POST'])
 def verify_otp():
@@ -232,7 +390,45 @@ def verify_otp():
     return render_template('verify_otp.html')
 
 
+@app.route('/download_data')
+def download_data():
+    # Querying data from the database
+    projects = Project.query.all()
+    votes = Vote.query.all()
+    comments = Comment.query.all()
+    downvotes = Downvote.query.all()
 
+    # Converting data to JSON format
+    data = {
+        "projects": [project.to_dict() for project in projects],
+        "votes": [vote.to_dict() for vote in votes],
+        "comments": [comment.to_dict() for comment in comments],
+        "downvotes": [downvote.to_dict() for downvote in downvotes]
+    }
+
+    # Creating a response with the JSON data
+    response = Response(
+        json.dumps(data, default=str),
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment;filename=data.json'}
+    )
+
+       # Create a zip file of user submissions
+    zip_path = zip_user_submissions()
+
+    if zip_path and zip_path.is_file():
+        data['image_zip_file'] = url_for('static', filename='usersubmissions.zip')
+    else:
+        data['image_zip_file'] = "No images available to download"
+
+    # Create JSON response
+    response = Response(
+        json.dumps(data, default=str),
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment;filename=data.json'}
+    )
+
+    return response
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -288,6 +484,13 @@ def project(project_id):
         flash('Your comment has been posted!', 'success')
         return redirect(url_for('project', project_id=project_id))
     return render_template('project.html', project=project, comments=comments, form=form)
+
+@app.route('/project/<int:project_id>')
+def project_view(project_id):
+    project = Project.query.get_or_404(project_id)
+    projects = Project.query.all()
+    return render_template('list.html', projects=projects, active_project=project)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

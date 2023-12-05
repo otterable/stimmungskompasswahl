@@ -31,8 +31,23 @@ class Project(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(300), nullable=False)
     image_file = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(100), nullable=False)  # Add this line for the category
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    author = db.Column(db.String(100), nullable=False)  # Added author field
     votes = db.relationship('Vote', backref='project', lazy=True)
+    downvotes = db.relationship('Downvote', backref='project', lazy=True)
     comments = db.relationship('Comment', backref='project', lazy=True)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "image_file": self.image_file,
+            "category": self.category,
+            "date": self.date.strftime("%Y-%m-%d %H:%M:%S"),
+            "author": self.author
+        }
 
 class Vote(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,10 +55,42 @@ class Vote(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     ip_address = db.Column(db.String(100))
-
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "user_id": self.user_id,
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(300), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "project_id": self.project_id,
+            "user_id": self.user_id,
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        
+class Downvote(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(100))
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "user_id": self.user_id,
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        }

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Data - Stimmungskompass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+   <style>
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f5f1e4;
+        color: black;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+    }
+
+        img {
+            border-radius: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo {
+            max-width: 1000px; /* Increase the max-width to make it bigger */
+            margin-bottom: 30px;
+        }
+
+        img:hover {
+            transform: scale(1.03);
+        }
+
+        .button {
+            border-radius: 30px;
+            padding: 15px;
+            background-color: white;
+            font-weight: bold;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+
+        .input-field {
+            border-radius: 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .form-container {
+            margin: auto;
+            width: 50%;
+            padding: 10px;
+        }
+
+        .project img {
+            max-width: 300px; /* Adjust the width as needed */
+            max-height: 200px; /* Adjust the height as needed */
+            height: auto; /* Maintain aspect ratio */
+            width: auto; /* Maintain aspect ratio */
+            border-radius: 30px; /* Optional: if you want rounded corners */
+        }
+
+        /* Added CSS for the top bar */
+.top-bar {
+    background-color: #003056; /* Background color of the top bar */
+    height: 80px; /* Height of the top bar */
+    width: 100%; /* Full width of the screen */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px; /* Add padding to the left and right */
+    box-sizing: border-box; /* Include padding in width calculation */
+    align-items: center; /* This ensures vertical alignment */
+}
+.top-bar a .logo {
+    max-width: auto; /* Adjust this value as needed */
+    max-height: 80px; /* Ensure the logo fits within the bar's height */
+margin: auto;
+}
+
+/* Styles for buttons inside links in the top bar */
+.top-bar a button {
+    transition: transform 0.3s ease; /* Transition for the transform property */
+    border-radius: 30px; /* If you want to keep the border-radius */
+    /* Add any other button-specific styles here */
+}
+
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
+
+
+/* Hover effect for links in the top bar */
+.top-bar a:not(:has(button)):hover::after {
+    transform: scaleX(1); /* Show the underscore on hover */
+    transform-origin: left;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px; /* Add spacing between links */
+    font-size: 18px; /* Increase text size */
+    font-weight: bold; /* Make text bold */
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease; /* Transition for color and text shadow */
+}
+
+.top-bar a:hover {
+    color: #a8c0ff; /* Change color on hover */
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7); /* Add text shadow on hover */
+}
+
+.top-bar a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
+
+/* Underline effect for links that do not contain buttons */
+.top-bar a:not(:has(> button))::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect to show underline for links that do not contain buttons */
+.top-bar a:not(:has(> button)):hover::after {
+    transform: scaleX(1);
+}
+    
+    .index-image {
+        width: 100%;
+        object-fit: cover; /* Crop the image when necessary */
+        max-height: 500px; /* Set a maximum height if needed */
+       border-radius: 0; /* Remove border-radius */
+    transition: none !important; /* Remove hover effect */
+	transform: none !important;
+}
+
+    .cover-text-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8); /* Black background with 70% opacity */
+        padding: 20px;
+        border-radius: 30px;
+        text-align: center;
+    }
+
+    .cover-text-container h1 {
+        font-size: 40px;
+        color: white;
+        margin: 0;
+        padding-bottom: 10px;
+    }
+
+    .cover-text-container p {
+        font-size: 30px;
+        color: white;
+        margin: 0;
+    }
+	
+	    .info-box-container {
+            display: flex;
+            justify-content: space-evenly;
+            padding: 20px;
+        }
+
+        .info-box {
+            background-color: #1b1b1b;
+            border-radius: 30px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            width: 30%; /* Set a fixed width for each box */
+        }
+
+        .info-box:hover {
+            transform: scale(1.03);
+        }
+        .info-box-icon {
+            max-width: 70px; /* Icon size */
+            border-radius: 50%; /* Make it circular */
+        }
+
+        .info-box-title {
+            color: white;
+            font-size: 30px;
+            margin: 10px 0;
+        }
+
+        .info-box-undertitle {
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Specific colors for each box */
+        .box-red {
+            background-color: #06467c ;
+        }
+
+        .box-blue {
+            background-color: #02569d ;
+        }
+
+        .box-green {
+            background-color: #2874A6 ;
+        }
+		
+	.info-text-field {
+            background-color: #F4F4F8; /* Light grey background */
+            width: 100%; /* Full width */
+            height: 400px; /* Specified height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        .info-text-container {
+            width: 50%; /* Width of the text container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .info-text-title {
+            font-size: 30px;
+            color: black;
+            margin-bottom: 10px;
+        }
+
+        .info-text-undertitle {
+            font-size: 20px;
+            color: black;
+            margin-top: 10px;
+        }
+
+/* Hamburger menu icon */
+.hamburger-menu {
+    display: none; /* Hidden by default */
+    cursor: pointer;
+}
+
+/* Media Query for Mobile Devices */
+@media screen and (max-width: 768px) {
+    .top-bar a {
+        display: none; /* Hide regular menu items */
+    }
+	 #nav-links {
+        display: none; /* Hide navigation links by default on mobile */
+    }
+
+    .hamburger-menu {
+        display: block; /* Show hamburger menu */
+    }
+
+    /* Adjust the layout for mobile view */
+    .form-container, .info-box-container, .info-text-container {
+        width: 90%; /* Adjust width for smaller screens */
+    }
+
+    .project img {
+        max-width: 100%; /* Full width on smaller screens */
+    }
+	
+	* Styles for the expanded menu */
+.menu-expanded {
+    display: none; /* Start with the menu collapsed */
+    flex-direction: column;
+    position: absolute;
+    background-color: #003056;
+    top: 80px; /* Below the top bar */
+    width: 100%;
+    text-align: left;
+}
+
+/* Styles for the hamburger menu */
+.hamburger-menu {
+    display: block; /* Show by default */
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    background-color: #3a3a3a;
+    border-radius: 30px;
+    text-align: center;
+    padding: 5px;
+    font-family: 'Roboto', sans-serif;
+    margin: 8px 0;
+    line-height: 1;
+    transition: background-color 0.2s ease-in-out;
+    width: 100%;
+    height: auto;
+}
+
+/* Styles for the category choices overlay */
+#category-choices {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: calc(100% - 44.5px);
+    margin: 0;
+    padding: 0 0 44.5px;
+    position: absolute; /* Overlay on top of other content */
+    top: 0; /* Align to top */
+    left: 0; /* Align to left */
+    right: 0; /* Align to right */
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    z-index: 1000; /* Make sure it's above other content */
+}
+
+.categorybutton {
+    border-radius: 30px;
+    padding: 15px;
+    margin: 10px 0;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    width: 80%; /* Adjust the width as needed */
+    text-align: center;
+}
+
+
+
+    </style>
+
+
+{% if current_user.is_authenticated %}
+    <div class="logged-in-info">
+        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
+    </div>
+{% endif %}
+
+
+<body>
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="hamburger-menu" onclick="toggleOverlay()">☰ Kategorie auswählen</div>
+    <div id="category-choices" style="display: none;">
+        <!-- Category Buttons -->
+        <button class="categorybutton" onclick="parent.setCategory('#3d3d3d')" style="background-color: #3d3d3d;"><h3>Dieser Ort gefällt mir.</h3></button>
+        <!-- ... other buttons ... -->
+    </div>
+    <a href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        </a>    <div id="nav-links">
+        <a href="https://stimmungskartendemo.ermine.at">Map</a>
+        <a href="/list">Suggestions</a> <!-- Updated this line -->
+        <a href="/beitraege">Submit a project</a>
+        <a href="#">About participatory planning</a>
+        <a href="#">Contact</a>
+		<a href="{{ url_for('opendata') }}">Open Data</a>
+
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
+        {% else %}
+            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
+        {% endif %}
+    </div>
+</div>
+    <h1>Fan of Open Data?</h1>
+    <p>You can download the entire website data. This is limited to once every week, per account.</p>
+    <p>Data will be in a single machine-readable JSON file. Pictures will be packed into a .zip file.</p>
+    <p>The data will include: Project title, short and long description, post date, votes, and comments.</p>
+
+    <h2>Delete Your Data</h2>
+    <p>Would you like to delete all your data from the website?</p>
+    <p>You can do this yourself, without filling out any form. All data associated with you (for example, name, address, phone, and e-mail data) will be deleted from the server, as well as the submissions and comments you have made.</p>
+
+    <a href="/">Return to Home</a>
+</body>
+</html>
+
+<a href="{{ url_for('download_data') }}" class="button">Download Website Data</a>
+<a href="{{ url_for('download_images') }}" class="button">Download Images</a>
+<a id="download-link" href="#" style="display: none;"></a>
+

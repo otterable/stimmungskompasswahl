@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Project Voting</title>
+    <title>Stimmungskompass DEMO</title>
+	<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
 </head>
 
    <style>
@@ -224,80 +227,101 @@
 
 {% if current_user.is_authenticated %}
     <div class="logged-in-info">
-        Logged in as: {{ current_user.name }}, {{ current_user.surname }}
-        <a href="{{ url_for('logout') }}"><button>Logout</button></a>
+        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
     </div>
 {% endif %}
 
 
 <body>
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-		<a href="https://stimmungskartendemo.ermine.at">Map</a> <!-- Updated URL here -->
-        <a href="#">Suggestions</a>
-        <a href="#">Submit a project</a>
+<!-- Top Bar -->
+<div class="top-bar">
+    <div id="category-choices" style="display: none;">
+        <!-- Category Buttons -->
+        <button class="categorybutton" onclick="parent.setCategory('#3d3d3d')" style="background-color: #3d3d3d;"><h3>Dieser Ort gefällt mir.</h3></button>
+        <!-- ... other buttons ... -->
+    </div>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    <div id="nav-links">
+        <a href="https://stimmungskartendemo.ermine.at">Map</a>
+        <a href="/list">Suggestions</a> <!-- Updated this line -->
+        <a href="/beitraege">Submit a project</a>
         <a href="#">About participatory planning</a>
         <a href="#">Contact</a>
-        <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
-    </div>
-    <img src="{{ url_for('static', filename='index_titleimage.png') }}" alt="Index Title Image" class="index-image">
-<div class="index-image">
-    <div class="cover-text-container">
-        <h1>Change your town for the better!</h1>
-        <p>Get involved in the development of your town and participate in its improvement!</p>
+		<a href="{{ url_for('opendata') }}">Open Data</a>
+
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
+        {% else %}
+            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
+        {% endif %}
     </div>
 </div>
-
- <div class="info-box-container">
-        <!-- Box 1 -->
-        <div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer;">
-            <img src="{{ url_for('static', filename='index_icon_map.png') }}" alt="Map Icon" class="info-box-icon">
-            <p class="info-box-title">Stimmungskompass karte</p>
-            <p class="info-box-undertitle">Post how you feel about your town on a map, and see how other citizens feel about it!</p>
-        </div>
-        <!-- Box 2 -->
-        <div class="info-box box-blue">
-            <img src="{{ url_for('static', filename='index_icon_public.png') }}" alt="Public Icon" class="info-box-icon">
-            <p class="info-box-title">Suggest an idea</p>
-            <p class="info-box-undertitle">Tell the city, what it should do better or different!</p>
-			<p class="info-box-undertitle">Currently posted projects: 0 </p>
+<!-- Main Content -->
+<div class="form-container">
+    <h1>Create your own Project showcase!</h1>
+    <form method="POST" enctype="multipart/form-data" action="/submit_project">
+        <!-- Title -->
+        <div class="input-field">
+            <label for="title">1. Add a Title (name)</label>
+            <input type="text" id="title" name="title" required>
         </div>
 
-        <!-- Box 3 -->
-        <div class="info-box box-green">
-            <img src="{{ url_for('static', filename='index_icon_list.png') }}" alt="List Icon" class="info-box-icon">
-            <p class="info-box-title">List of current suggestions</p>
-            <p class="info-box-undertitle">Vote on bereits suggested ideas to help bringing them to reality!</p>
-        </div>
-    </div>
-	
-   <!-- Info text field with wrapped text container -->
-    <div class="info-text-field">
-        <div class="info-text-container">
-            <p class="info-text-title">Together we can make this town beautiful!</p>
-            <p class="info-text-undertitle">Stimmungskompass is an all-encompassing tool of participatory planning.</p>
-            <p class="info-text-undertitle">This form of civic engagement helps influence town leadership and decision-making. Share your ideas, vote for improvements submitted by other citizens, and help send your town in the right direction.</p>
-			<p class="info-text-undertitle">The power to make this town better lies in your hands!</p>
-        </div>
-    </div>
-    <!-- Rest of your content -->
-    <div class="container">
-        {% if current_user.is_authenticated %}
-            <div class="logged-in-info">
-                Logged in as: {{ current_user.name }}, {{ current_user.surname }}
-                <a href="{{ url_for('logout') }}"><button>Logout</button></a>
-            </div>
-        {% endif %}
+        <!-- Description -->
+		<div class="input-field">
+			<label for="description">2. Write a description</label>
+			<!-- Quill editor container -->
+			<div id="editor" style="height: 200px;"></div>
+			<!-- Hidden textarea to store the Quill editor content -->
+			<textarea id="description" name="description" style="display:none;"></textarea>
+		</div>
 
+        <!-- Image Upload -->
+        <div class="input-field">
+            <label for="image">3. Upload an image (required)</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
 
-     
-    </div>
+        <!-- Category Selection -->
+        <div class="input-field">
+            <label for="category">4. Select a category</label>
+            <select id="category" name="category" required>
+                <option value="Transport">Transport</option>
+                <option value="Public spaces">Public spaces</option>
+                <option value="Environment">Environment</option>
+                <option value="Verwaltung">Verwaltung</option>
+                <option value="Culture">Culture</option>
+                <option value="Education">Education</option>
+                <option value="Health">Health</option>
+                <option value="Sport">Sport</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <!-- Publish Button -->
+        <button type="submit" class="button" onclick="console.log('Publish button clicked');">Publish</button>
+    </form>
+</div>
+<!-- Map Container -->
+<div id="map" style="height: 400px;"></div>
+
+</body>
+</html>
 </body>
 </html>
 
 
     <script>
+		// Initialize Quill editor
+		var quill = new Quill('#editor', {
+			theme: 'snow'
+		});
+
+		// Listen for form submission
+		document.querySelector('form').onsubmit = function() {
+			var description = document.querySelector('textarea[name=description]');
+			description.value = quill.root.innerHTML;
+		};
+	
         // JavaScript function to handle redirection to Stimmungskarte
         function redirectToStimmungskarte() {
             window.location.href = 'https://stimmungskartendemo.ermine.at';
@@ -312,4 +336,23 @@
         function redirectToBeitraege() {
             window.location.href = '/beitraege';
         }
+		// Show an alert if a success message is present
+        document.addEventListener("DOMContentLoaded", function(event) {
+            {% with messages = get_flashed_messages(category_filter=["success"]) %}
+                {% if messages %}
+                    alert("{{ messages[0] }}");
+                {% endif %}
+            {% endwith %}
+        });
     </script>
+
+	<script>
+		// Initialize the map
+		var map = L.map('map').setView([51.505, -0.09], 13); // Set the initial coordinates and zoom level
+
+		// Add an OpenStreetMap tile layer
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: '© OpenStreetMap contributors'
+		}).addTo(map);
+	</script>

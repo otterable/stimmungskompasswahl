@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stimmungskompass DEMO</title>
+	<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+</head>
+
+   <style>
+   
+   
+      body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f5f1e4;
+        color: black;
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+    }
+
+        img {
+            border-radius: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo {
+            max-width: 1000px; /* Increase the max-width to make it bigger */
+            margin-bottom: 30px;
+        }
+
+        img:hover {
+            transform: scale(1.03);
+        }
+
+        .button {
+            border-radius: 30px;
+            padding: 15px;
+            background-color: white;
+            font-weight: bold;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+
+        .input-field {
+            border-radius: 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .form-container {
+            margin: auto;
+            width: 50%;
+            padding: 10px;
+        }
+
+        .project img {
+            max-width: 300px; /* Adjust the width as needed */
+            max-height: 200px; /* Adjust the height as needed */
+            height: auto; /* Maintain aspect ratio */
+            width: auto; /* Maintain aspect ratio */
+            border-radius: 30px; /* Optional: if you want rounded corners */
+        }
+
+        /* Added CSS for the top bar */
+.top-bar {
+            background-color: #003056 ; /* Background color of the top bar */
+            height: 80px; /* Height of the top bar */
+            width: 100%; /* Full width of the screen */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20 20px; /* Add padding to the left and right */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+    .top-bar img {
+        max-height: 100%; /* Ensure the logo fits within the bar's height */
+    }
+
+   .top-bar a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px; /* Add spacing between links */
+        font-size: 18px; /* Increase text size */
+        font-weight: bold; /* Make text bold */
+        transition: transform 0.3s, font-weight 0.3s; /* Add transition effect */
+    }
+    .top-bar a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -3px; /* Adjust the position of the underscore */
+        width: 100%;
+        height: 2px;
+        background-color: white;
+        transform: scaleX(0); /* Initially hide the underscore */
+        transform-origin: right;
+        transition: transform 0.3s; /* Add transition effect for underscore */
+    }
+
+    .top-bar a:hover {
+        transform: scale(1.1); /* Scale to 1.1x on hover */
+        font-weight: bolder; /* Make it bolder on hover */
+    }
+
+    .top-bar a:hover::after {
+        transform: scaleX(1); /* Show the underscore on hover */
+        transform-origin: left;
+    }
+	
+.filter-bar {
+    background-color: #111111; /* Background color */
+    height: 80px; /* Bar height */
+    width: 100%; /* Full width */
+    display: flex;
+    justify-content: start; /* Align items to the start */
+    align-items: center;
+    padding: 0 20px; /* Horizontal padding */
+    box-sizing: border-box;
+    flex-wrap: nowrap; /* Prevent wrapping */
+}
+
+.filter-bar .filter-item label {
+    font-size: 18px; /* Adjust the font size for labels */
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Spacing between filter items */
+}
+
+.filter-item label {
+    color: white;
+    margin-right: 10px; /* Spacing between label and input/select */
+}
+
+/* Apply styles to fields within .filter-bar */
+.filter-bar input,
+.filter-bar select {
+    border-radius: 30px;
+    padding: 15px;
+    background-color: white;
+    font-weight: bold;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+
+
+    
+    .index-image {
+        width: 100%;
+        object-fit: cover; /* Crop the image when necessary */
+        max-height: 500px; /* Set a maximum height if needed */
+       border-radius: 0; /* Remove border-radius */
+    transition: none !important; /* Remove hover effect */
+	transform: none !important;
+}
+
+    .cover-text-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8); /* Black background with 70% opacity */
+        padding: 20px;
+        border-radius: 30px;
+        text-align: center;
+    }
+
+    .cover-text-container h1 {
+        font-size: 40px;
+        color: white;
+        margin: 0;
+        padding-bottom: 10px;
+    }
+
+    .cover-text-container p {
+        font-size: 30px;
+        color: white;
+        margin: 0;
+    }
+	
+	    .info-box-container {
+            display: flex;
+            justify-content: space-evenly;
+            padding: 20px;
+        }
+
+        .info-box {
+            background-color: #1b1b1b;
+            border-radius: 30px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            width: 30%; /* Set a fixed width for each box */
+        }
+
+        .info-box:hover {
+            transform: scale(1.03);
+        }
+        .info-box-icon {
+            max-width: 70px; /* Icon size */
+            border-radius: 50%; /* Make it circular */
+        }
+
+        .info-box-title {
+            color: white;
+            font-size: 30px;
+            margin: 10px 0;
+        }
+
+        .info-box-undertitle {
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Specific colors for each box */
+        .box-red {
+            background-color: #06467c ;
+        }
+
+        .box-blue {
+            background-color: #02569d ;
+        }
+
+        .box-green {
+            background-color: #2874A6 ;
+        }
+		
+	.info-text-field {
+            background-color: #F4F4F8; /* Light grey background */
+            width: 100%; /* Full width */
+            height: 400px; /* Specified height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        .info-text-container {
+            width: 50%; /* Width of the text container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .info-text-title {
+            font-size: 30px;
+            color: black;
+            margin-bottom: 10px;
+        }
+
+        .info-text-undertitle {
+            font-size: 20px;
+            color: black;
+            margin-top: 10px;
+        }
+/* CSS for project thumbnails */
+/* Style for project thumbnails */
+.project-thumbnail {
+    background-color: rgba(40, 116, 166, 0.3);
+    border-radius: 30px;
+    margin: 10px;
+    padding: 10px;
+    display: inline-block;
+    width: calc(30.33% - 20px); /* 3 equally sized thumbnails on desktop */
+    vertical-align: top; /* Align thumbnails to the top */
+    box-sizing: border-box; /* Include padding and margin in width calculation */
+    overflow: hidden; /* Prevent images from overflowing */
+    transition: transform 0.3s ease; /* Transition for hover effect */
+}
+
+/* Hover effect for project thumbnails */
+.project-thumbnail:hover {
+    transform: scale(1.03); /* Scale up on hover */
+}
+
+/* Image style within project thumbnails */
+.project-thumbnail img {
+    width: 100%; /* Set width to 100% to fill the container */
+    height: 100%; /* Set height to 100% to maintain aspect ratio */
+    object-fit: contain; /* Fit the entire image within the container without cropping */
+    border-radius: 30px; /* Rounded corners */
+    transition: none; /* Remove any transition effect */
+}
+
+/* Disable hover effect for images inside project thumbnails */
+.project-thumbnail img:hover {
+    transform: none; /* No transformation on hover */
+}
+
+
+
+
+/* Ensure images have a 4:3 aspect ratio */
+.project-thumbnail:after {
+    content: "";
+    display: block;
+}
+
+.project-list {
+    text-align: center; /* Center the projects horizontally */
+}
+
+    /* Overlay styles */
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .overlay-content {
+        background-color: white;
+        border-radius: 30px;
+        padding: 20px;
+        max-width: 80%;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+		display: none;
+    }
+	
+	/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+    </style>
+
+
+{% if current_user.is_authenticated %}
+    <div class="logged-in-info">
+        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
+    </div>
+{% endif %}
+
+
+<body>
+<!-- Top Bar -->
+<div class="top-bar">
+    <div id="category-choices" style="display: none;">
+        <!-- Category Buttons -->
+        <button class="categorybutton" onclick="parent.setCategory('#3d3d3d')" style="background-color: #3d3d3d;"><h3>Dieser Ort gefällt mir.</h3></button>
+        <!-- ... other buttons ... -->
+    </div>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    <div id="nav-links">
+        <a href="https://stimmungskartendemo.ermine.at">Map</a>
+        <a href="/list">Suggestions</a> <!-- Updated this line -->
+        <a href="/beitraege">Submit a project</a>
+        <a href="#">About participatory planning</a>
+        <a href="#">Contact</a>
+		<a href="{{ url_for('opendata') }}">Open Data</a>
+
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
+        {% else %}
+            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
+        {% endif %}
+    </div>
+</div>
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <form id="filter-form" action="{{ url_for('list_view') }}" method="get" style="display: flex; align-items: center;">
+        <div class="filter-item">
+            <label for="search">Suchen:</label>
+            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Search project titles...">
+        </div>
+
+        <div class="filter-item">
+            <label for="category">Category:</label>
+            <select name="category" id="category">
+                <option value="">All Categories</option>
+                {% set current_category = request.args.get('category', '') %}
+                <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
+                <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Public spaces</option>
+                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Environment</option>
+                <option value="Verwaltung" {% if current_category == 'Verwaltung' %}selected{% endif %}>Verwaltung</option>
+                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Culture</option>
+                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Education</option>
+                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Health</option>
+                <option value="Sport" {% if current_category == 'Sport' %}selected{% endif %}>Sport</option>
+                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label for="age">Age:</label>
+            <select name="age" id="age">
+                {% set current_age = request.args.get('age', '') %}
+                <option value="" {% if current_age == 'newest' %}selected{% endif %}>Newest</option>
+                <option value="oldest" {% if current_age == 'oldest' %}selected{% endif %}>Oldest</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label for="score">Score:</label>
+            <select name="score" id="score">
+                <option value="">Sort by score</option>
+                {% set current_score = request.args.get('score', '') %}
+                <option value="highest" {% if current_score == 'highest' %}selected{% endif %}>Highest Score</option>
+                <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Lowest Score</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+
+<h1>Citizen-submitted projects:</h1>
+<div class="project-list">
+  {% for project in projects %}
+<div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">
+    <h2>{{ project.name }}</h2>
+    <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+    <p>{{ project.description }}</p>
+    <p>Date: {{ project.date.strftime('%Y-%m-%d') }}</p>
+</div>
+{% endfor %}
+
+</div>
+
+
+
+
+<!-- Overlay -->
+<div class="overlay" id="overlay">
+    <div class="overlay-content">
+        <span class="close-btn" onclick="closeOverlay()">&#10006;</span>
+        <h2 id="overlay-title"></h2>
+        <img id="overlay-image" src="" alt="">
+        <p id="overlay-description"></p>
+        <p>Full Description: <span id="overlay-full-description"></span></p>
+        <p>Author: <span id="overlay-author"></span></p>
+        <p>Date: <span id="overlay-date"></span></p>
+    </div>
+</div>
+
+
+<div id="projectModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<script>
+    function openModal(projectId) {
+        // AJAX request to get project details
+        fetch(`/project/${projectId}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('modalBody').innerHTML = html;
+                document.getElementById('projectModal').style.display = 'block';
+            });
+    }
+
+    function closeModal() {
+        document.getElementById('projectModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('projectModal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectID = urlParams.get('projectID');
+    
+    if (projectID) {
+        showOverlayForProjectID(projectID);
+    }
+
+    document.querySelectorAll('.project-thumbnail').forEach(item => {
+    item.addEventListener('click', function() {
+        const projectID = this.getAttribute('data-project-id');
+        history.pushState(null, '', '/project/' + projectID);
+        showOverlayForProjectID(projectID);
+    });
+});
+
+    document.getElementById('overlay').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeOverlay();
+            history.pushState(null, '', '/list');
+        }
+    });
+});
+
+function showOverlayForProjectID(projectID) {
+    fetch('/api/project/' + projectID) // Assuming you have an API endpoint to get project details
+        .then(response => response.json())
+        .then(data => {
+            // Update overlay content with project details
+            document.getElementById('overlay-title').textContent = data.title;
+            document.getElementById('overlay-description').textContent = data.description;
+            // ... set other details
+
+            document.getElementById('overlay').style.display = 'flex';
+        });
+}
+
+function closeOverlay() {
+    document.getElementById('overlay').style.display = 'none';
+}
+</script>
+
+<script>
+    // Function to show the overlay with project details
+    function showOverlay(title, description, image, fullDescription, author, date) {
+        document.getElementById("overlay-title").textContent = title;
+        document.getElementById("overlay-description").textContent = description;
+        document.getElementById("overlay-image").src = "{{ url_for('static', filename='usersubmissions/') }}" + image;
+        document.getElementById("overlay-full-description").textContent = fullDescription;
+        document.getElementById("overlay-author").textContent = author;
+        document.getElementById("overlay-date").textContent = date;
+
+        // Show the overlay
+        document.getElementById("overlay").style.display = "flex";
+      // Update URL without reloading the page
+    history.pushState({}, '', '/project/' + projectId); // Adjust 'projectId' accordingly
+}
+
+
+    // Function to close the overlay
+    function closeOverlay() {
+        document.getElementById("overlay").style.display = "none";
+		    history.pushState({}, '', '/list');
+
+    }
+	
+document.addEventListener("DOMContentLoaded", function() {
+    {% if active_project %}
+        // Code to display the overlay with active_project details
+        showOverlay('{{ active_project.name }}', '{{ active_project.description }}', '{{ url_for('static', filename='usersubmissions/' + active_project.image_file) }}', '{{ active_project.full_description }}', '{{ active_project.author }}', '{{ active_project.date.strftime('%Y-%m-%d') }}');
+    {% endif %}
+});
+
+    // Add event listeners when DOM content is loaded
+    document.addEventListener("DOMContentLoaded", function(event) {
+        // Close overlay when clicking outside the overlay content
+        document.getElementById("overlay").addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeOverlay();
+            }
+        });
+
+        // Function to show user information
+        function showUserInfo() {
+            {% if current_user.is_authenticated %}
+                document.querySelector(".logged-in-info").style.display = "block";
+            {% endif %}
+        }
+
+        // Function to hide user information
+        function hideUserInfo() {
+            document.querySelector(".logged-in-info").style.display = "none";
+        }
+
+        // Add hover event listeners to the top bar
+        document.querySelector(".top-bar").addEventListener("mouseenter", showUserInfo);
+        document.querySelector(".top-bar").addEventListener("mouseleave", hideUserInfo);
+
+        // Initially hide user information
+        hideUserInfo();
+
+        // Event listener for filter form changes
+        document.getElementById('filter-form').addEventListener('change', function() {
+            this.submit();
+        });
+
+        // Delayed search functionality
+        document.getElementById('search').addEventListener('input', function() {
+            clearTimeout(window.searchTimer);
+            window.searchTimer = setTimeout(function() {
+                document.getElementById('filter-form').submit();
+            }, 500); // Adjust delay as needed
+        });
+
+        // Redirect functions
+        function redirectToStimmungskarte() {
+            window.location.href = 'https://stimmungskartendemo.ermine.at';
+        }
+
+        function redirectToNeuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
+        }
+
+        function redirectToBeitraege() {
+            window.location.href = '/beitraege';
+        }
+
+        // Display success message alert, if any
+        {% with messages = get_flashed_messages(category_filter=["success"]) %}
+            {% if messages %}
+                alert("{{ messages[0] }}");
+            {% endif %}
+        {% endwith %}
+    });
+</script>

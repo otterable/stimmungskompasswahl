@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Voting</title>
+    <title>Stimmungskompass DEMO</title>
 </head>
 
    <style>
@@ -26,7 +26,7 @@
         }
 
         img:hover {
-            transform: scale(1.1);
+            transform: scale(1.03);
         }
 
         .button {
@@ -61,50 +61,92 @@
 
         /* Added CSS for the top bar */
 .top-bar {
-            background-color: #003056 ; /* Background color of the top bar */
-            height: 80px; /* Height of the top bar */
-            width: 100%; /* Full width of the screen */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20 20px; /* Add padding to the left and right */
-            box-sizing: border-box; /* Include padding in width calculation */
-        }
+    background-color: #003056; /* Background color of the top bar */
+    height: 80px; /* Height of the top bar */
+    width: 100%; /* Full width of the screen */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px; /* Add padding to the left and right */
+    box-sizing: border-box; /* Include padding in width calculation */
+    align-items: center; /* This ensures vertical alignment */
+}
+.top-bar a .logo {
+    max-width: auto; /* Adjust this value as needed */
+    max-height: 80px; /* Ensure the logo fits within the bar's height */
+margin: auto;
+}
 
-    .top-bar img {
-        max-height: 100%; /* Ensure the logo fits within the bar's height */
-    }
+/* Styles for buttons inside links in the top bar */
+.top-bar a button {
+    transition: transform 0.3s ease; /* Transition for the transform property */
+    border-radius: 30px; /* If you want to keep the border-radius */
+    /* Add any other button-specific styles here */
+}
 
-   .top-bar a {
-        color: white;
-        text-decoration: none;
-        margin-right: 20px; /* Add spacing between links */
-        font-size: 18px; /* Increase text size */
-        font-weight: bold; /* Make text bold */
-        transition: transform 0.3s, font-weight 0.3s; /* Add transition effect */
-    }
-    .top-bar a::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: -3px; /* Adjust the position of the underscore */
-        width: 100%;
-        height: 2px;
-        background-color: white;
-        transform: scaleX(0); /* Initially hide the underscore */
-        transform-origin: right;
-        transition: transform 0.3s; /* Add transition effect for underscore */
-    }
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
 
-    .top-bar a:hover {
-        transform: scale(1.1); /* Scale to 1.1x on hover */
-        font-weight: bolder; /* Make it bolder on hover */
-    }
 
-    .top-bar a:hover::after {
-        transform: scaleX(1); /* Show the underscore on hover */
-        transform-origin: left;
-    }
+/* Hover effect for links in the top bar */
+.top-bar a:not(:has(button)):hover::after {
+    transform: scaleX(1); /* Show the underscore on hover */
+    transform-origin: left;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px; /* Add spacing between links */
+    font-size: 18px; /* Increase text size */
+    font-weight: bold; /* Make text bold */
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease; /* Transition for color and text shadow */
+}
+
+.top-bar a:hover {
+    color: #a8c0ff; /* Change color on hover */
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7); /* Add text shadow on hover */
+}
+
+.top-bar a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
+
+/* Underline effect for links that do not contain buttons */
+.top-bar a:not(:has(> button))::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect to show underline for links that do not contain buttons */
+.top-bar a:not(:has(> button)):hover::after {
+    transform: scaleX(1);
+}
     
     .index-image {
         width: 100%;
@@ -305,18 +347,20 @@
     text-align: center;
 }
 
+
+
     </style>
 
 
 {% if current_user.is_authenticated %}
     <div class="logged-in-info">
-        Logged in as: {{ current_user.name }}, {{ current_user.surname }}
+        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
     </div>
 {% endif %}
 
 
 <body>
-    <!-- Top Bar -->
+<!-- Top Bar -->
 <div class="top-bar">
     <div class="hamburger-menu" onclick="toggleOverlay()">☰ Kategorie auswählen</div>
     <div id="category-choices" style="display: none;">
@@ -324,13 +368,16 @@
         <button class="categorybutton" onclick="parent.setCategory('#3d3d3d')" style="background-color: #3d3d3d;"><h3>Dieser Ort gefällt mir.</h3></button>
         <!-- ... other buttons ... -->
     </div>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    <div id="nav-links">
+    <a href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        </a>    <div id="nav-links">
         <a href="https://stimmungskartendemo.ermine.at">Map</a>
-        <a href="#">Suggestions</a>
-        <a href="#">Submit a project</a>
+        <a href="/list">Suggestions</a> <!-- Updated this line -->
+        <a href="/beitraege">Submit a project</a>
         <a href="#">About participatory planning</a>
         <a href="#">Contact</a>
+		<a href="{{ url_for('opendata') }}">Open Data</a>
+
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
         {% else %}
@@ -338,6 +385,7 @@
         {% endif %}
     </div>
 </div>
+
 
     <img src="{{ url_for('static', filename='index_titleimage.png') }}" alt="Index Title Image" class="index-image">
 <div class="index-image">
@@ -379,17 +427,7 @@
 			<p class="info-text-undertitle">The power to make this town better lies in your hands!</p>
         </div>
     </div>
-    <!-- Rest of your content -->
-    <div class="container">
-        {% if current_user.is_authenticated %}
-            <div class="logged-in-info">
-                Logged in as: {{ current_user.name }}, {{ current_user.surname }}
-            </div>
-        {% endif %}
-
-
-     
-    </div>
+   
 </body>
 </html>
 

@@ -1,0 +1,14 @@
+<!-- project_detail.html -->
+{% extends "base.html" %} <!-- or your main layout file -->
+
+{% block content %}
+<div class="overlay">
+    <div class="overlay-content">
+        <span class="close-btn" onclick="window.history.back();">&#10006;</span>
+        <h2>{{ project.name }}</h2>
+        <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+        <p>{{ project.description }}</p>
+        <!-- Add other project details -->
+    </div>
+</div>
+{% endblock %}
