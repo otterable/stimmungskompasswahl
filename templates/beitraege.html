@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>Stimmungskompass DEMO</title>
 	<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
@@ -33,27 +32,71 @@
             transform: scale(1.1);
         }
 
-        .button {
-            border-radius: 30px;
-            padding: 15px;
-            background-color: white;
-            font-weight: bold;
-            color: black;
-            border: none;
-            cursor: pointer;
+   .form-container {
+            margin: 40px auto;
+            width: 60%;
+            background-color: #fff;
+            padding: 40px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-sizing: border-box;
         }
 
         .input-field {
-            border-radius: 5px;
-            padding: 5px;
-            border: 1px solid #ccc;
+            margin-bottom: 30px;
         }
 
-        .form-container {
-            margin: auto;
-            width: 50%;
-            padding: 10px;
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #333;
         }
+
+        input[type="text"],
+        select,
+        #description-editor,
+        #benefit-editor {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            border: none;
+        }
+    .button {
+    border-radius: 30px;
+    padding: 15px;
+    background-color: white;
+    font-weight: bold;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+.publish-button {
+    width: 100%; /* Full width */
+    padding: 20px 0; /* Vertical padding */
+    font-size: 20px; /* Font size */
+    background-color: #2874A6; /* Background color */
+    color: white; /* Text color */
+    border-radius: 30px; /* Border radius */
+    border: none; /* No border by default */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: transform 0.3s ease, border 0.3s ease; /* Smooth transition for transform and border */
+}
+
+.publish-button:hover {
+    transform: scale(1.03); /* Scale up on hover */
+    border: 2px solid black; /* Thin black border on hover */
+}
+
 
         .project img {
             max-width: 300px; /* Adjust the width as needed */
@@ -63,53 +106,119 @@
             border-radius: 30px; /* Optional: if you want rounded corners */
         }
 
-        /* Added CSS for the top bar */
-.top-bar {
-            background-color: #003056 ; /* Background color of the top bar */
-            height: 80px; /* Height of the top bar */
-            width: 100%; /* Full width of the screen */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20 20px; /* Add padding to the left and right */
-            box-sizing: border-box; /* Include padding in width calculation */
-        }
+ .top-bar {
+    background-color: #003056; /* Background color of the top bar */
+    height: 80px; /* Height of the top bar */
+    width: 100%; /* Full width of the screen */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px; /* Add padding to the left and right */
+    box-sizing: border-box; /* Include padding in width calculation */
+    align-items: center; /* This ensures vertical alignment */
+}
+.top-bar a .logo {
+    max-width: auto; /* Adjust this value as needed */
+    max-height: 80px; /* Ensure the logo fits within the bar's height */
+margin: auto;
+}
 
-    .top-bar img {
-        max-height: 100%; /* Ensure the logo fits within the bar's height */
-    }
+/* Styles for buttons inside links in the top bar */
+.top-bar a button {
+    transition: transform 0.3s ease; /* Transition for the transform property */
+    border-radius: 30px; /* If you want to keep the border-radius */
+    /* Add any other button-specific styles here */
+}
 
-   .top-bar a {
-        color: white;
-        text-decoration: none;
-        margin-right: 20px; /* Add spacing between links */
-        font-size: 18px; /* Increase text size */
-        font-weight: bold; /* Make text bold */
-        transition: transform 0.3s, font-weight 0.3s; /* Add transition effect */
-    }
-    .top-bar a::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: -3px; /* Adjust the position of the underscore */
-        width: 100%;
-        height: 2px;
-        background-color: white;
-        transform: scaleX(0); /* Initially hide the underscore */
-        transform-origin: right;
-        transition: transform 0.3s; /* Add transition effect for underscore */
-    }
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
 
-    .top-bar a:hover {
-        transform: scale(1.1); /* Scale to 1.1x on hover */
-        font-weight: bolder; /* Make it bolder on hover */
-    }
 
-    .top-bar a:hover::after {
-        transform: scaleX(1); /* Show the underscore on hover */
-        transform-origin: left;
-    }
-    
+/* Hover effect for links in the top bar */
+.top-bar a:not(:has(button)):hover::after {
+    transform: scaleX(1); /* Show the underscore on hover */
+    transform-origin: left;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px; /* Add spacing between links */
+    font-size: 18px; /* Increase text size */
+    font-weight: bold; /* Make text bold */
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease; /* Transition for color and text shadow */
+}
+
+
+/* Exclude the logo link from having the underline effect */
+.top-bar a[href="/"]:hover::after {
+    content: none;
+}
+/* Underline effect for links that do not contain the logo */
+.top-bar a:not(:has(> .logo))::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Additional styles for .logo to ensure it fits well in the top bar */
+.top-bar a .logo {
+    max-width: auto; /* Adjust this value as needed */
+    max-height: 80px; /* Ensure the logo fits within the bar's height */
+    margin: auto;
+}
+.top-bar a:hover {
+    color: #a8c0ff; /* Change color on hover */
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7); /* Add text shadow on hover */
+}
+
+.top-bar a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
+
+/* Underline effect for links that do not contain buttons */
+.top-bar a:not(:has(> button))::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect to show underline for links that do not contain buttons */
+.top-bar a:not(:has(> button)):hover::after {
+    transform: scaleX(1);
+}
+	
     .index-image {
         width: 100%;
         object-fit: cover; /* Crop the image when necessary */
@@ -222,6 +331,128 @@
             margin-top: 10px;
         }
 
+@media only screen and (max-width: 1445px) {
+.top-bar a button {
+    transition: transform 0.3s ease; /* Transition for the transform property */
+    border-radius: 30px; /* If you want to keep the border-radius */
+	padding: 7px;
+    /* Add any other button-specific styles here */
+}
+}
+#hamburger-button {
+    display: none; /* Hidden by default */
+	}
+@media only screen and (max-width: 1080px) {
+    body {
+        font-size: 14px; /* Smaller font size */
+    }
+    .top-bar {
+        flex-direction: column; /* Stack items vertically */
+        height: auto; /* Adjust height automatically */
+    }
+    .form-container {
+        width: 90%; /* Full width with some margin */
+        padding: 20px; /* Smaller padding */
+    }
+    .publish-button {
+        font-size: 18px; /* Slightly smaller font size */
+        padding: 15px 0; /* Adjust padding */
+    }
+
+	
+	/* Hamburger Menu Button */
+#hamburger-button {
+    display: none; /* Hidden by default */
+    font-size: 30px; /* Icon size */
+    color: white; /* Icon color */
+    background: none; /* No background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Navigation Overlay */
+.nav-overlay {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed position */
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    transition: 0.5s; /* Smooth transition for opening/closing */
+    z-index: 1000; /* High z-index to ensure it's on top */
+}
+
+.nav-overlay-active .main-content {
+    pointer-events: none;
+}
+
+/* Mobile Devices */
+@media only screen and (max-width: 1080px) {
+    #hamburger-button {
+        display: block; /* Show the button on mobile */
+    }
+
+    .top-bar a .logo {
+        margin-left: auto; /* Adjust logo position */
+		margin-right: auto;
+    }
+
+    #nav-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    #nav-links a {
+        padding: 20px; /* Larger clickable area */
+        font-size: 24px; /* Larger font size */
+    }
+}
+
+/* Mobile Devices */
+@media only screen and (max-width: 1080px) {
+    .top-bar {
+        flex-direction: row; /* Align items horizontally */
+        justify-content: space-between; /* Space between items */
+        align-items: center; /* Vertically center items */
+        padding: 10px 15px; /* Consistent padding */
+    }
+
+    .top-bar a {
+        display: flex; /* Flex container for the logo */
+        align-items: center; /* Vertically center logo */
+        margin: 0; /* Remove any default margin */
+    }
+
+    .top-bar a .logo {
+        max-width: 350px; /* Adjust logo size */
+        max-height: 350px; /* Adjust height automatically */
+    }
+
+    #hamburger-button {
+        display: block; /* Show the button on mobile */
+        margin: 0; /* Remove any margin */
+        align-self: center; /* Explicitly center the button vertically */
+    }
+
+   
+        #nav-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+
+    #nav-links a {
+        padding: 20px; /* Padding for each link */
+        font-size: 24px; /* Font size for links */
+    }
+}
+
     </style>
 
 
@@ -235,19 +466,20 @@
 <body>
 <!-- Top Bar -->
 <div class="top-bar">
-    <div id="category-choices" style="display: none;">
-        <!-- Category Buttons -->
-        <button class="categorybutton" onclick="parent.setCategory('#3d3d3d')" style="background-color: #3d3d3d;"><h3>Dieser Ort gefällt mir.</h3></button>
-        <!-- ... other buttons ... -->
-    </div>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    <div id="nav-links">
+
+		<a href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        </a>  
+		    <button id="hamburger-button">&#9776;</button>
+
+		<div id="nav-overlay" class="nav-overlay">
+		<div id="nav-links">
         <a href="https://stimmungskartendemo.ermine.at">Map</a>
         <a href="/list">Suggestions</a> <!-- Updated this line -->
         <a href="/beitraege">Submit a project</a>
-        <a href="#">About participatory planning</a>
-        <a href="#">Contact</a>
-		<a href="{{ url_for('opendata') }}">Open Data</a>
+        <a href="/erfolge">Success stories</a>
+       <a href="/ueber">Contact</a>
+		 <a href="/opendata">Open Data</a>
 
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
@@ -256,32 +488,21 @@
         {% endif %}
     </div>
 </div>
-<!-- Main Content -->
+</div>
+
+
 <div class="form-container">
-    <h1>Create your own Project showcase!</h1>
+    <h1>Teilen Sie Ihre eigene Idee!</h1>
     <form method="POST" enctype="multipart/form-data" action="/submit_project">
-        <!-- Title -->
-        <div class="input-field">
-            <label for="title">1. Add a Title (name)</label>
-            <input type="text" id="title" name="title" required>
-        </div>
+        <!-- Step 1: Title -->
+	<div class="input-field">
+		<label for="title">1. Add a Title for your project</label>
+		<p style="color: #003056;">How can you sum up your idea in a few words?</p> <!-- Added description -->
+		<input type="text" id="title" name="name" required>
+	</div>
 
-        <!-- Description -->
-		<div class="input-field">
-			<label for="description">2. Write a description</label>
-			<!-- Quill editor container -->
-			<div id="editor" style="height: 200px;"></div>
-			<!-- Hidden textarea to store the Quill editor content -->
-			<textarea id="description" name="description" style="display:none;"></textarea>
-		</div>
 
-        <!-- Image Upload -->
-        <div class="input-field">
-            <label for="image">3. Upload an image (required)</label>
-            <input type="file" id="image" name="image" accept="image/*" required>
-        </div>
-
-        <!-- Category Selection -->
+       <!-- Category Selection -->
         <div class="input-field">
             <label for="category">4. Select a category</label>
             <select id="category" name="category" required>
@@ -296,33 +517,180 @@
                 <option value="Other">Other</option>
             </select>
         </div>
+		<div id="category-description">
+		<!-- Dynamic category description text will appear here -->
+		</div>
+
+
+      <!-- Step 3: Description -->
+<div class="input-field" style="margin-top:40px">
+    <label for="descriptionwhy">3. Write a description of your project, and why you are suggesting it</label>
+	<p style="color: #003056;">Provide a detailed explanation of what you believe should be improved and the reasons behind your project idea.</p>
+    <div id="description-editor"></div> <!-- Quill container -->
+<textarea id="descriptionwhy" name="descriptionwhy" style="display:none;"></textarea>
+</div>
+
+<!-- Step 4: Benefit -->
+<div class="input-field">
+    <label for="public_benefit">4. How will the public benefit from your project?</label>
+		<p style="color: #003056;">Sum up in 1-3 sentences how others will benefit from your idea.</p>
+    <div id="benefit-editor"></div> <!-- Quill container -->
+<textarea id="public_benefit" name="public_benefit" style="display:none;"></textarea>
+</div>
+
+        <!-- Step 5: Image Upload -->
+        <div class="input-field">
+            <label for="image">5. Add an image to represent your project</label>
+<p style="color: #003056;">Please share a picture that best represents your project. In most cases, a photo of the affected location works great!</p>
+<input type="file" id="image" name="image_file" accept="image/*" required>
+        </div>
+
+        <!-- Step 6: Map Location -->
+        <!-- ... Add Map Integration if needed ... -->
 
         <!-- Publish Button -->
-        <button type="submit" class="button" onclick="console.log('Publish button clicked');">Publish</button>
+<button type="submit" class="button publish-button" onclick="console.log('Publish button clicked');">Publish</button>
+
     </form>
 </div>
-<!-- Map Container -->
-<div id="map" style="height: 400px;"></div>
+
 
 </body>
 </html>
-</body>
-</html>
+<script>
+    // Toggle the navigation overlay when the hamburger button is clicked
+    document.getElementById('hamburger-button').addEventListener('click', function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        navOverlay.classList.toggle('nav-overlay-active');
+    });
 
+    // Close the navigation overlay when clicking on the overlay background or on a non-button element
+    document.getElementById('nav-overlay').addEventListener('click', function(event) {
+        // Close only if the clicked element is not a button or a link
+        if (!event.target.closest('button, a')) {
+            closeNavOverlay();
+        }
+    });
 
-    <script>
-		// Initialize Quill editor
-		var quill = new Quill('#editor', {
-			theme: 'snow'
-		});
+    // Function to close the navigation overlay
+    function closeNavOverlay() {
+        var navOverlay = document.getElementById('nav-overlay');
+        navOverlay.classList.remove('nav-overlay-active');
+    }
 
-		// Listen for form submission
-		document.querySelector('form').onsubmit = function() {
-			var description = document.querySelector('textarea[name=description]');
-			description.value = quill.root.innerHTML;
-		};
+    // Prevent closing when clicking on buttons (delegation)
+    document.getElementById('nav-links').addEventListener('click', function(event) {
+        if (event.target.tagName === 'BUTTON' || event.target.tagName === 'A') {
+            event.stopPropagation();
+        }
+    });
+
+    // Resize event listener
+    window.addEventListener('resize', function() {
+        // Check if the window width is greater than the threshold for mobile view
+        if (window.innerWidth > 1080) {
+            // Make sure the nav-overlay is displayed
+            document.getElementById('nav-overlay').classList.add('nav-overlay-active');
+        } else {
+            // For mobile view, revert back to the default behavior
+            document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+        }
+    });
+
+   
+
+    // Function to update the category description text
+    function updateCategoryText() {
+        const categorySelect = document.getElementById("category");
+        const categoryDescription = document.getElementById("category-description");
+        const selectedOption = categorySelect.value;
+        
+        let categoryText = "";
+        
+        switch (selectedOption) {
+            case "Transport":
+                categoryText = "Do you wish for a new Radweg? New bus connection? Is a street in bad shape? Could your idea solve the parking situation? Share your ideas with us!";
+                break;
+            case "Public spaces":
+                categoryText = "Whether it's revitalizing parks, transforming public squares, introducing new green spaces, or adding a wasserquelle somewhere, we want to hear your ideas.";
+                break;
+            case "Environment":
+                categoryText = "We're seeking innovative ideas to make our town more environmentally sustainable and future-proof. Whether it's green initiatives, eco-friendly projects, or sustainable practices, your thoughts can drive the change.";
+                break;
+            case "Verwaltung":
+                categoryText = "Got ideas to enhance our city administration? Share your thoughts on increasing openness, hosting more public events, and fostering community engagement.";
+                break;
+            case "Culture":
+                categoryText = "Share your ideas for concerts, art installations, public workshops, events, and preserving our heritage statues and churches.";
+                break;
+            case "Education":
+                categoryText = "Ideas that could help education.";
+                break;
+            case "Health":
+                categoryText = "Ideas that could make the town healthier.";
+                break;
+            case "Sport":
+                categoryText = "Ideas that could support sport.";
+                break;
+            case "Other":
+                categoryText = "Have a unique idea that doesn't fit into the categories above? Whether it's about improving infrastructure, promoting wellness, enhancing safety, or any other innovative concept, we want to hear it.";
+                break;
+            default:
+                categoryText = "";
+                break;
+        }
+        
+        categoryDescription.textContent = categoryText;
+        categoryDescription.style.color = "#003056" // Set the text color to #003056
+    }
+    
+    // Initialize the category text when the page loads
+    window.addEventListener("load", updateCategoryText);
+    
+    // Listen for changes in the category selection
+    const categorySelect = document.getElementById("category");
+    categorySelect.addEventListener("change", updateCategoryText);
 	
-        // JavaScript function to handle redirection to Stimmungskarte
+	
+    // Initialize Quill editor for 'descriptionwhy'
+    var descriptionEditor = new Quill('#description-editor', {
+        theme: 'snow'
+    });
+
+    // Initialize Quill editor for 'public_benefit'
+    var benefitEditor = new Quill('#benefit-editor', {
+        theme: 'snow'
+    });
+
+    // Function to check if the editor content is effectively empty
+    function isEditorContentEmpty(editor) {
+        return editor.getText().trim().length === 0;
+    }
+
+    // Listen for form submission
+    document.querySelector('form').addEventListener('submit', function(event) {
+        // Get HTML content from Quill editor
+        var descriptionContent = descriptionEditor.root.innerHTML;
+        var benefitContent = benefitEditor.root.innerHTML;
+
+        // Check if editors are effectively empty
+        if(isEditorContentEmpty(descriptionEditor)) {
+            alert('Please fill in the description.');
+            event.preventDefault(); // Prevent form submission
+            return false;
+        }
+
+        if(isEditorContentEmpty(benefitEditor)) {
+            alert('Please fill in the public benefit.');
+            event.preventDefault(); // Prevent form submission
+            return false;
+        }
+
+        // Set the content to the hidden textareas
+        document.querySelector('textarea[name="descriptionwhy"]').value = descriptionContent;
+        document.querySelector('textarea[name="public_benefit"]').value = benefitContent;
+    });
+	// JavaScript function to handle redirection to Stimmungskarte
         function redirectToStimmungskarte() {
             window.location.href = 'https://stimmungskartendemo.ermine.at';
         }
@@ -344,15 +712,5 @@
                 {% endif %}
             {% endwith %}
         });
-    </script>
+</script>
 
-	<script>
-		// Initialize the map
-		var map = L.map('map').setView([51.505, -0.09], 13); // Set the initial coordinates and zoom level
-
-		// Add an OpenStreetMap tile layer
-		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			maxZoom: 19,
-			attribution: '© OpenStreetMap contributors'
-		}).addTo(map);
-	</script>

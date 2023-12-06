@@ -8,14 +8,10 @@ db = SQLAlchemy()
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     surname = db.Column(db.String(100), nullable=False)
-    street = db.Column(db.String(100), nullable=False)
-    town = db.Column(db.String(100), nullable=False)
-    plz = db.Column(db.String(10), nullable=False)
-    bundesland = db.Column(db.String(50), nullable=False)
+    
     ip_address = db.Column(db.String(100))  # Assuming you'll set this at registration
     highlight_id = db.Column(db.Integer)  # Assuming this is an integer field
     account_creation = db.Column(db.DateTime, default=datetime.utcnow)
@@ -29,23 +25,29 @@ class User(db.Model, UserMixin):
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(300), nullable=False)
-    image_file = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(100), nullable=False)  # Add this line for the category
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-    author = db.Column(db.String(100), nullable=False)  # Added author field
+    category = db.Column(db.String(100), nullable=False)
+    descriptionwhy = db.Column(db.String(300), nullable=False)  # Why the project is suggested
+    public_benefit = db.Column(db.String(300), nullable=False)  # How the public will benefit
+    image_file = db.Column(db.String(100), nullable=False)  # Path to the image file
+    geoloc = db.Column(db.String(100))  # Geolocation data (optional)
+    date = db.Column(db.DateTime, default=datetime.utcnow)  # Date of project creation
+    author = db.Column(db.String(100), nullable=False)  # Author of the project
+
+    # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True)
     downvotes = db.relationship('Downvote', backref='project', lazy=True)
     comments = db.relationship('Comment', backref='project', lazy=True)
-    
+
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description,
-            "image_file": self.image_file,
             "category": self.category,
-            "date": self.date.strftime("%Y-%m-%d %H:%M:%S"),
+            "descriptionwhy": self.descriptionwhy,
+            "public_benefit": self.public_benefit,
+            "image_file": self.image_file,
+            "geoloc": self.geoloc,
+            "date": self.date.strftime("%Y-%m-%d %H:%M:%S") if self.date else None,
             "author": self.author
         }
 
@@ -59,9 +61,14 @@ class Vote(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "project_id": self.project_id,
-            "user_id": self.user_id,
-            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            "name": self.name,
+            "category": self.category,
+            "descriptionwhy": self.descriptionwhy,
+            "public_benefit": self.public_benefit,
+            "image_file": self.image_file,
+            "geoloc": self.geoloc,
+            "date": self.date.strftime("%Y-%m-%d %H:%M:%S"),
+            "author": self.author
         }
         
 class Comment(db.Model):

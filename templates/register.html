@@ -29,7 +29,7 @@
 			                margin-top: 10px !important; /* 4px margin on all sides */
 
             align-items: center;
-			margin-bottom: 0px;
+			margin-bottom: 50px;
             padding: 5px 5px; /* Adjust as needed */
              cursor: pointer; /* Change cursor to indicate clickable */
             transition: transform 0.3s ease; /* Smooth transition for scaling */
@@ -298,68 +298,38 @@
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
 </div>
 
-    <div class="container">
-	
-        <div class="register-section">
-            <h1>Register your account here!</h1>
-
-            <form action="{{ url_for('register') }}" method="post">
-                <div class="form-section">
-    <label for="phone">Phone (required)</label>
-    <div class="phone-input-container">
-        <span class="phone-prefix">+43</span>
-<input type="text" name="phone_number" placeholder="Phone Number" required>
-    </div>
-
-    <label for="email">Mail address (not required)</label>
-    <input type="email" id="email" name="email" required maxlength="100">
-
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" required maxlength="100">
-
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" required maxlength="100">
-
-                    <label for="surname">Surname</label>
-    <input type="text" id="surname" name="surname" required maxlength="100">
-
-                 
+<div class="container">
+    <div class="register-section">
+        <h1>Register your account here!</h1>
+        <form action="{{ url_for('register') }}" method="post">
+            <div class="form-section">
+                <label for="phone">Phone</label>
+                <div class="phone-input-container">
+                    <input type="text" name="phone_number" placeholder="Phone Number" required>
                 </div>
 
-                <div class="form-section">
-                    <label for="street">Street and house number</label>
-                    <input type="text" id="street" name="street" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required maxlength="100">
 
-                    <label for="town">Town</label>
-                    <input type="text" id="town" name="town" required>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required maxlength="100">
 
-                     <label for="plz">PLZ</label>
-						<input type="text" id="plz" name="plz" required maxlength="4"> <!-- Max 4 characters -->
+                <label for="surname">Surname</label>
+                <input type="text" id="surname" name="surname" required maxlength="100">
+            </div>
 
-						<label for="bundesland">Bundesland</label>
-						<select id="bundesland" name="bundesland" required>
-							<option value="Wien">Wien</option>
-							<option value="Niederösterreich">Niederösterreich</option>
-							<option value="Oberösterreich">Oberösterreich</option>
-							<option value="Steiermark">Steiermark</option>
-							<option value="Kärnten">Kärnten</option>
-							<option value="Vorarlberg">Vorarlberg</option>
-							<option value="Burgenland">Burgenland</option>
-						</select>
-                </div>
+            <p class="informative-text">Aside from your first name, no details will be publicly shown.</p>
+            <p class="informative-text">At any time, you can download a copy of all your data within your profile settings.</p>
 
-                <p class="informative-text">Aside from your first name, no details will be publicly shown.</p>
-                <p class="informative-text">At any time, you can download a copy of all your data within your profile settings.</p>
-                <p class="informative-text">You may be contacted by the Gemeinde, if your project catches attention.</p>
-
-                <button type="submit" class="register-button">Register</button>
-            </form>
-        </div>
-		<div class="cover-section">
-            <img src="{{ url_for('static', filename='login_titleimage.png') }}" alt="Cover Image" class="cover-image">
-           
-        </div>
+            <button type="submit" class="register-button">Register</button>
+        </form>
     </div>
+
+    <div class="cover-section">
+        <img src="{{ url_for('static', filename='login_titleimage.png') }}" alt="Cover Image" class="cover-image">
+    </div>
+</div>
+
 </body>
 </html>
    <script>

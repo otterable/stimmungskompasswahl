@@ -153,22 +153,23 @@ def calculate_age(dob):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        print(request.form)  # Debug: print form data
-        phone_number = request.form.get('phone_number')  # Use .get() for safer access
-        email = request.form['email']
-        password = request.form['password']
-        name = request.form['name']
-        surname = request.form['surname']
-        street = request.form['street']
-        town = request.form['town']
-        plz = request.form['plz']
-        bundesland = request.form['bundesland']
+        logging.debug("Registration attempt: %s", request.form)  # Debug: print form data
+
+        phone_number = request.form.get('phone_number')
+        password = request.form.get('password')
+        name = request.form.get('name')
+        surname = request.form.get('surname')
+        street = request.form.get('street')
+        town = request.form.get('town')
+        plz = request.form.get('plz')
+        bundesland = request.form.get('bundesland')
         ip_address = request.remote_addr  # Capture IP address from request
 
-        # Check for existing user with the same phone number or email
-        existing_user = User.query.filter((User.phone_number == phone_number) | (User.email == email)).first()
+        # Check for existing user with the same phone number
+        existing_user = User.query.filter_by(phone_number=phone_number).first()
         if existing_user:
-            flash('An account with this phone number or email already exists.', 'danger')
+            flash('An account with this phone number already exists.', 'danger')
+            logging.debug("Account registration failed: Phone number already exists")
             return jsonify({'success': False, 'message': 'User already exists'}), 400
 
         # Generate OTP and handle verification
@@ -177,14 +178,13 @@ def register():
         message = client.messages.create(
             body=f"Your OTP is: {otp}",
             from_=twilio_number,
-            to=request.form.get('phone_number')
+            to=phone_number
         )
         logging.debug(f"Twilio message SID: {message.sid}")
 
         # Save the user data in session temporarily
         session['user_data'] = {
             'phone_number': phone_number,
-            'email': email,
             'password': password,
             'name': name,
             'surname': surname,
@@ -196,11 +196,11 @@ def register():
             'otp': otp
         }
 
-        logging.debug("User registered, OTP sent for verification")
+        logging.debug("OTP sent for verification to phone number: %s", phone_number)
         return jsonify({'success': True, 'message': 'OTP sent successfully'})
-        return redirect(url_for('verify_otp'))
 
     return render_template('register.html')
+
 
 
 def generate_otp_and_send(phone_number):
@@ -257,36 +257,63 @@ def reset_password():
 def beitraege():
     return render_template('beitraege.html')
     
-@app.route('/submit_project', methods=['POST'])
+@app.route('/submit_project', methods=['GET', 'POST'])
 @login_required
 def submit_project():
     if request.method == 'POST':
-        name = request.form.get('title')
-        description = request.form.get('description')
-        image = request.files.get('image')
+        # Debugging: Print form data
+        logging.debug("Form data received: %s", request.form)
+        logging.debug("Files received: %s", request.files)
+
+        # Extract form data
+        name = request.form.get('name')  # Instead of 'title'
         category = request.form.get('category')
+        descriptionwhy = request.form.get('descriptionwhy')
+        public_benefit = request.form.get('public_benefit')
+        image = request.files.get('image_file')  # Ensure this matches the 'name' attribute in your HTML form
+        geoloc = request.form.get('geoloc')  # Optional geolocation data
 
-        # Check if an image file was uploaded
+        # Debugging: Print extracted data
+        logging.debug("Project name: %s, Category: %s, Description: %s", name, category, descriptionwhy)
+
         if image:
-            # Generate a unique filename for the uploaded image
             image_filename = secure_filename(image.filename)
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_filename))  # Save the image to the specified folder
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+            image.save(image_path)
 
-            # Create a new project record in the database
-            new_project = Project(name=name, description=description, image_file=image_filename, category=category, author=current_user.id)
-              # Save the project and add a debug log
+            # Debugging: Confirm image saving
+            logging.debug("Image saved to: %s", image_path)
+
+            new_project = Project(
+                name=name,
+                category=category,
+                descriptionwhy=descriptionwhy,
+                public_benefit=public_benefit,
+                image_file=image_filename,
+                geoloc=geoloc,
+                author=current_user.id
+            )
+
+            # Debugging: Print new project details
+            logging.debug("New project details: %s", new_project.to_dict())
+
             db.session.add(new_project)
             db.session.commit()
-            logging.debug(f"Project '{name}' submitted by user {current_user.id}")
 
-            # Use flash to send a success message
-            flash('Success! The project has been successfully submitted.', 'success')
+            # Debugging: Confirm database commit
+            logging.debug("New project added to database with ID: %s", new_project.id)
+
+            flash('Your project has been successfully submitted.', 'success')
             return redirect(url_for('index'))
         else:
             flash('Please upload an image for your project.', 'danger')
-            return redirect(url_for('index'))
+            return redirect(url_for('submit_project'))
 
-    return render_template('submit_project.html')
+    # Display the form for GET request
+    return render_template('beitraege.html')
+
+
+
 
 @app.route('/list')
 def list_view():
@@ -358,23 +385,29 @@ def opendata():
     # Additional logic can be added here if needed
     return render_template('opendata.html')
 
+@app.route('/erfolge')
+def erfolge():
+    # Additional logic can be added here if needed
+    return render_template('erfolge.html')
 
+@app.route('/ueber')
+def ueber():
+    # Additional logic can be added here if needed
+    return render_template('ueber.html')
+    
 @app.route('/verify_otp', methods=['GET', 'POST'])
 def verify_otp():
     if request.method == 'POST':
-        user_otp = request.form['otp']
+        user_otp = request.form.get('otp')
         if 'user_data' in session and session['user_data']['otp'] == int(user_otp):
             user_data = session.pop('user_data')
+
+            # Create new user instance without email
             new_user = User(
                 phone_number=user_data['phone_number'],
-                email=user_data['email'],
                 password_hash=generate_password_hash(user_data['password']),
                 name=user_data['name'],
                 surname=user_data['surname'],
-                street=user_data['street'],
-                town=user_data['town'],
-                plz=user_data['plz'],
-                bundesland=user_data['bundesland'],
                 ip_address=user_data['ip_address']
             )
             db.session.add(new_user)
@@ -383,8 +416,10 @@ def verify_otp():
             # Log in the user automatically
             login_user(new_user)
 
+            logging.debug("New user registered: %s", new_user.phone_number)
             return jsonify({'success': True, 'message': 'Account successfully created'})
         else:
+            logging.debug("OTP verification failed")
             return jsonify({'success': False, 'message': 'Invalid OTP'}), 400
 
     return render_template('verify_otp.html')
@@ -442,9 +477,8 @@ def login():
         username_or_phone = request.form.get('username_or_phone')
         password = request.form.get('password')
 
-             # Adjust the filter to match the fields in your User model
-        user = User.query.filter((User.phone_number == username_or_phone) | (User.email == username_or_phone)).first()
-
+        # Adjusted to only check for phone number
+        user = User.query.filter_by(phone_number=username_or_phone).first()
 
         if user and user.check_password(password):
             login_user(user)
@@ -457,6 +491,7 @@ def login():
             return jsonify(success=False)
 
     return render_template('login.html')
+
 
 
 @app.route('/vote/<int:project_id>', methods=['GET', 'POST'])

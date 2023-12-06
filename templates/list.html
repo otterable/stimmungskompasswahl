@@ -64,52 +64,118 @@
             border-radius: 30px; /* Optional: if you want rounded corners */
         }
 
-        /* Added CSS for the top bar */
-.top-bar {
-            background-color: #003056 ; /* Background color of the top bar */
-            height: 80px; /* Height of the top bar */
-            width: 100%; /* Full width of the screen */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20 20px; /* Add padding to the left and right */
-            box-sizing: border-box; /* Include padding in width calculation */
-        }
+ .top-bar {
+    background-color: #003056; /* Background color of the top bar */
+    height: 80px; /* Height of the top bar */
+    width: 100%; /* Full width of the screen */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px; /* Add padding to the left and right */
+    box-sizing: border-box; /* Include padding in width calculation */
+    align-items: center; /* This ensures vertical alignment */
+}
+.top-bar a .logo {
+    max-width: auto; /* Adjust this value as needed */
+    max-height: 80px; /* Ensure the logo fits within the bar's height */
+margin: auto;
+}
 
-    .top-bar img {
-        max-height: 100%; /* Ensure the logo fits within the bar's height */
-    }
+/* Styles for buttons inside links in the top bar */
+.top-bar a button {
+    transition: transform 0.3s ease; /* Transition for the transform property */
+    border-radius: 30px; /* If you want to keep the border-radius */
+    /* Add any other button-specific styles here */
+}
 
-   .top-bar a {
-        color: white;
-        text-decoration: none;
-        margin-right: 20px; /* Add spacing between links */
-        font-size: 18px; /* Increase text size */
-        font-weight: bold; /* Make text bold */
-        transition: transform 0.3s, font-weight 0.3s; /* Add transition effect */
-    }
-    .top-bar a::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: -3px; /* Adjust the position of the underscore */
-        width: 100%;
-        height: 2px;
-        background-color: white;
-        transform: scaleX(0); /* Initially hide the underscore */
-        transform-origin: right;
-        transition: transform 0.3s; /* Add transition effect for underscore */
-    }
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
 
-    .top-bar a:hover {
-        transform: scale(1.1); /* Scale to 1.1x on hover */
-        font-weight: bolder; /* Make it bolder on hover */
-    }
 
-    .top-bar a:hover::after {
-        transform: scaleX(1); /* Show the underscore on hover */
-        transform-origin: left;
-    }
+/* Hover effect for links in the top bar */
+.top-bar a:not(:has(button)):hover::after {
+    transform: scaleX(1); /* Show the underscore on hover */
+    transform-origin: left;
+}
+
+.top-bar a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px; /* Add spacing between links */
+    font-size: 18px; /* Increase text size */
+    font-weight: bold; /* Make text bold */
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease; /* Transition for color and text shadow */
+}
+
+
+/* Exclude the logo link from having the underline effect */
+.top-bar a[href="/"]:hover::after {
+    content: none;
+}
+/* Underline effect for links that do not contain the logo */
+.top-bar a:not(:has(> .logo))::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Additional styles for .logo to ensure it fits well in the top bar */
+.top-bar a .logo {
+    max-width: auto; /* Adjust this value as needed */
+    max-height: 80px; /* Ensure the logo fits within the bar's height */
+    margin: auto;
+}
+.top-bar a:hover {
+    color: #a8c0ff; /* Change color on hover */
+    text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7); /* Add text shadow on hover */
+}
+
+.top-bar a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect for buttons inside links in the top bar */
+.top-bar a button:hover {
+    transform: scale(1.03); /* Scale up slightly on hover */
+}
+
+/* Underline effect for links that do not contain buttons */
+.top-bar a:not(:has(> button))::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s;
+}
+
+/* Hover effect to show underline for links that do not contain buttons */
+.top-bar a:not(:has(> button)):hover::after {
+    transform: scaleX(1);
+}
 	
 .filter-bar {
     background-color: #111111; /* Background color */
@@ -374,6 +440,196 @@
     cursor: pointer;
 }
 
+
+@media only screen and (max-width: 1445px) {
+.top-bar a button {
+    transition: transform 0.3s ease; /* Transition for the transform property */
+    border-radius: 30px; /* If you want to keep the border-radius */
+	padding: 7px;
+    /* Add any other button-specific styles here */
+}
+}
+
+#hamburger-button {
+    display: none; /* Hidden by default */
+	}
+@media only screen and (max-width: 1080px) {
+    body {
+        font-size: 14px; /* Smaller font size */
+    }
+    .top-bar {
+        flex-direction: column; /* Stack items vertically */
+        height: auto; /* Adjust height automatically */
+    }
+    .form-container {
+        width: 90%; /* Full width with some margin */
+        padding: 20px; /* Smaller padding */
+    }
+    .publish-button {
+        font-size: 18px; /* Slightly smaller font size */
+        padding: 15px 0; /* Adjust padding */
+    }
+
+	
+	/* Hamburger Menu Button */
+#hamburger-button {
+    display: none; /* Hidden by default */
+    font-size: 30px; /* Icon size */
+    color: white; /* Icon color */
+    background: none; /* No background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Navigation Overlay */
+.nav-overlay {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed position */
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    transition: 0.5s; /* Smooth transition for opening/closing */
+    z-index: 1000; /* High z-index to ensure it's on top */
+}
+
+.nav-overlay-active .main-content {
+    pointer-events: none;
+}
+
+/* Mobile Devices */
+@media only screen and (max-width: 1080px) {
+    #hamburger-button {
+        display: block; /* Show the button on mobile */
+    }
+
+    .top-bar a .logo {
+        margin-left: auto; /* Adjust logo position */
+		margin-right: auto;
+    }
+
+    #nav-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    #nav-links a {
+        padding: 20px; /* Larger clickable area */
+        font-size: 24px; /* Larger font size */
+    }
+}
+
+/* Mobile Devices */
+@media only screen and (max-width: 1080px) {
+    .top-bar {
+        flex-direction: row; /* Align items horizontally */
+        justify-content: space-between; /* Space between items */
+        align-items: center; /* Vertically center items */
+        padding: 10px 15px; /* Consistent padding */
+    }
+
+    .top-bar a {
+        display: flex; /* Flex container for the logo */
+        align-items: center; /* Vertically center logo */
+        margin: 0; /* Remove any default margin */
+    }
+
+    .top-bar a .logo {
+        max-width: 350px; /* Adjust logo size */
+        max-height: 350px; /* Adjust height automatically */
+    }
+
+    #hamburger-button {
+        display: block; /* Show the button on mobile */
+        margin: 0; /* Remove any margin */
+        align-self: center; /* Explicitly center the button vertically */
+    }
+
+   
+        #nav-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+
+    #nav-links a {
+        padding: 20px; /* Padding for each link */
+        font-size: 24px; /* Font size for links */
+    }
+}
+
+/* Mobile View adjustments */
+@media only screen and (max-width: 1080px) {
+    .filter-bar {
+        flex-direction: column; /* Stack items vertically */
+        align-items: start; /* Align items to start */
+        padding: 10px; /* Adjust padding */
+        display: none; /* Hide filter bar by default */
+    }
+
+    .filter-item {
+        width: 100%; /* Full width for each filter item */
+        margin-bottom: 10px; /* Space between filter items */
+    }
+
+    /* Style for the toggle button */
+    .filter-toggle-btn {
+        display: block; /* Show the button */
+        background-color: #003056; /* Match top bar color */
+        color: white;
+        text-align: center;
+        padding: 10px;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+    }
+}
+/* Mobile Devices */
+       /* Mobile view adjustments for the filter bar */
+        @media only screen and (max-width: 1080px) {
+            .filter-bar {
+                flex-direction: column; /* Stack filter items vertically */
+                align-items: start; /* Align items to start */
+                width: 100%; /* Full width */
+                display: none; /* Hide filter bar by default */
+                position: absolute; /* Position it absolutely to overlay content */
+                background-color: #111111; /* Background color of filter bar */
+                top: 80px; /* Position below the top bar */
+                left: 0; /* Align to the left */
+                z-index: 100; /* Ensure it's above other content */
+                box-sizing: border-box; /* Include padding in width calculation */
+            }
+
+            .filter-item {
+                width: 100%; /* Full width for each filter item */
+                margin-bottom: 10px; /* Space between filter items */
+                padding: 10px; /* Padding for touch friendliness */
+            }
+        }
+
+        /* Style for the toggle button */
+        .filter-toggle-btn {
+            display: none; /* Hide by default, will be displayed via JavaScript on mobile */
+            background-color: #003056; /* Background color */
+            color: white; /* Text color */
+            padding: 10px; /* Padding */
+            border: none; /* No border */
+            width: 100%; /* Full width */
+            text-align: center; /* Center text */
+            cursor: pointer; /* Pointer cursor */
+            position: fixed; /* Fixed position */
+            top: 80px; /* Position below the top bar */
+            left: 0; /* Align to the left */
+            z-index: 100; /* Ensure it's above other content */
+        }
+
+
     </style>
 
 
@@ -387,19 +643,20 @@
 <body>
 <!-- Top Bar -->
 <div class="top-bar">
-    <div id="category-choices" style="display: none;">
-        <!-- Category Buttons -->
-        <button class="categorybutton" onclick="parent.setCategory('#3d3d3d')" style="background-color: #3d3d3d;"><h3>Dieser Ort gefällt mir.</h3></button>
-        <!-- ... other buttons ... -->
-    </div>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    <div id="nav-links">
+
+		<a href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        </a>  
+		    <button id="hamburger-button">&#9776;</button>
+
+		<div id="nav-overlay" class="nav-overlay">
+		<div id="nav-links">
         <a href="https://stimmungskartendemo.ermine.at">Map</a>
         <a href="/list">Suggestions</a> <!-- Updated this line -->
         <a href="/beitraege">Submit a project</a>
-        <a href="#">About participatory planning</a>
-        <a href="#">Contact</a>
-		<a href="{{ url_for('opendata') }}">Open Data</a>
+        <a href="/erfolge">Success stories</a>
+       <a href="/ueber">Contact</a>
+		 <a href="/opendata">Open Data</a>
 
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
@@ -408,6 +665,8 @@
         {% endif %}
     </div>
 </div>
+</div>
+
 <!-- Filter Bar -->
 <div class="filter-bar">
     <form id="filter-form" action="{{ url_for('list_view') }}" method="get" style="display: flex; align-items: center;">
@@ -493,6 +752,21 @@
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const filterToggleButton = document.getElementById('filter-toggle-button');
+    const filterItems = document.querySelectorAll('.filter-item');
+    let isFilterVisible = true;
+
+    filterToggleButton.addEventListener('click', function() {
+        isFilterVisible = !isFilterVisible;
+        filterItems.forEach(item => {
+            item.style.display = isFilterVisible ? 'block' : 'none';
+        });
+        filterToggleButton.textContent = isFilterVisible ? 'Hide Filter Menu' : 'Show Filter Menu';
+    });
+});
+
+
     function openModal(projectId) {
         // AJAX request to get project details
         fetch(`/project/${projectId}`)
@@ -517,6 +791,83 @@
 </script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Create and insert the toggle button
+    var filterToggleButton = document.createElement("button");
+    filterToggleButton.innerHTML = "Show Filters";
+    filterToggleButton.classList.add("filter-toggle-btn");
+    document.querySelector('.filter-bar').before(filterToggleButton);
+
+    // Toggle filter display on button click
+    filterToggleButton.addEventListener('click', function() {
+        var filterBar = document.querySelector('.filter-bar');
+        if (filterBar.style.display === "none") {
+            filterBar.style.display = "flex";
+            filterToggleButton.innerHTML = "Hide Filters";
+        } else {
+            filterBar.style.display = "none";
+            filterToggleButton.innerHTML = "Show Filters";
+        }
+    });
+
+    // Initially hide the filter bar on mobile
+    if (window.innerWidth <= 1080) {
+        document.querySelector('.filter-bar').style.display = 'none';
+    }
+
+    // Adjust filter bar visibility on window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 1080) {
+            document.querySelector('.filter-bar').style.display = 'none';
+            filterToggleButton.innerHTML = "Show Filters";
+        } else {
+            document.querySelector('.filter-bar').style.display = 'flex';
+        }
+    });
+});
+
+
+   // JavaScript for handling the hamburger menu and navigation overlay
+    document.getElementById('hamburger-button').addEventListener('click', function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        // Toggle the display of the navigation overlay
+        navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Close the navigation overlay when clicking anywhere in the overlay
+    document.getElementById('nav-overlay').addEventListener('click', function(event) {
+        // Check if the clicked element is not a button or a link
+        if (!event.target.matches('button, a')) {
+            closeNavOverlay();
+        }
+    });
+
+    // Function to close the navigation overlay
+    function closeNavOverlay() {
+        document.getElementById('nav-overlay').style.display = 'none';
+    }
+
+    // Prevent closing when clicking on nav-links (delegation)
+    document.getElementById('nav-links').addEventListener('click', function(event) {
+        if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON') {
+            event.stopPropagation();
+        }
+    });
+	
+	   window.addEventListener('resize', function() {
+        // Check if the window width is greater than the threshold for mobile view
+        if (window.innerWidth > 1080) {
+            // Make sure the nav-overlay is displayed
+            document.getElementById('nav-overlay').style.display = 'block';
+            // Reset any inline display style on the nav-links (optional)
+            document.getElementById('nav-links').style.display = '';
+        } else {
+            // For mobile view, revert back to the default behavior
+            document.getElementById('nav-overlay').style.display = 'none';
+        }
+    });
+
+
 document.addEventListener("DOMContentLoaded", function() {
     const urlParams = new URLSearchParams(window.location.search);
     const projectID = urlParams.get('projectID');
@@ -589,7 +940,6 @@ document.addEventListener("DOMContentLoaded", function() {
         showOverlay('{{ active_project.name }}', '{{ active_project.description }}', '{{ url_for('static', filename='usersubmissions/' + active_project.image_file) }}', '{{ active_project.full_description }}', '{{ active_project.author }}', '{{ active_project.date.strftime('%Y-%m-%d') }}');
     {% endif %}
 });
-
     // Add event listeners when DOM content is loaded
     document.addEventListener("DOMContentLoaded", function(event) {
         // Close overlay when clicking outside the overlay content
@@ -599,21 +949,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
 
-        // Function to show user information
-        function showUserInfo() {
-            {% if current_user.is_authenticated %}
-                document.querySelector(".logged-in-info").style.display = "block";
-            {% endif %}
-        }
-
-        // Function to hide user information
-        function hideUserInfo() {
-            document.querySelector(".logged-in-info").style.display = "none";
-        }
-
-        // Add hover event listeners to the top bar
-        document.querySelector(".top-bar").addEventListener("mouseenter", showUserInfo);
-        document.querySelector(".top-bar").addEventListener("mouseleave", hideUserInfo);
 
         // Initially hide user information
         hideUserInfo();
