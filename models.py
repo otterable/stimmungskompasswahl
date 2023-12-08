@@ -35,8 +35,8 @@ class Project(db.Model):
 
     # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True)
-    downvotes = db.relationship('Downvote', backref='project', lazy=True)
     comments = db.relationship('Comment', backref='project', lazy=True)
+
 
     def to_dict(self):
         return {
@@ -56,7 +56,9 @@ class Vote(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    ip_address = db.Column(db.String(100))
+    upvote = db.Column(db.Boolean, default=False)  # Indicates if it's an upvote
+    downvote = db.Column(db.Boolean, default=False)  # Indicates if it's a downvote
+
     
     def to_dict(self):
         return {
@@ -82,21 +84,6 @@ class Comment(db.Model):
         return {
             "id": self.id,
             "text": self.text,
-            "project_id": self.project_id,
-            "user_id": self.user_id,
-            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
-        }
-        
-class Downvote(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    ip_address = db.Column(db.String(100))
-    
-    def to_dict(self):
-        return {
-            "id": self.id,
             "project_id": self.project_id,
             "user_id": self.user_id,
             "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")

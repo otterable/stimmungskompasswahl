@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from models import db, User, Project, Vote, Comment, Downvote
+from flask_migrate import Migrate
+from models import db, User, Project, Vote, Comment
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -42,6 +43,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project_voting.db'
 app.config['UPLOAD_FOLDER'] = 'static/usersubmissions'  # Specify the folder where uploaded files will be saved
 
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -315,8 +317,12 @@ def submit_project():
 
 
 
+
 @app.route('/list')
-def list_view():
+@app.route('/list/pages/<int:page>')
+def list_view(page=1):
+    per_page = 3  # Number of projects per page
+
     query = Project.query
 
     # Get parameters
@@ -342,9 +348,63 @@ def list_view():
     elif score == 'lowest':
         # Add logic to sort by lowest score
         pass  # Replace 'pass' with your logic
+   # Paginate the query using keyword arguments
+    paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    projects = query.all()
-    return render_template('list.html', projects=projects)
+    # Debugging: print current page and number of pages
+    logging.debug(f"Current Page: {paginated_projects.page}")
+    logging.debug(f"Total Pages: {paginated_projects.pages}")
+
+    return render_template('list.html', projects=paginated_projects.items, pagination=paginated_projects)
+    
+def get_project_by_id(project_id):
+    return Project.query.get_or_404(project_id)
+
+@app.route('/project_details/<int:project_id>', methods=['GET', 'POST'])
+def project_details(project_id):
+    try:
+        project = get_project_by_id(project_id)
+        comments = Comment.query.filter_by(project_id=project_id).all()
+
+        # Handle comment submission
+        if request.method == 'POST' and current_user.is_authenticated:
+            comment_text = request.form.get('comment')
+            new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=project_id)
+            db.session.add(new_comment)
+            db.session.commit()
+            logging.debug("New comment added: %s", comment_text)
+            return redirect(url_for('project_details', project_id=project_id))
+
+        # Fetch votes for the project
+        votes = Vote.query.filter_by(project_id=project_id).all()
+        upvote_count = sum(vote.upvote for vote in votes)
+        downvote_count = sum(vote.downvote for vote in votes)
+        total_votes = upvote_count + downvote_count
+
+        upvote_percentage = (upvote_count / total_votes * 100) if total_votes > 0 else 0
+        downvote_percentage = (downvote_count / total_votes * 100) if total_votes > 0 else 0
+
+        # Fetch the author of the project
+        project_author = User.query.get(project.author)
+        author_name = f"{project_author.name} {project_author.surname}" if project_author else "Unknown"
+
+        # Fetch the authors of the comments
+        comments_with_authors = []
+        for comment in comments:
+            author = User.query.get(comment.user_id)
+            comments_with_authors.append({
+                "text": comment.text,
+                "timestamp": comment.timestamp,
+                "author_name": f"{author.name} {author.surname}" if author else "Unknown"
+            })
+
+        logging.debug("Displaying project details for project ID: %s", project_id)
+        return render_template('project_details.html', project=project, upvote_percentage=upvote_percentage, 
+                               downvote_percentage=downvote_percentage, upvote_count=upvote_count, downvote_count=downvote_count, 
+                               author_name=author_name, comments=comments_with_authors)
+    except Exception as e:
+        logging.error("Error in project_details route: %s", str(e))
+        return str(e)  # or redirect to a generic error page
 
 
     
@@ -363,6 +423,38 @@ def downvote(project_id):
     db.session.commit()
     flash('Your downvote has been recorded!', 'success')
     return redirect(url_for('list_view'))
+
+
+@app.route('/vote/<int:project_id>/<string:vote_type>', methods=['POST'])
+@login_required
+def vote(project_id, vote_type):
+    project = Project.query.get_or_404(project_id)
+    
+    # Check for existing votes by the user for this project
+    existing_vote = Vote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
+
+    if existing_vote:
+        db.session.delete(existing_vote)
+
+    new_vote = Vote(user_id=current_user.id, project_id=project.id)
+    if vote_type == 'upvote':
+        new_vote.upvote = True
+        new_vote.downvote = False
+        app.logger.debug(f"Upvote received for project {project_id} by user {current_user.id}")
+    elif vote_type == 'downvote':
+        new_vote.downvote = True
+        new_vote.upvote = False
+        app.logger.debug(f"Downvote received for project {project_id} by user {current_user.id}")
+
+    db.session.add(new_vote)
+    db.session.commit()
+    flash('Your vote has been recorded!', 'success')
+    return redirect(url_for('project_details', project_id=project_id))
+
+
+
+
+
 
 @app.route('/comment/<int:project_id>', methods=['POST'])
 @login_required
@@ -496,7 +588,7 @@ def login():
 
 @app.route('/vote/<int:project_id>', methods=['GET', 'POST'])
 @login_required
-def vote(project_id):
+def single_vote(project_id):
     project = Project.query.get_or_404(project_id)
     if request.method == 'POST':
         vote = Vote(user_id=current_user.id, project_id=project.id, ip_address=request.remote_addr)
@@ -506,25 +598,8 @@ def vote(project_id):
         return redirect(url_for('index'))
     return render_template('vote.html', project=project)
 
-@app.route('/project/<int:project_id>', methods=['GET', 'POST'])
-@login_required
-def project(project_id):
-    project = Project.query.get_or_404(project_id)
-    comments = Comment.query.filter_by(project_id=project_id).all()
-    form = CommentForm()
-    if form.validate_on_submit():
-        comment = Comment(text=form.text.data, user_id=current_user.id, project_id=project_id)
-        db.session.add(comment)
-        db.session.commit()
-        flash('Your comment has been posted!', 'success')
-        return redirect(url_for('project', project_id=project_id))
-    return render_template('project.html', project=project, comments=comments, form=form)
 
-@app.route('/project/<int:project_id>')
-def project_view(project_id):
-    project = Project.query.get_or_404(project_id)
-    projects = Project.query.all()
-    return render_template('list.html', projects=projects, active_project=project)
+
 
 
 if __name__ == "__main__":

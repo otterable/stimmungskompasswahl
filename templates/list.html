@@ -19,7 +19,9 @@
         margin: 0; /* Remove default margin */
         padding: 0; /* Remove default padding */
     }
-
+#filter-form-mobile {
+    display: none; /* Hidden by default */
+}
         img {
             border-radius: 30px;
             transition: transform 0.3s ease;
@@ -63,7 +65,44 @@
             width: auto; /* Maintain aspect ratio */
             border-radius: 30px; /* Optional: if you want rounded corners */
         }
+		
+		
+		.projects-header {
+    text-align: center; /* Center the content */
+    margin-bottom: 20px; /* Add some space below the header */
+}
 
+.projects-header h1 {
+    margin: 0; /* Remove default margin */
+    padding: 10px 0; /* Add some vertical padding */
+}
+
+.projects-header p {
+    margin: 0; /* Remove default margin */
+    color: #003056; /* Specific color for the undertitle */
+    font-style: italic; /* Optional: make it italic */
+}
+
+		
+/* Style for filter-button on desktop */
+.filter-bar .filter-button {
+    background-color: #02569d; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    padding: 14px 20px; /* Padding inside the button */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Font weight */
+    border-radius: 30px; /* Rounded corners */
+    cursor: pointer; /* Cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover effect for filter-button */
+.filter-bar .filter-button:hover {
+    background-color: #002244; /* Darker shade for hover effect */
+}
+
+	
  .top-bar {
     background-color: #003056; /* Background color of the top bar */
     height: 80px; /* Height of the top bar */
@@ -128,6 +167,47 @@ margin: auto;
     transform-origin: right;
     transition: transform 0.3s;
 }
+/* Centering Pagination Wrapper */
+nav[aria-label="Page navigation"] {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center horizontally */
+    margin: 20px 0; /* Add vertical margin for spacing */
+}
+
+/* Pagination Container */
+.pagination {
+    background-color: #003056; /* Background color */
+    border-radius: 30px; /* Border radius */
+    padding: 10px; /* Inner spacing */
+    display: inline-flex; /* Align pagination items inline and allow flex properties */
+}
+
+/* Pagination Links */
+.pagination .page-link {
+    color: white; /* Text color */
+    background-color: transparent; /* Remove default background */
+    border: none; /* Remove default borders */
+    margin: 0 5px; /* Add horizontal spacing between items */
+}
+
+/* Pagination Items */
+.pagination .page-item {
+    display: inline-block; /* Display items inline */
+}
+
+/* Pagination Active Page */
+.pagination .page-item.active .page-link {
+    background-color: #02569d; /* Background for active page */
+    border-color: #02569d; /* Border for active page */
+}
+
+/* Pagination Item Hover */
+.pagination .page-item:hover .page-link {
+    background-color: #2874A6; /* Slightly lighter blue on hover */
+    border-color: #2874A6; /* Border color on hover */
+}
+
+
 
 /* Additional styles for .logo to ensure it fits well in the top bar */
 .top-bar a .logo {
@@ -176,17 +256,42 @@ margin: auto;
 .top-bar a:not(:has(> button)):hover::after {
     transform: scaleX(1);
 }
+.logged-in-info {
+    text-align: center; /* Centers the text inside the div */
+    padding: 2px 0; /* Adds some padding above and below the text */
+    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
+    /* Other styling as needed, such as font size, color, etc. */
+}
+
 	
 .filter-bar {
-    background-color: #111111; /* Background color */
-    height: 80px; /* Bar height */
+    background-color: #111111; /* Existing background color */
+    height: 80px; /* Existing height */
     width: 100%; /* Full width */
     display: flex;
-    justify-content: start; /* Align items to the start */
-    align-items: center;
-    padding: 0 20px; /* Horizontal padding */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    padding: 0 20px; /* Existing padding */
     box-sizing: border-box;
-    flex-wrap: nowrap; /* Prevent wrapping */
+    flex-wrap: nowrap; /* Existing no-wrap */
+}
+
+#filter-form {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center form contents */
+    width: 100%; /* Use the full width of the parent */
+    max-width: 800px; /* Set a max-width if needed */
+}
+
+.filter-item {
+    margin: 0 10px; /* Add some horizontal spacing between items */
+}
+
+/* You might need to adjust the width of inputs/selects inside filter-items */
+.filter-item input, 
+.filter-item select {
+    width: auto; /* Adjust width as needed */
 }
 
 .filter-bar .filter-item label {
@@ -328,52 +433,83 @@ margin: auto;
             font-size: 20px;
             color: black;
             margin-top: 10px;
-        }
-/* CSS for project thumbnails */
-/* Style for project thumbnails */
+			}
+/* Base styles for project thumbnails */
 .project-thumbnail {
     background-color: rgba(40, 116, 166, 0.3);
     border-radius: 30px;
     margin: 10px;
     padding: 10px;
     display: inline-block;
-    width: calc(30.33% - 20px); /* 3 equally sized thumbnails on desktop */
-    vertical-align: top; /* Align thumbnails to the top */
-    box-sizing: border-box; /* Include padding and margin in width calculation */
-    overflow: hidden; /* Prevent images from overflowing */
-    transition: transform 0.3s ease; /* Transition for hover effect */
+    vertical-align: top;
+    box-sizing: border-box;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    position: relative;
 }
 
 /* Hover effect for project thumbnails */
 .project-thumbnail:hover {
-    transform: scale(1.03); /* Scale up on hover */
+    transform: scale(1.03);
 }
 
 /* Image style within project thumbnails */
 .project-thumbnail img {
-    width: 100%; /* Set width to 100% to fill the container */
-    height: 100%; /* Set height to 100% to maintain aspect ratio */
-    object-fit: contain; /* Fit the entire image within the container without cropping */
-    border-radius: 30px; /* Rounded corners */
-    transition: none; /* Remove any transition effect */
+    width: 90%;
+    margin-top: 20px;
+    height: 400px; /* Fixed height for images */
+    object-fit: cover;
+    border-radius: 30px;
 }
 
-/* Disable hover effect for images inside project thumbnails */
-.project-thumbnail img:hover {
-    transform: none; /* No transformation on hover */
+/* Text style inside project thumbnails */
+.project-thumbnail h2, .project-thumbnail p {
+    margin: 0;
+    padding: 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
+/* Description positioning */
+.project-thumbnail p {
+    position: absolute;
+    bottom: 10px;
+    width: 90%;
+}
 
+/* Desktop screens (larger than 1200px) */
+@media (min-width: 1445px) {
+    .project-thumbnail {
+        width: calc(33.333% - 20px); /* Three items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+}
 
+/* Medium screens (between 1024px and 1199px) */
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .project-thumbnail {
+        width: calc(50% - 20px); /* Two items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+}
 
-/* Ensure images have a 4:3 aspect ratio */
-.project-thumbnail:after {
-    content: "";
-    display: block;
+/* Mobile screens (less than 1024px) */
+@media (max-width: 1088px) {
+    .project-thumbnail {
+        width: calc(100% - 20px); /* Full width */
+        height: auto; /* Height adjusts based on content */
+    }
+    .project-thumbnail img {
+        height: auto; /* Adjust image height for mobile */
+    }
 }
 
 .project-list {
-    text-align: center; /* Center the projects horizontally */
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
     /* Overlay styles */
@@ -453,6 +589,10 @@ margin: auto;
 #hamburger-button {
     display: none; /* Hidden by default */
 	}
+	
+#hamburger-button-filter {
+    display: none; /* Hidden by default */
+	}
 @media only screen and (max-width: 1080px) {
     body {
         font-size: 14px; /* Smaller font size */
@@ -469,7 +609,11 @@ margin: auto;
         font-size: 18px; /* Slightly smaller font size */
         padding: 15px 0; /* Adjust padding */
     }
-
+.filter-bar .filter-button {
+        /* Add any desktop-specific styles here */
+        padding: 10px 20px; /* Example: different padding */
+        margin-left: 10px; /* Add space between button and preceding elements */
+    }
 	
 	/* Hamburger Menu Button */
 #hamburger-button {
@@ -480,7 +624,14 @@ margin: auto;
     border: none; /* No border */
     cursor: pointer; /* Pointer cursor */
 }
-
+#hamburger-button-filter {
+    display: none; /* Hidden by default */
+    font-size: 20px; /* Icon size */
+    color: white; /* Icon color */
+    background-color: #111111; /* No background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor */
+}
 /* Navigation Overlay */
 .nav-overlay {
     display: none; /* Hidden by default */
@@ -495,9 +646,26 @@ margin: auto;
     z-index: 1000; /* High z-index to ensure it's on top */
 }
 
+
+#filter-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    overflow-x: hidden; /* Hide horizontal overflow */
+    transition: 0.5s;
+    z-index: 1000;
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+}
 .nav-overlay-active .main-content {
     pointer-events: none;
 }
+
+
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
@@ -505,9 +673,110 @@ margin: auto;
         display: block; /* Show the button on mobile */
     }
 
+ #hamburger-button-filter {
+        display: block; /* Show the button on mobile */
+		  width: 100%; /* Make it span the entire width of the screen */
+            text-align: center; /* Center the icon/text inside the button */
+            padding: 10px 0; /* Adjust padding as needed for better touch area */
+      
+    }
     .top-bar a .logo {
         margin-left: auto; /* Adjust logo position */
 		margin-right: auto;
+    }
+	
+	    /* Specific styles for filter form in overlay */
+#filter-form-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Stretch items to fill the width */
+    justify-content: center;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    margin: auto;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+#filter-form-mobile .filter-button {
+    padding: 15px 15px;
+    background-color: #003056; /* Adjust the color as needed */
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#filter-form-mobile .filter-button:hover {
+    background-color: #004680; /* Darker shade for hover effect */
+}
+
+
+#filter-form-mobile #search {
+    width: 100%;
+    padding: 15px; /* Adjust padding if necessary */
+    margin-bottom: 10px; /* Consistent margin with other fields */
+    border-radius: 30px; /* Consistent border-radius with other fields */
+    border: 1px solid #ccc; /* Consistent border */
+    font-size: 16px; /* Consistent font size */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+#filter-form-mobile .filter-item {
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center items horizontally */
+    width: 100%; /* Ensure each item takes full width */
+    margin-bottom: 10px; /* Spacing between filter items */
+}
+
+
+
+.filter-input {
+    width: 100%; /* Ensures full width */
+    padding: 10px 15px; /* Consistent padding for all elements */
+    border-radius: 5px; /* Consistent border-radius */
+    border: 1px solid #ccc; /* Consistent border style */
+    font-size: 16px; /* Consistent font size */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Style for input and select elements in filter-form-mobile */
+#filter-form-mobile .filter-item input,
+#filter-form-mobile .filter-item select {
+    width: 100%;
+	outline: 5px solid #003056;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 30px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Style for labels (titles) in filter-form-mobile */
+#filter-overlay #filter-form-mobile .filter-item label {
+    display: block;
+    font-weight: bold;
+    font-size: 30px; /* Increased font size for clarity */
+    margin-bottom: 5px; /* Space between label and field */
+    text-align: center !important; /* Force center align the text */
+}
+
+    /* Ensure filter bar is hidden on mobile */
+    .filter-bar {
+        display: none;
+    }
+
+    /* Additional styles for filter overlay to prevent overflow */
+    #filter-overlay {
+        overflow-y: auto; /* Enable vertical scrolling if needed */
     }
 
     #nav-links {
@@ -532,6 +801,10 @@ margin: auto;
         align-items: center; /* Vertically center items */
         padding: 10px 15px; /* Consistent padding */
     }
+	
+	.filter-bar {
+	display: none;
+	}
 
     .top-bar a {
         display: flex; /* Flex container for the logo */
@@ -549,7 +822,11 @@ margin: auto;
         margin: 0; /* Remove any margin */
         align-self: center; /* Explicitly center the button vertically */
     }
-
+    #hamburger-button-filter {
+        display: block; /* Show the button on mobile */
+        margin: 0; /* Remove any margin */
+        align-self: center; /* Explicitly center the button vertically */
+    }
    
         #nav-links {
         display: flex;
@@ -563,71 +840,7 @@ margin: auto;
         font-size: 24px; /* Font size for links */
     }
 }
-
-/* Mobile View adjustments */
-@media only screen and (max-width: 1080px) {
-    .filter-bar {
-        flex-direction: column; /* Stack items vertically */
-        align-items: start; /* Align items to start */
-        padding: 10px; /* Adjust padding */
-        display: none; /* Hide filter bar by default */
-    }
-
-    .filter-item {
-        width: 100%; /* Full width for each filter item */
-        margin-bottom: 10px; /* Space between filter items */
-    }
-
-    /* Style for the toggle button */
-    .filter-toggle-btn {
-        display: block; /* Show the button */
-        background-color: #003056; /* Match top bar color */
-        color: white;
-        text-align: center;
-        padding: 10px;
-        border: none;
-        width: 100%;
-        cursor: pointer;
-    }
 }
-/* Mobile Devices */
-       /* Mobile view adjustments for the filter bar */
-        @media only screen and (max-width: 1080px) {
-            .filter-bar {
-                flex-direction: column; /* Stack filter items vertically */
-                align-items: start; /* Align items to start */
-                width: 100%; /* Full width */
-                display: none; /* Hide filter bar by default */
-                position: absolute; /* Position it absolutely to overlay content */
-                background-color: #111111; /* Background color of filter bar */
-                top: 80px; /* Position below the top bar */
-                left: 0; /* Align to the left */
-                z-index: 100; /* Ensure it's above other content */
-                box-sizing: border-box; /* Include padding in width calculation */
-            }
-
-            .filter-item {
-                width: 100%; /* Full width for each filter item */
-                margin-bottom: 10px; /* Space between filter items */
-                padding: 10px; /* Padding for touch friendliness */
-            }
-        }
-
-        /* Style for the toggle button */
-        .filter-toggle-btn {
-            display: none; /* Hide by default, will be displayed via JavaScript on mobile */
-            background-color: #003056; /* Background color */
-            color: white; /* Text color */
-            padding: 10px; /* Padding */
-            border: none; /* No border */
-            width: 100%; /* Full width */
-            text-align: center; /* Center text */
-            cursor: pointer; /* Pointer cursor */
-            position: fixed; /* Fixed position */
-            top: 80px; /* Position below the top bar */
-            left: 0; /* Align to the left */
-            z-index: 100; /* Ensure it's above other content */
-        }
 
 
     </style>
@@ -650,6 +863,7 @@ margin: auto;
 		    <button id="hamburger-button">&#9776;</button>
 
 		<div id="nav-overlay" class="nav-overlay">
+		
 		<div id="nav-links">
         <a href="https://stimmungskartendemo.ermine.at">Map</a>
         <a href="/list">Suggestions</a> <!-- Updated this line -->
@@ -664,8 +878,11 @@ margin: auto;
             <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
         {% endif %}
     </div>
+	
 </div>
 </div>
+			<button id="hamburger-button-filter">&#9776; Filter</button>
+
 
 <!-- Filter Bar -->
 <div class="filter-bar">
@@ -710,11 +927,63 @@ margin: auto;
                 <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Lowest Score</option>
             </select>
         </div>
+		        <button type="submit" class="filter-button">Filter</button>
     </form>
 </div>
 
 
-<h1>Citizen-submitted projects:</h1>
+<div id="filter-overlay" class="nav-overlay">
+    <form id="filter-form-mobile" action="{{ url_for('list_view') }}" method="get">
+        <div class="filter-item">
+            <label for="search">Suchen:</label>
+            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Search project titles...">
+        </div>
+
+        <div class="filter-item">
+            <label for="category">Category:</label>
+            <select name="category" id="category">
+                <option value="">All Categories</option>
+                {% set current_category = request.args.get('category', '') %}
+                <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
+                <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Public spaces</option>
+                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Environment</option>
+                <option value="Verwaltung" {% if current_category == 'Verwaltung' %}selected{% endif %}>Verwaltung</option>
+                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Culture</option>
+                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Education</option>
+                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Health</option>
+                <option value="Sport" {% if current_category == 'Sport' %}selected{% endif %}>Sport</option>
+                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label for="age">Age:</label>
+            <select name="age" id="age">
+                {% set current_age = request.args.get('age', '') %}
+                <option value="" {% if current_age == 'newest' %}selected{% endif %}>Newest</option>
+                <option value="oldest" {% if current_age == 'oldest' %}selected{% endif %}>Oldest</option>
+            </select>
+        </div>
+
+        <div class="filter-item">
+            <label for="score">Score:</label>
+            <select name="score" id="score">
+                <option value="">Sort by score</option>
+                {% set current_score = request.args.get('score', '') %}
+                <option value="highest" {% if current_score == 'highest' %}selected{% endif %}>Highest Score</option>
+                <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Lowest Score</option>
+            </select>
+        </div>
+		        <button type="submit" class="filter-button">Filter</button>
+
+    </form>
+</div>
+
+<div class="projects-header">
+    <h1>Citizen-submitted projects</h1>
+    <p>Click on a project to display details!</p>
+</div>
+
 <div class="project-list">
   {% for project in projects %}
 <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">
@@ -727,6 +996,27 @@ margin: auto;
 
 </div>
 
+<div class="pagination-text" style="text-align: center; margin-top: 10px; margin-bottom: 0;">
+    <strong>Seiten:</strong>
+</div>
+
+{% if pagination.pages > 1 %}
+    <nav aria-label="Page navigation" style="margin-top: 0;">
+        <ul class="pagination">
+            {% for page in pagination.iter_pages() %}
+                {% if page %}
+                    {% if page != pagination.page %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('list_view', page=page) }}">{{ page }}</a></li>
+                    {% else %}
+                        <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}
 
 
 
@@ -752,21 +1042,6 @@ margin: auto;
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const filterToggleButton = document.getElementById('filter-toggle-button');
-    const filterItems = document.querySelectorAll('.filter-item');
-    let isFilterVisible = true;
-
-    filterToggleButton.addEventListener('click', function() {
-        isFilterVisible = !isFilterVisible;
-        filterItems.forEach(item => {
-            item.style.display = isFilterVisible ? 'block' : 'none';
-        });
-        filterToggleButton.textContent = isFilterVisible ? 'Hide Filter Menu' : 'Show Filter Menu';
-    });
-});
-
-
     function openModal(projectId) {
         // AJAX request to get project details
         fetch(`/project/${projectId}`)
@@ -791,41 +1066,6 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Create and insert the toggle button
-    var filterToggleButton = document.createElement("button");
-    filterToggleButton.innerHTML = "Show Filters";
-    filterToggleButton.classList.add("filter-toggle-btn");
-    document.querySelector('.filter-bar').before(filterToggleButton);
-
-    // Toggle filter display on button click
-    filterToggleButton.addEventListener('click', function() {
-        var filterBar = document.querySelector('.filter-bar');
-        if (filterBar.style.display === "none") {
-            filterBar.style.display = "flex";
-            filterToggleButton.innerHTML = "Hide Filters";
-        } else {
-            filterBar.style.display = "none";
-            filterToggleButton.innerHTML = "Show Filters";
-        }
-    });
-
-    // Initially hide the filter bar on mobile
-    if (window.innerWidth <= 1080) {
-        document.querySelector('.filter-bar').style.display = 'none';
-    }
-
-    // Adjust filter bar visibility on window resize
-    window.addEventListener('resize', function() {
-        if (window.innerWidth <= 1080) {
-            document.querySelector('.filter-bar').style.display = 'none';
-            filterToggleButton.innerHTML = "Show Filters";
-        } else {
-            document.querySelector('.filter-bar').style.display = 'flex';
-        }
-    });
-});
-
 
    // JavaScript for handling the hamburger menu and navigation overlay
     document.getElementById('hamburger-button').addEventListener('click', function() {
@@ -833,27 +1073,50 @@ document.addEventListener("DOMContentLoaded", function() {
         // Toggle the display of the navigation overlay
         navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
     });
+	
+// JavaScript for handling the filter form overlay
+document.getElementById('hamburger-button-filter').addEventListener('click', function() {
+    var filterOverlay = document.getElementById('filter-overlay');
+    // Toggle the display of the filter overlay
+    filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
+});
 
-    // Close the navigation overlay when clicking anywhere in the overlay
-    document.getElementById('nav-overlay').addEventListener('click', function(event) {
-        // Check if the clicked element is not a button or a link
-        if (!event.target.matches('button, a')) {
-            closeNavOverlay();
-        }
-    });
+// Close the filter overlay when clicking outside of its content
+document.getElementById('filter-overlay').addEventListener('click', function(event) {
+    // Check if the clicked element is outside of the filter form
+    var filterForm = document.getElementById('filter-form-mobile');
+    if (!filterForm.contains(event.target)) {
+        this.style.display = 'none';
+    }
+});
 
+// Prevent closing when clicking on filter form (stop the event from bubbling up)
+document.getElementById('filter-form-mobile').addEventListener('click', function(event) {
+    event.stopPropagation();
+});
+
+
+// JavaScript for handling the navigation overlay
+document.getElementById('nav-overlay').addEventListener('click', function(event) {
+    // Check if the clicked element is not a link or a button
+    if (!event.target.closest('#nav-links, #nav-links a, #nav-links button')) {
+        this.style.display = 'none';
+    }
+});
+
+// Prevent closing when clicking on nav-links or its children
+document.getElementById('nav-links').addEventListener('click', function(event) {
+    event.stopPropagation(); // Stop the click event from bubbling up to nav-overlay
+});
     // Function to close the navigation overlay
     function closeNavOverlay() {
         document.getElementById('nav-overlay').style.display = 'none';
     }
 
-    // Prevent closing when clicking on nav-links (delegation)
-    document.getElementById('nav-links').addEventListener('click', function(event) {
-        if (event.target.tagName === 'A' || event.target.tagName === 'BUTTON') {
-            event.stopPropagation();
-        }
-    });
 	
+	
+
+
 	   window.addEventListener('resize', function() {
         // Check if the window width is greater than the threshold for mobile view
         if (window.innerWidth > 1080) {
@@ -876,18 +1139,17 @@ document.addEventListener("DOMContentLoaded", function() {
         showOverlayForProjectID(projectID);
     }
 
-    document.querySelectorAll('.project-thumbnail').forEach(item => {
-    item.addEventListener('click', function() {
-        const projectID = this.getAttribute('data-project-id');
-        history.pushState(null, '', '/project/' + projectID);
-        showOverlayForProjectID(projectID);
-    });
-});
+   
 
     document.getElementById('overlay').addEventListener('click', function(event) {
         if (event.target === this) {
             closeOverlay();
             history.pushState(null, '', '/list');
+        }
+    });
+document.getElementById('filter-form-mobile').addEventListener('keypress', function(event) {
+        if (event.keyCode === 13) { // 13 is the Enter key
+            event.preventDefault();  // Prevent form submission
         }
     });
 });
@@ -911,59 +1173,31 @@ function closeOverlay() {
 </script>
 
 <script>
-    // Function to show the overlay with project details
-    function showOverlay(title, description, image, fullDescription, author, date) {
-        document.getElementById("overlay-title").textContent = title;
-        document.getElementById("overlay-description").textContent = description;
-        document.getElementById("overlay-image").src = "{{ url_for('static', filename='usersubmissions/') }}" + image;
-        document.getElementById("overlay-full-description").textContent = fullDescription;
-        document.getElementById("overlay-author").textContent = author;
-        document.getElementById("overlay-date").textContent = date;
-
-        // Show the overlay
-        document.getElementById("overlay").style.display = "flex";
-      // Update URL without reloading the page
-    history.pushState({}, '', '/project/' + projectId); // Adjust 'projectId' accordingly
+function openProjectDetails(projectId) {
+    window.location.href = '/project_details/' + projectId;
 }
 
-
-    // Function to close the overlay
-    function closeOverlay() {
-        document.getElementById("overlay").style.display = "none";
-		    history.pushState({}, '', '/list');
-
-    }
-	
 document.addEventListener("DOMContentLoaded", function() {
-    {% if active_project %}
-        // Code to display the overlay with active_project details
-        showOverlay('{{ active_project.name }}', '{{ active_project.description }}', '{{ url_for('static', filename='usersubmissions/' + active_project.image_file) }}', '{{ active_project.full_description }}', '{{ active_project.author }}', '{{ active_project.date.strftime('%Y-%m-%d') }}');
-    {% endif %}
-});
-    // Add event listeners when DOM content is loaded
-    document.addEventListener("DOMContentLoaded", function(event) {
-        // Close overlay when clicking outside the overlay content
-        document.getElementById("overlay").addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeOverlay();
-            }
+    document.querySelectorAll('.project-thumbnail').forEach(item => {
+        item.addEventListener('click', function() {
+            const projectId = this.getAttribute('data-project-id');
+            window.location.href = '/project_details/' + projectId;
         });
+    });
 
 
-        // Initially hide user information
-        hideUserInfo();
 
-        // Event listener for filter form changes
-        document.getElementById('filter-form').addEventListener('change', function() {
-            this.submit();
-        });
-
-        // Delayed search functionality
+        // Delayed search functionality for the filter form
         document.getElementById('search').addEventListener('input', function() {
             clearTimeout(window.searchTimer);
             window.searchTimer = setTimeout(function() {
                 document.getElementById('filter-form').submit();
             }, 500); // Adjust delay as needed
+        });
+
+        // Event listener for filter form changes
+        document.getElementById('filter-form').addEventListener('change', function() {
+            this.submit();
         });
 
         // Redirect functions
