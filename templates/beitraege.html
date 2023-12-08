@@ -6,7 +6,9 @@
     <title>Stimmungskompass DEMO</title>
 	<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+ 
 </head>
 
    <style>
@@ -21,6 +23,10 @@
         img {
             border-radius: 30px;
             transition: transform 0.3s ease;
+        }
+		
+		  #map {
+            height: 400px;
         }
 
         .logo {
@@ -545,9 +551,15 @@ margin: auto;
 <input type="file" id="image" name="image_file" accept="image/*" required>
         </div>
 
-        <!-- Step 6: Map Location -->
-        <!-- ... Add Map Integration if needed ... -->
 
+
+    <!-- Map Container -->
+    <div class="input-field">
+        <label for="map">6. Choose a location on the map</label>
+        <div id="map"></div>
+        <input type="hidden" id="geoloc" name="geoloc" required>
+    </div>
+	
         <!-- Publish Button -->
 <button type="submit" class="button publish-button" onclick="console.log('Publish button clicked');">Publish</button>
 
@@ -557,6 +569,46 @@ margin: auto;
 
 </body>
 </html>
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([51.505, -0.09], 13); // Default location
+
+    // Load and display tile layer on the map
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Fix for broken marker image
+    var icon = new L.Icon({
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    // Add event listener for map click
+    var marker;
+    map.on('click', function(e) {
+        var coord = e.latlng;
+        var lat = coord.lat;
+        var lng = coord.lng;
+        console.log("You clicked the map at latitude: " + lat + " and longitude: " + lng); // Debugging
+
+        // Update the hidden input field
+        document.getElementById('geoloc').value = lat + ',' + lng;
+
+        // Add or update marker
+        if (marker) {
+            marker.setLatLng(coord);
+        } else {
+            marker = L.marker(coord, { icon: icon }).addTo(map);
+        }
+    });
+</script>
 <script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {

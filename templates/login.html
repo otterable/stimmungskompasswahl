@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta name="google-signin-client_id" content="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.comLogin successful!">
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
 </head>
 
  <style>
@@ -242,6 +245,8 @@ margin-bottom: 10px;
                 <p>Register to let your voice be heard!</p>
 				<p>You need an account to post suggestions, vote, and to comment.</p>
                 <button class="register-button">Register</button>
+				<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+
             </div>
         </div>
 
@@ -274,7 +279,6 @@ margin-bottom: 10px;
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Login successful!');
                     window.location.href = "{{ url_for('index') }}";
                 } else {
                     alert('Login failed - invalid credentials.');
@@ -286,3 +290,40 @@ margin-bottom: 10px;
             registerButton.addEventListener("click", redirectToRegister);
         });
     </script>
+
+<script>
+function onSignIn(googleUser) {
+    var profile = googleUser.getBasicProfile();
+    console.log('ID: ' + profile.getId()); // Don't send this directly to your server!
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail());
+
+    // Send this information to your server
+    // Example: POST request with the profile information
+
+    // Display success message
+    alert('Google login successful! Welcome, ' + profile.getName());
+    
+    // You might want to redirect the user or perform other actions here
+}
+
+function onFailure(error) {
+    console.log(error);
+    alert('Google login failed. Please try again.');
+}
+
+// Initialize Google Sign In
+function renderButton() {
+    gapi.signin2.render('g-signin2', {
+        'scope': 'profile email',
+        'width': 240,
+        'height': 50,
+        'longtitle': true,
+        'theme': 'dark',
+        'onsuccess': onSignIn,
+        'onfailure': onFailure
+    });
+}
+
+</script>

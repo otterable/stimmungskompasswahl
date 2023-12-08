@@ -5,7 +5,7 @@ from models import db, User, Project, Vote, Comment
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta
 from forms import RegistrationForm, LoginForm, CommentForm  # Import CommentForm
 from random import randint
 from urllib.parse import quote, unquote
@@ -19,6 +19,7 @@ import random
 import string
 import json
 import zipfile
+import pytz
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -95,11 +96,11 @@ def download_images():
             # Return the script as an HTML response
             return Response(download_script, mimetype='text/html')
         else:
-            flash('No images available to download.', 'info')
+            # flash('No images available to download.', 'info')
             return redirect(url_for('opendata'))
     except Exception as e:
         logging.error("Error in downloading images: %s", e)
-        flash('Error in downloading images.', 'danger')
+        # flash('Error in downloading images.', 'danger')
         return redirect(url_for('opendata'))
 
 
@@ -170,7 +171,7 @@ def register():
         # Check for existing user with the same phone number
         existing_user = User.query.filter_by(phone_number=phone_number).first()
         if existing_user:
-            flash('An account with this phone number already exists.', 'danger')
+            # flash('An account with this phone number already exists.', 'danger')
             logging.debug("Account registration failed: Phone number already exists")
             return jsonify({'success': False, 'message': 'User already exists'}), 400
 
@@ -247,12 +248,12 @@ def reset_password():
                 user.set_password(new_password)
                 db.session.commit()
                 logging.debug(f"Password reset for user with phone number {phone_number}")
-                flash('Your password has been reset successfully.', 'success')
+                # flash('Your password has been reset successfully.', 'success')
                 return redirect(url_for('login'))
-            else:
-                flash('Invalid phone number.', 'danger')
-        else:
-            flash('Invalid OTP. Please try again.', 'danger')
+            # else:
+                # flash('Invalid phone number.', 'danger')
+        # else:
+            # flash('Invalid OTP. Please try again.', 'danger')
     return render_template('reset_password.html')
     
 @app.route('/beitraege')
@@ -286,6 +287,8 @@ def submit_project():
             # Debugging: Confirm image saving
             logging.debug("Image saved to: %s", image_path)
 
+            current_time = datetime.now(pytz.utc) + timedelta(hours=1)  # Adjusting time to your timezone
+
             new_project = Project(
                 name=name,
                 category=category,
@@ -293,7 +296,8 @@ def submit_project():
                 public_benefit=public_benefit,
                 image_file=image_filename,
                 geoloc=geoloc,
-                author=current_user.id
+                author=current_user.id,
+                date=current_time  # Corrected field for the timestamp
             )
 
             # Debugging: Print new project details
@@ -305,10 +309,8 @@ def submit_project():
             # Debugging: Confirm database commit
             logging.debug("New project added to database with ID: %s", new_project.id)
 
-            flash('Your project has been successfully submitted.', 'success')
             return redirect(url_for('index'))
         else:
-            flash('Please upload an image for your project.', 'danger')
             return redirect(url_for('submit_project'))
 
     # Display the form for GET request
@@ -415,13 +417,13 @@ def downvote(project_id):
     existing_downvote = Downvote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
 
     if existing_downvote:
-        flash('You have already downvoted this project.', 'info')
+        # flash('You have already downvoted this project.', 'info')
         return redirect(url_for('list_view'))
 
     downvote = Downvote(user_id=current_user.id, project_id=project.id, ip_address=request.remote_addr)
     db.session.add(downvote)
     db.session.commit()
-    flash('Your downvote has been recorded!', 'success')
+    # flash('Your downvote has been recorded!', 'success')
     return redirect(url_for('list_view'))
 
 
@@ -448,7 +450,7 @@ def vote(project_id, vote_type):
 
     db.session.add(new_vote)
     db.session.commit()
-    flash('Your vote has been recorded!', 'success')
+    # flash('Your vote has been recorded!', 'success')
     return redirect(url_for('project_details', project_id=project_id))
 
 
@@ -469,7 +471,7 @@ def comment(project_id):
     db.session.add(new_comment)
     db.session.commit()
     
-    flash('Your comment has been posted!', 'success')
+    # flash('Your comment has been posted!', 'success')
     return redirect(url_for('list_view'))
 
 @app.route('/opendata')
@@ -575,11 +577,11 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             logging.debug("Login successful")
-            flash('Login successful!', 'success')
+            # flash('Login successful!', 'success')
             return jsonify(success=True)
         else:
             logging.debug("Login failed")
-            flash('Login failed - invalid credentials.', 'danger')
+            # flash('Login failed - invalid credentials.', 'danger')
             return jsonify(success=False)
 
     return render_template('login.html')
@@ -594,7 +596,7 @@ def single_vote(project_id):
         vote = Vote(user_id=current_user.id, project_id=project.id, ip_address=request.remote_addr)
         db.session.add(vote)
         db.session.commit()
-        flash('Your vote has been recorded!', 'success')
+        # flash('Your vote has been recorded!', 'success')
         return redirect(url_for('index'))
     return render_template('vote.html', project=project)
 
