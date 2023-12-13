@@ -1832,6 +1832,14 @@ margin: auto;
 <body>
 
 <!-- Top Bar -->
+
+
+{% if current_user.is_authenticated %}
+    <div class="logged-in-info">
+        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
+    </div>
+{% endif %}
+
 <div class="top-bar">
     <a href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
@@ -1848,7 +1856,7 @@ margin: auto;
             <a href="/opendata">Open Data</a>
 
             {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
 <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
            {% endif %}
@@ -1925,23 +1933,6 @@ margin: auto;
 <?php CATEGORIES PULL END ?>
 </div>
 <?php SIDEBAR BODY END ?>
-
-<script>
-function logoutUser() {
-    // Remember the current URL
-    const currentUrl = window.location.href;
-
-    fetch("{{ url_for('logout') }}")
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Redirect back to the same page
-            window.location.href = currentUrl;
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-</script>
 
 <script type="text/javascript">
 // Initialize the map

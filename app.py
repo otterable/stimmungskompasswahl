@@ -119,7 +119,9 @@ def index():
 @login_required
 def logout():
     logout_user()
-    return jsonify({'success': True})
+    next_page = request.args.get('next')
+    return redirect(next_page or url_for('index'))  # 'index' is the function name of your home route
+
 
 
 
@@ -403,6 +405,24 @@ def list_view(page=1):
     # Paginate the query
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
 
+    # Calculate upvote and downvote counts and percentages
+    for project in paginated_projects.items:
+        upvotes = sum(vote.upvote for vote in project.votes)
+        downvotes = sum(vote.downvote for vote in project.votes)
+        total_votes = upvotes + downvotes
+
+        # Add upvote and downvote counts to each project
+        project.upvotes = upvotes
+        project.downvotes = downvotes
+
+        # Calculate and add percentages
+        if total_votes > 0:
+            project.upvote_percentage = upvotes / total_votes * 100
+            project.downvote_percentage = downvotes / total_votes * 100
+        else:
+            project.upvote_percentage = 0
+            project.downvote_percentage = 0
+
     return render_template('list.html', projects=paginated_projects.items, pagination=paginated_projects)
 
 
@@ -468,36 +488,42 @@ def delete_my_data():
     try:
         user_id = current_user.id
 
-        # Delete user's votes, comments, projects, and account
+        # Delete user's votes
         Vote.query.filter_by(user_id=user_id).delete()
+
+        # Delete user's comments
         Comment.query.filter_by(user_id=user_id).delete()
 
+        # Delete user's projects and associated files
         projects = Project.query.filter_by(author=user_id).all()
-        for project in projects:
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], project.image_file)
-            if os.path.exists(image_path):
-                os.remove(image_path)
-            db.session.delete(project)
+        for project in paginated_projects.items:
+            total_votes = sum(vote.upvote + vote.downvote for vote in project.votes)
+            project.upvotes = sum(vote.upvote for vote in project.votes)
+            project.downvotes = sum(vote.downvote for vote in project.votes)
+            if total_votes > 0:
+                project.upvote_percentage = project.upvotes / total_votes * 100
+                project.downvote_percentage = project.downvotes / total_votes * 100
+            else:
+                project.upvote_percentage = 0
+                project.downvote_percentage = 0
 
+
+        # Delete user account
         User.query.filter_by(id=user_id).delete()
 
         # Commit changes to the database
         db.session.commit()
 
-        # Vacuum the database to reclaim space (may not work as expected with SQLite)
-        try:
-            db.session.execute('VACUUM')
-            db.session.commit()
-        except Exception as vacuum_error:
-            logging.error(f"Error during VACUUM: {vacuum_error}")
-
         # Log out the user
         logout_user()
 
+        # flash message or return JSON response
         return jsonify({'success': True, 'message': 'Your data has been deleted successfully.'})
     except Exception as e:
         logging.error(f"Error in delete_my_data: {e}")
+        # flash message or return JSON response
         return jsonify({'success': False, 'message': 'An error occurred while deleting your data.'}), 500
+
 
 
 
@@ -541,8 +567,25 @@ def vote(project_id, vote_type):
 
     db.session.add(new_vote)
     db.session.commit()
-    # flash('Your vote has been recorded!', 'success')
-    return redirect(url_for('project_details', project_id=project_id))
+
+    # Re-fetch the project to get updated vote counts
+    project = Project.query.get_or_404(project_id)
+    upvote_count = sum(vote.upvote for vote in project.votes)
+    downvote_count = sum(vote.downvote for vote in project.votes)
+    total_votes = upvote_count + downvote_count
+    upvote_percentage = (upvote_count / total_votes * 100) if total_votes > 0 else 0
+    downvote_percentage = (downvote_count / total_votes * 100) if total_votes > 0 else 0
+
+    # Return updated vote data
+    return jsonify({
+        'success': True,
+        'message': 'Vote recorded',
+        'upvote_count': upvote_count,
+        'downvote_count': downvote_count,
+        'upvote_percentage': upvote_percentage,
+        'downvote_percentage': downvote_percentage
+    })
+
 
 
 @app.route('/comment/<int:project_id>', methods=['POST'])
@@ -551,7 +594,10 @@ def comment(project_id):
     project = Project.query.get_or_404(project_id)
     comment_text = request.form.get('comment')
 
-    new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=project_id)
+    # Add one hour to the current timestamp
+    timestamp = datetime.now() + timedelta(hours=0)
+
+    new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=project_id, timestamp=timestamp)
     db.session.add(new_comment)
     db.session.commit()
 

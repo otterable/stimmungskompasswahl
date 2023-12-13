@@ -238,6 +238,48 @@ nav[aria-label="Page navigation"] {
     transform: scale(1.03); /* Scale up slightly on hover */
 }
 
+.voting-bar {
+    width: 90%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 30px !important;
+    margin-top: 0px;
+    display: flex;
+}
+
+.upvotes {
+    height: 100%;
+    background-color: #4caf50;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.downvotes {
+    height: 100%;
+    background-color: #b71c1c;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.upvotes, .downvotes {
+    /* Existing styles */
+    position: relative; /* Ensure the position is relative for child positioning */
+}
+
+.upvotes span, .downvotes span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Choose a contrasting color */
+    font-size: 12px; /* Adjust the font size */
+    white-space: nowrap;
+    pointer-events: none; /* Prevents blocking click events */
+}
+
+
+
+
 /* Underline effect for links that do not contain buttons */
 .top-bar a:not(:has(> button))::after {
     content: "";
@@ -440,12 +482,13 @@ nav[aria-label="Page navigation"] {
     border-radius: 30px;
     margin: 10px;
     padding: 10px;
-    display: inline-block;
-    vertical-align: top;
+    display: flex; /* Changed to flex to better control the layout */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
     box-sizing: border-box;
-    overflow: hidden;
     transition: transform 0.3s ease;
     position: relative;
+    overflow: visible; /* Ensure the content is not clipped */
 }
 
 /* Hover effect for project thumbnails */
@@ -466,16 +509,15 @@ nav[aria-label="Page navigation"] {
 .project-thumbnail h2, .project-thumbnail p {
     margin: 0;
     padding: 5px 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    width: 90%; /* Adjust the width to match the image */
+    text-align: center; /* Center the text */
 }
 
-/* Description positioning */
+/* Remove absolute positioning from the description */
 .project-thumbnail p {
-    position: absolute;
-    bottom: 10px;
-    width: 90%;
+    position: relative; /* Changed from absolute to relative */
+    bottom: auto; /* Remove bottom positioning */
+    overflow: visible; /* Ensure text is not clipped */
 }
 
 /* Desktop screens (larger than 1200px) */
@@ -871,7 +913,7 @@ nav[aria-label="Page navigation"] {
             <a href="/opendata">Open Data</a>
 
             {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
 <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
            {% endif %}
@@ -973,26 +1015,50 @@ nav[aria-label="Page navigation"] {
 
 <div class="projects-header">
     <h1>Citizen-submitted projects</h1>
-    <p>Click on a project to display details!</p>
+    {% if projects %}
+        <p>Click on a project to display details!</p>
+    {% endif %}
 </div>
 
 <div class="project-list">
-  {% for project in projects %}
-<div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">
-    <h2>{{ project.name }}</h2>
-    <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
-    <p>{{ project.description }}</p>
-    <p>Date: {{ project.date.strftime('%Y-%m-%d') }}</p>
-</div>
-{% endfor %}
+    {% if projects %}
+        {% for project in projects %}
+            <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">
+                <h2>{{ project.name }}</h2>
+                <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
 
+                <!-- Voting Bar -->
+                <div class="voting-bar">
+                    {% if project.upvotes > 0 %}
+                    <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                        <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                    </div>
+                    {% endif %}
+                    {% if project.downvotes > 0 %}
+                    <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                        <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+                <p>{{ project.description }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center;">No results found. Submit your own project!</p>
+    {% endif %}
 </div>
 
-<div class="pagination-text" style="text-align: center; margin-top: 10px; margin-bottom: 0;">
-    <strong>Seiten:</strong>
+
+
 </div>
 
 {% if pagination.pages > 1 %}
+    <div class="pagination-text" style="text-align: center; margin-top: 10px; margin-bottom: 0;">
+        <strong>Seiten:</strong>
+    </div>
+
     <nav aria-label="Page navigation" style="margin-top: 0;">
         <ul class="pagination">
             {% for page in pagination.iter_pages() %}
@@ -1009,6 +1075,7 @@ nav[aria-label="Page navigation"] {
         </ul>
     </nav>
 {% endif %}
+
 
 
 
@@ -1032,22 +1099,7 @@ nav[aria-label="Page navigation"] {
         <div id="modalBody"></div>
     </div>
 </div>
-<script>
-function logoutUser() {
-    // Remember the current URL
-    const currentUrl = window.location.href;
 
-    fetch("{{ url_for('logout') }}")
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Redirect back to the same page
-            window.location.href = currentUrl;
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-</script>
 <script>
     function openModal(projectId) {
         // AJAX request to get project details

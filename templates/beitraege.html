@@ -506,7 +506,7 @@ display: block;
             <a href="/opendata">Open Data</a>
 
             {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+    <a href="{{ url_for('logout', next=(request.endpoint if request.endpoint != 'beitraege' else '/')) }}"><button class="button">Abmelden</button></a>
             {% else %}
 <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
            {% endif %}
@@ -588,16 +588,6 @@ display: block;
 </body>
 </html>
 
-<script>
-function logoutUser() {
-    fetch("{{ url_for('logout') }}")
-    .then(response => {
-        // Redirect to the index page after successful logout
-        window.location.href = "{{ url_for('index') }}";
-    })
-    .catch(error => console.error('Error:', error));
-}
-</script>
 
 <script>
 

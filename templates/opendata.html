@@ -80,15 +80,24 @@
 }
 
 .publish-button {
-    width: 100%; /* Full width */
-    padding: 20px 0; /* Vertical padding */
-    font-size: 20px; /* Font size */
-    background-color: #2874A6; /* Background color */
-    color: white; /* Text color */
-    border-radius: 30px; /* Border radius */
-    border: none; /* No border by default */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: transform 0.3s ease, border 0.3s ease; /* Smooth transition for transform and border */
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 14px 0;
+    padding: 15px;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-decoration: none;
+	    white-space: normal;
+    border-radius: 30px;
+    background-color: #111111; /* Use a general variable */
+    transition: background-color 0.2s ease-in-out;
+    color: white;
+    text-align: center;
+    line-height: 1;
+    max-height: 40px;
+    width: 100%;
 }
 
 .publish-button:hover {
@@ -489,7 +498,7 @@ display: block;
             <a href="/opendata">Open Data</a>
 
             {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
 <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
            {% endif %}
@@ -503,33 +512,31 @@ display: block;
     <p>Data will be in a single machine-readable JSON file. Pictures will be packed into a .zip file.</p>
     <p>The data will include: Project title, short and long description, post date, votes, and comments.</p>
 
-       <h2>Delete Your Data</h2>
-    <p>Would you like to delete all your data from the website? This action is irreversible.</p>
-    <button id="delete-data-btn" class="button danger-button">Delete All My Data</button>
 
 	<div>
-	<a href="{{ url_for('download_data') }}" class="publish-button ">Download Website Data</a> <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Download Images</a>
+	 <h2>Download all website data</h2>
+	<p>This will download the data of the entire website, in a machine-readable .json file.</p>
+	<p>The data contains all project data, including geolocations, their categories, descriptions, and more.</p>
+	<a href="{{ url_for('download_data') }}" class="publish-button">Download Website Data</a> <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Download Images</a>
+
+
+
+        <h2>Delete Account</h2>
+        {% if current_user.is_authenticated %}
+            <p>Would you like to delete all your data from the website? This action is irreversible.</p>
+				<p> Your account, your project, votes, comments and images will be deleted from the website.</p>
+
+            <a href="{{ url_for('delete_my_data') }}" class="publish-button" id="delete-data-btn">Delete All My Data</a>
+        {% else %}
+            <p>Please log in to delete your data.</p>
+        {% endif %}
+
 
 <a id="download-link" href="#" style="display: none;"></a>
 	</div>
 </body>
 </html>
-<script>
-function logoutUser() {
-    // Remember the current URL
-    const currentUrl = window.location.href;
 
-    fetch("{{ url_for('logout') }}")
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Redirect back to the same page
-            window.location.href = currentUrl;
-        }
-    })
-    .catch(error => console.error('Error:', error));
-}
-</script>
    <script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
@@ -628,5 +635,6 @@ document.getElementById('delete-data-btn').addEventListener('click', function() 
         .catch(error => console.error('Error:', error));
     }
 });
+
 
 </script>
