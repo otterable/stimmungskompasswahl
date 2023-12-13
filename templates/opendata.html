@@ -503,12 +503,12 @@ display: block;
     <p>Data will be in a single machine-readable JSON file. Pictures will be packed into a .zip file.</p>
     <p>The data will include: Project title, short and long description, post date, votes, and comments.</p>
 
-    <h2>Delete Your Data</h2>
-    <p>Would you like to delete all your data from the website?</p>
-    <p>You can do this yourself, without filling out any form. All data associated with you (for example, name, address, phone, and e-mail data) will be deleted from the server, as well as the submissions and comments you have made.</p>
+       <h2>Delete Your Data</h2>
+    <p>Would you like to delete all your data from the website? This action is irreversible.</p>
+    <button id="delete-data-btn" class="button danger-button">Delete All My Data</button>
 
 	<div>
-	<a href="{{ url_for('download_data') }}" class="publish-button ">Download Website Data</a> <a href="{{ url_for('download_images') }}" class="publish-button">Download Images</a>
+	<a href="{{ url_for('download_data') }}" class="publish-button ">Download Website Data</a> <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Download Images</a>
 
 <a id="download-link" href="#" style="display: none;"></a>
 	</div>
@@ -606,3 +606,27 @@ function logoutUser() {
 }
 
     </script>
+	
+	<script>
+document.getElementById('delete-data-btn').addEventListener('click', function() {
+    var confirmation = confirm('Are you sure you want to permanently delete all your data? This action cannot be undone.');
+    if (confirmation) {
+        fetch('{{ url_for("delete_my_data") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // Add CSRF token if you're using CSRF protection, otherwise remove this line
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success) {
+                window.location.href = '/'; // Redirect to the homepage or login page
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+});
+
+</script>

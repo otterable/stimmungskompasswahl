@@ -459,9 +459,48 @@ def project_details(project_id):
     except Exception as e:
         logging.error("Error in project_details route: %s", str(e))
         return str(e)  # or redirect to a generic error page
+        
+        
+        
+@app.route('/delete_my_data', methods=['POST'])
+@login_required
+def delete_my_data():
+    try:
+        user_id = current_user.id
+
+        # Delete user's votes, comments, projects, and account
+        Vote.query.filter_by(user_id=user_id).delete()
+        Comment.query.filter_by(user_id=user_id).delete()
+
+        projects = Project.query.filter_by(author=user_id).all()
+        for project in projects:
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], project.image_file)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+            db.session.delete(project)
+
+        User.query.filter_by(id=user_id).delete()
+
+        # Commit changes to the database
+        db.session.commit()
+
+        # Vacuum the database to reclaim space (may not work as expected with SQLite)
+        try:
+            db.session.execute('VACUUM')
+            db.session.commit()
+        except Exception as vacuum_error:
+            logging.error(f"Error during VACUUM: {vacuum_error}")
+
+        # Log out the user
+        logout_user()
+
+        return jsonify({'success': True, 'message': 'Your data has been deleted successfully.'})
+    except Exception as e:
+        logging.error(f"Error in delete_my_data: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred while deleting your data.'}), 500
 
 
-    
+
 @app.route('/downvote/<int:project_id>', methods=['POST'])
 @login_required
 def downvote(project_id):
@@ -566,31 +605,21 @@ def verify_otp():
 
     return render_template('verify_otp.html')
 
-
 @app.route('/download_data')
 def download_data():
     # Querying data from the database
     projects = Project.query.all()
     votes = Vote.query.all()
     comments = Comment.query.all()
-    downvotes = Downvote.query.all()
 
-    # Converting data to JSON format
+    # Convert data to JSON format
     data = {
         "projects": [project.to_dict() for project in projects],
         "votes": [vote.to_dict() for vote in votes],
-        "comments": [comment.to_dict() for comment in comments],
-        "downvotes": [downvote.to_dict() for downvote in downvotes]
+        "comments": [comment.to_dict() for comment in comments]
     }
 
-    # Creating a response with the JSON data
-    response = Response(
-        json.dumps(data, default=str),
-        mimetype='application/json',
-        headers={'Content-Disposition': 'attachment;filename=data.json'}
-    )
-
-       # Create a zip file of user submissions
+    # Create a zip file of user submissions
     zip_path = zip_user_submissions()
 
     if zip_path and zip_path.is_file():
@@ -606,6 +635,7 @@ def download_data():
     )
 
     return response
+
 
 @login_manager.user_loader
 def load_user(user_id):

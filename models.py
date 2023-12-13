@@ -63,14 +63,11 @@ class Vote(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "name": self.name,
-            "category": self.category,
-            "descriptionwhy": self.descriptionwhy,
-            "public_benefit": self.public_benefit,
-            "image_file": self.image_file,
-            "geoloc": self.geoloc,
-            "date": self.date.strftime("%Y-%m-%d %H:%M:%S"),
-            "author": self.author
+            "project_id": self.project_id,
+            "user_id": self.user_id,
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "upvote": self.upvote,
+            "downvote": self.downvote
         }
         
 class Comment(db.Model):
