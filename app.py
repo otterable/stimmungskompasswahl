@@ -204,6 +204,31 @@ def register():
 
     return render_template('register.html')
 
+@app.route('/get_projects')
+def get_projects():
+    try:
+        projects = Project.query.all()
+        projects_data = []
+        for project in projects:
+            upvotes = sum(1 for vote in project.votes if vote.upvote)
+            downvotes = sum(1 for vote in project.votes if vote.downvote)
+            upvote_percentage = (upvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
+            downvote_percentage = (downvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
+
+            project_data = project.to_dict()
+            project_data['upvotes'] = upvotes
+            project_data['downvotes'] = downvotes
+            project_data['upvote_percentage'] = upvote_percentage
+            project_data['downvote_percentage'] = downvote_percentage
+            projects_data.append(project_data)
+        return jsonify(projects_data)
+    except Exception as e:
+        logging.error(f"Error in get_projects: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+
+
 
 
 def generate_otp_and_send(phone_number):
@@ -220,6 +245,18 @@ def generate_otp_and_send(phone_number):
         logging.error(f"Error sending OTP: {e}")
         return None
     return otp
+
+
+@app.route('/favicon.ico')
+def favicon():
+    app.logger.debug('Favicon loaded successfully')  # Add this debug message
+    return url_for('static', filename='favicon.ico')
+    
+@app.route('/karte')
+def karte():
+    # Additional logic can be added here if needed
+    return render_template('karte.html')
+
 
 @app.route('/request_otp', methods=['POST'])
 def request_otp():
@@ -323,7 +360,7 @@ def submit_project():
 @app.route('/list')
 @app.route('/list/pages/<int:page>')
 def list_view(page=1):
-    per_page = 3  # Number of projects per page
+    per_page = 9  # Number of projects per page
 
     query = Project.query
 
