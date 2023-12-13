@@ -170,7 +170,8 @@ display:none !important;
         top: 95px; /* Increased from 15px to 95px to accommodate the top bar's height */
         bottom: 15px;
         border-radius: 30px;
-        overflow: hidden;
+		    overflow-y: auto; /* Enables vertical scrolling */
+
     }
 
     #map {
@@ -186,7 +187,6 @@ display:none !important;
         bottom: 15px;
         padding: 10px;
         border-radius: 30px;
-        overflow: hidden;
         background: var(--sidebar-bg); /* Use variable for background */
     }
 }
@@ -217,6 +217,12 @@ display:none !important;
 ::-webkit-scrollbar {
     width: 0px; /* Hide scrollbar globally */
 }
+
+.faded {
+    opacity: 0.5; /* Adjust the value as needed for the desired faded effect */
+    transition: opacity 0.3s ease; /* Smooth transition for the opacity change */
+}
+
 
 ::-webkit-scrollbar-thumb {
     background-color: transparent; /* Invisible scrollbar thumb globally */
@@ -253,6 +259,7 @@ body {
 /* Custom Scrollbar CSS End */
 
 
+
 /* CITY PICTURE CSS START */
 .logo-img {
 max-width: 100%;
@@ -277,7 +284,7 @@ border-radius: 30px;"
 
 /* LEAFLET MAP ICONS CSS */
 .leaflet-control-zoom-in, .leaflet-control-zoom-out, .leaflet-draw-draw-polyline, .leaflet-draw-draw-polygon, .leaflet-draw-draw-rectangle, .leaflet-draw-draw-circle, .leaflet-draw-draw-marker, .leaflet-draw-draw-circlemarker, .leaflet-draw-edit-edit, .leaflet-draw-edit-remove {
-  background-color: #ffffff !important; /* Use variable */
+  background-color: #f5f1e4 !important; /* Use variable */
   color: #000000 !important; /* Use variable */
   border: none !important;
   font-size: 18px !important;
@@ -370,9 +377,7 @@ display: none !important;
     opacity: 1;
 }
 
-.leaflet-control-layers-expanded {
-    color: #ffffff !important;
-}
+
 
 
 /* Hide the background image when the control layers menu is expanded */
@@ -382,6 +387,7 @@ display: none !important;
 
 .leaflet-control-layers-expanded .leaflet-control-layers-list {
     color: #ffffff !important;
+
     font-size: 15px;
     font-weight: bold;
     padding: 10px;  /* Added padding here */
@@ -389,6 +395,7 @@ display: none !important;
 
 .leaflet-control-layers-selector {
     color: #ffffff !important;
+	
     margin: 2px !important;
 }
 
@@ -399,6 +406,8 @@ display: none !important;
 
 /* Your existing rules for .leaflet-control-layers and .leaflet-top leaflet-right had typos, corrected below */
 .leaflet-control-layers.leaflet-control {
+		background-color: #f5f1e4 !important;
+
     border-radius: 30px;
 }
 
@@ -888,6 +897,14 @@ display: none !important;
   text-align: center;
 }
 
+.logged-in-info {
+    text-align: center; /* Centers the text inside the div */
+    padding: 2px 0; /* Adds some padding above and below the text */
+    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
+    /* Other styling as needed, such as font size, color, etc. */
+}
+
+
 #popup-text img {
   max-width: 95%;  /* Ensures the image does not exceed the width of the popup */
   height: auto;     /* Maintains the aspect ratio of the image */
@@ -1127,6 +1144,8 @@ margin-bottom: 50px;
         margin-bottom: 15px;
         overflow: hidden;
 		width: auto;
+		    overflow-y: auto; /* Enables vertical scrolling */
+
 		background: var(--sidebar-bg); /* Use variable for background */
     }
 	
@@ -1238,6 +1257,8 @@ margin-bottom: 50px;
         top: 95px; /* Increased from 15px to 95px to accommodate the top bar's height */
         bottom: 15px; /* Consistent margin from the bottom */
         padding: 10px; /* Maintain padding */
+		    overflow-y: auto; /* Enables vertical scrolling */
+
         border-radius: 30px; /* Maintain border radius */
         background: var(--sidebar-bg); /* Use variable for background */
     }
@@ -1665,12 +1686,10 @@ margin: auto;
     z-index: 1000; /* High z-index to ensure it's on top */
 }
 
-.nav-overlay-active {
-display: block;
-}
 .nav-overlay-active .main-content {
     pointer-events: none;
 }
+
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
@@ -1822,17 +1841,17 @@ display: block;
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
             <a href="/karte">Karte</a>
-            <a href="/list">Suggestions</a>
-            <a href="/beitraege">Submit a project</a>
-            <a href="/erfolge">Success stories</a>
-            <a href="/ueber">Contact</a>
+            <a href="/list">Beiträge</a>
+            <a href="/beitraege">Beitrag hinzufügen</a>
+            <a href="/erfolge">Erfolge</a>
+            <a href="/ueber">Über</a>
             <a href="/opendata">Open Data</a>
 
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
+<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
             {% else %}
-                <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
-            {% endif %}
+<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+           {% endif %}
         </div>
     </div>
 </div>
@@ -1906,11 +1925,31 @@ display: block;
 <?php CATEGORIES PULL END ?>
 </div>
 <?php SIDEBAR BODY END ?>
+
+<script>
+function logoutUser() {
+    // Remember the current URL
+    const currentUrl = window.location.href;
+
+    fetch("{{ url_for('logout') }}")
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect back to the same page
+            window.location.href = currentUrl;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
 <script type="text/javascript">
 // Initialize the map
 var map = L.map('map').setView([48.4102, 15.6022], 15);
 var currentDrawnLayer = null;
 var selectedToolButton = null;
+// Track the current base layer
+var currentBaseLayer = 'Standardkarte'; // Default layer
 
 // Calculate the offset for boundaries
 var horizontalOffset = 1125; // 1.125 km on each side, total 2.25 km
@@ -2039,23 +2078,38 @@ var baseLayers = {
 
 
 map.on('baselayerchange', function(e) {
-    console.log('Map base layer switched to:', e.name);
+    currentBaseLayer = e.name;
+    updateMarkerIcons();
 });
 
 L.control.layers(baseLayers).addTo(map);
 
 
     // Function to create a colored circle icon
+// Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor) {
-    // Increase the pin size by 3 times
-    pinSize = pinSize * 1.5;
+    // Adjust pin size based on current base layer
+    if (currentBaseLayer === 'Satellit') {
+        pinSize = pinSize * 2.5; // Increase size more for satellite view
+    } else {
+        pinSize = pinSize * 1.5; // Default increase
+    }
 
-    // Increase the outline size for a thicker outline
-    outlineSize = outlineSize * 10; // Adjust this as needed for the desired thickness
+    var strokeColor, strokeWidth, strokeOpacity;
+
+    if (currentBaseLayer === 'Satellit') {
+        strokeColor = 'white';
+        strokeWidth = 5; // Thicker white outline
+        strokeOpacity = 1;
+    } else {
+        strokeColor = fillColor;
+        strokeWidth = outlineSize * 10;
+        strokeOpacity = 0.5; // 50% opacity
+    }
 
     var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${pinSize}" height="${pinSize}" viewBox="0 0 ${pinSize} ${pinSize}">
         <circle cx="${pinSize / 2}" cy="${pinSize / 2}" r="${pinSize / 4}" fill="${fillColor}" />
-        <circle cx="${pinSize / 2}" cy="${pinSize / 2}" r="${pinSize / 4}" stroke="${fillColor}" stroke-width="${outlineSize}" fill="none" stroke-opacity="0.5" />
+        <circle cx="${pinSize / 2}" cy="${pinSize / 2}" r="${pinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
     </svg>`;
 
     return L.icon({
@@ -2065,6 +2119,24 @@ function createIcon(pinSize, outlineSize, fillColor) {
         popupAnchor: [0, -pinSize / 2]
     });
 }
+
+
+
+function updateMarkerIcons() {
+    for (var category in categoryLayers) {
+        categoryLayers[category].eachLayer(function(marker) {
+            // Assuming 'outlineSize' value is constant for all markers, adjust if necessary
+            var pinSize = 24; // Base pin size
+            var outlineSize = 2;
+            var fillColor = getCategoryColor(marker.options.category); // Assuming each marker has a 'category' option
+
+            var newIcon = createIcon(pinSize, outlineSize, fillColor);
+            marker.setIcon(newIcon);
+        });
+    }
+}
+
+
 
     // Function to get color based on category
     function getCategoryColor(category) {
@@ -2116,7 +2188,11 @@ function addMarkers(projects) {
                 </div>
             `;
 
-            var marker = L.marker(latLng, {icon: createIcon(24, 2, fillColor)}).addTo(map);
+var marker = L.marker(latLng, {
+    icon: createIcon(24, 2, getCategoryColor(project.category)),
+    category: project.category // Make sure this line is present when creating markers
+}).addTo(map);
+
             marker.bindPopup(`
                 <div style="text-align: center;">
                     <b>${project.name}</b><br>
@@ -2141,6 +2217,8 @@ function addMarkers(projects) {
     });
 }
 
+
+
 fetch('/get_projects')
     .then(response => response.json())
     .then(data => {
@@ -2154,16 +2232,15 @@ fetch('/get_projects')
 function createCategoryButtons() {
     var container = document.getElementById('category-toggle-buttons');
     for (var category in categoryLayers) {
-        // Create a div to wrap the button
         var wrapperDiv = document.createElement('div');
         wrapperDiv.style.textAlign = 'center';
 
-        // Create the category button
+
+ // Create the category button
         var button = document.createElement('button');
         button.innerText = `${category} (${categoryLayers[category].getLayers().length} Beiträge)`;
-        button.onclick = function() {
-            toggleCategory(this.innerText); // Keep the category name for toggling
-        };
+        button.setAttribute('category-name', category);
+
 
         // Apply custom styles to the button
         button.style.fontWeight = 'bold';
@@ -2179,34 +2256,61 @@ function createCategoryButtons() {
         button.style.transition = 'background-color 0.2s ease-in-out';
         button.style.borderRadius = '30px';
         button.style.textAlign = 'center';
-        button.style.border = 'none';
+        button.style.border = '3px solid #3a3a3a'; // Added black border
         button.style.flexGrow = '1';
         button.style.flexShrink = '1';
-        button.style.padding = '7px'; // Increased padding
+        button.style.padding = '7px';
         button.style.margin = '7px auto';
-        button.style.fontSize = '18px'; // Increased font size
-        button.style.color = 'white'; // Text color changed to white
-        button.style.backgroundColor = getCategoryColor(category); // Set background color based on category
+        button.style.fontSize = '18px';
+        button.style.color = 'white';
+        button.style.backgroundColor = getCategoryColor(category);
 
-        // Append the button to the wrapper div
+
+        applyButtonStyles(button);
+        setButtonState(button, category);
+
+  // Add faded effect if the layer is not initially visible
+        if (!map.hasLayer(categoryLayers[category])) {
+            button.classList.add('faded');
+        }
+
+        // Set onclick event
+         button.onclick = function() {
+            toggleCategory(this.innerText);
+            setButtonState(this, this.getAttribute('category-name'));
+        };
+
         wrapperDiv.appendChild(button);
-
-        // Append the wrapper div to the container
         container.appendChild(wrapperDiv);
     }
 }
+function setButtonState(button, category) {
+    if (map.hasLayer(categoryLayers[category])) {
+        button.classList.remove('faded');
+    } else {
+        button.classList.add('faded');
+    }
+}
 
+
+function applyButtonStyles(button) {
+    button.style.fontWeight = 'bold';
+    // ... rest of the styling ...
+}
 
 
 function toggleCategory(categoryName) {
     for (var category in categoryLayers) {
         if (categoryLayers.hasOwnProperty(category)) {
             var layer = categoryLayers[category];
+            var button = document.querySelector(`button[category-name="${category}"]`);
             if (categoryName === `${category} (${layer.getLayers().length} Beiträge)`) {
                 if (map.hasLayer(layer)) {
                     map.removeLayer(layer);
+                    button.classList.remove('faded');
                 } else {
                     map.addLayer(layer);
+                    button.classList.add('faded');
                 }
             }
         }
@@ -2241,13 +2345,82 @@ function updateCategoryButtonColors() {
 updateCategoryButtonColors();
 	
 </script>
-<script>
-document.getElementById('hamburger-button').addEventListener('click', function() {
-    var navOverlay = document.getElementById('nav-overlay');
-    navOverlay.classList.toggle('nav-overlay-active');
-});
-</script>
+   <script>
+    // Toggle the navigation overlay when the hamburger button is clicked
+    document.getElementById('hamburger-button').addEventListener('click', function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        navOverlay.classList.toggle('nav-overlay-active');
+    });
 
+    // Close the navigation overlay when clicking on the overlay background or on a non-button element
+    document.getElementById('nav-overlay').addEventListener('click', function(event) {
+        // Close only if the clicked element is not a button or a link
+        if (!event.target.closest('button, a')) {
+            closeNavOverlay();
+        }
+    });
+
+    // Function to close the navigation overlay
+    function closeNavOverlay() {
+        var navOverlay = document.getElementById('nav-overlay');
+        navOverlay.classList.remove('nav-overlay-active');
+    }
+
+    // Prevent closing when clicking on buttons (delegation)
+    document.getElementById('nav-links').addEventListener('click', function(event) {
+        if (event.target.tagName === 'BUTTON' || event.target.tagName === 'A') {
+            event.stopPropagation();
+        }
+    });
+
+    // Resize event listener
+    window.addEventListener('resize', function() {
+        // Check if the window width is greater than the threshold for mobile view
+        if (window.innerWidth > 1080) {
+            // Make sure the nav-overlay is displayed
+            document.getElementById('nav-overlay').classList.add('nav-overlay-active');
+        } else {
+            // For mobile view, revert back to the default behavior
+            document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+        }
+    });
+
+    // Call the function on page load to set the initial state
+
+	function toggleOverlay() {
+    var overlay = document.getElementById("category-choices");
+    if (overlay.style.display === "none") {
+        overlay.style.display = "flex";
+    } else {
+        overlay.style.display = "none";
+    }
+}
+
+        // JavaScript function to handle redirection to Stimmungskarte
+        function redirectToStimmungskarte() {
+            window.location.href = '/karte';
+        }
+
+        // JavaScript function to handle redirection to Suggest an Idea
+        function redirectToList() {
+            window.location.href = '/list';
+        }
+
+        // JavaScript function to handle redirection to List of Current Suggestions
+        function redirectToBeitraege() {
+            window.location.href = '/beitraege';
+        }
+		
+	function toggleMenu() {
+    var x = document.getElementById("nav-links");
+    if (x.style.display === "block") {
+        x.style.display = "none";
+    } else {
+        x.style.display = "block";
+    }
+}
+
+    </script>
 
 
 </body>

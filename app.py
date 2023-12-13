@@ -1,5 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from flask_migrate import Migrate
 from models import db, User, Project, Vote, Comment
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -107,16 +108,19 @@ def download_images():
 @app.route('/')
 def index():
     projects = Project.query.all()
+    project_count = Project.query.count()  # Get the total count of projects
     for project in projects:
         project.image_file = quote(project.image_file)
     logging.debug("Projects: %s", projects)
-    return render_template('index.html', projects=projects)
+    return render_template('index.html', projects=projects, project_count=project_count)
+
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return jsonify({'success': True})
+
 
 
 @app.route('/init_projects')
@@ -173,13 +177,13 @@ def register():
         if existing_user:
             # flash('An account with this phone number already exists.', 'danger')
             logging.debug("Account registration failed: Phone number already exists")
-            return jsonify({'success': False, 'message': 'User already exists'}), 400
+            return jsonify({'success': False, 'message': 'Diese Telefonnummer ist bereits registriert.'}), 400
 
         # Generate OTP and handle verification
         otp = randint(100000, 999999)
         client = Client(account_sid, auth_token)
         message = client.messages.create(
-            body=f"Your OTP is: {otp}",
+            body=f"Stimmungskompass: Ihr OTP ist: {otp}. Fügen Sie hinzu, um die Registrierung abzuschließen!",
             from_=twilio_number,
             to=phone_number
         )
@@ -346,7 +350,8 @@ def submit_project():
             # Debugging: Confirm database commit
             logging.debug("New project added to database with ID: %s", new_project.id)
 
-            return redirect(url_for('index'))
+            # Redirect to the project details page of the newly created project
+            return redirect(url_for('project_details', project_id=new_project.id))
         else:
             return redirect(url_for('submit_project'))
 
@@ -356,45 +361,55 @@ def submit_project():
 
 
 
-
 @app.route('/list')
 @app.route('/list/pages/<int:page>')
 def list_view(page=1):
     per_page = 9  # Number of projects per page
-
     query = Project.query
-
-    # Get parameters
     category = request.args.get('category')
-    age = request.args.get('age')
-    score = request.args.get('score')
+    sort = request.args.get('sort')
     search = request.args.get('search')
 
-    # Apply filters
+    # Apply category and search filters
     if category:
         query = query.filter(Project.category == category)
     if search:
         query = query.filter(Project.name.contains(search))
-    if age == 'newest':
-        query = query.order_by(Project.date.desc())
-    elif age == 'oldest':
-        query = query.order_by(Project.date)
 
-    # Here, you need to fill in the logic for 'highest' and 'lowest' scores
-    if score == 'highest':
-        # Add logic to sort by highest score
-        pass  # Replace 'pass' with your logic
-    elif score == 'lowest':
-        # Add logic to sort by lowest score
-        pass  # Replace 'pass' with your logic
-   # Paginate the query using keyword arguments
+    # Apply combined sort filter
+    if sort == 'oldest':
+        query = query.order_by(Project.date.asc())
+        logging.debug("Sorting by oldest posts")
+    elif sort == 'lowest':
+        query = query.outerjoin(Vote, Project.id == Vote.project_id) \
+                    .group_by(Project.id) \
+                    .order_by(func.sum(Vote.upvote - Vote.downvote))
+        logging.debug("Sorting by lowest score")
+    elif sort == 'newest':
+        query = query.order_by(Project.date.desc())
+        logging.debug("Sorting by newest posts")
+    else:  # Default to highest score if no valid sort option is provided
+        query = query.outerjoin(Vote, Project.id == Vote.project_id) \
+                    .group_by(Project.id) \
+                    .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
+        logging.debug("Sorting by highest score")
+
+    # Execute the query and get the first three projects for debugging
+    top_three_projects = query.limit(3).all()
+    for project in top_three_projects:
+        score = sum(vote.upvote - vote.downvote for vote in project.votes)
+        logging.debug(f"Project: {project.name}, Date: {project.date}, Score: {score}")
+
+    # Paginate the query
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    # Debugging: print current page and number of pages
-    logging.debug(f"Current Page: {paginated_projects.page}")
-    logging.debug(f"Total Pages: {paginated_projects.pages}")
-
     return render_template('list.html', projects=paginated_projects.items, pagination=paginated_projects)
+
+
+
+
+
+
     
 def get_project_by_id(project_id):
     return Project.query.get_or_404(project_id)
@@ -491,25 +506,21 @@ def vote(project_id, vote_type):
     return redirect(url_for('project_details', project_id=project_id))
 
 
-
-
-
-
 @app.route('/comment/<int:project_id>', methods=['POST'])
 @login_required
 def comment(project_id):
     project = Project.query.get_or_404(project_id)
     comment_text = request.form.get('comment')
-    
-    # Create a new Comment instance
+
     new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=project_id)
-    
-    # Add and commit the new comment to the database
     db.session.add(new_comment)
     db.session.commit()
-    
-    # flash('Your comment has been posted!', 'success')
-    return redirect(url_for('list_view'))
+
+    return jsonify({
+        'text': new_comment.text,
+        'author_name': f"{current_user.name} {current_user.surname}",
+        'timestamp': new_comment.timestamp.strftime('%d.%m.%Y %H:%M')
+    })
 
 @app.route('/opendata')
 def opendata():
@@ -601,28 +612,26 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Capture 'next' parameter or set to index if not present
+    next_page = request.args.get('next') or url_for('index')
+    logging.debug(f"'next' parameter detected, user will be redirected to {next_page} after logging in.")
+
     if request.method == 'POST':
         username_or_phone = request.form.get('username_or_phone')
         password = request.form.get('password')
-
-        # Adjusted to only check for phone number
         user = User.query.filter_by(phone_number=username_or_phone).first()
 
         if user and user.check_password(password):
             login_user(user)
             logging.debug("Login successful")
-            # flash('Login successful!', 'success')
-            return jsonify(success=True)
+            return jsonify(success=True, next=next_page)
         else:
             logging.debug("Login failed")
-            # flash('Login failed - invalid credentials.', 'danger')
             return jsonify(success=False)
 
-    return render_template('login.html')
-
+    return render_template('login.html', next=next_page)
 
 
 @app.route('/vote/<int:project_id>', methods=['GET', 'POST'])

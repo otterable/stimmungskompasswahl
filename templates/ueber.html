@@ -194,6 +194,15 @@ margin: auto;
     transition: transform 0.3s;
 }
 
+
+.logged-in-info {
+    text-align: center; /* Centers the text inside the div */
+    padding: 2px 0; /* Adds some padding above and below the text */
+    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
+    /* Other styling as needed, such as font size, color, etc. */
+}
+
+
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
     transform: scale(1.03); /* Scale up slightly on hover */
@@ -466,30 +475,28 @@ display: block;
 
 
 <body>
-<!-- Top Bar -->
 <div class="top-bar">
+    <a href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
 
-		<a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-        </a>  
-		    <button id="hamburger-button">&#9776;</button>
+    <div id="nav-overlay" class="nav-overlay">
+        <div id="nav-links">
+            <a href="/karte">Karte</a>
+            <a href="/list">Beiträge</a>
+            <a href="/beitraege">Beitrag hinzufügen</a>
+            <a href="/erfolge">Erfolge</a>
+            <a href="/ueber">Über</a>
+            <a href="/opendata">Open Data</a>
 
-		<div id="nav-overlay" class="nav-overlay">
-		<div id="nav-links">
-        <a href="https://stimmungskartendemo.ermine.at">Map</a>
-        <a href="/list">Suggestions</a> <!-- Updated this line -->
-        <a href="/beitraege">Submit a project</a>
-        <a href="/erfolge">Success stories</a>
-       <a href="/ueber">Contact</a>
-		 <a href="/opendata">Open Data</a>
-
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
-        {% else %}
-            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
-        {% endif %}
+            {% if current_user.is_authenticated %}
+<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+            {% else %}
+<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+           {% endif %}
+        </div>
     </div>
-</div>
 </div>
 <div class="form-container">
 
@@ -497,8 +504,24 @@ display: block;
 
 </body>
 </html>
-
 <script>
+function logoutUser() {
+    // Remember the current URL
+    const currentUrl = window.location.href;
+
+    fetch("{{ url_for('logout') }}")
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect back to the same page
+            window.location.href = currentUrl;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
+   <script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');
@@ -538,5 +561,39 @@ display: block;
         }
     });
 
-   
-</script>
+    // Call the function on page load to set the initial state
+
+	function toggleOverlay() {
+    var overlay = document.getElementById("category-choices");
+    if (overlay.style.display === "none") {
+        overlay.style.display = "flex";
+    } else {
+        overlay.style.display = "none";
+    }
+}
+
+        // JavaScript function to handle redirection to Stimmungskarte
+        function redirectToStimmungskarte() {
+            window.location.href = '/karte';
+        }
+
+        // JavaScript function to handle redirection to Suggest an Idea
+        function redirectToList() {
+            window.location.href = '/list';
+        }
+
+        // JavaScript function to handle redirection to List of Current Suggestions
+        function redirectToBeitraege() {
+            window.location.href = '/beitraege';
+        }
+		
+	function toggleMenu() {
+    var x = document.getElementById("nav-links");
+    if (x.style.display === "block") {
+        x.style.display = "none";
+    } else {
+        x.style.display = "block";
+    }
+}
+
+    </script>

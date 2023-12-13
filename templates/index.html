@@ -281,6 +281,14 @@ margin: auto;
         .info-box:hover {
             transform: scale(1.03);
         }
+		
+		.logged-in-info {
+    text-align: center; /* Centers the text inside the div */
+    padding: 2px 0; /* Adds some padding above and below the text */
+    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
+    /* Other styling as needed, such as font size, color, etc. */
+}
+
         .info-box-icon {
             max-width: 70px; /* Icon size */
             border-radius: 50%; /* Make it circular */
@@ -551,30 +559,28 @@ display: block;
 
 
 <body>
-<!-- Top Bar -->
 <div class="top-bar">
+    <a href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
 
-		<a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-        </a>  
-		    <button id="hamburger-button">&#9776;</button>
+    <div id="nav-overlay" class="nav-overlay">
+        <div id="nav-links">
+            <a href="/karte">Karte</a>
+            <a href="/list">Beiträge</a>
+            <a href="/beitraege">Beitrag hinzufügen</a>
+            <a href="/erfolge">Erfolge</a>
+            <a href="/ueber">Über</a>
+            <a href="/opendata">Open Data</a>
 
-		<div id="nav-overlay" class="nav-overlay">
-		<div id="nav-links">
-        <a href="/karte">Karte</a>
-        <a href="/list">Suggestions</a> <!-- Updated this line -->
-        <a href="/beitraege">Submit a project</a>
-        <a href="/erfolge">Success stories</a>
-       <a href="/ueber">Contact</a>
-		 <a href="/opendata">Open Data</a>
-
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
-        {% else %}
-            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
-        {% endif %}
+            {% if current_user.is_authenticated %}
+<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+            {% else %}
+<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+           {% endif %}
+        </div>
     </div>
-</div>
 </div>
 
 
@@ -597,11 +603,11 @@ display: block;
         </div>
         <!-- Box 2 -->
         <div class="info-box box-blue" onclick="redirectToBeitraege()" style="cursor: pointer; margin: 10px">
-            <img src="{{ url_for('static', filename='index_icon_public.png') }}" alt="Public Icon" class="info-box-icon">
-            <p class="info-box-title">Suggest an idea</p>
-            <p class="info-box-undertitle">Tell the city, what it should do better or different!</p>
-			<p class="info-box-undertitle">Currently posted projects: 0 </p>
-        </div>
+		<img src="{{ url_for('static', filename='index_icon_public.png') }}" alt="Public Icon" class="info-box-icon">
+		<p class="info-box-title">Suggest an idea</p>
+		<p class="info-box-undertitle">Tell the city what it should do better or different!</p>
+		<p class="info-box-undertitle">Currently posted projects: {{ project_count }}</p>
+		</div>
 
         <!-- Box 3 -->
         <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
@@ -624,6 +630,22 @@ display: block;
 </body>
 </html>
 
+<script>
+function logoutUser() {
+    // Remember the current URL
+    const currentUrl = window.location.href;
+
+    fetch("{{ url_for('logout') }}")
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect back to the same page
+            window.location.href = currentUrl;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
 
     <script>
     // Toggle the navigation overlay when the hamburger button is clicked

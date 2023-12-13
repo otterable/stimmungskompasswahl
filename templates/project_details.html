@@ -338,6 +338,12 @@ margin: auto;
     transition: transform 0.3s;
 }
 
+.section-title {
+    border-bottom: 2px solid #003056; /* Solid line of 2px */
+    padding-bottom: 5px; /* Space between the text and the line */
+}
+
+
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
     transform: scale(1.03); /* Scale up slightly on hover */
@@ -669,30 +675,27 @@ display: block;
     </div>
 {% endif %}
 <div class="top-bar">
+    <a href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
 
-		<a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-        </a>  
-		    <button id="hamburger-button">&#9776;</button>
+    <div id="nav-overlay" class="nav-overlay">
+        <div id="nav-links">
+            <a href="/karte">Karte</a>
+            <a href="/list">Beiträge</a>
+            <a href="/beitraege">Beitrag hinzufügen</a>
+            <a href="/erfolge">Erfolge</a>
+            <a href="/ueber">Über</a>
+            <a href="/opendata">Open Data</a>
 
-		<div id="nav-overlay" class="nav-overlay">
-		
-		<div id="nav-links">
-        <a href="https://stimmungskartendemo.ermine.at">Map</a>
-        <a href="/list">Suggestions</a> <!-- Updated this line -->
-        <a href="/beitraege">Submit a project</a>
-        <a href="/erfolge">Success stories</a>
-       <a href="/ueber">Contact</a>
-		 <a href="/opendata">Open Data</a>
-
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
-        {% else %}
-            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
-        {% endif %}
+            {% if current_user.is_authenticated %}
+<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+            {% else %}
+<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+           {% endif %}
+        </div>
     </div>
-	
-</div>
 </div>
 
    <div class="form-container">
@@ -740,20 +743,20 @@ display: block;
                 <div id="map" class="map-container"></div>
 <!-- Inside your HTML file -->
 <div class="text-section">
-    <h2 class="centered-title" style="margin-top: 30px; margin-bottom: 10px;">Why Suggested</h2>
+    <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Warum schlage ich es vor?</h2>
     <p class="text-content">{{ project.descriptionwhy | safe }}</p>
 </div>
 <div class="text-section">
-    <h2 class="centered-title" style="margin-top: 30px; margin-bottom: 10px;">Public Benefit</h2>
+    <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wie wird die Öffentlichkeit davon profitieren?</h2>
     <p class="text-content">{{ project.public_benefit | safe }}</p>
 </div>
 
-    <h2 class="centered-title" style="margin-top: 30px; margin-bottom: 10px;">Where is this project located?</h2>
+<h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wo ist dieses Projekt?</h2>
+<div id="project-map"></div>
+
 				
-			 <div id="project-map"></div>
 				
-				
-<div class="comments" style="margin-top:30px">
+<div id="comments-container" class="comments" style="margin-top:30px">
     <h2 class="centered-title" style="margin-bottom: 10px">Kommentare</h2>
     {% for comment in comments %}
         <div class="comment">
@@ -765,7 +768,7 @@ display: block;
 
 {% if current_user.is_authenticated %}
 <div class="comment-form">
-    <form action="{{ url_for('comment', project_id=project.id) }}" method="POST">
+    <form id="comment-form" action="{{ url_for('comment', project_id=project.id) }}" method="POST">
         <textarea name="comment" class="full-width-textarea" required></textarea>
         <button type="submit" class="button comment-button">Speichern 💬</button>
     </form>
@@ -788,72 +791,98 @@ display: block;
 
 
 <script>
+function logoutUser() {
+    // Remember the current URL
+    const currentUrl = window.location.href;
 
-   // JavaScript for handling the hamburger menu and navigation overlay
+    fetch("{{ url_for('logout') }}")
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect back to the same page
+            window.location.href = currentUrl;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
+   <script>
+    // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');
-        // Toggle the display of the navigation overlay
-        navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
+        navOverlay.classList.toggle('nav-overlay-active');
     });
-	
-// JavaScript for handling the filter form overlay
-document.getElementById('hamburger-button-filter').addEventListener('click', function() {
-    var filterOverlay = document.getElementById('filter-overlay');
-    // Toggle the display of the filter overlay
-    filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
-});
 
-// Close the filter overlay when clicking outside of its content
-document.getElementById('filter-overlay').addEventListener('click', function(event) {
-    // Check if the clicked element is outside of the filter form
-    var filterForm = document.getElementById('filter-form-mobile');
-    if (!filterForm.contains(event.target)) {
-        this.style.display = 'none';
-    }
-});
+    // Close the navigation overlay when clicking on the overlay background or on a non-button element
+    document.getElementById('nav-overlay').addEventListener('click', function(event) {
+        // Close only if the clicked element is not a button or a link
+        if (!event.target.closest('button, a')) {
+            closeNavOverlay();
+        }
+    });
 
-// Prevent closing when clicking on filter form (stop the event from bubbling up)
-document.getElementById('filter-form-mobile').addEventListener('click', function(event) {
-    event.stopPropagation();
-});
-
-
-// JavaScript for handling the navigation overlay
-document.getElementById('nav-overlay').addEventListener('click', function(event) {
-    // Check if the clicked element is not a link or a button
-    if (!event.target.closest('#nav-links, #nav-links a, #nav-links button')) {
-        this.style.display = 'none';
-    }
-});
-
-// Prevent closing when clicking on nav-links or its children
-document.getElementById('nav-links').addEventListener('click', function(event) {
-    event.stopPropagation(); // Stop the click event from bubbling up to nav-overlay
-});
     // Function to close the navigation overlay
     function closeNavOverlay() {
-        document.getElementById('nav-overlay').style.display = 'none';
+        var navOverlay = document.getElementById('nav-overlay');
+        navOverlay.classList.remove('nav-overlay-active');
     }
 
-	
-	
+    // Prevent closing when clicking on buttons (delegation)
+    document.getElementById('nav-links').addEventListener('click', function(event) {
+        if (event.target.tagName === 'BUTTON' || event.target.tagName === 'A') {
+            event.stopPropagation();
+        }
+    });
 
-
-	   window.addEventListener('resize', function() {
+    // Resize event listener
+    window.addEventListener('resize', function() {
         // Check if the window width is greater than the threshold for mobile view
         if (window.innerWidth > 1080) {
             // Make sure the nav-overlay is displayed
-            document.getElementById('nav-overlay').style.display = 'block';
-            // Reset any inline display style on the nav-links (optional)
-            document.getElementById('nav-links').style.display = '';
+            document.getElementById('nav-overlay').classList.add('nav-overlay-active');
         } else {
             // For mobile view, revert back to the default behavior
-            document.getElementById('nav-overlay').style.display = 'none';
+            document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
         }
     });
-	
-	
-	</script>		
+
+    // Call the function on page load to set the initial state
+
+	function toggleOverlay() {
+    var overlay = document.getElementById("category-choices");
+    if (overlay.style.display === "none") {
+        overlay.style.display = "flex";
+    } else {
+        overlay.style.display = "none";
+    }
+}
+
+        // JavaScript function to handle redirection to Stimmungskarte
+        function redirectToStimmungskarte() {
+            window.location.href = '/karte';
+        }
+
+        // JavaScript function to handle redirection to Suggest an Idea
+        function redirectToList() {
+            window.location.href = '/list';
+        }
+
+        // JavaScript function to handle redirection to List of Current Suggestions
+        function redirectToBeitraege() {
+            window.location.href = '/beitraege';
+        }
+		
+	function toggleMenu() {
+    var x = document.getElementById("nav-links");
+    if (x.style.display === "block") {
+        x.style.display = "none";
+    } else {
+        x.style.display = "block";
+    }
+}
+
+    </script>
 	
 <script>
     // Initialize the map
@@ -887,6 +916,36 @@ document.getElementById('nav-links').addEventListener('click', function(event) {
         projectMap.setView([lat, lng], 13);
         L.marker([lat, lng], {icon: customIcon}).addTo(projectMap);
     }
+</script>
+<script>
+    document.getElementById('comment-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', this.action, true);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        
+        xhr.onload = function() {
+            if (this.status >= 200 && this.status < 400) {
+                // Success! Parse response and update comments
+                var response = JSON.parse(this.response);
+                var commentsContainer = document.getElementById('comments-container');
+                var newCommentHtml = `
+                    <div class="comment">
+                        <p>"${response.text}"</p>
+                        <p>${response.author_name} am ${response.timestamp}</p>
+                    </div>
+                `;
+                commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
+            } else {
+                // Error handling
+                console.error('Error occurred in comment submission');
+            }
+        };
+
+        xhr.send(formData);
+    });
 </script>
 
 

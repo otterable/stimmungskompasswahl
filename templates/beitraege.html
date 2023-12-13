@@ -12,7 +12,7 @@
 </head>
 
    <style>
-      body {
+        body {
         font-family: 'Roboto', sans-serif;
         background-color: #f5f1e4;
         color: black;
@@ -24,17 +24,6 @@
             border-radius: 30px;
             transition: transform 0.3s ease;
         }
-		
-		#map {
-    width: 100%;      /* Full width to ensure it expands properly */
-    height: 500px;    /* Fixed height, adjust as needed */
-    min-height: 300px; /* Minimum height for smaller screens */
-    margin: 0;        /* Reset any default margin */
-    padding: 0;       /* Reset any default padding */
-    border: 1px solid #ccc; /* Optional: adds a border for visibility */
-    border-radius: 10px; /* Optional: if you want rounded corners */
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.1); /* Optional: adds shadow for depth */
-}
 
         .logo {
             max-width: 1000px; /* Increase the max-width to make it bigger */
@@ -91,6 +80,17 @@
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease; /* Smooth transition for background color */
+}
+
+		#map {
+    width: 100%;      /* Full width to ensure it expands properly */
+    height: 500px;    /* Fixed height, adjust as needed */
+    min-height: 300px; /* Minimum height for smaller screens */
+    margin: 0;        /* Reset any default margin */
+    padding: 0;       /* Reset any default padding */
+    border: 1px solid #ccc; /* Optional: adds a border for visibility */
+    border-radius: 10px; /* Optional: if you want rounded corners */
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1); /* Optional: adds shadow for depth */
 }
 
 .publish-button {
@@ -241,12 +241,20 @@ margin: auto;
 	transform: none !important;
 }
 
+.logged-in-info {
+    text-align: center; /* Centers the text inside the div */
+    padding: 2px 0; /* Adds some padding above and below the text */
+    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
+    /* Other styling as needed, such as font size, color, etc. */
+}
+
+
     .cover-text-container {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.8); /* Black background with 70% opacity */
+        background-color: rgba(0, 0, 0, 0.4); /* Black background with 70% opacity */
         padding: 20px;
         border-radius: 30px;
         text-align: center;
@@ -397,6 +405,9 @@ margin: auto;
     z-index: 1000; /* High z-index to ensure it's on top */
 }
 
+.nav-overlay-active {
+display: block;
+}
 .nav-overlay-active .main-content {
     pointer-events: none;
 }
@@ -466,6 +477,7 @@ margin: auto;
     }
 }
 
+
     </style>
 
 
@@ -479,28 +491,27 @@ margin: auto;
 <body>
 <!-- Top Bar -->
 <div class="top-bar">
+    <a href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
 
-		<a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-        </a>  
-		    <button id="hamburger-button">&#9776;</button>
+    <div id="nav-overlay" class="nav-overlay">
+        <div id="nav-links">
+            <a href="/karte">Karte</a>
+            <a href="/list">Beiträge</a>
+            <a href="/beitraege">Beitrag hinzufügen</a>
+            <a href="/erfolge">Erfolge</a>
+            <a href="/ueber">Über</a>
+            <a href="/opendata">Open Data</a>
 
-		<div id="nav-overlay" class="nav-overlay">
-		<div id="nav-links">
-        <a href="https://stimmungskartendemo.ermine.at">Map</a>
-        <a href="/list">Suggestions</a> <!-- Updated this line -->
-        <a href="/beitraege">Submit a project</a>
-        <a href="/erfolge">Success stories</a>
-       <a href="/ueber">Contact</a>
-		 <a href="/opendata">Open Data</a>
-
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
-        {% else %}
-            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
-        {% endif %}
+            {% if current_user.is_authenticated %}
+<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+            {% else %}
+<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+           {% endif %}
+        </div>
     </div>
-</div>
 </div>
 
 
@@ -576,6 +587,18 @@ margin: auto;
 
 </body>
 </html>
+
+<script>
+function logoutUser() {
+    fetch("{{ url_for('logout') }}")
+    .then(response => {
+        // Redirect to the index page after successful logout
+        window.location.href = "{{ url_for('index') }}";
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
 <script>
 
 // Initialize the map
@@ -625,7 +648,7 @@ setTimeout(function() {
 }, 100); // Adjust the timeout as needed
 
 </script>
-<script>
+  <script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');
@@ -665,6 +688,43 @@ setTimeout(function() {
         }
     });
 
+    // Call the function on page load to set the initial state
+
+	function toggleOverlay() {
+    var overlay = document.getElementById("category-choices");
+    if (overlay.style.display === "none") {
+        overlay.style.display = "flex";
+    } else {
+        overlay.style.display = "none";
+    }
+}
+
+        // JavaScript function to handle redirection to Stimmungskarte
+        function redirectToStimmungskarte() {
+            window.location.href = '/karte';
+        }
+
+        // JavaScript function to handle redirection to Suggest an Idea
+        function redirectToList() {
+            window.location.href = '/list';
+        }
+
+        // JavaScript function to handle redirection to List of Current Suggestions
+        function redirectToBeitraege() {
+            window.location.href = '/beitraege';
+        }
+		
+	function toggleMenu() {
+    var x = document.getElementById("nav-links");
+    if (x.style.display === "block") {
+        x.style.display = "none";
+    } else {
+        x.style.display = "block";
+    }
+}
+
+    </script>
+	<script>
    
 
     // Function to update the category description text
@@ -782,3 +842,8 @@ setTimeout(function() {
         });
 </script>
 
+{% if not current_user.is_authenticated %}
+    <script>
+        window.location.href = "{{ url_for('login', next=url_for('beitraege')) }}";
+    </script>
+{% endif %}

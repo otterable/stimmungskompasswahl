@@ -856,31 +856,29 @@ nav[aria-label="Page navigation"] {
 <body>
 <!-- Top Bar -->
 <div class="top-bar">
+    <a href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
 
-		<a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-        </a>  
-		    <button id="hamburger-button">&#9776;</button>
+    <div id="nav-overlay" class="nav-overlay">
+        <div id="nav-links">
+            <a href="/karte">Karte</a>
+            <a href="/list">Beiträge</a>
+            <a href="/beitraege">Beitrag hinzufügen</a>
+            <a href="/erfolge">Erfolge</a>
+            <a href="/ueber">Über</a>
+            <a href="/opendata">Open Data</a>
 
-		<div id="nav-overlay" class="nav-overlay">
-		
-		<div id="nav-links">
-        <a href="https://stimmungskartendemo.ermine.at">Map</a>
-        <a href="/list">Suggestions</a> <!-- Updated this line -->
-        <a href="/beitraege">Submit a project</a>
-        <a href="/erfolge">Success stories</a>
-       <a href="/ueber">Contact</a>
-		 <a href="/opendata">Open Data</a>
-
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('logout') }}"><button class="button">Abmelden</button></a>
-        {% else %}
-            <a href="{{ url_for('login') }}"><button class="button">Anmelden</button></a>
-        {% endif %}
+            {% if current_user.is_authenticated %}
+<a href="{{ url_for('logout', next=request.path) }}"><button onclick="logoutUser()" class="button">Abmelden</button></a>
+            {% else %}
+<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+           {% endif %}
+        </div>
     </div>
-	
 </div>
-</div>
+
 			<button id="hamburger-button-filter">&#9776; Filter</button>
 
 
@@ -889,13 +887,13 @@ nav[aria-label="Page navigation"] {
     <form id="filter-form" action="{{ url_for('list_view') }}" method="get" style="display: flex; align-items: center;">
         <div class="filter-item">
             <label for="search">Suchen:</label>
-            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Search project titles...">
+            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Beiträgen...">
         </div>
 
         <div class="filter-item">
-            <label for="category">Category:</label>
+            <label for="category">Kategorie:</label>
             <select name="category" id="category">
-                <option value="">All Categories</option>
+                <option value="">Alle Kategorien</option>
                 {% set current_category = request.args.get('category', '') %}
                 <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
                 <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Public spaces</option>
@@ -909,24 +907,18 @@ nav[aria-label="Page navigation"] {
             </select>
         </div>
 
-        <div class="filter-item">
-            <label for="age">Age:</label>
-            <select name="age" id="age">
-                {% set current_age = request.args.get('age', '') %}
-                <option value="" {% if current_age == 'newest' %}selected{% endif %}>Newest</option>
-                <option value="oldest" {% if current_age == 'oldest' %}selected{% endif %}>Oldest</option>
-            </select>
-        </div>
 
         <div class="filter-item">
-            <label for="score">Score:</label>
-            <select name="score" id="score">
-                <option value="">Sort by score</option>
-                {% set current_score = request.args.get('score', '') %}
-                <option value="highest" {% if current_score == 'highest' %}selected{% endif %}>Highest Score</option>
-                <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Lowest Score</option>
-            </select>
-        </div>
+    <label for="sort">Sort:</label>
+    <select name="sort" id="sort">
+		<option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Sort by highest score</option>
+        <option value="lowest" {% if request.args.get('sort', '') == 'lowest' %}selected{% endif %}>Sort by lowest score</option>
+        <option value="newest" {% if request.args.get('sort', '') == 'newest' %}selected{% endif %}>Sort by newest</option>
+        <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Sort by oldest</option>
+        
+    </select>
+</div>
+
 		        <button type="submit" class="filter-button">Filter</button>
     </form>
 </div>
@@ -936,13 +928,13 @@ nav[aria-label="Page navigation"] {
     <form id="filter-form-mobile" action="{{ url_for('list_view') }}" method="get">
         <div class="filter-item">
             <label for="search">Suchen:</label>
-            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Search project titles...">
+            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Beiträgen...">
         </div>
 
         <div class="filter-item">
-            <label for="category">Category:</label>
+            <label for="category">Kategorie:</label>
             <select name="category" id="category">
-                <option value="">All Categories</option>
+                <option value="">Alle Kategorien</option>
                 {% set current_category = request.args.get('category', '') %}
                 <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
                 <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Public spaces</option>
@@ -1040,7 +1032,22 @@ nav[aria-label="Page navigation"] {
         <div id="modalBody"></div>
     </div>
 </div>
+<script>
+function logoutUser() {
+    // Remember the current URL
+    const currentUrl = window.location.href;
 
+    fetch("{{ url_for('logout') }}")
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect back to the same page
+            window.location.href = currentUrl;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
 <script>
     function openModal(projectId) {
         // AJAX request to get project details
@@ -1181,43 +1188,42 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('.project-thumbnail').forEach(item => {
         item.addEventListener('click', function() {
             const projectId = this.getAttribute('data-project-id');
-            window.location.href = '/project_details/' + projectId;
+            openProjectDetails(projectId);
         });
     });
 
-
-
-        // Delayed search functionality for the filter form
-        document.getElementById('search').addEventListener('input', function() {
-            clearTimeout(window.searchTimer);
-            window.searchTimer = setTimeout(function() {
-                document.getElementById('filter-form').submit();
-            }, 500); // Adjust delay as needed
-        });
-
-        // Event listener for filter form changes
-        document.getElementById('filter-form').addEventListener('change', function() {
-            this.submit();
-        });
-
-        // Redirect functions
-        function redirectToStimmungskarte() {
-            window.location.href = 'https://stimmungskartendemo.ermine.at';
-        }
-
-        function redirectToNeuerbeitrag() {
-            window.location.href = '/neuerbeitrag';
-        }
-
-        function redirectToBeitraege() {
-            window.location.href = '/beitraege';
-        }
-
-        // Display success message alert, if any
-        {% with messages = get_flashed_messages(category_filter=["success"]) %}
-            {% if messages %}
-                alert("{{ messages[0] }}");
-            {% endif %}
-        {% endwith %}
+    // Delayed search functionality for the filter form
+    document.getElementById('search').addEventListener('input', function() {
+        clearTimeout(window.searchTimer);
+        window.searchTimer = setTimeout(function() {
+            document.getElementById('filter-form').submit();
+        }, 500); // Adjust delay as needed
     });
+
+    // Event listener for filter form changes
+    document.getElementById('filter-form').addEventListener('change', function() {
+        this.submit();
+    });
+
+    // Redirect functions
+    function redirectToStimmungskarte() {
+        window.location.href = 'https://stimmungskartendemo.ermine.at';
+    }
+
+    function redirectToNeuerbeitrag() {
+        window.location.href = '/neuerbeitrag';
+    }
+
+    function redirectToBeitraege() {
+        window.location.href = '/beitraege';
+    }
+
+    // Display success message alert, if any
+    {% with messages = get_flashed_messages(category_filter=["success"]) %}
+        {% if messages %}
+            alert("{{ messages[0] }}");
+        {% endif %}
+    {% endwith %}
+});
+
 </script>
