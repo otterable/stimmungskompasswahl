@@ -1,13 +1,22 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stimmungskompass DEMO</title>
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stimmungskompass DEMO</title>
+<style>
+img { max-width: 100%; height: auto;
+    max-width: 100%;
+    height: auto;
+}
 
-
-   <style>
+.info-box-icon {
+    max-width: 70px; /* Adjust this value as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+</style></head>
+<style>
       body {
         font-family: 'Roboto', sans-serif;
         background-color: #f5f1e4;
@@ -16,7 +25,7 @@
         padding: 0; /* Remove default padding */
     }
 
-        img {
+        img { max-width: 100%; height: auto;
             border-radius: 30px;
             transition: transform 0.3s ease;
         }
@@ -27,7 +36,7 @@
         }
 
         img:hover {
-            transform: scale(1.1);
+            transform: scale(1.01);
         }
 
    .form-container {
@@ -96,7 +105,7 @@
 }
 
 
-        .project img {
+        .project img { max-width: 100%; height: auto;
             max-width: 300px; /* Adjust the width as needed */
             max-height: 200px; /* Adjust the height as needed */
             height: auto; /* Maintain aspect ratio */
@@ -363,6 +372,25 @@ margin: auto;
     display: none; /* Hidden by default */
 	}
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     body {
         font-size: 14px; /* Smaller font size */
     }
@@ -413,6 +441,25 @@ display: block;
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     #hamburger-button {
         display: block; /* Show the button on mobile */
     }
@@ -438,6 +485,25 @@ display: block;
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     .top-bar {
         flex-direction: row; /* Align items horizontally */
         justify-content: space-between; /* Space between items */
@@ -476,11 +542,31 @@ display: block;
     }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     .info-box-container {
         flex-direction: column;
         align-items: center;
     }
+
 
     .info-box {
         width: 80%; /* Adjust width to fit mobile screens */
@@ -489,6 +575,25 @@ display: block;
 }
 
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     .cover-text-container h1 {
         font-size: 4vw; /* Adjust font size for smaller screens */
     }
@@ -521,16 +626,54 @@ display: block;
 }
 
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     .info-text-title {
-        font-size: 4vw; /* Larger size for smaller screens */
+        font-size: 6vw; /* Larger size for smaller screens */
     }
 
     .info-text-undertitle {
-        font-size: 3vw; /* Larger size for smaller screens */
+        font-size: 4vw !important; /* Larger size for smaller screens */
     }
 }
 
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     .info-text-field {
         height: auto; /* Allow the height to adjust based on content */
     }
@@ -539,7 +682,26 @@ display: block;
         width: 80%; /* Reduce the width for tablets */
     }
 }
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     .info-text-field {
         height: auto; /* Allow the height to adjust based on content */
     }
@@ -560,19 +722,18 @@ display: block;
 
 <body>
 <div class="top-bar">
-    <a href="/">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-    </a>  
-    <button id="hamburger-button">&#9776;</button>
-
-    <div id="nav-overlay" class="nav-overlay">
-        <div id="nav-links">
-            <a href="/karte">Karte</a>
-            <a href="/list">Beiträge</a>
-            <a href="/beitraege">Beitrag hinzufügen</a>
-            <a href="/erfolge">Erfolge</a>
-            <a href="/ueber">Über</a>
-            <a href="/opendata">Open Data</a>
+<a href="/">
+<img alt="Logo" class="logo" src="{{ url_for('static', filename='logo.png') }}" style="; max-width: 100%; height: auto;"/>
+</a>
+<button id="hamburger-button">☰</button>
+<div class="nav-overlay" id="nav-overlay">
+<div id="nav-links">
+<a href="/karte">Karte</a>
+<a href="/list">Beiträge</a>
+<a href="/beitraege">Beitrag hinzufügen</a>
+<a href="/erfolge">Erfolge</a>
+<a href="/ueber">Über</a>
+<a href="/opendata">Open Data</a>
 
             {% if current_user.is_authenticated %}
 <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
@@ -580,59 +741,48 @@ display: block;
 <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
            {% endif %}
         </div>
-    </div>
 </div>
-
-
-
+</div>
 <div class="index-image">
-    <img src="{{ url_for('static', filename='index_titleimage.png') }}" alt="Index Title Image" class="index-image">
-
-    <div class="cover-text-container">
-        <h1>Change your town for the better!</h1>
-        <p>Get involved in the development of your town and participate in its improvement!</p>
-    </div>
+<img alt="Index Title Image" class="index-image" src="{{ url_for('static', filename='index_titleimage.png') }}" style="; max-width: 100%; height: auto;"/>
+<div class="cover-text-container">
+<h1>Change your town for the better!</h1>
+<p>Get involved in the development of your town and participate in its improvement!</p>
 </div>
-
- <div class="info-box-container">
-        <!-- Box 1 -->
-        <div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer; margin: 10px">
-            <img src="{{ url_for('static', filename='index_icon_map.png') }}" alt="Map Icon" class="info-box-icon">
-            <p class="info-box-title">Karte</p>
-            <p class="info-box-undertitle">Post how you feel about your town on a map, and see how other citizens feel about it!</p>
-        </div>
-        <!-- Box 2 -->
-        <div class="info-box box-blue" onclick="redirectToBeitraege()" style="cursor: pointer; margin: 10px">
-		<img src="{{ url_for('static', filename='index_icon_public.png') }}" alt="Public Icon" class="info-box-icon">
-		<p class="info-box-title">Suggest an idea</p>
-		<p class="info-box-undertitle">Tell the city what it should do better or different!</p>
-		<p class="info-box-undertitle">Currently posted projects: {{ project_count }}</p>
-		</div>
-
-        <!-- Box 3 -->
-        <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
-            <img src="{{ url_for('static', filename='index_icon_list.png') }}" alt="List Icon" class="info-box-icon">
-            <p class="info-box-title">List of current suggestions</p>
-            <p class="info-box-undertitle">Vote on bereits suggested ideas to help bringing them to reality!</p>
-        </div>
-    </div>
-	
-   <!-- Info text field with wrapped text container -->
-    <div class="info-text-field">
-        <div class="info-text-container">
-            <p class="info-text-title">Together we can make this town beautiful!</p>
-            <p class="info-text-undertitle">Stimmungskompass is an all-encompassing tool of participatory planning.</p>
-            <p class="info-text-undertitle">This form of civic engagement helps influence town leadership and decision-making. Share your ideas, vote for improvements submitted by other citizens, and help send your town in the right direction.</p>
-			<p class="info-text-undertitle">The power to make this town better lies in your hands!</p>
-        </div>
-    </div>
-   
+</div>
+<div class="info-box-container">
+<!-- Box 1 -->
+<div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer; margin: 10px">
+<img alt="Map Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_map.png') }}">
+<p class="info-box-title">Karte</p>
+<p class="info-box-undertitle">Post how you feel about your town on a map, and see how other citizens feel about it!</p>
+</div>
+<!-- Box 2 -->
+<div class="info-box box-blue" onclick="redirectToBeitraege()" style="cursor: pointer; margin: 10px">
+<img alt="Public Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_public.png') }}">
+<p class="info-box-title">Suggest an idea</p>
+<p class="info-box-undertitle">Tell the city what it should do better or different!</p>
+<p class="info-box-undertitle">Currently posted projects: {{ project_count }}</p>
+</div>
+<!-- Box 3 -->
+<div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
+<img alt="List Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_list.png') }}" >
+<p class="info-box-title">List of current s uggestions</p>
+<p class="info-box-undertitle">Vote on bereits suggested ideas to help bringing them to reality!</p>
+</div>
+</div>
+<!-- Info text field with wrapped text container -->
+<div class="info-text-field">
+<div class="info-text-container">
+<p class="info-text-title">Together we can make this town beautiful!</p>
+<p class="info-text-undertitle">Stimmungskompass is an all-encompassing tool of participatory planning.</p>
+<p class="info-text-undertitle">This form of civic engagement helps influence town leadership and decision-making. Share your ideas, vote for improvements submitted by other citizens, and help send your town in the right direction.</p>
+<p class="info-text-undertitle">The power to make this town better lies in your hands!</p>
+</div>
+</div>
 </body>
 </html>
-
-
-
-    <script>
+<script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');

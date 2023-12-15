@@ -32,10 +32,12 @@ class Project(db.Model):
     geoloc = db.Column(db.String(100))  # Geolocation data (optional)
     date = db.Column(db.DateTime, default=datetime.utcnow)  # Date of project creation
     author = db.Column(db.String(100), nullable=False)  # Author of the project
+    is_important = db.Column(db.Boolean, default=False)  # New field to mark projects as important
 
     # Relationships
-    votes = db.relationship('Vote', backref='project', lazy=True)
-    comments = db.relationship('Comment', backref='project', lazy=True)
+    votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
+    comments = db.relationship('Comment', backref='project', lazy=True, cascade="all, delete-orphan")
+
 
 
     def to_dict(self):

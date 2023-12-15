@@ -481,6 +481,85 @@ def project_details(project_id):
         return str(e)  # or redirect to a generic error page
         
         
+@app.route('/admintools', methods=['GET', 'POST'])
+@login_required
+def admintools():
+    # Retrieve users
+    users = User.query.all()
+
+    if request.method == 'POST':
+        if 'mark_important' in request.form:
+            project_id_to_mark_important = request.form.get('project_id')
+            project_to_mark_important = Project.query.get(project_id_to_mark_important)
+            if project_to_mark_important:
+                project_to_mark_important.is_important = True
+                db.session.commit()
+                flash('Project marked as important', 'success')
+            else:
+                flash('Project not found for marking as important', 'error')
+        else:
+            project_id_to_delete = request.form.get('project_id')
+            project_to_delete = Project.query.get(project_id_to_delete)
+            if project_to_delete:
+                # Delete the project
+                db.session.delete(project_to_delete)
+                db.session.commit()
+                logging.debug(f"Project {project_id_to_delete} successfully deleted.")
+            else:
+                logging.debug(f"Project {project_id_to_delete} not found for deletion.")
+        return redirect(url_for('admintools'))
+
+    # GET request handling
+    sort = request.args.get('sort', 'score_desc')
+    search_query = request.args.get('search', '')
+    search_user_query = request.args.get('searchUserByName', '')
+    search_user_id_query = request.args.get('searchUserById', '')
+    query = Project.query
+
+    if search_query:
+        query = query.filter(Project.name.contains(search_query))
+
+    projects = query.all()
+    for project in projects:
+        user = User.query.get(project.author)
+        if user:
+            project.author_name = f"{user.name} {user.surname}"
+        else:
+            project.author_name = 'Unknown'
+        project.comments_count = Comment.query.filter_by(project_id=project.id).count()
+        upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+        downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
+        project.upvotes = upvotes
+        project.downvotes = downvotes
+        project.score = upvotes - downvotes
+
+    if sort == 'oldest':
+        projects.sort(key=lambda x: x.date)
+    elif sort == 'newest':
+        projects.sort(key=lambda x: x.date, reverse=True)
+    elif sort == 'category':
+        projects.sort(key=lambda x: x.category)
+    elif sort == 'user_id':
+        projects.sort(key=lambda x: x.author)
+    elif sort == 'upvotes':
+        projects.sort(key=lambda x: x.upvotes, reverse=True)
+    elif sort == 'downvotes':
+        projects.sort(key=lambda x: x.downvotes, reverse=True)
+    elif sort == 'comments':
+        projects.sort(key=lambda x: x.comments_count, reverse=True)
+    elif sort == 'alpha_asc':
+        projects.sort(key=lambda x: x.name.lower())  # Sort alphabetically by project title
+    elif sort == 'alpha_desc':
+        projects.sort(key=lambda x: x.name.lower(), reverse=True)  # Sort alphabetically by project title (Z-A)
+    else:
+        projects.sort(key=lambda x: x.score, reverse=True)
+
+    # Separate important projects
+    important_projects = [project for project in projects if project.is_important]
+
+    return render_template('admintools.html', projects=projects, sort=sort, search_query=search_query, users=users, search_user_query=search_user_query, search_user_id_query=search_user_id_query, important_projects=important_projects)
+
+        
         
 @app.route('/delete_my_data', methods=['POST'])
 @login_required
@@ -525,6 +604,44 @@ def delete_my_data():
         return jsonify({'success': False, 'message': 'An error occurred while deleting your data.'}), 500
 
 
+@app.route('/delete_user', methods=['POST'])
+@login_required
+def delete_user():
+    try:
+        user_id_to_delete = request.form.get('user_id')
+        user_to_delete = User.query.get(user_id_to_delete)
+        if user_to_delete:
+            # Delete user's votes
+            Vote.query.filter_by(user_id=user_id_to_delete).delete()
+
+            # Delete user's comments
+            Comment.query.filter_by(user_id=user_id_to_delete).delete()
+
+            # Delete user's projects and associated files
+            projects_to_delete = Project.query.filter_by(author=user_id_to_delete).all()
+            for project in projects_to_delete:
+                # Delete associated votes and comments for each project
+                Vote.query.filter_by(project_id=project.id).delete()
+                Comment.query.filter_by(project_id=project.id).delete()
+
+                # Delete project files (you may need to implement this logic)
+                # For example, if you store project images in a folder, you can delete them here
+
+                # Finally, delete the project itself
+                db.session.delete(project)
+
+            # Delete user account
+            db.session.delete(user_to_delete)
+
+            # Commit changes to the database
+            db.session.commit()
+
+            return jsonify({'success': True, 'message': 'User and their contributions have been deleted successfully.'})
+        else:
+            return jsonify({'success': False, 'message': 'User not found for deletion.'}), 404
+    except Exception as e:
+        logging.error(f"Error in delete_user: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred while deleting the user and contributions.'}), 500
 
 
 @app.route('/downvote/<int:project_id>', methods=['POST'])

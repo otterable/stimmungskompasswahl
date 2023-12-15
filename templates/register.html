@@ -154,15 +154,21 @@
             box-sizing: border-box; /* Include padding in width calculation */
         }
 		
-		
+	    @media screen and (max-width: 480px) {
+            .logo-container {
+                width: 80%; /* Reduce the width to 80% of the screen size */
+                margin: 10px auto; /* Add more margin to the top and bottom */
+            }
+
+            .logo {
+                max-width: 100%; /* Ensure the logo fits within the container */
+                height: auto; /* Maintain aspect ratio */
+            }
+        }	
         /* Existing styles... */
 @media screen and (max-width: 768px) {
 
-    .logo-container {
-        width: 90%; /* Limit width to 90% of the screen */
-        margin: 0px auto; /* Center horizontally with automatic margins */
-        padding: 5px; /* Adjust padding */
-    }
+  
 	
 	 .register-section {
         text-align: center;
@@ -170,7 +176,7 @@
     }
 
     .logo {
-        max-width: 100%; /* Ensure the logo fits within the container */
+        max-width: 300px !important; /* Ensure the logo fits within the container */
         height: auto; /* Maintain aspect ratio */
     }
         .container {
@@ -304,9 +310,7 @@
         <form action="{{ url_for('register') }}" method="post">
             <div class="form-section">
                 <label for="phone">Phone</label>
-                <div class="phone-input-container">
                     <input type="text" name="phone_number" placeholder="Phone Number" required>
-                </div>
 
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required maxlength="100">

@@ -38,7 +38,7 @@
         }
 
         .logo-container:hover {
-            transform: scale(1.03); /* Enlarge on hover */
+            transform: scale(1.01); /* Enlarge on hover */
 			    padding: 5px; /* Adjust padding if needed */
 
         }
@@ -191,6 +191,16 @@
 margin-bottom: 10px;				
             }
         }
+		
+		      @media screen and (max-width: 480px) {
+            .container {
+                overflow-y: auto; /* Enable vertical scrolling */
+            }
+
+            body, html {
+                height: auto; /* Allow body to expand based on content */
+            }
+        }
 
         /* Media query for mobile phones */
         @media screen and (max-width: 480px) {
@@ -227,7 +237,9 @@ margin-bottom: 10px;
 <body>
 
 <div class="logo-container" onclick="redirectToIndex()">
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    <a href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>
 </div>
     <div class="container">
         <!-- Left side - Login Section -->
@@ -241,13 +253,12 @@ margin-bottom: 10px;
                 </form>
             </div>
             <div class="register-section">
-                <p>Don't have an account yet?</p>
-                <p>Register to let your voice be heard!</p>
-				<p>You need an account to post suggestions, vote, and to comment.</p>
-                <button class="register-button">Register</button>
-				<div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-
-            </div>
+            <p>Don't have an account yet?</p>
+            <p>Register to let your voice be heard!</p>
+            <p>You need an account to post suggestions, vote, and to comment.</p>
+            <a href="/register" class="register-button">Register</a>
+            <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" style="display:none"></div>
+        </div>
         </div>
 
         <!-- Right side - Cover Image Section -->
@@ -316,4 +327,10 @@ function renderButton() {
     });
 }
 
+</script>
+
+<script>
+function redirectToIndex() {
+    window.location.href = '/';
+}
 </script>

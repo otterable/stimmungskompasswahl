@@ -636,6 +636,11 @@ nav[aria-label="Page navigation"] {
     display: none; /* Hidden by default */
 	}
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+
     body {
         font-size: 14px; /* Smaller font size */
     }
@@ -711,6 +716,11 @@ nav[aria-label="Page navigation"] {
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+
     #hamburger-button {
         display: block; /* Show the button on mobile */
     }
@@ -837,6 +847,11 @@ nav[aria-label="Page navigation"] {
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+
     .top-bar {
         flex-direction: row; /* Align items horizontally */
         justify-content: space-between; /* Space between items */
@@ -855,7 +870,7 @@ nav[aria-label="Page navigation"] {
     }
 
     .top-bar a .logo {
-        max-width: 350px; /* Adjust logo size */
+        max-width: 270px; /* Adjust logo size */
         max-height: 350px; /* Adjust height automatically */
     }
 

@@ -364,6 +364,30 @@ margin: auto;
     display: none; /* Hidden by default */
 	}
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+	
+		#map {
+    height: 400px;    /* Fixed height, adjust as needed */
+	}
+	
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     body {
         font-size: 14px; /* Smaller font size */
     }
@@ -414,6 +438,25 @@ display: block;
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     #hamburger-button {
         display: block; /* Show the button on mobile */
     }
@@ -439,6 +482,25 @@ display: block;
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
+    html, body {
+        max-width: 100vw; /* Prevent horizontal overflow */
+        overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+    .top-bar {
+        width: 100%; /* Full width of the screen */
+        display: flex;
+        justify-content: space-between; /* Space items evenly */
+        align-items: center; /* Center items vertically */
+        padding: 0 10px; /* Padding on the sides */
+        box-sizing: border-box; /* Include padding in width calculation */
+    }
+    .hamburger-menu {
+        position: absolute; /* Adjust to absolute positioning */
+        right: 10px; /* Align to the right with some space */
+        top: 10px; /* Align to the top with some space */
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+
     .top-bar {
         flex-direction: row; /* Align items horizontally */
         justify-content: space-between; /* Space between items */
@@ -453,7 +515,7 @@ display: block;
     }
 
     .top-bar a .logo {
-        max-width: 350px; /* Adjust logo size */
+        max-width: 270px; /* Adjust logo size */
         max-height: 350px; /* Adjust height automatically */
     }
 
