@@ -582,25 +582,25 @@ display: block;
     <form method="POST" enctype="multipart/form-data" action="/submit_project">
         <!-- Step 1: Title -->
 	<div class="input-field">
-		<label for="title">1. Add a Title for your project</label>
-		<p style="color: #003056;">How can you sum up your idea in a few words?</p> <!-- Added description -->
+		<label for="title">1. Geben Sie Ihrem Vorschlag einen Namen</label>
+		<p style="color: #003056;">Worum geht es? (Formuliert in ein paar Worten)</p> <!-- Added description -->
 		<input type="text" id="title" name="name" required>
 	</div>
 
 
        <!-- Category Selection -->
         <div class="input-field">
-            <label for="category">4. Select a category</label>
+            <label for="category">2. Wählen Sie eine Kategorie</label>
             <select id="category" name="category" required>
                 <option value="Transport">Transport</option>
-                <option value="Public spaces">Public spaces</option>
-                <option value="Environment">Environment</option>
+                <option value="Public spaces">Öffentliche Plätze</option>
+                <option value="Environment">Umwelt</option>
                 <option value="Verwaltung">Verwaltung</option>
-                <option value="Culture">Culture</option>
-                <option value="Education">Education</option>
-                <option value="Health">Health</option>
+                <option value="Culture">Kultur</option>
+                <option value="Education">Bildung</option>
+                <option value="Health">Gesundheit</option>
                 <option value="Sport">Sport</option>
-                <option value="Other">Other</option>
+                <option value="Other">Andere</option>
             </select>
         </div>
 		<div id="category-description">
@@ -610,24 +610,24 @@ display: block;
 
       <!-- Step 3: Description -->
 <div class="input-field" style="margin-top:40px">
-    <label for="descriptionwhy">3. Write a description of your project, and why you are suggesting it</label>
-	<p style="color: #003056;">Provide a detailed explanation of what you believe should be improved and the reasons behind your project idea.</p>
+    <label for="descriptionwhy">3. Beschreiben Sie Ihren Vorschlag und schreiben Sie, warum es Ihnen ein Anliegen ist.</label>
+	<p style="color: #003056;">Erklären Sie verständlich, worum es geht und beschreiben Sie, was und warum es verbessert oder verändert werden soll. </p>
     <div id="description-editor"></div> <!-- Quill container -->
 <textarea id="descriptionwhy" name="descriptionwhy" style="display:none;"></textarea>
 </div>
 
 <!-- Step 4: Benefit -->
 <div class="input-field">
-    <label for="public_benefit">4. How will the public benefit from your project?</label>
-		<p style="color: #003056;">Sum up in 1-3 sentences how others will benefit from your idea.</p>
+    <label for="public_benefit">4. Welcher Vorteil für die Öffentlichkeit ensteht dadurch?</label>
+		<p style="color: #003056;">Erklären Sie kurz, wie die Einwohner davon profitieren.</p>
     <div id="benefit-editor"></div> <!-- Quill container -->
 <textarea id="public_benefit" name="public_benefit" style="display:none;"></textarea>
 </div>
 
         <!-- Step 5: Image Upload -->
         <div class="input-field">
-            <label for="image">5. Add an image to represent your project</label>
-<p style="color: #003056;">Please share a picture that best represents your project. In most cases, a photo of the affected location works great!</p>
+            <label for="image">5. Fügen Sie ein Bild hinzu.</label>
+<p style="color: #003056;">Wählen Sie ein passendes Bild, dass den Vorschlag verständlich macht.</p>
 <input type="file" id="image" name="image_file" accept="image/*" required>
         </div>
 
@@ -635,13 +635,13 @@ display: block;
 
     <!-- Map Container -->
     <div class="input-field">
-        <label for="map">6. Choose a location on the map</label>
+        <label for="map">6. Wählen Sie den betreffenden Ort auf der Stadtkarte aus.</label>
         <div id="map"></div>
         <input type="hidden" id="geoloc" name="geoloc" required>
     </div>
 	
         <!-- Publish Button -->
-<button type="submit" class="button publish-button" onclick="console.log('Publish button clicked');">Publish</button>
+<button type="submit" class="button publish-button" onclick="console.log('Publish button clicked');">Veröffentlichen</button>
 
     </form>
 </div>
@@ -789,31 +789,31 @@ setTimeout(function() {
         
         switch (selectedOption) {
             case "Transport":
-                categoryText = "Do you wish for a new Radweg? New bus connection? Is a street in bad shape? Could your idea solve the parking situation? Share your ideas with us!";
+                categoryText = "Wünschen Sie sich einen neuen Radweg? Eine neue Busverbindung? Gibt es Probleme mit dem Parken?";
                 break;
             case "Public spaces":
-                categoryText = "Whether it's revitalizing parks, transforming public squares, introducing new green spaces, or adding a wasserquelle somewhere, we want to hear your ideas.";
+                categoryText = "Sollen öffentliche Plätze umgestaltet werden? Braucht es mehr Grünflächen?";
                 break;
             case "Environment":
-                categoryText = "We're seeking innovative ideas to make our town more environmentally sustainable and future-proof. Whether it's green initiatives, eco-friendly projects, or sustainable practices, your thoughts can drive the change.";
+                categoryText = "Ist Ihnen Umweltverschmutzung aufgefallen? Haben Sie Ideen, um die Stadt sauberer, ökologischer oder Zukunftsfit zu machen?";
                 break;
             case "Verwaltung":
-                categoryText = "Got ideas to enhance our city administration? Share your thoughts on increasing openness, hosting more public events, and fostering community engagement.";
+                categoryText = "Gibt es Ideen für bessere Dienste der Verwaltung?. Vorschläge, öffentliche Veranstaltungen betreffen?";
                 break;
             case "Culture":
-                categoryText = "Share your ideas for concerts, art installations, public workshops, events, and preserving our heritage statues and churches.";
+                categoryText = "Gibt es Ideen für Verstaltungen, Kunstinstallationen, Theater oder Literatur?";
                 break;
             case "Education":
-                categoryText = "Ideas that could help education.";
+                categoryText = "Welche Dinge im Bereich der Bildungen, Schulen und Hochschulen können wir als Gemeinde verbessern?";
                 break;
             case "Health":
-                categoryText = "Ideas that could make the town healthier.";
+                categoryText = "Ideen zum Thema Gesundheit?";
                 break;
             case "Sport":
-                categoryText = "Ideas that could support sport.";
+                categoryText = "Ideen zu Sportveranstaltungen, Sportplätzen oder städitschen Kursen?";
                 break;
             case "Other":
-                categoryText = "Have a unique idea that doesn't fit into the categories above? Whether it's about improving infrastructure, promoting wellness, enhancing safety, or any other innovative concept, we want to hear it.";
+                categoryText = "Haben Sie einen eigenen Vorschlag, der in keine der genannten Kategorien passt? Teilen Sie Ihre Idee uns mit!;
                 break;
             default:
                 categoryText = "";

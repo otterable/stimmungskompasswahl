@@ -11,10 +11,11 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(200), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     surname = db.Column(db.String(100), nullable=False)
-    
-    ip_address = db.Column(db.String(100))  # Assuming you'll set this at registration
-    highlight_id = db.Column(db.Integer)  # Assuming this is an integer field
+    ip_address = db.Column(db.String(100))  # Optional, set at registration
+    highlight_id = db.Column(db.Integer)  # Optional, assumed to be an integer
     account_creation = db.Column(db.DateTime, default=datetime.utcnow)
+    is_admin = db.Column(db.Boolean, default=False)  # New field to indicate admin status
+
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -26,19 +27,19 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     category = db.Column(db.String(100), nullable=False)
-    descriptionwhy = db.Column(db.String(300), nullable=False)  # Why the project is suggested
-    public_benefit = db.Column(db.String(300), nullable=False)  # How the public will benefit
-    image_file = db.Column(db.String(100), nullable=False)  # Path to the image file
-    geoloc = db.Column(db.String(100))  # Geolocation data (optional)
-    date = db.Column(db.DateTime, default=datetime.utcnow)  # Date of project creation
-    author = db.Column(db.String(100), nullable=False)  # Author of the project
-    is_important = db.Column(db.Boolean, default=False)  # New field to mark projects as important
+    descriptionwhy = db.Column(db.String(300), nullable=False)
+    public_benefit = db.Column(db.String(300), nullable=False)
+    image_file = db.Column(db.String(100), nullable=False)
+    geoloc = db.Column(db.String(100))
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    author = db.Column(db.String(100), nullable=False)
+    is_important = db.Column(db.Boolean, default=False)
+    p_reports = db.Column(db.Integer, default=0)
+    is_featured = db.Column(db.Boolean, default=False)  # New field
 
     # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
     comments = db.relationship('Comment', backref='project', lazy=True, cascade="all, delete-orphan")
-
-
 
     def to_dict(self):
         return {
@@ -50,7 +51,10 @@ class Project(db.Model):
             "image_file": self.image_file,
             "geoloc": self.geoloc,
             "date": self.date.strftime("%Y-%m-%d %H:%M:%S") if self.date else None,
-            "author": self.author
+            "author": self.author,
+            "is_important": self.is_important,
+            "p_reports": self.p_reports,
+            "is_featured": self.is_featured  # Include new field
         }
 
 class Vote(db.Model):
@@ -78,12 +82,14 @@ class Comment(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    
+    c_reports = db.Column(db.Integer, default=0)  # New field to store report counts
+
     def to_dict(self):
         return {
             "id": self.id,
             "text": self.text,
             "project_id": self.project_id,
             "user_id": self.user_id,
-            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "c_reports": self.c_reports  # Include the new field in the dictionary
         }

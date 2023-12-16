@@ -30,6 +30,8 @@
             border-radius: 80px; /* Pill shape */
             display: inline-flex;
             justify-content: center;
+			                margin-top: 10px !important; /* 4px margin on all sides */
+
             align-items: center;
 			margin-bottom: 50px;
             padding: 5px 5px; /* Adjust as needed */
@@ -38,7 +40,7 @@
         }
 
         .logo-container:hover {
-            transform: scale(1.01); /* Enlarge on hover */
+            transform: scale(1.03); /* Enlarge on hover */
 			    padding: 5px; /* Adjust padding if needed */
 
         }
@@ -51,7 +53,7 @@
         .container {
             display: flex;
             justify-content: space-between;
-            width: 80%;
+            width: 90%;
             align-items: flex-start; /* Align the top of the sections */
         }
      .login-form {
@@ -91,6 +93,14 @@
         align-items: center; /* Center items horizontally in both sections */
     }
 	
+	.login-section {
+    align-items: center; /* Center items horizontally */
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Adjust width as needed */
+    /* Other existing styles... */
+}
+	
 	
     .button:hover, .register-button:hover {
         background-color: #004080; /* Lighten up color on hover - adjust as needed */
@@ -125,13 +135,13 @@
         font-size: 16px;
         margin: 10px 0;
         cursor: pointer;
-        width: 100%; /* Full width */
+        width: 90%; /* Full width */
         box-sizing: border-box; /* Include padding in width */
     }
 
     .register-section {
         text-align: center;
-        margin-top: 20px; /* Space above the section */
+        margin-top: 0; /* Space above the section */
     }
 
     .register-section p {
@@ -156,84 +166,148 @@
             box-sizing: border-box; /* Include padding in width calculation */
         }
 		
-		
-        /* Existing styles... */
-
-        /* Media query for tablets */
-  @media screen and (max-width: 768px) {
+	    @media screen and (max-width: 480px) {
             .logo-container {
-                margin: 10px !important; /* 4px margin on all sides */
-                width: 90%; /* 90% width */
-            }
-			
-		
-            .container {
-                flex-direction: column;
-                width: 90%;
-            }
-
-            .login-section, .cover-section {
-                width: 100%;
-                margin: 10px 0;
-            }
-
-            .login-form input[type="text"], .login-form input[type="password"] {
-                padding: 5px 5px; /* Smaller padding */
-            }
-
-            .button, .register-button {
-                padding: 10px 20px;
-            }
-
-            .cover-image {
-                height: 300px; /* Smaller image for tablet */
-				margin: auto;
-margin-bottom: 10px;				
-            }
-        }
-		
-		      @media screen and (max-width: 480px) {
-            .container {
-                overflow-y: auto; /* Enable vertical scrolling */
-            }
-
-            body, html {
-                height: auto; /* Allow body to expand based on content */
-            }
-        }
-
-        /* Media query for mobile phones */
-        @media screen and (max-width: 480px) {
-            body {
-                font-size: 14px; /* Smaller text size */
-            }
-			
-
-                       .logo-container {
-                margin: 4px; /* 4px margin on all sides */
-                margin-bottom: 10px; /* 10px margin-bottom */
-                width: 90%; /* 90% width */
+                width: 80%; /* Reduce the width to 80% of the screen size */
+                margin: 10px auto; /* Add more margin to the top and bottom */
             }
 
             .logo {
-                max-width: 250px; /* Smaller logo for mobile */
+                max-width: 100%; /* Ensure the logo fits within the container */
+                height: auto; /* Maintain aspect ratio */
             }
+        }	
+        /* Existing styles... */
+@media screen and (max-width: 768px) {
 
-            .login-form input[type="text"], .login-form input[type="password"] {
-                padding: 5px 5px;
-            }
+  
+	
+	 .register-section {
+        text-align: center;
+        margin-top: 0px; /* Space above the section */
+    }
 
-            .button, .register-button {
-                font-size: 14px;
-                padding: 8px 15px;
-            }
-
-            .cover-image {
-                height: 200px; /* Even smaller image for mobile */
-            }
+    .logo {
+        max-width: 300px !important; /* Ensure the logo fits within the container */
+        height: auto; /* Maintain aspect ratio */
+    }
+        .container {
+            flex-direction: column; /* Stack content vertically */
         }
-    </style>
 
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            padding: 5px 5px;
+        }
+
+        .button,
+        .register-button {
+            padding: 10px 20px;
+        }
+
+        .cover-image {
+           display:none;
+            margin: auto;
+            margin-bottom: 10px;
+        }
+    }
+ 
+    @media screen and (max-width: 480px) {
+        body {
+            font-size: 14px;
+        }
+
+      
+    .logo-container {
+        width: auto; /* Adjust to fit content */
+        margin: 0 auto; /* Center horizontally */
+        padding: 5px; /* Less padding for smaller screens */
+    }
+
+    .logo {
+        max-width: 100%; /* Ensure the logo is not wider than its container */
+    }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            padding: 5px 5px;
+        }
+
+        .button,
+        .register-button {
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+
+        .cover-image {
+		display:none;
+            height: 200px;
+        }
+    }
+		
+		 
+
+    .form-section input[type="text"],
+    .form-section input[type="password"],
+    .form-section input[type="date"],
+    .form-section input[type="email"] {
+          background-color: white;
+            border: solid #003056;
+            border-radius: 30px;
+            padding: 5px 5px;
+            margin-bottom: 2px;
+            width: 100%; /* Full width of the container */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+    .form-section label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .register-button {
+        /* Similar styles to your login page buttons */
+    }
+
+    .informative-text {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+	
+	.form-section select {
+    background-color: white;
+    border: solid #003056;
+    border-radius: 30px;
+    padding: 10px 15px; /* Adjust padding as needed */
+    margin-bottom: 10px;
+    width: 100%; /* Full width of the container */
+    box-sizing: border-box; /* Include padding in width calculation */
+    font-size: 16px; /* Adjust font size as needed */
+}
+
+.phone-input-container {
+    display: flex;
+    align-items: center;
+    border: solid #003056;
+    border-radius: 30px;
+    padding: 5px;
+}
+
+.phone-prefix {
+    padding: 5px 10px;
+    background-color: #e9ecef; /* Light grey background */
+    border-right: 1px solid #003056;
+    border-radius: 25px 0 0 25px; /* Rounded left corners */
+}
+
+.phone-input-container input {
+    flex: 1;
+    border: none;
+    border-radius: 0 25px 25px 0; /* Rounded right corners */
+    margin-left: 5px;
+}
+
+    </style>
 <body>
 
 <div class="logo-container" onclick="redirectToIndex()">
@@ -242,31 +316,36 @@ margin-bottom: 10px;
     </a>
 </div>
     <div class="container">
-        <!-- Left side - Login Section -->
-       <div class="login-section">
-            <h1>Log in to submit your ideas!</h1>
-            <div class="login-form">
-<form action="{{ url_for('login', next=next) }}" method="post">
-                    <input type="text" name="username_or_phone" placeholder="Phone number / e-mail" required>
-                    <input type="password" name="password" placeholder="Password" required>
-                    <button type="submit" class="button">Log in</button>
-                </form>
-            </div>
-            <div class="register-section">
-            <p>Don't have an account yet?</p>
-            <p>Register to let your voice be heard!</p>
-            <p>You need an account to post suggestions, vote, and to comment.</p>
-            <a href="/register" class="register-button">Register</a>
+    <!-- Left side - Login Section -->
+    <div class="login-section">
+        <div style="text-align: center !important;">
+            <h2>Melden Sie sich ein, um Vorschläge zu posten.</h2>
+        </div>
+        <div class="login-form">
+            <form action="{{ url_for('login', next=next) }}" method="post">
+                <input type="text" name="username_or_phone" placeholder="Phone number / e-mail" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" class="register-button" style="font-weight: bold;">Log in</button>
+				  <a href="/register" class="register-button">Registrieren</a>
             <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" style="display:none"></div>
-        </div>
-        </div>
+			            <a href="{{ url_for('password_recovery') }}" class="register-button">Passwort zurücksetzen</a>
 
-        <!-- Right side - Cover Image Section -->
-        <div class="cover-section">
-            <img src="{{ url_for('static', filename='login_titleimage.png') }}" alt="Cover Image" class="cover-image">
-           
+            </form>
+        </div>
+        <div class="register-section">
+            <p>Haben Sie noch kein Konto?</p>
+            <p>Registrieren Sie sich, um beizutragen!</p>
+            <p>Sie benötigen ein Konto, um Vorschläge zu machen, Abzustimmen oder Kommentare zu schreiben.</p>
+          
         </div>
     </div>
+
+    <!-- Right side - Cover Image Section -->
+    <div class="cover-section">
+        <img src="{{ url_for('static', filename='login_titleimage.png') }}" alt="Cover Image" class="cover-image">
+    </div>
+</div>
+
 </body>
 </html>
 <script>

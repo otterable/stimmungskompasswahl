@@ -113,6 +113,153 @@ img { max-width: 100%; height: auto;
             border-radius: 30px; /* Optional: if you want rounded corners */
         }
 
+
+/* Base styles for project thumbnails */
+.project-thumbnail {
+    background-color: rgba(40, 116, 166, 0.3);
+    border-radius: 30px;
+    margin: 10px;
+    padding: 10px;
+    display: flex; /* Changed to flex to better control the layout */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: visible; /* Ensure the content is not clipped */
+}
+
+/* Hover effect for project thumbnails */
+.project-thumbnail:hover {
+    transform: scale(1.03);
+}
+
+/* Image style within project thumbnails */
+.project-thumbnail img {
+    width: 90%;
+    margin-top: 20px;
+    height: 400px; /* Fixed height for images */
+    object-fit: cover;
+    border-radius: 30px;
+}
+
+/* Text style inside project thumbnails */
+.project-thumbnail h2, .project-thumbnail p {
+    margin: 0;
+    padding: 5px 0;
+    width: 90%; /* Adjust the width to match the image */
+    text-align: center; /* Center the text */
+}
+
+/* Remove absolute positioning from the description */
+.project-thumbnail p {
+    position: relative; /* Changed from absolute to relative */
+    bottom: auto; /* Remove bottom positioning */
+    overflow: visible; /* Ensure text is not clipped */
+}
+
+
+
+.voting-bar {
+    width: 90%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 30px !important;
+    margin-top: 0px;
+    display: flex;
+}
+
+.upvotes {
+    height: 100%;
+    background-color: #4caf50;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.downvotes {
+    height: 100%;
+    background-color: #b71c1c;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.upvotes, .downvotes {
+    /* Existing styles */
+    position: relative; /* Ensure the position is relative for child positioning */
+}
+
+.upvotes span, .downvotes span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Choose a contrasting color */
+    font-size: 12px; /* Adjust the font size */
+    white-space: nowrap;
+    pointer-events: none; /* Prevents blocking click events */
+}
+
+.projects-header {
+    text-align: center; /* Center the content */
+    margin-bottom: 20px; /* Add some space below the header */
+}
+
+.projects-header h1 {
+    margin: 0; /* Remove default margin */
+    padding: 10px 0; /* Add some vertical padding */
+}
+
+.projects-header p {
+    margin: 0; /* Remove default margin */
+    color: #003056; /* Specific color for the undertitle */
+    font-style: italic; /* Optional: make it italic */
+}
+
+
+/* Desktop screens (larger than 1200px) */
+@media (min-width: 1445px) {
+    .project-thumbnail {
+        width: calc(33.333% - 20px); /* Three items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+}
+
+/* Medium screens (between 1024px and 1199px) */
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .project-thumbnail {
+        width: calc(50% - 20px); /* Two items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+}
+
+/* Mobile screens (less than 1024px) */
+@media (max-width: 1088px) {
+    .project-thumbnail {
+        width: calc(100% - 20px); /* Full width */
+        height: auto; /* Height adjusts based on content */
+    }
+    .project-thumbnail img {
+        height: auto; /* Adjust image height for mobile */
+    }
+}
+
+.project-list {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.bottom-bar {
+    background-color: #003056; /* Dark blue background */
+    color: white; /* White text color */
+    text-align: center; /* Center align text */
+    padding: 1px 0; /* Padding on top and bottom */
+    width: 100%; /* Full width */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+
  .top-bar {
     background-color: #003056; /* Background color of the top bar */
     height: 80px; /* Height of the top bar */
@@ -746,8 +893,8 @@ display: block;
 <div class="index-image">
 <img alt="Index Title Image" class="index-image" src="{{ url_for('static', filename='index_titleimage.png') }}" style="; max-width: 100%; height: auto;"/>
 <div class="cover-text-container">
-<h1>Change your town for the better!</h1>
-<p>Get involved in the development of your town and participate in its improvement!</p>
+<h1>Verschönern Sie Ihre Stadt!</h1>
+<p>Tragen Sie zu einer höheren Lebensqualität bei!</p>
 </div>
 </div>
 <div class="info-box-container">
@@ -755,20 +902,20 @@ display: block;
 <div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer; margin: 10px">
 <img alt="Map Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_map.png') }}">
 <p class="info-box-title">Karte</p>
-<p class="info-box-undertitle">Post how you feel about your town on a map, and see how other citizens feel about it!</p>
+<p class="info-box-undertitle">Posten Sie Beiträge auf der Stadtkarte und sehen Sie sich andere Beiträge an!</p>
 </div>
 <!-- Box 2 -->
 <div class="info-box box-blue" onclick="redirectToBeitraege()" style="cursor: pointer; margin: 10px">
 <img alt="Public Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_public.png') }}">
-<p class="info-box-title">Suggest an idea</p>
-<p class="info-box-undertitle">Tell the city what it should do better or different!</p>
-<p class="info-box-undertitle">Currently posted projects: {{ project_count }}</p>
+<p class="info-box-title">Machen Sie einen Vorschlag!</p>
+<p class="info-box-undertitle">Teilen Sie Ihrer Stadt mit, welche Veränderungen oder Verbesserungen Sie sich wünschen!</p>
+<p class="info-box-undertitle">Aktuelle Vorschläge: {{ project_count }}</p>
 </div>
 <!-- Box 3 -->
 <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
 <img alt="List Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_list.png') }}" >
-<p class="info-box-title">List of current s uggestions</p>
-<p class="info-box-undertitle">Vote on bereits suggested ideas to help bringing them to reality!</p>
+<p class="info-box-title">Aktuelle Vorschläge</p>
+<p class="info-box-undertitle">Stimmen Sie über Vorschläge ab und verhelfen Sie ihnen zum Erfolg!</p>
 </div>
 </div>
 <!-- Info text field with wrapped text container -->
@@ -780,6 +927,48 @@ display: block;
 <p class="info-text-undertitle">The power to make this town better lies in your hands!</p>
 </div>
 </div>
+
+<!-- Featured Projects Section -->
+<div class="projects-header">
+    <h1>Featured Projects:</h1>
+    <p>Take a look at the projects that caught our attention!</p>
+</div>
+
+
+<div class="project-list">
+    {% if featured_projects %}
+        {% for project in featured_projects %}
+            <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="window.location.href='{{ url_for('project_details', project_id=project.id) }}'">
+                <h2>{{ project.name }}</h2>
+                <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
+
+                <!-- Voting Bar -->
+                <div class="voting-bar">
+                    {% if project.upvotes > 0 %}
+                        <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                            <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                        </div>
+                    {% endif %}
+                    {% if project.downvotes > 0 %}
+                        <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                            <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+                <div class="project-description">{{ project.descriptionwhy|safe }}</div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center;">Keine hervorgehobenen Projekte gefunden.</p>
+    {% endif %}
+</div>
+
+<div class="bottom-bar">
+    <p>v16.12.2023, Kontakt: office@ermine.at</p>
+</div>
+
 </body>
 </html>
 <script>

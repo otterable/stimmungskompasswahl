@@ -104,15 +104,24 @@ def download_images():
         # flash('Error in downloading images.', 'danger')
         return redirect(url_for('opendata'))
 
-
 @app.route('/')
 def index():
     projects = Project.query.all()
-    project_count = Project.query.count()  # Get the total count of projects
-    for project in projects:
-        project.image_file = quote(project.image_file)
-    logging.debug("Projects: %s", projects)
-    return render_template('index.html', projects=projects, project_count=project_count)
+    featured_projects = Project.query.filter_by(is_featured=True).all()
+
+    # Calculate upvotes and downvotes for each project
+    for project in projects + featured_projects:
+        upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+        downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
+
+        project.upvotes = upvotes
+        project.downvotes = downvotes
+        project.upvote_percentage = (upvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
+        project.downvote_percentage = (downvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
+
+    project_count = len(projects)
+    return render_template('index.html', projects=projects, project_count=project_count, featured_projects=featured_projects)
+
 
 
 @app.route('/logout')
@@ -480,40 +489,64 @@ def project_details(project_id):
         logging.error("Error in project_details route: %s", str(e))
         return str(e)  # or redirect to a generic error page
         
-        
+
 @app.route('/admintools', methods=['GET', 'POST'])
 @login_required
 def admintools():
-    # Retrieve users
     users = User.query.all()
 
     if request.method == 'POST':
+        project_id = request.form.get('project_id')
+
         if 'mark_important' in request.form:
-            project_id_to_mark_important = request.form.get('project_id')
-            project_to_mark_important = Project.query.get(project_id_to_mark_important)
-            if project_to_mark_important:
-                project_to_mark_important.is_important = True
+            project = Project.query.get(project_id)
+            if project:
+                project.is_important = True
                 db.session.commit()
                 flash('Project marked as important', 'success')
             else:
                 flash('Project not found for marking as important', 'error')
-        else:
-            project_id_to_delete = request.form.get('project_id')
-            project_to_delete = Project.query.get(project_id_to_delete)
-            if project_to_delete:
-                # Delete the project
-                db.session.delete(project_to_delete)
+
+        elif 'unmark_important' in request.form:
+            project = Project.query.get(project_id)
+            if project:
+                project.is_important = False
                 db.session.commit()
-                logging.debug(f"Project {project_id_to_delete} successfully deleted.")
+                flash('Project unmarked as important', 'success')
             else:
-                logging.debug(f"Project {project_id_to_delete} not found for deletion.")
+                flash('Project not found for unmarking as important', 'error')
+
+        elif 'mark_featured' in request.form:
+            project = Project.query.get(project_id)
+            if project:
+                project.is_featured = True
+                db.session.commit()
+                flash('Project marked as featured', 'success')
+            else:
+                flash('Project not found for marking as featured', 'error')
+
+        elif 'unmark_featured' in request.form:
+            project = Project.query.get(project_id)
+            if project:
+                project.is_featured = False
+                db.session.commit()
+                flash('Project unmarked as featured', 'success')
+            else:
+                flash('Project not found for unmarking as featured', 'error')
+
+        elif 'delete_project' in request.form:
+            project = Project.query.get(project_id)
+            if project:
+                db.session.delete(project)
+                db.session.commit()
+                flash(f'Project {project_id} successfully deleted.', 'success')
+            else:
+                flash(f'Project {project_id} not found for deletion.', 'error')
+
         return redirect(url_for('admintools'))
 
-    # GET request handling
     sort = request.args.get('sort', 'score_desc')
     search_query = request.args.get('search', '')
-    search_user_query = request.args.get('searchUserByName', '')
-    search_user_id_query = request.args.get('searchUserById', '')
     query = Project.query
 
     if search_query:
@@ -522,16 +555,11 @@ def admintools():
     projects = query.all()
     for project in projects:
         user = User.query.get(project.author)
-        if user:
-            project.author_name = f"{user.name} {user.surname}"
-        else:
-            project.author_name = 'Unknown'
+        project.author_name = f"{user.name} {user.surname}" if user else 'Unknown'
         project.comments_count = Comment.query.filter_by(project_id=project.id).count()
-        upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
-        downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
-        project.upvotes = upvotes
-        project.downvotes = downvotes
-        project.score = upvotes - downvotes
+        project.upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+        project.downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
+        project.score = project.upvotes - project.downvotes
 
     if sort == 'oldest':
         projects.sort(key=lambda x: x.date)
@@ -548,16 +576,16 @@ def admintools():
     elif sort == 'comments':
         projects.sort(key=lambda x: x.comments_count, reverse=True)
     elif sort == 'alpha_asc':
-        projects.sort(key=lambda x: x.name.lower())  # Sort alphabetically by project title
+        projects.sort(key=lambda x: x.name.lower())
     elif sort == 'alpha_desc':
-        projects.sort(key=lambda x: x.name.lower(), reverse=True)  # Sort alphabetically by project title (Z-A)
+        projects.sort(key=lambda x: x.name.lower(), reverse=True)
     else:
         projects.sort(key=lambda x: x.score, reverse=True)
 
-    # Separate important projects
     important_projects = [project for project in projects if project.is_important]
+    featured_projects = [project for project in projects if project.is_featured]
 
-    return render_template('admintools.html', projects=projects, sort=sort, search_query=search_query, users=users, search_user_query=search_user_query, search_user_id_query=search_user_id_query, important_projects=important_projects)
+    return render_template('admintools.html', projects=projects, sort=sort, search_query=search_query, users=users, important_projects=important_projects, featured_projects=featured_projects)
 
         
         
@@ -744,9 +772,9 @@ def verify_otp():
     if request.method == 'POST':
         user_otp = request.form.get('otp')
         if 'user_data' in session and session['user_data']['otp'] == int(user_otp):
+            # Handle New User Registration
             user_data = session.pop('user_data')
 
-            # Create new user instance without email
             new_user = User(
                 phone_number=user_data['phone_number'],
                 password_hash=generate_password_hash(user_data['password']),
@@ -757,16 +785,52 @@ def verify_otp():
             db.session.add(new_user)
             db.session.commit()
 
-            # Log in the user automatically
             login_user(new_user)
-
             logging.debug("New user registered: %s", new_user.phone_number)
             return jsonify({'success': True, 'message': 'Account successfully created'})
+
+        elif 'reset_otp' in session and session['reset_otp'] == int(user_otp):
+            # Handle Password Reset
+            phone_number = session.pop('phone_number')
+            user = User.query.filter_by(phone_number=phone_number).first()
+            if user:
+                new_password = request.form.get('new_password')
+                user.set_password(new_password)
+                db.session.commit()
+                logging.debug(f"Password reset for user with phone number {phone_number}")
+                flash('Your password has been reset successfully.', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash('User not found.', 'error')
+
         else:
             logging.debug("OTP verification failed")
-            return jsonify({'success': False, 'message': 'Invalid OTP'}), 400
+            flash('Invalid OTP', 'error')
 
     return render_template('verify_otp.html')
+
+
+
+@app.route('/password_recovery', methods=['GET', 'POST'])
+def password_recovery():
+    if request.method == 'POST':
+        phone_number = request.form['phone_number']
+        user = User.query.filter_by(phone_number=phone_number).first()
+        if user:
+            otp = randint(100000, 999999)
+            client = Client(account_sid, auth_token)
+            client.messages.create(
+                body=f"Your OTP is: {otp}",
+                from_=twilio_number,
+                to=phone_number
+            )
+            session['phone_number'] = phone_number
+            session['otp'] = otp
+            return redirect(url_for('verify_otp'))
+        else:
+            flash('Phone number not found', 'error')
+    return render_template('password_recovery.html')
+
 
 @app.route('/download_data')
 def download_data():

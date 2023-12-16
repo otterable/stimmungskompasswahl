@@ -591,10 +591,11 @@ display: block;
             <strong>{{ project.name }}</strong> - Category: {{ project.category }} <br>
             Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
             Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
-             <form method="POST" action="{{ url_for('admintools') }}">
+            <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit">Delete</button>
+                <button type="submit" name="delete_project">Delete</button>
                 <button type="submit" name="mark_important">Mark as Important</button>
+                <button type="submit" name="mark_featured">Mark as Featured</button> <!-- New button to mark as featured -->
             </form>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
         </li>
@@ -604,13 +605,42 @@ display: block;
 
 <h2>Important Projects</h2>
 <ul>
-    {% for project in projects if project.is_important %}
+    {% for project in important_projects %}
         <li>
-            <!-- Display important project details here -->
+            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" width="100" height="100">
+            <strong>{{ project.name }}</strong> - Category: {{ project.category }} <br>
+            Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
+            Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+            <form method="POST" action="{{ url_for('admintools') }}">
+                <input type="hidden" name="project_id" value="{{ project.id }}">
+                <button type="submit" name="unmark_important">Unmark as Important</button>
+            </form>
+            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
         </li>
+    {% else %}
+        <li>No important projects found.</li>
     {% endfor %}
 </ul>
 
+
+<h2>Featured Projects</h2>
+<ul>
+    {% for project in featured_projects %}
+        <li>
+            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" width="100" height="100">
+            <strong>{{ project.name }}</strong> - Category: {{ project.category }} <br>
+            Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
+            Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+            <form method="POST" action="{{ url_for('admintools') }}">
+                <input type="hidden" name="project_id" value="{{ project.id }}">
+                <button type="submit" name="unmark_featured">Unmark as Featured</button>
+            </form>
+            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
+        </li>
+    {% else %}
+        <li>No featured projects found.</li>
+    {% endfor %}
+</ul>
 
 
 <h1>Delete Users and Contributions</h1>

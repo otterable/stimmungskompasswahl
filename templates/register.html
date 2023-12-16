@@ -306,26 +306,26 @@
 
 <div class="container">
     <div class="register-section">
-        <h1>Register your account here!</h1>
+        <h2>Erstellen Sie ein Konto.</h2>
         <form action="{{ url_for('register') }}" method="post">
             <div class="form-section">
-                <label for="phone">Phone</label>
+                <label for="phone">Telefonnummer</label>
                     <input type="text" name="phone_number" placeholder="Phone Number" required>
 
-                <label for="password">Password</label>
+                <label for="password">Passwort</label>
                 <input type="password" id="password" name="password" required maxlength="100">
 
-                <label for="name">Name</label>
+                <label for="name">Benutzername</label>
                 <input type="text" id="name" name="name" required maxlength="100">
 
-                <label for="surname">Surname</label>
+                <label for="surname">Echter Name.</label>
                 <input type="text" id="surname" name="surname" required maxlength="100">
             </div>
 
-            <p class="informative-text">Aside from your first name, no details will be publicly shown.</p>
-            <p class="informative-text">At any time, you can download a copy of all your data within your profile settings.</p>
+            <p class="informative-text">Außer Ihrem Vornamen wird nichts öffentlich angezeigt.</p>
+            <p class="informative-text">Sie können Ihre Daten jederzeit in Ihren Profileinstellungen ansehen.</p>
 
-            <button type="submit" class="register-button">Register</button>
+            <button type="submit" class="register-button" style="font-weight: bold;">Register</button>
         </form>
     </div>
 

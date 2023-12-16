@@ -953,14 +953,14 @@ nav[aria-label="Page navigation"] {
                 <option value="">Alle Kategorien</option>
                 {% set current_category = request.args.get('category', '') %}
                 <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
-                <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Public spaces</option>
-                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Environment</option>
+                <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Öffentliche Plätze</option>
+                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Umwelt</option>
                 <option value="Verwaltung" {% if current_category == 'Verwaltung' %}selected{% endif %}>Verwaltung</option>
-                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Culture</option>
-                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Education</option>
-                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Health</option>
+                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Kultur</option>
+                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Bildung</option>
+                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Gesundheit</option>
                 <option value="Sport" {% if current_category == 'Sport' %}selected{% endif %}>Sport</option>
-                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Other</option>
+                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Andere</option>
             </select>
         </div>
 
@@ -968,10 +968,10 @@ nav[aria-label="Page navigation"] {
         <div class="filter-item">
     <label for="sort">Sort:</label>
     <select name="sort" id="sort">
-		<option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Sort by highest score</option>
-        <option value="lowest" {% if request.args.get('sort', '') == 'lowest' %}selected{% endif %}>Sort by lowest score</option>
-        <option value="newest" {% if request.args.get('sort', '') == 'newest' %}selected{% endif %}>Sort by newest</option>
-        <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Sort by oldest</option>
+		<option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
+        <option value="lowest" {% if request.args.get('sort', '') == 'lowest' %}selected{% endif %}>Niedrigste Bewertung zuerst </option>
+        <option value="newest" {% if request.args.get('sort', '') == 'newest' %}selected{% endif %}>Neuester Beitrag zuerst </option>
+        <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Ältester Beitrag zuerst</option>
         
     </select>
 </div>
@@ -994,14 +994,14 @@ nav[aria-label="Page navigation"] {
                 <option value="">Alle Kategorien</option>
                 {% set current_category = request.args.get('category', '') %}
                 <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
-                <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Public spaces</option>
-                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Environment</option>
+                <option value="Public spaces" {% if current_category == 'Public spaces' %}selected{% endif %}>Öffentliche Plätze</option>
+                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Umwelt</option>
                 <option value="Verwaltung" {% if current_category == 'Verwaltung' %}selected{% endif %}>Verwaltung</option>
-                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Culture</option>
-                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Education</option>
-                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Health</option>
+                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Kultur</option>
+                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Bildung</option>
+                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Gesundheit</option>
                 <option value="Sport" {% if current_category == 'Sport' %}selected{% endif %}>Sport</option>
-                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Other</option>
+                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Andere</option>
             </select>
         </div>
 
@@ -1009,18 +1009,18 @@ nav[aria-label="Page navigation"] {
             <label for="age">Age:</label>
             <select name="age" id="age">
                 {% set current_age = request.args.get('age', '') %}
-                <option value="" {% if current_age == 'newest' %}selected{% endif %}>Newest</option>
-                <option value="oldest" {% if current_age == 'oldest' %}selected{% endif %}>Oldest</option>
+                <option value="" {% if current_age == 'newest' %}selected{% endif %}>Am Neuesten</option>
+                <option value="oldest" {% if current_age == 'oldest' %}selected{% endif %}>Am Ältesten</option>
             </select>
         </div>
 
         <div class="filter-item">
-            <label for="score">Score:</label>
+            <label for="score">Bewertung:</label>
             <select name="score" id="score">
-                <option value="">Sort by score</option>
+                <option value="">Nach Bewertung</option>
                 {% set current_score = request.args.get('score', '') %}
-                <option value="highest" {% if current_score == 'highest' %}selected{% endif %}>Highest Score</option>
-                <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Lowest Score</option>
+                <option value="highest" {% if current_score == 'highest' %}selected{% endif %}>Höchste Bewertung</option>
+                <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Niedrigste Bewertung</option>
             </select>
         </div>
 		        <button type="submit" class="filter-button">Filter</button>
@@ -1029,9 +1029,9 @@ nav[aria-label="Page navigation"] {
 </div>
 
 <div class="projects-header">
-    <h1>Citizen-submitted projects</h1>
+    <h1>Eingebrachte Vorschläge</h1>
     {% if projects %}
-        <p>Click on a project to display details!</p>
+        <p>Klicken Sie auf einen Vorschlag, nähere Informatioinen zu sehen.</p>
     {% endif %}
 </div>
 
@@ -1061,7 +1061,7 @@ nav[aria-label="Page navigation"] {
             </div>
         {% endfor %}
     {% else %}
-        <p style="text-align: center;">No results found. Submit your own project!</p>
+        <p style="text-align: center;">Keine Ergebnisse gefunden. Machen Sie selbst einen Vorschlag!</p>
     {% endif %}
 </div>
 
