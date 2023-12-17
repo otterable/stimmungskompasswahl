@@ -98,11 +98,11 @@ def download_images():
             return Response(download_script, mimetype='text/html')
         else:
             # flash('No images available to download.', 'info')
-            return redirect(url_for('opendata'))
+            return redirect(url_for('profil'))
     except Exception as e:
         logging.error("Error in downloading images: %s", e)
         # flash('Error in downloading images.', 'danger')
-        return redirect(url_for('opendata'))
+        return redirect(url_for('profil'))
 
 @app.route('/')
 def index():
@@ -752,10 +752,45 @@ def comment(project_id):
         'timestamp': new_comment.timestamp.strftime('%d.%m.%Y %H:%M')
     })
 
-@app.route('/opendata')
-def opendata():
-    # Additional logic can be added here if needed
-    return render_template('opendata.html')
+@app.route('/profil')
+def profil():
+    user_projects = None
+    user_comments = None
+    user_statistics = None
+
+    if current_user.is_authenticated:
+        user_projects = Project.query.filter_by(author=current_user.id).all()
+        for project in user_projects:
+            upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+            downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
+            total_votes = upvotes + downvotes
+            project.upvotes = upvotes
+            project.downvotes = downvotes
+            project.upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
+            project.downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
+
+        user_comments = db.session.query(Comment, Project.name).join(Project, Comment.project_id == Project.id).filter(Comment.user_id == current_user.id).all()
+
+        # Calculate statistics
+        num_projects = len(user_projects)
+        num_comments = Comment.query.filter_by(user_id=current_user.id).count()
+
+        # Find the most successful project
+        most_successful_project = None
+        max_upvotes = 0
+        for project in user_projects:
+            upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+            if upvotes > max_upvotes:
+                max_upvotes = upvotes
+                most_successful_project = project
+
+        user_statistics = {
+            'num_projects': num_projects,
+            'num_comments': num_comments,
+            'most_successful_project': most_successful_project
+        }
+
+    return render_template('profil.html', user_projects=user_projects, user_comments=user_comments, user_statistics=user_statistics, is_authenticated=current_user.is_authenticated)
 
 @app.route('/erfolge')
 def erfolge():
@@ -766,6 +801,84 @@ def erfolge():
 def ueber():
     # Additional logic can be added here if needed
     return render_template('ueber.html')
+
+@app.route('/delete_project/<int:project_id>', methods=['POST'])
+@login_required
+def delete_project(project_id):
+    try:
+        project = Project.query.get_or_404(project_id)
+        app.logger.debug(f"User {current_user.id} attempting to delete project {project_id}, owned by user {project.author}")
+
+        # Convert project.author to int for comparison
+        project_author_id = int(project.author)
+        app.logger.debug(f"Converted project.author to int: {project_author_id}")
+
+        if project_author_id == current_user.id:
+            db.session.delete(project)
+            db.session.commit()
+            app.logger.debug(f"Project {project_id} deleted successfully.")
+            flash('Project successfully deleted.', 'success')
+        else:
+            flash('You do not have permission to delete this project.', 'danger')
+            app.logger.debug(f"Permission denied to delete project {project_id}.")
+    except Exception as e:
+        flash(f'Error deleting project: {e}', 'danger')
+        app.logger.error(f'Error deleting project: {e}')
+    return redirect(url_for('profil'))
+
+
+@app.route('/download_my_data')
+@login_required
+def download_my_data():
+    user_id = current_user.id
+
+    # Fetch user data
+    user_data = User.query.filter_by(id=user_id).first()
+
+    # Fetch user's projects
+    projects = Project.query.filter_by(author=user_id).all()
+    projects_data = [project.to_dict() for project in projects]
+
+    # Fetch user's comments
+    comments = Comment.query.filter_by(user_id=user_id).all()
+    comments_data = [comment.to_dict() for comment in comments]
+
+    # Fetch user's votes
+    votes = Vote.query.filter_by(user_id=user_id).all()
+    votes_data = [vote.to_dict() for vote in votes]
+
+    # Aggregate data
+    data = {
+        'user_info': {
+            'name': user_data.name,
+            'surname': user_data.surname,
+            'phone_number': user_data.phone_number,
+            'account_creation': user_data.account_creation.strftime("%Y-%m-%d %H:%M:%S"),
+            'ip_address': user_data.ip_address
+        },
+        'projects': projects_data,
+        'comments': comments_data,
+        'votes': votes_data
+    }
+
+    # Convert data to JSON format
+    response = jsonify(data)
+    response.headers['Content-Disposition'] = f'attachment; filename=user_{user_id}_data.json'
+    return response
+
+
+
+
+@app.route('/delete_comment/<int:comment_id>', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    if comment.user_id == current_user.id:
+        db.session.delete(comment)
+        db.session.commit()
+        # Add a flash message or redirect as needed
+    return redirect(url_for('profil'))
+
     
 @app.route('/verify_otp', methods=['GET', 'POST'])
 def verify_otp():
@@ -905,6 +1018,259 @@ def single_vote(project_id):
 
 
 
+@app.route('/categories')
+def categories():
+    return render_template('categories.html')
+    
+
+@app.route('/favicon.ico')
+def favicon():
+    app.logger.debug('Favicon loaded successfully')  # Add this debug message
+    return url_for('static', filename='favicon.ico')
+
+
+
+@app.route('/api/shapes', methods=['POST'])
+def add_shape2():
+    try:
+        print("Request method:", request.method)
+        print("Is JSON:", request.is_json)
+
+        # Check if the request is JSON
+        if request.is_json:
+            data = request.json
+            shape_data_json = json.dumps(data.get('shape_data', {}))
+            shape_note = data.get('shape_note', '')  # For JSON requests
+        else:
+            # Handling Form data
+            data = request.form
+            shape_data_json = data.get('shape_data', '{}')
+            shape_note = data.get('note', '')  # For form data, the key is 'note'
+
+        print("Shape Note:", shape_note)
+        print("Form Data:", data)
+
+        new_shape = Shape(
+            shape_data=shape_data_json,
+            shape_note=shape_note,
+            shape_type=data.get('shape_type', ''),
+            shape_color=data.get('shape_color', '#212120'),
+            molen_id=data.get('molen_id', 'null'),
+            score=data.get('score', 'null'),
+            highlight_id=data.get('highlight_id', 'null')
+        )
+
+        radius = data.get('radius')
+        if new_shape.shape_type == 'circle' and radius and radius != 'null':
+            new_shape.radius = float(radius)
+        else:
+            new_shape.radius = None
+
+        if 'shape_image' in request.files:
+            image = request.files['shape_image']
+            if image and image.filename != '':
+                filename = secure_filename(image.filename)
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                    os.makedirs(app.config['UPLOAD_FOLDER'])
+                image.save(image_path)
+                new_shape.shape_imagelink = image_path
+                print(f"Image saved at {image_path}")
+            else:
+                print("No image uploaded")
+
+        if hasattr(new_shape, 'shape_imagelink'):
+            print("Image Link:", new_shape.shape_imagelink)
+
+        db.session.add(new_shape)
+        db.session.commit()
+        print(f"New shape added with ID: {new_shape.id}")
+
+        return jsonify(success=True, id=new_shape.id, image_link=getattr(new_shape, 'shape_imagelink', None))
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify(success=False, error=str(e)), 500
+    
+@app.route('/api/colorOrder')
+def color_order():
+    try:
+        with open('templates/categories.html', 'r') as file:
+            content = file.read()
+            soup = BeautifulSoup(content, 'html.parser')
+            colors = [button['style'].split(': ')[1] for button in soup.find_all('button', {'class': 'categorybutton'})]
+            return jsonify({'colorOrder': colors})
+    except Exception as e:
+        print(f"Error retrieving color order: {e}")
+        return jsonify({'error': 'Could not retrieve color order'}), 500
+
+@app.route('/api/shapes', methods=['GET'])
+def get_shapes():
+    shapes = Shape.query.all()
+    shapes_data = []
+
+    for shape in shapes:
+        # Construct the shape data
+        shape_info = {
+            'id': shape.id,
+            'shape_data': json.loads(shape.shape_data),
+            'shape_type': shape.shape_type,
+            'shape_color': shape.shape_color,
+            'radius': shape.radius,
+            'shape_note': shape.shape_note,
+            'shape_imagelink': shape.shape_imagelink
+        }
+        shapes_data.append(shape_info)
+
+        # Print the name of the image file if it exists
+        if shape.shape_imagelink:
+            image_name = os.path.basename(shape.shape_imagelink)
+            print(f"Image file fetched: {image_name}")
+
+    print('Shapes fetched:', len(shapes_data))
+    return jsonify(shapes=shapes_data)
+
+
+
+
+@app.route('/api/add-shape', methods=['POST'])
+def add_shape():
+    shape_data = request.json.get('shape_data')
+    shape_note = request.json.get('shape_note', '')
+    shape_type = request.json.get('shape_type')
+    shape_color = request.json.get('shape_color', '#FFFFFF')
+
+    new_shape = Shape(shape_data=shape_data, shape_note=shape_note, shape_type=shape_type, shape_color=shape_color)
+    db.session.add(new_shape)
+    db.session.commit()
+
+    return jsonify({'success': True, 'id': new_shape.id})
+    
+@app.route('/api/shapes/<int:shape_id>', methods=['DELETE'])
+def delete_shape(shape_id):
+    shape = Shape.query.get(shape_id)
+    if shape:
+        db.session.delete(shape)
+        db.session.commit()
+        print('Shape deleted with ID:', shape_id)
+
+        # Call the get_shapes route to fetch the updated list of shapes
+        updated_shapes_data = get_shapes().get_json()
+        return jsonify(success=True, shapes=updated_shapes_data['shapes']), 200
+    else:
+        print('Shape not found with ID:', shape_id)
+        return jsonify(success=False), 404
+        
+@app.route('/export-geojson', methods=['GET'])
+def export_geojson():
+    # Query all shapes from the database
+    shapes = Shape.query.all()
+    
+    # Construct GeoJSON features list
+    features = []
+    for shape in shapes:
+        # Parse shape data and create GeoJSON feature
+        feature = {
+            "type": "Feature",
+            "geometry": json.loads(shape.shape_data),
+            "properties": {
+                "id": shape.id,
+                "note": shape.shape_note,
+                "type": shape.shape_type,
+                "color": shape.shape_color,
+                "molen_id": shape.molen_id,
+                "score": shape.score,
+                "highlight_id": shape.highlight_id,
+                "radius": shape.radius,
+                "imagelink": shape.shape_imagelink
+            }
+        }
+        features.append(feature)
+    
+    # Construct the full GeoJSON structure
+    geojson = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+    
+    # Convert the GeoJSON to a string and then to a BytesIO object for file download
+    geojson_str = json.dumps(geojson, indent=2)
+    geojson_bytes = io.BytesIO(geojson_str.encode('utf-8'))
+    
+    # Send the GeoJSON file to the client
+    return send_file(geojson_bytes, mimetype='application/json',
+    as_attachment=True, download_name='shapes_export.geojson')
+
+@app.route('/import-geojson', methods=['POST'])
+def import_geojson():
+    try:
+        uploaded_file = request.files['file']
+        if uploaded_file:
+            geojson_data = json.load(uploaded_file)
+            for feature in geojson_data['features']:
+                shape_data = json.dumps(feature['geometry'])
+                shape_note = feature['properties']['note']
+                shape_type = feature['properties']['type']
+                shape_color = feature['properties']['color']
+                molen_id = feature['properties']['molen_id']
+                score = feature['properties']['score']
+                highlight_id = feature['properties']['highlight_id']
+                radius = feature['properties']['radius']
+                shape = Shape(
+                    shape_data=shape_data,
+                    shape_note=shape_note,
+                    shape_type=shape_type,
+                    shape_color=shape_color,
+                    molen_id=molen_id,
+                    score=score,
+                    highlight_id=highlight_id,
+                    radius=radius
+                )
+                db.session.add(shape)
+            db.session.commit()
+            return '''
+                <script>
+                    alert('GeoJSON data imported successfully');
+                    window.location.href = '/';
+                </script>
+            '''
+        else:
+            return '''
+                <script>
+                    alert('No file uploaded');
+                    window.location.href = '/';
+                </script>
+            '''
+    except Exception as e:
+        return '''
+            <script>
+                alert('Error: {}');
+                window.location.href = '/';
+            </script>
+        '''.format(str(e))
+
+# Function to count all objects, category objects, and colors
+def count_objects():
+    total_objects = Shape.query.count()
+    categories = Shape.query.with_entities(Shape.shape_type).distinct()
+    category_counts = {}
+    color_counts = {}
+
+    for category in categories:
+        category_counts[category[0]] = Shape.query.filter_by(shape_type=category[0]).count()
+
+    # Count objects by color
+    colors = Shape.query.with_entities(Shape.shape_color).distinct()
+    for color in colors:
+        color_counts[color[0]] = Shape.query.filter_by(shape_color=color[0]).count()
+
+    return total_objects, category_counts, color_counts
+
+
+@app.route('/stimmungskarte')
+def index():
+    total_objects, category_counts, color_counts = count_objects()  # Assuming count_objects is already defined as per your previous messages.
+    return render_template('stimmungskarte.html', category_counts=category_counts, color_counts=color_counts, favicon=favicon)
 
 
 if __name__ == "__main__":

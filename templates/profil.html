@@ -17,6 +17,22 @@
         padding: 0; /* Remove default padding */
     }
 
+		      .register-button {
+        background-color: #003056; /* Example color */
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 15px 30px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 10px 0;
+        cursor: pointer;
+        width: 100%; /* Full width */
+        box-sizing: border-box; /* Include padding in width */
+    }
+	
         img {
             border-radius: 30px;
             transition: transform 0.3s ease;
@@ -28,7 +44,7 @@
         }
 
         img:hover {
-            transform: scale(1.1);
+            transform: scale(1.03);
         }
 
    .form-container {
@@ -96,6 +112,156 @@
     border: 2px solid black; /* Thin black border on hover */
 }
 
+  .centered-text {
+            text-align: center;
+        }
+		
+      .project img { max-width: 100%; height: auto;
+            max-width: 300px; /* Adjust the width as needed */
+            max-height: 200px; /* Adjust the height as needed */
+            height: auto; /* Maintain aspect ratio */
+            width: auto; /* Maintain aspect ratio */
+            border-radius: 30px; /* Optional: if you want rounded corners */
+        }
+
+
+/* Base styles for project thumbnails */
+.project-thumbnail {
+    background-color: rgba(40, 116, 166, 0.3);
+    border-radius: 30px;
+    margin: 10px;
+    padding: 10px;
+    display: flex; /* Changed to flex to better control the layout */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: visible; /* Ensure the content is not clipped */
+}
+
+/* Hover effect for project thumbnails */
+.project-thumbnail:hover {
+    transform: scale(1.03);
+}
+
+/* Image style within project thumbnails */
+.project-thumbnail img {
+    width: 90%;
+    margin-top: 20px;
+    height: 400px; /* Fixed height for images */
+    object-fit: cover;
+    border-radius: 30px;
+}
+
+/* Text style inside project thumbnails */
+.project-thumbnail h2, .project-thumbnail p {
+    margin: 0;
+    padding: 5px 0;
+    width: 90%; /* Adjust the width to match the image */
+    text-align: center; /* Center the text */
+}
+
+/* Remove absolute positioning from the description */
+.project-thumbnail p {
+    position: relative; /* Changed from absolute to relative */
+    bottom: auto; /* Remove bottom positioning */
+    overflow: visible; /* Ensure text is not clipped */
+}
+
+
+
+.voting-bar {
+    width: 90%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 30px !important;
+    margin-top: 0px;
+    display: flex;
+}
+
+.upvotes {
+    height: 100%;
+    background-color: #4caf50;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.downvotes {
+    height: 100%;
+    background-color: #b71c1c;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.upvotes, .downvotes {
+    /* Existing styles */
+    position: relative; /* Ensure the position is relative for child positioning */
+}
+
+.upvotes span, .downvotes span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Choose a contrasting color */
+    font-size: 12px; /* Adjust the font size */
+    white-space: nowrap;
+    pointer-events: none; /* Prevents blocking click events */
+}
+
+.projects-header {
+    text-align: center; /* Center the content */
+    margin-bottom: 20px; /* Add some space below the header */
+}
+
+.projects-header h1 {
+    margin: 0; /* Remove default margin */
+    padding: 10px 0; /* Add some vertical padding */
+}
+
+.projects-header p {
+    margin: 0; /* Remove default margin */
+    color: #003056; /* Specific color for the undertitle */
+    font-style: italic; /* Optional: make it italic */
+}
+
+
+/* Desktop screens (larger than 1200px) */
+@media (min-width: 1445px) {
+    .project-thumbnail {
+        width: calc(33.333% - 20px); /* Three items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+}
+
+/* Medium screens (between 1024px and 1199px) */
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .project-thumbnail {
+        width: calc(50% - 20px); /* Two items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+	
+	
+}
+
+/* Mobile screens (less than 1024px) */
+@media (max-width: 1088px) {
+    .project-thumbnail {
+        width: calc(100% - 20px); /* Full width */
+        height: auto; /* Height adjusts based on content */
+    }
+    .project-thumbnail img {
+        height: auto; /* Adjust image height for mobile */
+    }
+}
+
+.project-list {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
         .project img {
             max-width: 300px; /* Adjust the width as needed */
@@ -309,15 +475,33 @@ margin: auto;
 	.info-text-field {
             background-color: #F4F4F8; /* Light grey background */
             width: 100%; /* Full width */
-            height: 400px; /* Specified height */
+            height: 240px; /* Specified height */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             padding: 20px;
+			margin-top: 20px;
+			margin-bottom: 2px;
             box-sizing: border-box; /* Include padding in width calculation */
         }
+		
+		
+			.info-text-field2 {
+            background-color: #F4F4F8; /* Light grey background */
+            width: 100%; /* Full width */
+            height: 620px; /* Specified height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+			margin-top: 20px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+		
         .info-text-container {
             width: 50%; /* Width of the text container */
             display: flex;
@@ -331,6 +515,9 @@ margin: auto;
             color: black;
             margin-bottom: 10px;
         }
+		
+
+	
 
         .info-text-undertitle {
             font-size: 20px;
@@ -467,6 +654,13 @@ display: block;
         max-width: 100vw; /* Prevent horizontal overflow */
         overflow-x: hidden; /* Hide horizontal scrollbar */
     }
+	
+	        .button,
+        .register-button {
+            padding: 10px 20px;
+        }
+
+
     .top-bar {
         width: 100%; /* Full width of the screen */
         display: flex;
@@ -540,12 +734,12 @@ display: block;
 
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
-            <a href="/karte">Karte</a>
+            <a href="karte.stimmungskompass.at">Karte</a>
             <a href="/list">Beiträge</a>
             <a href="/beitraege">Beitrag hinzufügen</a>
             <a href="/erfolge">Erfolge</a>
             <a href="/ueber">Über</a>
-            <a href="/opendata">Open Data</a>
+            <a href="/profil">Profil</a>
 
             {% if current_user.is_authenticated %}
 <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
@@ -555,31 +749,133 @@ display: block;
         </div>
     </div>
 </div>
-<div class="form-container">
-
-    <h1>Statistics:</h1>
-  
-	<div>
-	 <h2>Download all website data</h2>
-	<p>This will download the data of the entire website, in a machine-readable .json file.</p>
-	<p>The data contains all project data, including geolocations, their categories, descriptions, and more.</p>
-	<a href="{{ url_for('download_data') }}" class="publish-button">Download Website Data</a> <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Download Images</a>
 
 
+  {% if is_authenticated %}
+        <!-- My Projects Section -->
+		
+        <div class="my-projects centered-text">
+            <h1>My Projects:</h1>
+			
+<!-- My Statistics Section -->
+<div class="my-statistics centered-text">
+      <p>You have posted <span style="color: #003056;">{{ user_statistics.num_projects }} project(s) and <span style="color: #003056;">{{ user_statistics.num_comments }} comment(s)</span>.</p>
 
-        <h2>Delete Account</h2>
-        {% if current_user.is_authenticated %}
+    {% if user_statistics.most_successful_project %}
+        <p>Your most successful project is <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, with <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} upvote(s)</span>.</p>
+    {% else %}
+        <p>You have no projects yet.</p>
+    {% endif %}
+</div>
+
+
+		
+            <div class="project-list">
+                {% if user_projects %}
+                    {% for project in user_projects %}
+                        <div class="project-thumbnail">
+                            <h3>{{ project.name }}</h3>
+                            <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
+                            
+                            <!-- Voting Bar -->
+                            <div class="voting-bar">
+                                {% if project.upvotes > 0 %}
+                                    <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                                        <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                                    </div>
+                                {% endif %}
+                                {% if project.downvotes > 0 %}
+                                    <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                                        <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <a href="{{ url_for('project_details', project_id=project.id) }}">
+                                <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+                            </a>
+                            <div class="project-description">{{ project.descriptionwhy|safe }}</div>
+
+                            <!-- Delete Button for Project -->
+                            <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
+                                <input type="submit" class="register-button" style="font-weight: bold;" value="Delete Project">
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No projects found.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+
+        <!-- My Comments Section -->
+		
+		<div class="info-text-field">
+        <div class="my-comments centered-text">
+            <h1>My Comments:</h1>
+            <div class="comment-list">
+                {% if user_comments %}
+                    {% for comment, project_name in user_comments %}
+                        <div class="comment">
+                            <p><strong>Comment on:</strong> <a href="{{ url_for('project_details', project_id=comment.project_id) }}">{{ project_name }}</a></p>
+                            <p>{{ comment.text }}</p>
+                            <p class="comment-date">Posted on: {{ comment.timestamp.strftime('%d.%m.%Y %H:%M') }}</p>
+
+                            <!-- Delete Button for Comment -->
+                            <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST">
+                                <input type="submit"  class="register-button" style="font-weight: bold;" value="Delete Comment">
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No comments found.</p>
+                {% endif %}
+            </div>
+        </div>
+</div>
+<!-- My Account Section -->
+<div class="my-account centered-text">
+    <h1>My Account:</h1>
+    <p>Your account name is <span style="color: #003056;">{{ current_user.name }}</span></p>
+    <p>Your account is bound to phone number <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
+    <p>Your account was created on <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
+    <p>To reset your password, head to <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Password Recovery</a>.</p>
+</div>
+
+
+    {% else %}
+        <div class="login-prompt centered-text">
+            <p>To view your projects and statistics, please <a href="{{ url_for('login') }}">log in</a>.</p>
+        </div>
+    {% endif %}
+
+
+{% if is_authenticated %}
+    <div class="info-text-field2">
+        <div class="centered-text">
+            <h1>Data:</h1>
+
+            <!-- Download My Data Section -->
+            <h2>Download My Data</h2>
+            <p>Download all data associated with your account from the server.</p>
+            <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold;">Download My Data</a>
+
+            <h2>Download all website data</h2>
+            <p>This will download the data of the entire website, in a machine-readable .json file.</p>
+            <p>The data contains all project data, including geolocations, their categories, descriptions, and more.</p>
+            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Download Website Data</a>
+            <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Download Images</a>
+
+            <h2>Delete Account</h2>
             <p>Would you like to delete all your data from the website? This action is irreversible.</p>
-				<p> Your account, your project, votes, comments and images will be deleted from the website.</p>
-
-            <a href="{{ url_for('delete_my_data') }}" class="publish-button" id="delete-data-btn">Delete All My Data</a>
-        {% else %}
-            <p>Please log in to delete your data.</p>
-        {% endif %}
-
+            <p>Your account, your project, votes, comments, and images will be deleted from the server.</p>
+            <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold;" id="delete-data-btn">Delete All My Data</a>
+        </div>
+    </div>
+{% endif %}
 
 <a id="download-link" href="#" style="display: none;"></a>
-	</div>
 </body>
 </html>
 

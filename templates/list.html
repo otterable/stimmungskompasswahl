@@ -923,7 +923,6 @@ nav[aria-label="Page navigation"] {
             <a href="/karte">Karte</a>
             <a href="/list">Beiträge</a>
             <a href="/beitraege">Beitrag hinzufügen</a>
-            <a href="/erfolge">Erfolge</a>
             <a href="/ueber">Über</a>
             <a href="/opendata">Open Data</a>
 
@@ -966,6 +965,7 @@ nav[aria-label="Page navigation"] {
 
 
         <div class="filter-item">
+		
     <label for="sort">Sort:</label>
     <select name="sort" id="sort">
 		<option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
@@ -974,9 +974,13 @@ nav[aria-label="Page navigation"] {
         <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Ältester Beitrag zuerst</option>
         
     </select>
+	
 </div>
 
 		        <button type="submit" class="filter-button">Filter</button>
+				
+						    <button onclick="window.location.href='http://karte.stimmungskompass.at';" style="margin-left: 10px" class="filter-button">Karte</button>
+
     </form>
 </div>
 
