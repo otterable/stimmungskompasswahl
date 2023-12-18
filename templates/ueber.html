@@ -226,6 +226,14 @@ margin: auto;
     transform: scaleX(1);
 }
 	
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
+}
+
     .index-image {
         width: 100%;
         object-fit: cover; /* Crop the image when necessary */
@@ -523,15 +531,6 @@ display: block;
 
     </style>
 
-
-{% if current_user.is_authenticated %}
-    <div class="logged-in-info">
-        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
-    </div>
-{% endif %}
-
-
-<body>
 <div class="top-bar">
     <a href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
@@ -540,18 +539,19 @@ display: block;
 
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
-            <a href="/karte">Stimmungskarte</a>
+            <a href="/karte">Karte</a>
             <a href="/list">Beiträge</a>
-            <a href="/beitraege">Beitrag hinzufügen</a>
-            <a href="/erfolge">Erfolge</a>
+            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
             <a href="/ueber">Über</a>
-            <a href="/opendata">Open Data</a>
-
-            {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
+            <a href="/profil">Profil</a>
+ {% if current_user.is_authenticated %}
+            <span class="user-info">
+                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+            </span>
+            <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
-<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-           {% endif %}
+            <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -639,8 +639,8 @@ display: block;
         }
 
         // JavaScript function to handle redirection to List of Current Suggestions
-        function redirectToBeitraege() {
-            window.location.href = '/beitraege';
+        function redirectToneuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
         }
 		
 	function toggleMenu() {

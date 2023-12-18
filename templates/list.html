@@ -491,6 +491,15 @@ nav[aria-label="Page navigation"] {
     overflow: visible; /* Ensure the content is not clipped */
 }
 
+
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
+}
+
 /* Hover effect for project thumbnails */
 .project-thumbnail:hover {
     transform: scale(1.03);
@@ -546,6 +555,8 @@ nav[aria-label="Page navigation"] {
         height: auto; /* Adjust image height for mobile */
     }
 }
+
+
 
 .project-list {
     text-align: center;
@@ -902,16 +913,6 @@ nav[aria-label="Page navigation"] {
 
     </style>
 
-
-{% if current_user.is_authenticated %}
-    <div class="logged-in-info">
-        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
-    </div>
-{% endif %}
-
-
-<body>
-<!-- Top Bar -->
 <div class="top-bar">
     <a href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
@@ -922,15 +923,17 @@ nav[aria-label="Page navigation"] {
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Beiträge</a>
-            <a href="/beitraege">Beitrag hinzufügen</a>
+            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
             <a href="/ueber">Über</a>
-            <a href="/opendata">Open Data</a>
-
-            {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
+            <a href="/profil">Profil</a>
+ {% if current_user.is_authenticated %}
+            <span class="user-info">
+                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+            </span>
+            <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
-<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-           {% endif %}
+            <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -965,7 +968,6 @@ nav[aria-label="Page navigation"] {
 
 
         <div class="filter-item">
-		
     <label for="sort">Sort:</label>
     <select name="sort" id="sort">
 		<option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
@@ -974,13 +976,9 @@ nav[aria-label="Page navigation"] {
         <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Ältester Beitrag zuerst</option>
         
     </select>
-	
 </div>
 
 		        <button type="submit" class="filter-button">Filter</button>
-				
-						    <button onclick="window.location.href='http://karte.stimmungskompass.at';" style="margin-left: 10px" class="filter-button">Karte</button>
-
     </form>
 </div>
 
@@ -1174,39 +1172,6 @@ document.getElementById('filter-form-mobile').addEventListener('click', function
 });
 
 
-// JavaScript for handling the navigation overlay
-document.getElementById('nav-overlay').addEventListener('click', function(event) {
-    // Check if the clicked element is not a link or a button
-    if (!event.target.closest('#nav-links, #nav-links a, #nav-links button')) {
-        this.style.display = 'none';
-    }
-});
-
-// Prevent closing when clicking on nav-links or its children
-document.getElementById('nav-links').addEventListener('click', function(event) {
-    event.stopPropagation(); // Stop the click event from bubbling up to nav-overlay
-});
-    // Function to close the navigation overlay
-    function closeNavOverlay() {
-        document.getElementById('nav-overlay').style.display = 'none';
-    }
-
-	
-	
-
-
-	   window.addEventListener('resize', function() {
-        // Check if the window width is greater than the threshold for mobile view
-        if (window.innerWidth > 1080) {
-            // Make sure the nav-overlay is displayed
-            document.getElementById('nav-overlay').style.display = 'block';
-            // Reset any inline display style on the nav-links (optional)
-            document.getElementById('nav-links').style.display = '';
-        } else {
-            // For mobile view, revert back to the default behavior
-            document.getElementById('nav-overlay').style.display = 'none';
-        }
-    });
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -1285,8 +1250,8 @@ document.addEventListener("DOMContentLoaded", function() {
         window.location.href = '/neuerbeitrag';
     }
 
-    function redirectToBeitraege() {
-        window.location.href = '/beitraege';
+    function redirectToneuerbeitrag() {
+        window.location.href = '/neuerbeitrag';
     }
 
     // Display success message alert, if any

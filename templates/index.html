@@ -437,14 +437,13 @@ margin: auto;
         .info-box:hover {
             transform: scale(1.03);
         }
-		
-		.logged-in-info {
-    text-align: center; /* Centers the text inside the div */
-    padding: 2px 0; /* Adds some padding above and below the text */
-    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
-    /* Other styling as needed, such as font size, color, etc. */
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
 }
-
         .info-box-icon {
             max-width: 70px; /* Icon size */
             border-radius: 50%; /* Make it circular */
@@ -860,35 +859,30 @@ display: block;
 
     </style>
 
-{% if current_user.is_authenticated %}
-    <div class="logged-in-info">
-        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
-    </div>
-{% endif %}
 
-
-<body>
 <div class="top-bar">
-<a href="/">
-<img alt="Logo" class="logo" src="{{ url_for('static', filename='logo.png') }}" style="; max-width: 100%; height: auto;"/>
-</a>
-<button id="hamburger-button">☰</button>
-<div class="nav-overlay" id="nav-overlay">
-<div id="nav-links">
-<a href="/karte">Karte</a>
-<a href="/list">Beiträge</a>
-<a href="/beitraege">Beitrag hinzufügen</a>
-<a href="/erfolge">Erfolge</a>
-<a href="/ueber">Über</a>
-<a href="/opendata">Open Data</a>
+    <a href="/">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
 
-            {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
+    <div id="nav-overlay" class="nav-overlay">
+        <div id="nav-links">
+            <a href="/karte">Karte</a>
+            <a href="/list">Beiträge</a>
+            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
+            <a href="/ueber">Über</a>
+            <a href="/profil">Profil</a>
+ {% if current_user.is_authenticated %}
+            <span class="user-info">
+                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+            </span>
+            <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
-<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-           {% endif %}
+            <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+            {% endif %}
         </div>
-</div>
+    </div>
 </div>
 <div class="index-image">
 <img alt="Index Title Image" class="index-image" src="{{ url_for('static', filename='index_titleimage.png') }}" style="; max-width: 100%; height: auto;"/>
@@ -905,11 +899,12 @@ display: block;
 <p class="info-box-undertitle">Posten Sie Beiträge auf der Stadtkarte und sehen Sie sich andere Beiträge an!</p>
 </div>
 <!-- Box 2 -->
-<div class="info-box box-blue" onclick="redirectToBeitraege()" style="cursor: pointer; margin: 10px">
+<div class="info-box box-blue" onclick="redirectToneuerbeitrag()" style="cursor: pointer; margin: 10px">
 <img alt="Public Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_public.png') }}">
 <p class="info-box-title">Machen Sie einen Vorschlag!</p>
 <p class="info-box-undertitle">Teilen Sie Ihrer Stadt mit, welche Veränderungen oder Verbesserungen Sie sich wünschen!</p>
 <p class="info-box-undertitle">Aktuelle Vorschläge: {{ project_count }}</p>
+<p class="info-box-undertitle">Aktuelle Mapobjekte: {{ mapobject_count }}</p>
 </div>
 <!-- Box 3 -->
 <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
@@ -1033,8 +1028,8 @@ display: block;
         }
 
         // JavaScript function to handle redirection to List of Current Suggestions
-        function redirectToBeitraege() {
-            window.location.href = '/beitraege';
+        function redirectToneuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
         }
 		
 	function toggleMenu() {

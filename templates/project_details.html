@@ -117,6 +117,14 @@
         transform: scale(1.03);
     }
 
+
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
+}
     .comment-button {
         background-color: #003056;
         color: white;
@@ -678,11 +686,7 @@ display: block;
 
 
     </style>
-{% if current_user.is_authenticated %}
-    <div class="logged-in-info">
-        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
-    </div>
-{% endif %}
+
 <div class="top-bar">
     <a href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
@@ -693,110 +697,95 @@ display: block;
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Beiträge</a>
-            <a href="/beitraege">Beitrag hinzufügen</a>
-            <a href="/erfolge">Erfolge</a>
+            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
             <a href="/ueber">Über</a>
-            <a href="/opendata">Open Data</a>
-
-            {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
+            <a href="/profil">Profil</a>
+ {% if current_user.is_authenticated %}
+            <span class="user-info">
+                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+            </span>
+            <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
-<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-           {% endif %}
+            <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+            {% endif %}
         </div>
     </div>
 </div>
-
-   <div class="form-container">
+<div class="form-container">
     <h2 class="centered-title">{{ project.name }}</h2>
     <p class="centered-title">Gepostet am: {{ project.date.strftime('%d.%m.%Y, %H:%M') }}</p>
-	           <p class="centered-title">
+    <p class="centered-title">
         <strong>Kategorie:</strong>
         <a href="{{ url_for('list_view', search='', category=project.category) }}">{{ project.category }}</a>
     </p>
+    <p class="centered-title" style="color: #003056; font-style: italic; margin-bottom: 30px;"><strong>Autor/in:</strong> {{ author_name }}</p>
 
-        <p class="centered-title" style="color: #003056; font-style: italic; margin-bottom: 30px;"><strong>Autor/in:</strong> {{ author_name }}</p>
-
-
-
+    {% if not is_mapobject %}
         <div class="project-details">
             <div class="left-column">
                 <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
-                 <div class="voting-bar">
-        <div class="upvotes" style="width: {{ upvote_percentage }}%;"></div>
-        <div class="downvotes" style="width: {{ downvote_percentage }}%;"></div>
-		
+                <div class="voting-bar">
+                    <div class="upvotes" style="width: {{ upvote_percentage }}%;"></div>
+                    <div class="downvotes" style="width: {{ downvote_percentage }}%;"></div>
+                </div>
+                <div class="vote-counts">
+                    <div class="upvotes-info">
+                        <p id="upvote-count">Gefällt: {{ upvote_count }} ({{ upvote_percentage }}%)</p>
+                    </div>
+                    <div class="downvotes-info">
+                        <p id="downvote-count">Gefällt nicht: {{ downvote_count }} ({{ downvote_percentage }}%)</p>
+                    </div>
+                </div>
+                {% if current_user.is_authenticated %}
+                    <div class="voting-buttons-container">
+                        <button onclick="vote({{ project.id }}, 'upvote')" class="button upvote-button">Gefällt mir! 👍</button>
+                        <button onclick="vote({{ project.id }}, 'downvote')" class="button downvote-button">Gefällt mir nicht. 👎</button>
+                    </div>
+                {% else %}
+                    <div class="voting-login-prompt">
+                        <p>Log in to vote on projects.</p>
+                    </div>
+                {% endif %}
             </div>
-
-
-
-<div class="vote-counts">
-    <div class="upvotes-info">
-        <p id="upvote-count">Gefällt: {{ upvote_count }} ({{ upvote_percentage }}%)</p>
-    </div>
-    <div class="downvotes-info">
-        <p id="downvote-count">Gefällt nicht: {{ downvote_count }} ({{ downvote_percentage }}%)</p>
-    </div>
-</div>
-
-
-{% if current_user.is_authenticated %}
-    <div class="voting-buttons-container">
-        <button onclick="vote({{ project.id }}, 'upvote')" class="button upvote-button">Gefällt mir! 👍</button>
-        <button onclick="vote({{ project.id }}, 'downvote')" class="button downvote-button">Gefällt mir nicht. 👎</button>
-    </div>
-{% else %}
-    <div class="voting-login-prompt">
-        <p>Log in to vote on projects.</p>
-    </div>
-{% endif %}
-
-
-
-				
             <div class="right-column" style="text-align: left">
                 <div id="map" class="map-container"></div>
-<!-- Inside your HTML file -->
-<div class="text-section">
-    <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Warum schlage ich es vor?</h2>
-    <p class="text-content">{{ project.descriptionwhy | safe }}</p>
-</div>
-<div class="text-section">
-    <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wie wird die Öffentlichkeit davon profitieren?</h2>
-    <p class="text-content">{{ project.public_benefit | safe }}</p>
-</div>
-
-<h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wo ist dieses Projekt?</h2>
-<div id="project-map"></div>
-
-				
-				
-<div id="comments-container" class="comments" style="margin-top:30px">
-    <h2 class="centered-title" style="margin-bottom: 10px">Kommentare</h2>
-    {% for comment in comments %}
-        <div class="comment">
-            <p>"{{ comment.text }}"</p>
-            <p>{{ comment.author_name }} am {{ comment.timestamp.strftime('%d.%m.%Y %H:%M') }}</p>
-        </div>
-    {% endfor %}
-</div>
-
-{% if current_user.is_authenticated %}
-<div class="comment-form">
-    <form id="comment-form" action="{{ url_for('comment', project_id=project.id) }}" method="POST">
-        <textarea name="comment" class="full-width-textarea" required></textarea>
-        <button type="submit" class="button comment-button">Speichern 💬</button>
-    </form>
-</div>
-{% endif %}
-
-<div class="share-button-container" style="display:none;">
-<button id="shareButton" class="button">Teilen</button>
-</div>
-
+                <div class="text-section">
+                    <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Warum schlage ich es vor?</h2>
+                    <p class="text-content">{{ project.descriptionwhy | safe }}</p>
+                </div>
+                <div class="text-section">
+                    <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wie wird die Öffentlichkeit davon profitieren?</h2>
+                    <p class="text-content">{{ project.public_benefit | safe }}</p>
+                </div>
+                <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wo ist dieses Projekt?</h2>
+                <div id="project-map"></div>
+                <div id="comments-container" class="comments" style="margin-top:30px">
+                    <h2 class="centered-title" style="margin-bottom: 10px">Kommentare</h2>
+                    {% for comment in comments %}
+                        <div class="comment">
+                            <p>"{{ comment.text }}"</p>
+                            <p>{{ comment.author_name }} am {{ comment.timestamp.strftime('%d.%m.%Y %H:%M') }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if current_user.is_authenticated %}
+                    <div class="comment-form">
+                        <form id="comment-form" action="{{ url_for('comment', project_id=project.id) }}" method="POST">
+                            <textarea name="comment" class="full-width-textarea" required></textarea>
+                            <button type="submit" class="button comment-button">Speichern 💬</button>
+                        </form>
+                    </div>
+                {% endif %}
+                <div class="share-button-container" style="display:none;">
+                    <button id="shareButton" class="button">Teilen</button>
+                </div>
             </div>
         </div>
-    </div>
+    {% else %}
+        <p>"This project was created via Karte.html as a marker. Therefore, nothing will be shown here."</p>
+    {% endif %}
+</div>
+
 
     <script>
         // JavaScript to fetch and display project details
@@ -867,8 +856,8 @@ display: block;
         }
 
         // JavaScript function to handle redirection to List of Current Suggestions
-        function redirectToBeitraege() {
-            window.location.href = '/beitraege';
+        function redirectToneuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
         }
 		
 	function toggleMenu() {

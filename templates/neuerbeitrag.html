@@ -195,6 +195,14 @@ margin: auto;
     text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7); /* Add text shadow on hover */
 }
 
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
+}
+
 .top-bar a::after {
     content: "";
     position: absolute;
@@ -211,6 +219,14 @@ margin: auto;
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
     transform: scale(1.03); /* Scale up slightly on hover */
+}
+
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
 }
 
 /* Underline effect for links that do not contain buttons */
@@ -543,15 +559,6 @@ display: block;
     </style>
 
 
-{% if current_user.is_authenticated %}
-    <div class="logged-in-info">
-        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
-    </div>
-{% endif %}
-
-
-<body>
-<!-- Top Bar -->
 <div class="top-bar">
     <a href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
@@ -562,16 +569,17 @@ display: block;
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Beiträge</a>
-            <a href="/beitraege">Beitrag hinzufügen</a>
-            <a href="/erfolge">Erfolge</a>
+            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
             <a href="/ueber">Über</a>
-            <a href="/opendata">Open Data</a>
-
-            {% if current_user.is_authenticated %}
-    <a href="{{ url_for('logout', next=(request.endpoint if request.endpoint != 'beitraege' else '/')) }}"><button class="button">Abmelden</button></a>
+            <a href="/profil">Profil</a>
+ {% if current_user.is_authenticated %}
+            <span class="user-info">
+                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+            </span>
+            <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
-<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-           {% endif %}
+            <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -762,8 +770,8 @@ setTimeout(function() {
         }
 
         // JavaScript function to handle redirection to List of Current Suggestions
-        function redirectToBeitraege() {
-            window.location.href = '/beitraege';
+        function redirectToneuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
         }
 		
 	function toggleMenu() {
@@ -881,8 +889,8 @@ setTimeout(function() {
         }
 
         // JavaScript function to handle redirection to List of Current Suggestions
-        function redirectToBeitraege() {
-            window.location.href = '/beitraege';
+        function redirectToneuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
         }
 		// Show an alert if a success message is present
         document.addEventListener("DOMContentLoaded", function(event) {
@@ -896,6 +904,6 @@ setTimeout(function() {
 
 {% if not current_user.is_authenticated %}
     <script>
-        window.location.href = "{{ url_for('login', next=url_for('beitraege')) }}";
+        window.location.href = "{{ url_for('login', next=url_for('neuerbeitrag')) }}";
     </script>
 {% endif %}

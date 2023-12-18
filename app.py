@@ -119,9 +119,13 @@ def index():
         project.upvote_percentage = (upvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
         project.downvote_percentage = (downvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
 
-    project_count = len(projects)
-    return render_template('index.html', projects=projects, project_count=project_count, featured_projects=featured_projects)
+    # Count projects where is_mapobject is false
+    project_count_non_map = Project.query.filter_by(is_mapobject=False).count()
 
+    # Count projects where is_mapobject is true
+    mapobject_count = Project.query.filter_by(is_mapobject=True).count()
+
+    return render_template('index.html', projects=projects, project_count=project_count_non_map, mapobject_count=mapobject_count, featured_projects=featured_projects)
 
 
 @app.route('/logout')
@@ -176,11 +180,6 @@ def register():
         phone_number = request.form.get('phone_number')
         password = request.form.get('password')
         name = request.form.get('name')
-        surname = request.form.get('surname')
-        street = request.form.get('street')
-        town = request.form.get('town')
-        plz = request.form.get('plz')
-        bundesland = request.form.get('bundesland')
         ip_address = request.remote_addr  # Capture IP address from request
 
         # Check for existing user with the same phone number
@@ -205,11 +204,6 @@ def register():
             'phone_number': phone_number,
             'password': password,
             'name': name,
-            'surname': surname,
-            'street': street,
-            'town': town,
-            'plz': plz,
-            'bundesland': bundesland,
             'ip_address': ip_address,
             'otp': otp
         }
@@ -219,18 +213,52 @@ def register():
 
     return render_template('register.html')
 
+
+@app.route('/add_marker', methods=['POST'])
+def add_marker():
+    data = request.json
+    try:
+        author_id = current_user.id if current_user.is_authenticated and hasattr(current_user, 'id') else 0
+
+        # Providing default values for public_benefit and image_file
+        public_benefit = data.get('public_benefit', 'Default public benefit description')
+        image_file = data.get('image_file', 'default_image.jpg')  # Assuming 'default_image.jpg' is a valid placeholder
+
+        new_project = Project(
+            name="User Generated Marker",  # Modify as needed
+            category=data['category'],
+            descriptionwhy=data['description'],
+            public_benefit=public_benefit,
+            image_file=image_file,  # Use the determined image file
+            geoloc=f"{data['lat']}, {data['lng']}",
+            author=author_id,  # Use the determined author_id
+            is_mapobject=True  # Explicitly set is_mapobject to True for markers
+            # Add other necessary fields
+        )
+        db.session.add(new_project)
+        db.session.commit()
+        return jsonify({'message': 'Marker added successfully', 'id': new_project.id}), 200
+    except Exception as e:
+        app.logger.error('Error saving marker: %s', str(e))
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+        
 @app.route('/get_projects')
 def get_projects():
     try:
         projects = Project.query.all()
         projects_data = []
         for project in projects:
+            project_data = project.to_dict()
+            project_data['is_mapobject'] = project.is_mapobject  # Include the is_mapobject attribute
             upvotes = sum(1 for vote in project.votes if vote.upvote)
             downvotes = sum(1 for vote in project.votes if vote.downvote)
             upvote_percentage = (upvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
             downvote_percentage = (downvotes / (upvotes + downvotes) * 100) if (upvotes + downvotes) > 0 else 0
 
-            project_data = project.to_dict()
             project_data['upvotes'] = upvotes
             project_data['downvotes'] = downvotes
             project_data['upvote_percentage'] = upvote_percentage
@@ -240,8 +268,6 @@ def get_projects():
     except Exception as e:
         logging.error(f"Error in get_projects: {e}")
         return jsonify({'error': str(e)}), 500
-
-
 
 
 
@@ -308,9 +334,9 @@ def reset_password():
             # flash('Invalid OTP. Please try again.', 'danger')
     return render_template('reset_password.html')
     
-@app.route('/beitraege')
-def beitraege():
-    return render_template('beitraege.html')
+@app.route('/neuerbeitrag')
+def neuerbeitrag():
+    return render_template('neuerbeitrag.html')
     
 @app.route('/submit_project', methods=['GET', 'POST'])
 @login_required
@@ -367,8 +393,7 @@ def submit_project():
             return redirect(url_for('submit_project'))
 
     # Display the form for GET request
-    return render_template('beitraege.html')
-
+    return render_template('neuerbeitrag.html')
 
 
 
@@ -376,7 +401,8 @@ def submit_project():
 @app.route('/list/pages/<int:page>')
 def list_view(page=1):
     per_page = 9  # Number of projects per page
-    query = Project.query
+    query = Project.query.filter(Project.is_mapobject != True)  # Exclude projects with is_mapobject = True
+
     category = request.args.get('category')
     sort = request.args.get('sort')
     search = request.args.get('search')
@@ -405,12 +431,6 @@ def list_view(page=1):
                     .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
         logging.debug("Sorting by highest score")
 
-    # Execute the query and get the first three projects for debugging
-    top_three_projects = query.limit(3).all()
-    for project in top_three_projects:
-        score = sum(vote.upvote - vote.downvote for vote in project.votes)
-        logging.debug(f"Project: {project.name}, Date: {project.date}, Score: {score}")
-
     # Paginate the query
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
 
@@ -437,58 +457,60 @@ def list_view(page=1):
 
 
 
-
-
     
 def get_project_by_id(project_id):
-    return Project.query.get_or_404(project_id)
 
+    return Project.query.get_or_404(project_id)
+    
+    
 @app.route('/project_details/<int:project_id>', methods=['GET', 'POST'])
 def project_details(project_id):
     try:
         project = get_project_by_id(project_id)
         comments = Comment.query.filter_by(project_id=project_id).all()
 
-        # Handle comment submission
         if request.method == 'POST' and current_user.is_authenticated:
             comment_text = request.form.get('comment')
             new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=project_id)
             db.session.add(new_comment)
             db.session.commit()
-            logging.debug("New comment added: %s", comment_text)
             return redirect(url_for('project_details', project_id=project_id))
 
-        # Fetch votes for the project
         votes = Vote.query.filter_by(project_id=project_id).all()
         upvote_count = sum(vote.upvote for vote in votes)
         downvote_count = sum(vote.downvote for vote in votes)
         total_votes = upvote_count + downvote_count
-
         upvote_percentage = (upvote_count / total_votes * 100) if total_votes > 0 else 0
         downvote_percentage = (downvote_count / total_votes * 100) if total_votes > 0 else 0
 
-        # Fetch the author of the project
         project_author = User.query.get(project.author)
-        author_name = f"{project_author.name} {project_author.surname}" if project_author else "Unknown"
+        author_name = project_author.name if project_author else "Unknown"
 
-        # Fetch the authors of the comments
-        comments_with_authors = []
-        for comment in comments:
-            author = User.query.get(comment.user_id)
-            comments_with_authors.append({
+        comments_with_authors = [
+            {
                 "text": comment.text,
                 "timestamp": comment.timestamp,
-                "author_name": f"{author.name} {author.surname}" if author else "Unknown"
-            })
+                "author_name": User.query.get(comment.user_id).name if User.query.get(comment.user_id) else "Unknown"
+            }
+            for comment in comments
+        ]
 
-        logging.debug("Displaying project details for project ID: %s", project_id)
-        return render_template('project_details.html', project=project, upvote_percentage=upvote_percentage, 
-                               downvote_percentage=downvote_percentage, upvote_count=upvote_count, downvote_count=downvote_count, 
-                               author_name=author_name, comments=comments_with_authors)
+        # Ensure is_mapobject is explicitly checked and assigned
+        is_mapobject = getattr(project, 'is_mapobject', False)
+
+        return render_template('project_details.html', project=project, 
+                               upvote_percentage=upvote_percentage, 
+                               downvote_percentage=downvote_percentage, 
+                               upvote_count=upvote_count, 
+                               downvote_count=downvote_count, 
+                               author_name=author_name, 
+                               comments=comments_with_authors, 
+                               is_mapobject=is_mapobject)
     except Exception as e:
         logging.error("Error in project_details route: %s", str(e))
-        return str(e)  # or redirect to a generic error page
-        
+        return str(e)  # Or redirect to a generic error page
+
+
 
 @app.route('/admintools', methods=['GET', 'POST'])
 @login_required
@@ -555,7 +577,7 @@ def admintools():
     projects = query.all()
     for project in projects:
         user = User.query.get(project.author)
-        project.author_name = f"{user.name} {user.surname}" if user else 'Unknown'
+        project.author_name = f"{user.name}" if user else 'Unknown'
         project.comments_count = Comment.query.filter_by(project_id=project.id).count()
         project.upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
         project.downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
@@ -748,7 +770,7 @@ def comment(project_id):
 
     return jsonify({
         'text': new_comment.text,
-        'author_name': f"{current_user.name} {current_user.surname}",
+        'author_name': f"{current_user.name}",
         'timestamp': new_comment.timestamp.strftime('%d.%m.%Y %H:%M')
     })
 
@@ -851,7 +873,6 @@ def download_my_data():
     data = {
         'user_info': {
             'name': user_data.name,
-            'surname': user_data.surname,
             'phone_number': user_data.phone_number,
             'account_creation': user_data.account_creation.strftime("%Y-%m-%d %H:%M:%S"),
             'ip_address': user_data.ip_address
@@ -892,7 +913,6 @@ def verify_otp():
                 phone_number=user_data['phone_number'],
                 password_hash=generate_password_hash(user_data['password']),
                 name=user_data['name'],
-                surname=user_data['surname'],
                 ip_address=user_data['ip_address']
             )
             db.session.add(new_user)
@@ -1016,261 +1036,6 @@ def single_vote(project_id):
         return redirect(url_for('index'))
     return render_template('vote.html', project=project)
 
-
-
-@app.route('/categories')
-def categories():
-    return render_template('categories.html')
-    
-
-@app.route('/favicon.ico')
-def favicon():
-    app.logger.debug('Favicon loaded successfully')  # Add this debug message
-    return url_for('static', filename='favicon.ico')
-
-
-
-@app.route('/api/shapes', methods=['POST'])
-def add_shape2():
-    try:
-        print("Request method:", request.method)
-        print("Is JSON:", request.is_json)
-
-        # Check if the request is JSON
-        if request.is_json:
-            data = request.json
-            shape_data_json = json.dumps(data.get('shape_data', {}))
-            shape_note = data.get('shape_note', '')  # For JSON requests
-        else:
-            # Handling Form data
-            data = request.form
-            shape_data_json = data.get('shape_data', '{}')
-            shape_note = data.get('note', '')  # For form data, the key is 'note'
-
-        print("Shape Note:", shape_note)
-        print("Form Data:", data)
-
-        new_shape = Shape(
-            shape_data=shape_data_json,
-            shape_note=shape_note,
-            shape_type=data.get('shape_type', ''),
-            shape_color=data.get('shape_color', '#212120'),
-            molen_id=data.get('molen_id', 'null'),
-            score=data.get('score', 'null'),
-            highlight_id=data.get('highlight_id', 'null')
-        )
-
-        radius = data.get('radius')
-        if new_shape.shape_type == 'circle' and radius and radius != 'null':
-            new_shape.radius = float(radius)
-        else:
-            new_shape.radius = None
-
-        if 'shape_image' in request.files:
-            image = request.files['shape_image']
-            if image and image.filename != '':
-                filename = secure_filename(image.filename)
-                image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                    os.makedirs(app.config['UPLOAD_FOLDER'])
-                image.save(image_path)
-                new_shape.shape_imagelink = image_path
-                print(f"Image saved at {image_path}")
-            else:
-                print("No image uploaded")
-
-        if hasattr(new_shape, 'shape_imagelink'):
-            print("Image Link:", new_shape.shape_imagelink)
-
-        db.session.add(new_shape)
-        db.session.commit()
-        print(f"New shape added with ID: {new_shape.id}")
-
-        return jsonify(success=True, id=new_shape.id, image_link=getattr(new_shape, 'shape_imagelink', None))
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return jsonify(success=False, error=str(e)), 500
-    
-@app.route('/api/colorOrder')
-def color_order():
-    try:
-        with open('templates/categories.html', 'r') as file:
-            content = file.read()
-            soup = BeautifulSoup(content, 'html.parser')
-            colors = [button['style'].split(': ')[1] for button in soup.find_all('button', {'class': 'categorybutton'})]
-            return jsonify({'colorOrder': colors})
-    except Exception as e:
-        print(f"Error retrieving color order: {e}")
-        return jsonify({'error': 'Could not retrieve color order'}), 500
-
-@app.route('/api/shapes', methods=['GET'])
-def get_shapes():
-    shapes = Shape.query.all()
-    shapes_data = []
-
-    for shape in shapes:
-        # Construct the shape data
-        shape_info = {
-            'id': shape.id,
-            'shape_data': json.loads(shape.shape_data),
-            'shape_type': shape.shape_type,
-            'shape_color': shape.shape_color,
-            'radius': shape.radius,
-            'shape_note': shape.shape_note,
-            'shape_imagelink': shape.shape_imagelink
-        }
-        shapes_data.append(shape_info)
-
-        # Print the name of the image file if it exists
-        if shape.shape_imagelink:
-            image_name = os.path.basename(shape.shape_imagelink)
-            print(f"Image file fetched: {image_name}")
-
-    print('Shapes fetched:', len(shapes_data))
-    return jsonify(shapes=shapes_data)
-
-
-
-
-@app.route('/api/add-shape', methods=['POST'])
-def add_shape():
-    shape_data = request.json.get('shape_data')
-    shape_note = request.json.get('shape_note', '')
-    shape_type = request.json.get('shape_type')
-    shape_color = request.json.get('shape_color', '#FFFFFF')
-
-    new_shape = Shape(shape_data=shape_data, shape_note=shape_note, shape_type=shape_type, shape_color=shape_color)
-    db.session.add(new_shape)
-    db.session.commit()
-
-    return jsonify({'success': True, 'id': new_shape.id})
-    
-@app.route('/api/shapes/<int:shape_id>', methods=['DELETE'])
-def delete_shape(shape_id):
-    shape = Shape.query.get(shape_id)
-    if shape:
-        db.session.delete(shape)
-        db.session.commit()
-        print('Shape deleted with ID:', shape_id)
-
-        # Call the get_shapes route to fetch the updated list of shapes
-        updated_shapes_data = get_shapes().get_json()
-        return jsonify(success=True, shapes=updated_shapes_data['shapes']), 200
-    else:
-        print('Shape not found with ID:', shape_id)
-        return jsonify(success=False), 404
-        
-@app.route('/export-geojson', methods=['GET'])
-def export_geojson():
-    # Query all shapes from the database
-    shapes = Shape.query.all()
-    
-    # Construct GeoJSON features list
-    features = []
-    for shape in shapes:
-        # Parse shape data and create GeoJSON feature
-        feature = {
-            "type": "Feature",
-            "geometry": json.loads(shape.shape_data),
-            "properties": {
-                "id": shape.id,
-                "note": shape.shape_note,
-                "type": shape.shape_type,
-                "color": shape.shape_color,
-                "molen_id": shape.molen_id,
-                "score": shape.score,
-                "highlight_id": shape.highlight_id,
-                "radius": shape.radius,
-                "imagelink": shape.shape_imagelink
-            }
-        }
-        features.append(feature)
-    
-    # Construct the full GeoJSON structure
-    geojson = {
-        "type": "FeatureCollection",
-        "features": features
-    }
-    
-    # Convert the GeoJSON to a string and then to a BytesIO object for file download
-    geojson_str = json.dumps(geojson, indent=2)
-    geojson_bytes = io.BytesIO(geojson_str.encode('utf-8'))
-    
-    # Send the GeoJSON file to the client
-    return send_file(geojson_bytes, mimetype='application/json',
-    as_attachment=True, download_name='shapes_export.geojson')
-
-@app.route('/import-geojson', methods=['POST'])
-def import_geojson():
-    try:
-        uploaded_file = request.files['file']
-        if uploaded_file:
-            geojson_data = json.load(uploaded_file)
-            for feature in geojson_data['features']:
-                shape_data = json.dumps(feature['geometry'])
-                shape_note = feature['properties']['note']
-                shape_type = feature['properties']['type']
-                shape_color = feature['properties']['color']
-                molen_id = feature['properties']['molen_id']
-                score = feature['properties']['score']
-                highlight_id = feature['properties']['highlight_id']
-                radius = feature['properties']['radius']
-                shape = Shape(
-                    shape_data=shape_data,
-                    shape_note=shape_note,
-                    shape_type=shape_type,
-                    shape_color=shape_color,
-                    molen_id=molen_id,
-                    score=score,
-                    highlight_id=highlight_id,
-                    radius=radius
-                )
-                db.session.add(shape)
-            db.session.commit()
-            return '''
-                <script>
-                    alert('GeoJSON data imported successfully');
-                    window.location.href = '/';
-                </script>
-            '''
-        else:
-            return '''
-                <script>
-                    alert('No file uploaded');
-                    window.location.href = '/';
-                </script>
-            '''
-    except Exception as e:
-        return '''
-            <script>
-                alert('Error: {}');
-                window.location.href = '/';
-            </script>
-        '''.format(str(e))
-
-# Function to count all objects, category objects, and colors
-def count_objects():
-    total_objects = Shape.query.count()
-    categories = Shape.query.with_entities(Shape.shape_type).distinct()
-    category_counts = {}
-    color_counts = {}
-
-    for category in categories:
-        category_counts[category[0]] = Shape.query.filter_by(shape_type=category[0]).count()
-
-    # Count objects by color
-    colors = Shape.query.with_entities(Shape.shape_color).distinct()
-    for color in colors:
-        color_counts[color[0]] = Shape.query.filter_by(shape_color=color[0]).count()
-
-    return total_objects, category_counts, color_counts
-
-
-@app.route('/stimmungskarte')
-def index():
-    total_objects, category_counts, color_counts = count_objects()  # Assuming count_objects is already defined as per your previous messages.
-    return render_template('stimmungskarte.html', category_counts=category_counts, color_counts=color_counts, favicon=favicon)
 
 
 if __name__ == "__main__":

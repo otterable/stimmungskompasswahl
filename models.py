@@ -10,7 +10,6 @@ class User(db.Model, UserMixin):
     phone_number = db.Column(db.String(20), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     name = db.Column(db.String(100), nullable=False)
-    surname = db.Column(db.String(100), nullable=False)
     ip_address = db.Column(db.String(100))  # Optional, set at registration
     highlight_id = db.Column(db.Integer)  # Optional, assumed to be an integer
     account_creation = db.Column(db.DateTime, default=datetime.utcnow)
@@ -36,6 +35,7 @@ class Project(db.Model):
     is_important = db.Column(db.Boolean, default=False)
     p_reports = db.Column(db.Integer, default=0)
     is_featured = db.Column(db.Boolean, default=False)  # New field
+    is_mapobject = db.Column(db.Boolean, default=False)
 
     # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")

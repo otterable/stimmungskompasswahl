@@ -228,6 +228,14 @@ display:none !important;
     background-color: transparent; /* Invisible scrollbar thumb globally */
 }
 
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
+}
+
 /* Hide scrollbar for IE, Edge, and Firefox */
 body {
     -ms-overflow-style: none; /* IE and Edge */
@@ -1784,7 +1792,7 @@ margin: auto;
 }
 }
 
-}
+
 
 
 
@@ -1834,11 +1842,6 @@ margin: auto;
 <!-- Top Bar -->
 
 
-{% if current_user.is_authenticated %}
-    <div class="logged-in-info">
-        Angemeldet als: {{ current_user.name }} {{ current_user.surname }}, ID: {{ current_user.id }}
-    </div>
-{% endif %}
 
 <div class="top-bar">
     <a href="/">
@@ -1850,16 +1853,17 @@ margin: auto;
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Beiträge</a>
-            <a href="/beitraege">Beitrag hinzufügen</a>
-            <a href="/erfolge">Erfolge</a>
+            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
             <a href="/ueber">Über</a>
-            <a href="/opendata">Open Data</a>
-
-            {% if current_user.is_authenticated %}
-<a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
+            <a href="/profil">Profil</a>
+ {% if current_user.is_authenticated %}
+            <span class="user-info">
+                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+            </span>
+            <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
-<a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-           {% endif %}
+            <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -1885,6 +1889,7 @@ margin: auto;
 <div id="sidebar">
 
 
+<button id="hideNonMapMarkers">Hide Non-Map Markers</button>
 
 
 <h3 class="hide-on-mobile resistant-h3" style="display: none; text-align: center; margin-top: 5px;">
@@ -1895,7 +1900,8 @@ margin: auto;
 </h3>
 
 <?php WEBSITE DESCRIPTION END ?>
-<!-- Popup HTML Structure -->
+
+
 
 
 <!-- SMALL OPTIONS MENU TOP START -->
@@ -1919,6 +1925,26 @@ margin: auto;
 <?php CITY LOGO START ?>
 <img class="hide-on-mobile resistant-image" id="overlay-image" src="static/overlay.jpg" style="max-width: 97%; height: auto; display: block; margin-left:auto; margin-right:auto; margin-top: 3px; margin-bottom: 20px; border-radius: 30px; max-height: 368px;"/>
 <?php CITY LOGO END ?>
+
+<!-- Add this inside your <body> tag in karte.html -->
+<div id="marker-input-form" style="display:block;">
+    <h2>Place a Marker</h2>
+    <div class="input-field">
+        <label for="category">Choose a category:</label>
+        <select id="marker-category" name="category" required>
+            <option value="Transport">Transport</option>
+            <option value="Public spaces">Öffentliche Plätze</option>
+            <option value="Environment">Umwelt</option>
+            <!-- Add other categories here -->
+        </select>
+    </div>
+    <div class="input-field">
+        <label for="description">Description:</label>
+        <textarea id="marker-description" name="description" required></textarea>
+    </div>
+    <button onclick="addMarker()">Add Marker</button>
+</div>
+
 
 
 <h3 style="display: block; text-align: center; margin-top: 5px;">
@@ -2156,6 +2182,7 @@ function updateMarkerIcons() {
     }
 
 var categoryLayers = {}; // Global object to hold category layers
+
 function addMarkers(projects) {
     projects.forEach(project => {
         if (project.geoloc) {
@@ -2163,46 +2190,28 @@ function addMarkers(projects) {
             var latLng = L.latLng(parseFloat(coords[0]), parseFloat(coords[1]));
             var fillColor = getCategoryColor(project.category);
 
-            // Adjusted voting details HTML with increased font weight
-            var votingDetailsHtml = `
-                <div style="text-align: center; margin-bottom: 1px; font-size: 14px; font-weight: bold;">
-                    Gefällt: ${project.upvotes} (${project.upvote_percentage}%),
-                    Gefällt nicht: ${project.downvotes} (${project.downvote_percentage}%)
-                </div>
-            `;
+            // Check if descriptionwhy exists and use it, else show an empty string
+            var description = project.descriptionwhy ? project.descriptionwhy : "";
 
-            // Adjusted voting bar HTML
-            var votingBarHtml = `
-                <div class="voting-bar" style="margin-top: 1px;">
-                    <div class="upvotes" style="width: ${project.upvote_percentage}%;"></div>
-                    <div class="downvotes" style="width: ${project.downvote_percentage}%;"></div>
-                </div>
-            `;
-
-var marker = L.marker(latLng, {
-    icon: createIcon(24, 2, getCategoryColor(project.category)),
-    category: project.category // Make sure this line is present when creating markers
-}).addTo(map);
-
-            marker.bindPopup(`
+            var popupContent = `
                 <div style="text-align: center;">
-                    <b>${project.name}</b><br>
-                    <img src="/static/usersubmissions/${project.image_file}" style="width:300px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
-                    ${votingDetailsHtml}
-                    ${votingBarHtml}
-                    <a href="/project_details/${project.id}" target="_blank" class="button-hover-effect" style="font-size: 14px; font-weight: bold; color:white !important;">
-                        Details anzeigen
-                    </a>
+                    ${description}
                 </div>
-            `);
+            `;
 
-            // Log the type of button created
+            var marker = L.marker(latLng, {
+                icon: createIcon(24, 2, fillColor),
+                category: project.category // Make sure this line is present when creating markers
+            }).addTo(map);
+
+            marker.bindPopup(popupContent);
+
             console.log(`Created a marker for the category: ${project.category}`);
-         // Check if the layer for the category exists, if not create a new one
+
             if (!categoryLayers[project.category]) {
                 categoryLayers[project.category] = L.layerGroup().addTo(map);
             }
-            // Add the marker to the respective category layer
+
             marker.addTo(categoryLayers[project.category]);
         }
     });
@@ -2334,8 +2343,67 @@ function updateCategoryButtonColors() {
 
 // Call the function after the buttons are added to the DOM
 updateCategoryButtonColors();
-	
+
+
+// Inside your existing script tag or in a separate JS file
+
+let selectedLatLng;
+
+map.on('click', function(e) {
+    selectedLatLng = e.latlng;
+    document.getElementById('marker-input-form').style.display = 'block';
+});
+
+function addMarker() {
+    const category = document.getElementById('marker-category').value;
+    const description = document.getElementById('marker-description').value;
+
+    // Create marker
+    const marker = L.marker(selectedLatLng).addTo(map);
+    marker.bindPopup(`<strong>${category}</strong><br>${description}`);
+
+    // Send data to server (see Step 3)
+    saveMarkerData(selectedLatLng, category, description);
+
+    // Clear form and hide it
+    document.getElementById('marker-category').value = '';
+    document.getElementById('marker-description').value = '';
+    document.getElementById('marker-input-form').style.display = 'none';
+}
+
+	// Add this function in your JavaScript
+
+function saveMarkerData(latlng, category, description) {
+    // Check if user is authenticated
+    var isAuthenticated = false; // You need to set this variable based on the user's authentication status
+
+    // Prepare the data to be sent to the server
+    var dataToSend = {
+        lat: latlng.lat,
+        lng: latlng.lng,
+        category: category,
+        description: description,
+        isAnonymous: !isAuthenticated // Mark as anonymous if the user is not authenticated
+    };
+
+    $.ajax({
+        url: '/add_marker',
+        method: 'POST',
+        data: JSON.stringify(dataToSend),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Marker saved:', response);
+        },
+        error: function(error) {
+            console.error('Error saving marker:', error);
+        }
+    });
+}
+
+
 </script>
+   
    <script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
@@ -2398,8 +2466,8 @@ updateCategoryButtonColors();
         }
 
         // JavaScript function to handle redirection to List of Current Suggestions
-        function redirectToBeitraege() {
-            window.location.href = '/beitraege';
+        function redirectToneuerbeitrag() {
+            window.location.href = '/neuerbeitrag';
         }
 		
 	function toggleMenu() {
@@ -2412,6 +2480,11 @@ updateCategoryButtonColors();
 }
 
     </script>
+
+<script type="text/javascript">
+    var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
+</script>
+
 
 
 </body>
