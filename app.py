@@ -773,15 +773,18 @@ def comment(project_id):
         'author_name': f"{current_user.name}",
         'timestamp': new_comment.timestamp.strftime('%d.%m.%Y %H:%M')
     })
-
+    
 @app.route('/profil')
 def profil():
     user_projects = None
     user_comments = None
     user_statistics = None
+    map_objects_count = 0  # Initialize map objects count
 
     if current_user.is_authenticated:
         user_projects = Project.query.filter_by(author=current_user.id).all()
+        map_objects_count = sum(1 for project in user_projects if project.is_mapobject)
+
         for project in user_projects:
             upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
             downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
@@ -794,20 +797,22 @@ def profil():
         user_comments = db.session.query(Comment, Project.name).join(Project, Comment.project_id == Project.id).filter(Comment.user_id == current_user.id).all()
 
         # Calculate statistics
-        num_projects = len(user_projects)
+        num_projects = len([project for project in user_projects if not project.is_mapobject])
         num_comments = Comment.query.filter_by(user_id=current_user.id).count()
 
         # Find the most successful project
         most_successful_project = None
         max_upvotes = 0
         for project in user_projects:
-            upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
-            if upvotes > max_upvotes:
-                max_upvotes = upvotes
-                most_successful_project = project
+            if not project.is_mapobject:  # Consider only non-map object projects
+                upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+                if upvotes > max_upvotes:
+                    max_upvotes = upvotes
+                    most_successful_project = project
 
         user_statistics = {
             'num_projects': num_projects,
+            'num_map_objects': map_objects_count,  # Add map objects count
             'num_comments': num_comments,
             'most_successful_project': most_successful_project
         }
@@ -839,12 +844,12 @@ def delete_project(project_id):
             db.session.delete(project)
             db.session.commit()
             app.logger.debug(f"Project {project_id} deleted successfully.")
-            flash('Project successfully deleted.', 'success')
+           # flash('Project successfully deleted.', 'success')
         else:
             flash('You do not have permission to delete this project.', 'danger')
             app.logger.debug(f"Permission denied to delete project {project_id}.")
     except Exception as e:
-        flash(f'Error deleting project: {e}', 'danger')
+       # flash(f'Error deleting project: {e}', 'danger')
         app.logger.error(f'Error deleting project: {e}')
     return redirect(url_for('profil'))
 

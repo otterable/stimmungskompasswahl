@@ -772,10 +772,11 @@ display: block;
 
 
 		
-            <div class="project-list">
-                {% if user_projects %}
-                    {% for project in user_projects %}
-                        <div class="project-thumbnail">
+              <div class="project-list">
+        {% if user_projects %}
+            {% for project in user_projects %}
+                {% if not project.is_mapobject %}
+                    <div class="project-thumbnail">
                             <h3>{{ project.name }}</h3>
                             <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
                             
@@ -803,13 +804,54 @@ display: block;
                                 <input type="submit" class="register-button" style="font-weight: bold;" value="Delete Project">
                             </form>
                         </div>
+						                {% endif %}
+
                     {% endfor %}
                 {% else %}
                     <p>No projects found.</p>
                 {% endif %}
             </div>
         </div>
-        
+		
+<div class="my-map-objects centered-text">
+    <h1>My Map Objects:</h1>
+    
+    <!-- Map Objects Statistics Section -->
+    <div class="map-objects-statistics centered-text">
+        <p>You have posted <span style="color: #003056;">{{ user_statistics.num_map_objects }} map object(s)</span>.</p>
+    </div>
+
+    <div class="project-list">
+        {% if user_projects %}
+            {% for project in user_projects %}
+                {% if project.is_mapobject %}
+                    <div class="project-thumbnail">
+                        <!-- Display the category of the project -->
+                        <p class="project-category">Kategorie: <strong>{{ project.category }}</strong></p>
+
+                        <!-- Display only the description of the project -->
+                        <div class="project-description">
+                            {{ project.descriptionwhy|safe }}
+                        </div>
+
+                        <!-- Display the date when the project was posted -->
+                        <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
+
+                        <!-- Delete Button for Project -->
+                        <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
+                            <input type="submit" class="register-button" style="font-weight: bold;" value="Delete marker">
+                        </form>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <p>No map objects found.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+
 
         <!-- My Comments Section -->
 		
@@ -835,6 +877,8 @@ display: block;
                 {% endif %}
             </div>
         </div>
+		
+		
 </div>
 <!-- My Account Section -->
 <div class="my-account centered-text">
