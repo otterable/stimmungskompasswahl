@@ -775,17 +775,41 @@ def comment(project_id):
     })
     
 @app.route('/profil')
-def profil():
-    user_projects = None
-    user_comments = None
-    user_statistics = None
-    map_objects_count = 0  # Initialize map objects count
+@app.route('/profil/projects/<int:project_page>/map_objects/<int:map_object_page>/comments/<int:comment_page>')
+def profil(project_page=1, map_object_page=1, comment_page=1):
+    per_page = 1  # Number of items per page
+
+
 
     if current_user.is_authenticated:
-        user_projects = Project.query.filter_by(author=current_user.id).all()
-        map_objects_count = sum(1 for project in user_projects if project.is_mapobject)
+        # Pagination for user projects (excluding map objects)
+        paginated_projects = Project.query.filter_by(
+            author=current_user.id, is_mapobject=False
+        ).paginate(page=project_page, per_page=per_page, error_out=False)
 
-        for project in user_projects:
+        # Pagination for map objects
+        paginated_map_objects = Project.query.filter_by(
+            author=current_user.id, is_mapobject=True
+        ).paginate(page=map_object_page, per_page=per_page, error_out=False)
+
+        # Pagination for comments
+        paginated_comments = db.session.query(Comment, Project.name).join(
+            Project, Comment.project_id == Project.id
+        ).filter(Comment.user_id == current_user.id).paginate(
+            page=comment_page, per_page=per_page, error_out=False
+        )
+
+        
+        user_statistics = None
+        if current_user.is_authenticated:
+            num_projects = Project.query.filter_by(author=current_user.id, is_mapobject=False).count()
+            num_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
+            num_comments = Comment.query.filter_by(user_id=current_user.id).count()
+            
+        # Count map objects separately
+        map_objects_count = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
+
+        for project in paginated_projects.items:
             upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
             downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
             total_votes = upvotes + downvotes
@@ -796,28 +820,59 @@ def profil():
 
         user_comments = db.session.query(Comment, Project.name).join(Project, Comment.project_id == Project.id).filter(Comment.user_id == current_user.id).all()
 
-        # Calculate statistics
-        num_projects = len([project for project in user_projects if not project.is_mapobject])
+         # Prepare user statistics
+        num_projects = Project.query.filter_by(author=current_user.id, is_mapobject=False).count()
+        num_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
         num_comments = Comment.query.filter_by(user_id=current_user.id).count()
 
         # Find the most successful project
         most_successful_project = None
         max_upvotes = 0
-        for project in user_projects:
-            if not project.is_mapobject:  # Consider only non-map object projects
-                upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
-                if upvotes > max_upvotes:
-                    max_upvotes = upvotes
-                    most_successful_project = project
+        for project in paginated_projects.items:
+            upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+            if upvotes > max_upvotes:
+                max_upvotes = upvotes
+                most_successful_project = project
 
         user_statistics = {
             'num_projects': num_projects,
-            'num_map_objects': map_objects_count,  # Add map objects count
+            'num_map_objects': num_map_objects,
             'num_comments': num_comments,
             'most_successful_project': most_successful_project
         }
 
-    return render_template('profil.html', user_projects=user_projects, user_comments=user_comments, user_statistics=user_statistics, is_authenticated=current_user.is_authenticated)
+    else:
+        paginated_projects = None
+        paginated_map_objects = None
+        paginated_comments = None
+
+
+    # Check if it's an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        requested_section = request.args.get('section')
+
+        if requested_section == 'comments':
+            return render_template('partials/comments_section.html', 
+                                   comment_pagination=paginated_comments,
+                                   project_page=project_page, 
+                                   map_object_page=map_object_page,
+                                   user_statistics=user_statistics)
+        elif requested_section == 'map_objects':
+            return render_template('partials/map_objects_section.html', 
+                                   map_object_pagination=paginated_map_objects,
+                                   project_page=project_page, 
+                                   comment_page=comment_page,
+                                   user_statistics=user_statistics)
+
+    # Render the full page for a normal request
+    return render_template(
+        'profil.html', 
+        project_pagination=paginated_projects, 
+        map_object_pagination=paginated_map_objects, 
+        comment_pagination=paginated_comments, 
+        user_statistics=user_statistics, 
+        is_authenticated=current_user.is_authenticated
+    )
 
 @app.route('/erfolge')
 def erfolge():

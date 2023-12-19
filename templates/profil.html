@@ -124,6 +124,12 @@
             border-radius: 30px; /* Optional: if you want rounded corners */
         }
 
+.pagination-container {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center horizontally */
+    margin: 20px 0; /* Add vertical margin for spacing */
+    width: 100%; /* Ensure it takes full width */
+}
 
 /* Base styles for project thumbnails */
 .project-thumbnail {
@@ -315,6 +321,47 @@ margin: auto;
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
     transform: scale(1.03); /* Scale up slightly on hover */
+}
+
+
+/* Centering Pagination Wrapper */
+nav[aria-label="Page navigation"] {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center horizontally */
+    margin: 20px 0; /* Add vertical margin for spacing */
+}
+
+/* Pagination Container */
+.pagination {
+    background-color: #003056; /* Background color */
+    border-radius: 30px; /* Border radius */
+    padding: 10px; /* Inner spacing */
+    display: inline-flex; /* Align pagination items inline and allow flex properties */
+}
+
+/* Pagination Links */
+.pagination .page-link {
+    color: white; /* Text color */
+    background-color: transparent; /* Remove default background */
+    border: none; /* Remove default borders */
+    margin: 0 5px; /* Add horizontal spacing between items */
+}
+
+/* Pagination Items */
+.pagination .page-item {
+    display: inline-block; /* Display items inline */
+}
+
+/* Pagination Active Page */
+.pagination .page-item.active .page-link {
+    background-color: #02569d; /* Background for active page */
+    border-color: #02569d; /* Border for active page */
+}
+
+/* Pagination Item Hover */
+.pagination .page-item:hover .page-link {
+    background-color: #2874A6; /* Slightly lighter blue on hover */
+    border-color: #2874A6; /* Border color on hover */
 }
 
 
@@ -753,33 +800,28 @@ display: block;
 </div>
 
 
-  {% if is_authenticated %}
-        <!-- My Projects Section -->
-		
-        <div class="my-projects centered-text">
-            <h1>My Projects:</h1>
-			
-<!-- My Statistics Section -->
-<div class="my-statistics centered-text">
-      <p>You have posted <span style="color: #003056;">{{ user_statistics.num_projects }} project(s) and <span style="color: #003056;">{{ user_statistics.num_comments }} comment(s)</span>.</p>
+{% if is_authenticated %}
+<!-- My Projects Section -->
+<div class="my-projects centered-text">
+ <h1>My Projects:</h1>
+            <!-- My Statistics Section -->
+            <div class="my-statistics centered-text">
+                <p>You have posted <span style="color: #003056;">{{ user_statistics.num_projects }} project(s)</span> and <span style="color: #003056;">{{ user_statistics.num_comments }} comment(s)</span>.</p>
+                {% if user_statistics.most_successful_project %}
+                    <p>Your most successful project is <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, with <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} upvote(s)</span>.</p>
+                {% else %}
+                    <p>You have no projects yet.</p>
+                {% endif %}
+            </div>
 
-    {% if user_statistics.most_successful_project %}
-        <p>Your most successful project is <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, with <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} upvote(s)</span>.</p>
-    {% else %}
-        <p>You have no projects yet.</p>
-    {% endif %}
-</div>
-
-
-		
-              <div class="project-list">
-        {% if user_projects %}
-            {% for project in user_projects %}
-                {% if not project.is_mapobject %}
-                    <div class="project-thumbnail">
+         <div class="project-list">
+            {% if project_pagination.items %}
+                {% for project in project_pagination.items %}
+                    {% if not project.is_mapobject %}
+                        <div class="project-thumbnail">
                             <h3>{{ project.name }}</h3>
                             <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
-                            
+
                             <!-- Voting Bar -->
                             <div class="voting-bar">
                                 {% if project.upvotes > 0 %}
@@ -804,80 +846,56 @@ display: block;
                                 <input type="submit" class="register-button" style="font-weight: bold;" value="Delete Project">
                             </form>
                         </div>
-						                {% endif %}
+                    {% endif %}
+                {% endfor %}
 
-                    {% endfor %}
-                {% else %}
-                    <p>No projects found.</p>
-                {% endif %}
-            </div>
-        </div>
-		
-<div class="my-map-objects centered-text">
-    <h1>My Map Objects:</h1>
-    
-    <!-- Map Objects Statistics Section -->
-    <div class="map-objects-statistics centered-text">
-        <p>You have posted <span style="color: #003056;">{{ user_statistics.num_map_objects }} map object(s)</span>.</p>
-    </div>
-
-    <div class="project-list">
-        {% if user_projects %}
-            {% for project in user_projects %}
-                {% if project.is_mapobject %}
-                    <div class="project-thumbnail">
-                        <!-- Display the category of the project -->
-                        <p class="project-category">Kategorie: <strong>{{ project.category }}</strong></p>
-
-                        <!-- Display only the description of the project -->
-                        <div class="project-description">
-                            {{ project.descriptionwhy|safe }}
-                        </div>
-
-                        <!-- Display the date when the project was posted -->
-                        <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
-
-                        <!-- Delete Button for Project -->
-                        <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
-                            <input type="submit" class="register-button" style="font-weight: bold;" value="Delete marker">
-                        </form>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            <p>No map objects found.</p>
+                <!-- Pagination Links for Projects -->
+<nav aria-label="Page navigation" class="pagination-container">
+    <ul class="pagination">
+        {% if project_pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.prev_num, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page) }}">Previous</a>
+            </li>
         {% endif %}
+        {% for page in project_pagination.iter_pages() %}
+            <li class="page-item {{ 'active' if page == project_pagination.page else '' }}">
+                <a class="page-link" href="{{ url_for('profil', project_page=page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page) }}">{{ page }}</a>
+            </li>
+        {% endfor %}
+        {% if project_pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.next_num, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page) }}">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+
+            {% else %}
+                <p>No projects found.</p>
+            {% endif %}
+        </div>
     </div>
+
+
+<!-- My Map Objects Section -->
+<div id="map-objects-container">
+    {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
+        {% include 'partials/map_objects_section.html' %}
+    {% endwith %}
+</div>
+
+<!-- My Comments Section -->
+<div id="comments-container">
+    {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
+        {% include 'partials/comments_section.html' %}
+    {% endwith %}
 </div>
 
 
 
 
-        <!-- My Comments Section -->
-		
-		<div class="info-text-field">
-        <div class="my-comments centered-text">
-            <h1>My Comments:</h1>
-            <div class="comment-list">
-                {% if user_comments %}
-                    {% for comment, project_name in user_comments %}
-                        <div class="comment">
-                            <p><strong>Comment on:</strong> <a href="{{ url_for('project_details', project_id=comment.project_id) }}">{{ project_name }}</a></p>
-                            <p>{{ comment.text }}</p>
-                            <p class="comment-date">Posted on: {{ comment.timestamp.strftime('%d.%m.%Y %H:%M') }}</p>
 
-                            <!-- Delete Button for Comment -->
-                            <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST">
-                                <input type="submit"  class="register-button" style="font-weight: bold;" value="Delete Comment">
-                            </form>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p>No comments found.</p>
-                {% endif %}
-            </div>
-        </div>
-		
+
 		
 </div>
 <!-- My Account Section -->
@@ -924,6 +942,56 @@ display: block;
 <a id="download-link" href="#" style="display: none;"></a>
 </body>
 </html>
+
+
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    attachPaginationEvent('comments-container');
+    attachPaginationEvent('map-objects-container');
+});
+
+function attachPaginationEvent(containerId) {
+    let container = document.getElementById(containerId);
+    if (container) {
+        console.log('Attaching click event to:', containerId);
+        container.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && e.target.classList.contains('page-link')) {
+                e.preventDefault();
+                const url = new URL(e.target.href);
+                console.log('Fetching URL:', url.href);
+                updatePaginationContent(url.href, containerId);
+            }
+        });
+    } else {
+        console.error(containerId + ' not found');
+    }
+}
+
+function updatePaginationContent(url, containerId) {
+    const section = containerId === 'comments-container' ? 'comments' : 'map_objects';
+    const ajaxUrl = new URL(url);
+    ajaxUrl.searchParams.set('section', section);
+
+    fetch(ajaxUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(html => {
+            document.getElementById(containerId).innerHTML = html;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+
+</script>
+
 
    <script>
     // Toggle the navigation overlay when the hamburger button is clicked
