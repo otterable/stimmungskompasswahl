@@ -777,35 +777,26 @@ def comment(project_id):
 @app.route('/profil')
 @app.route('/profil/projects/<int:project_page>/map_objects/<int:map_object_page>/comments/<int:comment_page>')
 def profil(project_page=1, map_object_page=1, comment_page=1):
-    per_page = 1  # Number of items per page
-
-
+    per_page = 9  # Number of items per page
 
     if current_user.is_authenticated:
-        # Pagination for user projects (excluding map objects)
+        # Pagination for user projects (excluding map objects), ordered by newest first
         paginated_projects = Project.query.filter_by(
             author=current_user.id, is_mapobject=False
-        ).paginate(page=project_page, per_page=per_page, error_out=False)
+        ).order_by(Project.date.desc()).paginate(page=project_page, per_page=per_page, error_out=False)
 
-        # Pagination for map objects
+        # Pagination for map objects, ordered by newest first
         paginated_map_objects = Project.query.filter_by(
             author=current_user.id, is_mapobject=True
-        ).paginate(page=map_object_page, per_page=per_page, error_out=False)
+        ).order_by(Project.date.desc()).paginate(page=map_object_page, per_page=per_page, error_out=False)
 
-        # Pagination for comments
+        # Pagination for comments, already ordered by newest first
         paginated_comments = db.session.query(Comment, Project.name).join(
             Project, Comment.project_id == Project.id
-        ).filter(Comment.user_id == current_user.id).paginate(
+        ).filter(Comment.user_id == current_user.id).order_by(Comment.timestamp.desc()).paginate(
             page=comment_page, per_page=per_page, error_out=False
         )
 
-        
-        user_statistics = None
-        if current_user.is_authenticated:
-            num_projects = Project.query.filter_by(author=current_user.id, is_mapobject=False).count()
-            num_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
-            num_comments = Comment.query.filter_by(user_id=current_user.id).count()
-            
         # Count map objects separately
         map_objects_count = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
 
@@ -818,9 +809,7 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
             project.upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
             project.downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
 
-        user_comments = db.session.query(Comment, Project.name).join(Project, Comment.project_id == Project.id).filter(Comment.user_id == current_user.id).all()
-
-         # Prepare user statistics
+        # Prepare user statistics
         num_projects = Project.query.filter_by(author=current_user.id, is_mapobject=False).count()
         num_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
         num_comments = Comment.query.filter_by(user_id=current_user.id).count()
@@ -846,7 +835,6 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
         paginated_map_objects = None
         paginated_comments = None
 
-
     # Check if it's an AJAX request
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         requested_section = request.args.get('section')
@@ -861,6 +849,12 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
             return render_template('partials/map_objects_section.html', 
                                    map_object_pagination=paginated_map_objects,
                                    project_page=project_page, 
+                                   comment_page=comment_page,
+                                   user_statistics=user_statistics)
+        elif requested_section == 'projects':
+            return render_template('partials/projects_section.html', 
+                                   project_pagination=paginated_projects,
+                                   map_object_page=map_object_page, 
                                    comment_page=comment_page,
                                    user_statistics=user_statistics)
 

@@ -1,53 +1,64 @@
-<!-- map_objects_section.html -->
-<div class="my-map-objects centered-text">
-    <h1>My Map Objects:</h1>
-
-    <!-- Map Objects Statistics Section -->
-    <div class="map-objects-statistics centered-text">
-        <p>You have posted <span style="color: #003056;">{{ user_statistics.num_map_objects }} map object(s)</span>.</p>
-    </div>
-
+<!-- projects_section.html -->
+<div class="my-projects centered-text">
     <div class="project-list">
-        {% if map_object_pagination.items %}
-            {% for project in map_object_pagination.items %}
-                {% if project.is_mapobject %}
+        {% if project_pagination.items %}
+            {% for project in project_pagination.items %}
+                {% if not project.is_mapobject %}
                     <div class="project-thumbnail">
-                        <h3 class="project-description">
-                            <em>“{{ project.descriptionwhy|safe }}”</em>
-                        </h3>
-                        <p class="project-category">Kategorie: <strong>{{ project.category }}</strong></p>
+                        <h3>{{ project.name }}</h3>
                         <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
+                        <div class="voting-bar">
+                            {% if project.upvotes > 0 %}
+                                <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                                    <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                                </div>
+                            {% endif %}
+                            {% if project.downvotes > 0 %}
+                                <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                                    <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('project_details', project_id=project.id) }}">
+                            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+                        </a>
+                        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
                         <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
-                            <input type="submit" class="register-button" style="font-weight: bold;" value="Delete marker">
+                            <input type="submit" class="register-button" style="font-weight: bold;" value="Delete Project">
                         </form>
                     </div>
                 {% endif %}
             {% endfor %}
-    </div>
 
-            <!-- Pagination for Map Objects -->
-            {% if map_object_pagination.pages > 1 %}
-                <nav aria-label="Map Object Page navigation">
+            <!-- Pagination for Projects -->
+            {% if project_pagination.pages > 1 %}
+                <nav aria-label="Page navigation" class="pagination-container">
                     <ul class="pagination">
-                        {% if map_object_pagination.has_prev %}
+                        <!-- Previous Page -->
+                        {% if project_pagination.has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('profil', project_page=project_page, map_object_page=map_object_pagination.prev_num, comment_page=comment_page) }}">Previous</a>
+                                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.prev_num, map_object_page=map_object_page, comment_page=comment_page) }}">Previous</a>
                             </li>
                         {% endif %}
-                        {% for page in map_object_pagination.iter_pages() %}
-                            <li class="page-item {{ 'active' if page == map_object_pagination.page else '' }}">
-                                <a class="page-link" href="{{ url_for('profil', project_page=project_page, map_object_page=page, comment_page=comment_page) }}">{{ page }}</a>
+
+                        <!-- Page Numbers -->
+                        {% for page in project_pagination.iter_pages() %}
+                            <li class="page-item {{ 'active' if page == project_pagination.page else '' }}">
+                                <a class="page-link" href="{{ url_for('profil', project_page=page, map_object_page=map_object_page, comment_page=comment_page) }}">{{ page }}</a>
                             </li>
                         {% endfor %}
-                        {% if map_object_pagination.has_next %}
+
+                        <!-- Next Page -->
+                        {% if project_pagination.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('profil', project_page=project_page, map_object_page=map_object_pagination.next_num, comment_page=comment_page) }}">Next</a>
+                                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.next_num, map_object_page=map_object_page, comment_page=comment_page) }}">Next</a>
                             </li>
                         {% endif %}
                     </ul>
                 </nav>
             {% endif %}
         {% else %}
-            <p>No map objects found.</p>
+            <p>No projects found.</p>
         {% endif %}
+    </div>
 </div>
