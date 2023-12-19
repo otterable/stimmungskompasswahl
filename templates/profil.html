@@ -800,6 +800,9 @@ display: block;
 </div>
 <div class="my-projects centered-text">
 
+   {% if current_user.is_authenticated %}
+   
+   
     <h1>My Projects:</h1>
     <div class="my-statistics centered-text">
         <p>You have posted <span style="color: #003056;">{{ user_statistics.num_projects }} project(s)</span> and <span style="color: #003056;">{{ user_statistics.num_comments }} comment(s)</span>.</p>
@@ -811,7 +814,7 @@ display: block;
     </div>
 	</div>
 
-<!-- My Projects Section -->
+   <!-- My Projects Section -->
 <div id="projects-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
         {% include 'partials/projects_section.html' %}
@@ -832,8 +835,27 @@ display: block;
         {% include 'partials/comments_section.html' %}
     {% endwith %}
 </div>
+</div>
+
+<div class="my-account centered-text">
+    <h1>My Account:</h1>
+    {% if current_user.is_authenticated %}
+        <p>Your account name is <span style="color: #003056;">{{ current_user.name }}</span></p>
+        <p>Your account is bound to phone number <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
+        <p>Your account was created on <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
+        <p>To reset your password, head to <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Password Recovery</a>.</p>
+    {% else %}
+    {% endif %}
+</div>
 
 
+
+		
+  {% else %}
+        <div class="login-prompt centered-text">
+            <p>You must be logged in to view details.</p>
+        </div>
+    {% endif %}
 
 
 
@@ -841,18 +863,7 @@ display: block;
 		
 </div>
 <!-- My Account Section -->
-<div class="my-account centered-text">
-    <h1>My Account:</h1>
-    <p>Your account name is <span style="color: #003056;">{{ current_user.name }}</span></p>
-    <p>Your account is bound to phone number <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
-    <p>Your account was created on <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
-    <p>To reset your password, head to <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Password Recovery</a>.</p>
-</div>
 
-
-        <div class="login-prompt centered-text">
-            <p>To view your projects and statistics, please <a href="{{ url_for('login') }}">log in</a>.</p>
-        </div>
 
 
 {% if is_authenticated %}

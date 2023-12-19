@@ -778,6 +778,7 @@ def comment(project_id):
 @app.route('/profil/projects/<int:project_page>/map_objects/<int:map_object_page>/comments/<int:comment_page>')
 def profil(project_page=1, map_object_page=1, comment_page=1):
     per_page = 9  # Number of items per page
+    user_statistics = None  # Initialize to None
 
     if current_user.is_authenticated:
         # Pagination for user projects (excluding map objects), ordered by newest first
@@ -829,7 +830,6 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
             'num_comments': num_comments,
             'most_successful_project': most_successful_project
         }
-
     else:
         paginated_projects = None
         paginated_map_objects = None
