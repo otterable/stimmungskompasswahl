@@ -1371,6 +1371,32 @@ margin-bottom: 50px;
     transition: background-color 0.3s ease; /* Smooth transition for background color */
 }
 
+        .register-button {
+        background-color: #003056; /* Example color */
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 15px 30px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: auto;
+        cursor: pointer;
+        width: 90%; /* Full width */
+        box-sizing: border-box; /* Include padding in width */
+    }
+
+
+.button-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically if needed */
+    width: 100%; /* Take full width of the parent */
+    margin-top: 20px; /* Add some space on top */
+}
+
+
 .publish-button {
     width: 100%; /* Full width */
     padding: 20px 0; /* Vertical padding */
@@ -1879,9 +1905,15 @@ margin: auto;
         <p>Finally, press the "post a marker" button, for the overlay to disappear. Then, click anywhere on the map. You will then be asked "are you sure you want to place your marker here?" Click "yes", and the marker will be placed where you wanted it!</p>
 
         <select id="marker-category">
-            <option value="Transport">Transport</option>
+                        <option value="Transport">Transport</option>
             <option value="Öffentliche Plätze">Öffentliche Plätze</option>
-            <!-- Add more categories here -->
+            <option value="Environment">Umwelt</option>
+            <option value="Verwaltung">Verwaltung</option>
+            <option value="Culture">Kultur</option>
+            <option value="Education">Bildung</option>
+            <option value="Health">Gesundheit</option>
+            <option value="Sport">Sport</option>
+            <option value="Other">Andere</option>
         </select>
         <br><br>
         <textarea id="marker-description" rows="4" cols="50"></textarea>
@@ -1911,7 +1943,6 @@ margin: auto;
 <?php SIDEBAR BODY START ?>
 <div id="sidebar">
 
-<button id="open-overlay" onclick="openMarkerOverlay()">Open Marker placing overlay</button>
 
 <button id="hideNonMapMarkers">Hide Non-Map Markers</button>
 
@@ -1950,37 +1981,19 @@ margin: auto;
 <img class="hide-on-mobile resistant-image" id="overlay-image" src="static/overlay.jpg" style="max-width: 97%; height: auto; display: block; margin-left:auto; margin-right:auto; margin-top: 3px; margin-bottom: 20px; border-radius: 30px; max-height: 368px;"/>
 <?php CITY LOGO END ?>
 
-<!-- Add this inside your <body> tag in karte.html -->
-<div id="marker-input-form" style="display:block;">
-    <h2>Place a Marker</h2>
-    <div class="input-field">
-        <label for="category">Choose a category:</label>
-        <select id="marker-category" name="category" required>
-            <option value="Transport">Transport</option>
-            <option value="Öffentliche Plätze">Öffentliche Plätze</option>
-            <option value="Environment">Umwelt</option>
-            <option value="Verwaltung">Verwaltung</option>
-            <option value="Culture">Kultur</option>
-            <option value="Education">Bildung</option>
-            <option value="Health">Gesundheit</option>
-            <option value="Sport">Sport</option>
-            <option value="Other">Andere</option>
-        </select>
-    </div>
-    <div class="input-field">
-        <label for="description">Description:</label>
-        <textarea id="marker-description" name="description" required></textarea>
-    </div>
-    <button onclick="addMarker()">Add Marker</button>
-</div>
+
 
 
 
 
 <h3 style="display: block; text-align: center; margin-top: 5px;">
+
       Klicken Sie zum ein- und ausblenden.
      </h3>
 <div id="category-toggle-buttons">
+<div class="button-container">
+        <button id="open-overlay" class="register-button" onclick="openMarkerOverlay()">Open Marker placing overlay</button>
+    </div>
     <!-- Buttons will be added here dynamically -->
 </div>
 
@@ -2135,59 +2148,95 @@ L.control.layers(baseLayers).addTo(map);
     // Function to create a colored circle icon
 // Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor) {
-    // Adjust pin size based on current base layer
-    if (currentBaseLayer === 'Satellit') {
-        pinSize = pinSize * 2.5; // Increase size more for satellite view
-    } else {
-        pinSize = pinSize * 1.5; // Default increase
-    }
+    // Adjustments for pin size and stroke based on base layer
+    var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
+    var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
+    var strokeWidth = currentBaseLayer === 'Satellit' ? 5 : outlineSize * 10;
+    var strokeOpacity = currentBaseLayer === 'Satellit' ? 1 : 0.5;
 
-    var strokeColor, strokeWidth, strokeOpacity;
-
-    if (currentBaseLayer === 'Satellit') {
-        strokeColor = 'white';
-        strokeWidth = 5; // Thicker white outline
-        strokeOpacity = 1;
-    } else {
-        strokeColor = fillColor;
-        strokeWidth = outlineSize * 10;
-        strokeOpacity = 0.5; // 50% opacity
-    }
-
-    var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${pinSize}" height="${pinSize}" viewBox="0 0 ${pinSize} ${pinSize}">
-        <circle cx="${pinSize / 2}" cy="${pinSize / 2}" r="${pinSize / 4}" fill="${fillColor}" />
-        <circle cx="${pinSize / 2}" cy="${pinSize / 2}" r="${pinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
+    var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
+        <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" fill="${fillColor}" />
+        <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
     </svg>`;
 
     return L.icon({
         iconUrl: `data:image/svg+xml;base64,${btoa(svgIcon)}`,
-        iconSize: [pinSize, pinSize],
-        iconAnchor: [pinSize / 2, pinSize / 2],
-        popupAnchor: [0, -pinSize / 2]
+        iconSize: [adjustedPinSize, adjustedPinSize],
+        iconAnchor: [adjustedPinSize / 2, adjustedPinSize / 2],
+        popupAnchor: [0, -adjustedPinSize / 2]
     });
+}
+
+function addMarker(latlng, category, description) {
+    console.log("Adding marker at:", latlng);
+
+    var fillColor = getCategoryColor(category);
+    var markerIcon = createIcon(24, 2, fillColor);
+
+    var marker = L.marker(latlng, { icon: markerIcon });
+    marker.bindPopup(`<strong>${category}</strong><br>${description}`).addTo(map);
+
+    console.log("Marker added to the map:", marker);
+}
+
+// Function to create a simple SVG icon for cursor
+function createCursorIcon(fillColor) {
+    var svgCursorIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" fill="${fillColor}" />
+    </svg>`;
+    return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgCursorIcon)))}`;
+}
+
+// Function to set map cursor
+function setMapCursor(category, fillColor) {
+    console.log("Attempting to set map cursor...");
+
+    var cursorIconUrl = createCursorIcon(fillColor);
+    document.getElementById('map').style.cursor = `url('${cursorIconUrl}') 12 12, auto`;
+    
+    console.log("ready to place, custom cursor icon activated");
+    console.log(`Map cursor set to category icon: ${category}`);
+}
+
+// Function to reset map cursor
+function resetMapCursor() {
+    console.log("Attempting to reset map cursor...");
+
+    document.getElementById('map').style.cursor = '';
+    
+    console.log("marker has been placed, custom cursor deactivated");
+    console.log("Map cursor reset to default");
 }
 
 
 // Function to open marker overlay
     function openMarkerOverlay() {
-        document.getElementById('marker-overlay').style.display = 'block';
-        console.log("Marker overlay opened");
-    }
+    document.getElementById('marker-overlay').style.display = 'block';
+    console.log("Marker overlay opened");
+}
 	
    // Function to handle posting a marker
     function postMarker() {
-        document.getElementById('marker-overlay').style.display = 'none';
-        console.log("Ready to place marker on map");
+    document.getElementById('marker-overlay').style.display = 'none';
+    console.log("Ready to place marker on map");
+    console.log("postMarker function called");
 
-        map.once('click', function(e) {
-            if (confirm("Are you sure you want to place your marker here?")) {
-                addMarker(e.latlng, document.getElementById('marker-category').value, document.getElementById('marker-description').value);
-                console.log("Marker placed at:", e.latlng);
-            } else {
-                console.log("Marker placement cancelled");
-            }
-        });
-    }
+    var selectedCategory = document.getElementById('marker-category').value;
+    var fillColor = getCategoryColor(selectedCategory);
+    setMapCursor(selectedCategory, fillColor);
+
+    map.once('click', function(e) {
+        if (confirm("Are you sure you want to place your marker here?")) {
+            addMarker(e.latlng, selectedCategory, document.getElementById('marker-description').value);
+            console.log("Marker placed at:", e.latlng);
+            resetMapCursor();
+        } else {
+            console.log("Marker placement cancelled");
+            resetMapCursor();
+        }
+    });
+}
+
 
 	
 
