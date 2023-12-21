@@ -81,7 +81,7 @@ display:none !important;
 }
 
 .button-hover-effect:hover {
-    transform: scale(1.01);
+    transform: scale(1.02);
     background-color: #111111; /* Light blue color */
 }
 
@@ -1013,7 +1013,7 @@ display: none !important;
 }
 
 .tool-btn:hover img {
-    transform: scale(1.1);
+    transform: scale(1.02);
     outline: var(--tool-btn-hover-outline);
 }
 
@@ -1384,7 +1384,7 @@ margin-bottom: 50px;
 }
 
 .publish-button:hover {
-    transform: scale(1.03); /* Scale up on hover */
+    transform: scale(1.02); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 
@@ -1428,7 +1428,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.03); /* Scale up slightly on hover */
+    transform: scale(1.02); /* Scale up slightly on hover */
 }
 
 
@@ -1493,7 +1493,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.03); /* Scale up slightly on hover */
+    transform: scale(1.02); /* Scale up slightly on hover */
 }
 
 /* Underline effect for links that do not contain buttons */
@@ -1577,7 +1577,7 @@ margin: auto;
         }
 
         .info-box:hover {
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -1868,6 +1868,29 @@ margin: auto;
     </div>
 </div>
 
+
+
+<!-- Marker Placing Overlay -->
+<div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:1000;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:10px;">
+        <h2>Add a new marker to the map!</h2>
+        <p>First, choose a category in the dropdown below.</p>
+        <p>Then, write the text of your marker below in the text field.</p>
+        <p>Finally, press the "post a marker" button, for the overlay to disappear. Then, click anywhere on the map. You will then be asked "are you sure you want to place your marker here?" Click "yes", and the marker will be placed where you wanted it!</p>
+
+        <select id="marker-category">
+            <option value="Transport">Transport</option>
+            <option value="Öffentliche Plätze">Öffentliche Plätze</option>
+            <!-- Add more categories here -->
+        </select>
+        <br><br>
+        <textarea id="marker-description" rows="4" cols="50"></textarea>
+        <br><br>
+        <button onclick="postMarker()">Post a Marker</button>
+    </div>
+</div>
+
+
 <div>
     <div id="mobileCategoryOverlay"></div>
 
@@ -1888,6 +1911,7 @@ margin: auto;
 <?php SIDEBAR BODY START ?>
 <div id="sidebar">
 
+<button id="open-overlay" onclick="openMarkerOverlay()">Open Marker placing overlay</button>
 
 <button id="hideNonMapMarkers">Hide Non-Map Markers</button>
 
@@ -1933,9 +1957,14 @@ margin: auto;
         <label for="category">Choose a category:</label>
         <select id="marker-category" name="category" required>
             <option value="Transport">Transport</option>
-            <option value="Public spaces">Öffentliche Plätze</option>
+            <option value="Öffentliche Plätze">Öffentliche Plätze</option>
             <option value="Environment">Umwelt</option>
-            <!-- Add other categories here -->
+            <option value="Verwaltung">Verwaltung</option>
+            <option value="Culture">Kultur</option>
+            <option value="Education">Bildung</option>
+            <option value="Health">Gesundheit</option>
+            <option value="Sport">Sport</option>
+            <option value="Other">Andere</option>
         </select>
     </div>
     <div class="input-field">
@@ -1944,6 +1973,7 @@ margin: auto;
     </div>
     <button onclick="addMarker()">Add Marker</button>
 </div>
+
 
 
 
@@ -1969,8 +1999,8 @@ var selectedToolButton = null;
 var currentBaseLayer = 'Standardkarte'; // Default layer
 
 // Calculate the offset for boundaries
-var horizontalOffset = 1125; // 1.125 km on each side, total 2.25 km
-var verticalOffset = 594; // 0.59375 km on each side, total 1.1875 km
+var horizontalOffset = 1125; // 1.0225 km on each side, total 2.25 km
+var verticalOffset = 594; // 0.59375 km on each side, total 1.02875 km
 
 // Define the boundaries
 var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
@@ -2138,6 +2168,28 @@ function createIcon(pinSize, outlineSize, fillColor) {
 }
 
 
+// Function to open marker overlay
+    function openMarkerOverlay() {
+        document.getElementById('marker-overlay').style.display = 'block';
+        console.log("Marker overlay opened");
+    }
+	
+   // Function to handle posting a marker
+    function postMarker() {
+        document.getElementById('marker-overlay').style.display = 'none';
+        console.log("Ready to place marker on map");
+
+        map.once('click', function(e) {
+            if (confirm("Are you sure you want to place your marker here?")) {
+                addMarker(e.latlng, document.getElementById('marker-category').value, document.getElementById('marker-description').value);
+                console.log("Marker placed at:", e.latlng);
+            } else {
+                console.log("Marker placement cancelled");
+            }
+        });
+    }
+
+	
 
 function updateMarkerIcons() {
     for (var category in categoryLayers) {
@@ -2160,7 +2212,7 @@ function updateMarkerIcons() {
         switch (category) {
             case 'Transport':
                 return '#6f5cff';
-            case 'Public spaces':
+            case 'Öffentliche Plätze':
                 return '#3d3d3d';
             case 'Environment':
                 return '#4CAF50';
@@ -2320,7 +2372,7 @@ function toggleCategory(categoryName) {
 function updateCategoryButtonColors() {
     const categoryColors = {
         'Transport': '#6f5cff',
-        'Public spaces': '#3d3d3d',
+        'Öffentliche Plätze': '#3d3d3d',
         'Environment': '#4CAF50',
         'Verwaltung': '#71e5d7',
         'Culture': '#494731',
@@ -2358,24 +2410,38 @@ function addMarker() {
     const category = document.getElementById('marker-category').value;
     const description = document.getElementById('marker-description').value;
 
-    // Create marker
+    // Close the overlay
+    document.getElementById('marker-overlay').style.display = 'none';
+
+    // Create marker at the previously selected location
     const marker = L.marker(selectedLatLng).addTo(map);
     marker.bindPopup(`<strong>${category}</strong><br>${description}`);
 
-    // Send data to server (see Step 3)
+    // Send data to server
     saveMarkerData(selectedLatLng, category, description);
 
-    // Clear form and hide it
+    // Clear form inputs
     document.getElementById('marker-category').value = '';
     document.getElementById('marker-description').value = '';
-    document.getElementById('marker-input-form').style.display = 'none';
+
+    console.log("Marker added with category:", category, "and description:", description);
 }
+
+// Variable to store the selected latitude and longitude
+
+// Event listener for map click
+map.on('click', function(e) {
+    selectedLatLng = e.latlng;
+    document.getElementById('marker-input-form').style.display = 'block';
+    console.log("Map clicked at:", selectedLatLng);
+});
 
 	// Add this function in your JavaScript
 
 function saveMarkerData(latlng, category, description) {
     // Check if user is authenticated
-    var isAuthenticated = false; // You need to set this variable based on the user's authentication status
+    // Note: You need to implement the logic to determine if the user is authenticated
+    var isAuthenticated = false; // Set this based on the user's authentication status
 
     // Prepare the data to be sent to the server
     var dataToSend = {
@@ -2386,20 +2452,24 @@ function saveMarkerData(latlng, category, description) {
         isAnonymous: !isAuthenticated // Mark as anonymous if the user is not authenticated
     };
 
+    // Send the data using AJAX
     $.ajax({
-        url: '/add_marker',
+        url: '/add_marker', // Server endpoint that handles marker data
         method: 'POST',
         data: JSON.stringify(dataToSend),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function(response) {
             console.log('Marker saved:', response);
+            // Optionally, you can handle any post-success actions here
         },
         error: function(error) {
             console.error('Error saving marker:', error);
+            // Optionally, handle any error scenarios here
         }
     });
 }
+
 
 
 </script>

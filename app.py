@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func, desc, asc  # Added desc and asc here
 from flask_migrate import Migrate
 from models import db, User, Project, Vote, Comment
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -515,10 +515,43 @@ def project_details(project_id):
 @app.route('/admintools', methods=['GET', 'POST'])
 @login_required
 def admintools():
-    users = User.query.all()
+    # Check if the user is the admin
+    if current_user.id != 1:
+        flash('Access Denied: You are not authorized to view this page.', 'danger')
+        return redirect(url_for('index'))
 
+    # Check for OTP verification
+    if 'admin_verified' not in session or not session['admin_verified']:
+        # Generate OTP
+        otp = randint(100000, 999999)
+        client = Client(account_sid, auth_token)
+        message = client.messages.create(
+            body=f"Stimmungskompass: Um sich bei Admintools anzumelden, verwenden Sie OTP: {otp}",
+            from_=twilio_number,
+            to=current_user.phone_number
+        )
+        session['admin_otp'] = otp
+        return redirect(url_for('verify_admin_otp'))
+
+    # Admin tools logic begins here
+    users = User.query.all()
+    for user in users:
+        user.project_count = Project.query.filter_by(author=user.id, is_mapobject=False).count()
+        user.map_object_count = Project.query.filter_by(author=user.id, is_mapobject=True).count()
+        user.comment_count = Comment.query.filter_by(user_id=user.id).count()
+
+    comments = Comment.query.all()
+    for comment in comments:
+        project = Project.query.get(comment.project_id)
+        user = User.query.get(comment.user_id)
+        comment.project_name = project.name if project else "Unknown Project"
+        comment.author_name = user.name if user else "Unknown Author"
+        comment.author_id = user.id if user else "Unknown ID"
+
+    # POST request handling
     if request.method == 'POST':
         project_id = request.form.get('project_id')
+
 
         if 'mark_important' in request.form:
             project = Project.query.get(project_id)
@@ -567,48 +600,125 @@ def admintools():
 
         return redirect(url_for('admintools'))
 
+    # GET request logic with pagination and sorting
     sort = request.args.get('sort', 'score_desc')
     search_query = request.args.get('search', '')
-    query = Project.query
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
 
+    query = Project.query
     if search_query:
         query = query.filter(Project.name.contains(search_query))
 
-    projects = query.all()
-    for project in projects:
-        user = User.query.get(project.author)
-        project.author_name = f"{user.name}" if user else 'Unknown'
-        project.comments_count = Comment.query.filter_by(project_id=project.id).count()
-        project.upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
-        project.downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
-        project.score = project.upvotes - project.downvotes
+    # Adjust the sorting logic
+    if sort == 'comments':
+        comments_subquery = db.session.query(
+            Comment.project_id, func.count('*').label('comments_count')
+        ).group_by(Comment.project_id).subquery()
+        query = query.outerjoin(comments_subquery, Project.id == comments_subquery.c.project_id) \
+                    .order_by(desc(comments_subquery.c.comments_count))
 
-    if sort == 'oldest':
-        projects.sort(key=lambda x: x.date)
+    elif sort == 'oldest':
+        query = query.order_by(Project.date)
     elif sort == 'newest':
-        projects.sort(key=lambda x: x.date, reverse=True)
+        query = query.order_by(desc(Project.date))
     elif sort == 'category':
-        projects.sort(key=lambda x: x.category)
+        query = query.order_by(Project.category)
     elif sort == 'user_id':
-        projects.sort(key=lambda x: x.author)
+        query = query.order_by(Project.author)
     elif sort == 'upvotes':
-        projects.sort(key=lambda x: x.upvotes, reverse=True)
+        query = query.outerjoin(Vote, Project.id == Vote.project_id) \
+                    .group_by(Project.id) \
+                    .order_by(func.sum(Vote.upvote).desc())
     elif sort == 'downvotes':
-        projects.sort(key=lambda x: x.downvotes, reverse=True)
-    elif sort == 'comments':
-        projects.sort(key=lambda x: x.comments_count, reverse=True)
+        query = query.outerjoin(Vote, Project.id == Vote.project_id) \
+                    .group_by(Project.id) \
+                    .order_by(func.sum(Vote.downvote).desc())
     elif sort == 'alpha_asc':
-        projects.sort(key=lambda x: x.name.lower())
+        query = query.order_by(asc(Project.name))
     elif sort == 'alpha_desc':
-        projects.sort(key=lambda x: x.name.lower(), reverse=True)
+        query = query.order_by(desc(Project.name))
     else:
-        projects.sort(key=lambda x: x.score, reverse=True)
+        query = query.outerjoin(Vote, Project.id == Vote.project_id) \
+                    .group_by(Project.id) \
+                    .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
 
-    important_projects = [project for project in projects if project.is_important]
-    featured_projects = [project for project in projects if project.is_featured]
+    paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    return render_template('admintools.html', projects=projects, sort=sort, search_query=search_query, users=users, important_projects=important_projects, featured_projects=featured_projects)
+    # Calculate upvotes and downvotes for each project
+    for project in paginated_projects.items:
+        upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+        downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
 
+        project.upvotes = upvotes
+        project.downvotes = downvotes
+
+        total_votes = upvotes + downvotes
+        if total_votes > 0:
+            project.upvote_percentage = (upvotes / total_votes) * 100
+            project.downvote_percentage = (downvotes / total_votes) * 100
+        else:
+            project.upvote_percentage = 0
+            project.downvote_percentage = 0
+
+    # Updating user statistics for all users
+    users = User.query.all()
+    for user in users:
+        user.project_count = Project.query.filter_by(author=user.id, is_mapobject=False).count()
+        user.map_object_count = Project.query.filter_by(author=user.id, is_mapobject=True).count()
+        user.comment_count = Comment.query.filter_by(user_id=user.id).count()
+
+    # Updating comment information
+    comments = Comment.query.all()
+    for comment in comments:
+        project = Project.query.get(comment.project_id)
+        user = User.query.get(comment.user_id)
+        comment.project_name = project.name if project else "Unknown Project"
+        comment.author_name = user.name if user else "Unknown Author"
+        comment.author_id = user.id if user else "Unknown ID"
+
+    # Prepare lists of important and featured projects
+    important_projects = [project for project in paginated_projects.items if project.is_important]
+    featured_projects = [project for project in paginated_projects.items if project.is_featured]
+
+    # Check if it's an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return render_template('partials/project_list_section.html', 
+                               paginated_projects=paginated_projects, 
+                               sort=sort, 
+                               search_query=search_query)
+
+    # Normal request
+    return render_template('admintools.html', 
+                           paginated_projects=paginated_projects,
+                           comments=comments, 
+                           sort=sort, 
+                           search_query=search_query, 
+                           users=users, 
+                           important_projects=important_projects, 
+                           featured_projects=featured_projects)
+
+
+@app.route('/verify_admin_otp', methods=['GET', 'POST'])
+@login_required
+def verify_admin_otp():
+    # Ensure the user is an admin
+    if current_user.id != 1:
+        flash('Access Denied: You are not authorized to perform this action.', 'danger')
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        entered_otp = request.form.get('otp')
+
+        # Verify OTP
+        if 'admin_otp' in session and str(session['admin_otp']) == entered_otp:
+            session['admin_verified'] = True
+            flash('OTP Verified. Access granted to admin tools.', 'success')
+            return redirect(url_for('admintools'))
+        else:
+            flash('Invalid OTP. Please try again.', 'danger')
+
+    return render_template('verify_admin_otp.html')  # Ensure this template exists for OTP input
         
         
 @app.route('/delete_my_data', methods=['POST'])
@@ -942,17 +1052,26 @@ def download_my_data():
     return response
 
 
-
-
 @app.route('/delete_comment/<int:comment_id>', methods=['POST'])
 @login_required
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-    if comment.user_id == current_user.id:
+
+    # Check if the current user is the author of the comment or an admin
+    if comment.user_id == current_user.id or current_user.id == 1:  # Assuming admin has user ID 1
         db.session.delete(comment)
         db.session.commit()
-        # Add a flash message or redirect as needed
-    return redirect(url_for('profil'))
+        # flash('Comment deleted successfully.', 'success')
+    # else:
+        # flash('You do not have permission to delete this comment.', 'danger')
+
+    # Redirect to the appropriate page based on the referrer
+    referrer = request.referrer
+    if referrer and '/admintools' in referrer:
+        return redirect(url_for('admintools'))
+    else:
+        return redirect(url_for('profil'))
+
 
     
 @app.route('/verify_otp', methods=['GET', 'POST'])

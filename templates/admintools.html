@@ -16,6 +16,8 @@
 
 
    <style>
+   
+   
       body {
         font-family: 'Roboto', sans-serif;
         background-color: #f5f1e4;
@@ -23,7 +25,9 @@
         margin: 0; /* Remove default margin */
         padding: 0; /* Remove default padding */
     }
-
+#filter-form-mobile {
+    display: none; /* Hidden by default */
+}
         img {
             border-radius: 30px;
             transition: transform 0.3s ease;
@@ -35,74 +39,30 @@
         }
 
         img:hover {
-            transform: scale(1.1);
+            transform: scale(1.02);
         }
 
-   .form-container {
-            margin: 40px auto;
-            width: 60%;
-            background-color: #fff;
-            padding: 40px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            box-sizing: border-box;
+        .button {
+            border-radius: 30px;
+            padding: 15px;
+            background-color: white;
+            font-weight: bold;
+            color: black;
+            border: none;
+            cursor: pointer;
         }
 
         .input-field {
-            margin-bottom: 30px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 18px;
-            color: #333;
-        }
-
-        input[type="text"],
-        select,
-        #description-editor,
-        #benefit-editor {
-            width: 100%;
-            padding: 10px;
             border-radius: 5px;
+            padding: 5px;
             border: 1px solid #ccc;
-            font-size: 16px;
-            color: #333;
-            box-sizing: border-box;
         }
 
-        input[type="file"] {
-            border: none;
+        .form-container {
+            margin: auto;
+            width: 50%;
+            padding: 10px;
         }
-    .button {
-    border-radius: 30px;
-    padding: 15px;
-    background-color: white;
-    font-weight: bold;
-    color: black;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth transition for background color */
-}
-
-.publish-button {
-    width: 100%; /* Full width */
-    padding: 20px 0; /* Vertical padding */
-    font-size: 20px; /* Font size */
-    background-color: #2874A6; /* Background color */
-    color: white; /* Text color */
-    border-radius: 30px; /* Border radius */
-    border: none; /* No border by default */
-    cursor: pointer; /* Pointer cursor on hover */
-    transition: transform 0.3s ease, border 0.3s ease; /* Smooth transition for transform and border */
-}
-
-.publish-button:hover {
-    transform: scale(1.03); /* Scale up on hover */
-    border: 2px solid black; /* Thin black border on hover */
-}
-
 
         .project img {
             max-width: 300px; /* Adjust the width as needed */
@@ -111,7 +71,44 @@
             width: auto; /* Maintain aspect ratio */
             border-radius: 30px; /* Optional: if you want rounded corners */
         }
+		
+		
+		.projects-header {
+    text-align: center; /* Center the content */
+    margin-bottom: 20px; /* Add some space below the header */
+}
 
+.projects-header h1 {
+    margin: 0; /* Remove default margin */
+    padding: 10px 0; /* Add some vertical padding */
+}
+
+.projects-header p {
+    margin: 0; /* Remove default margin */
+    color: #003056; /* Specific color for the undertitle */
+    font-style: italic; /* Optional: make it italic */
+}
+
+		
+/* Style for filter-button on desktop */
+.filter-bar .filter-button {
+    background-color: #02569d; /* Button background color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    padding: 14px 20px; /* Padding inside the button */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Font weight */
+    border-radius: 30px; /* Rounded corners */
+    cursor: pointer; /* Cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Hover effect for filter-button */
+.filter-bar .filter-button:hover {
+    background-color: #002244; /* Darker shade for hover effect */
+}
+
+	
  .top-bar {
     background-color: #003056; /* Background color of the top bar */
     height: 80px; /* Height of the top bar */
@@ -129,14 +126,6 @@
 margin: auto;
 }
 
-.logged-in-info {
-    text-align: center; /* Centers the text inside the div */
-    padding: 2px 0; /* Adds some padding above and below the text */
-    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
-    /* Other styling as needed, such as font size, color, etc. */
-}
-
-
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
     transition: transform 0.3s ease; /* Transition for the transform property */
@@ -146,7 +135,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.03); /* Scale up slightly on hover */
+    transform: scale(1.02); /* Scale up slightly on hover */
 }
 
 
@@ -184,6 +173,47 @@ margin: auto;
     transform-origin: right;
     transition: transform 0.3s;
 }
+/* Centering Pagination Wrapper */
+nav[aria-label="Page navigation"] {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center horizontally */
+    margin: 20px 0; /* Add vertical margin for spacing */
+}
+
+/* Pagination Container */
+.pagination {
+    background-color: #003056; /* Background color */
+    border-radius: 30px; /* Border radius */
+    padding: 10px; /* Inner spacing */
+    display: inline-flex; /* Align pagination items inline and allow flex properties */
+}
+
+/* Pagination Links */
+.pagination .page-link {
+    color: white; /* Text color */
+    background-color: transparent; /* Remove default background */
+    border: none; /* Remove default borders */
+    margin: 0 5px; /* Add horizontal spacing between items */
+}
+
+/* Pagination Items */
+.pagination .page-item {
+    display: inline-block; /* Display items inline */
+}
+
+/* Pagination Active Page */
+.pagination .page-item.active .page-link {
+    background-color: #02569d; /* Background for active page */
+    border-color: #02569d; /* Border for active page */
+}
+
+/* Pagination Item Hover */
+.pagination .page-item:hover .page-link {
+    background-color: #2874A6; /* Slightly lighter blue on hover */
+    border-color: #2874A6; /* Border color on hover */
+}
+
+
 
 /* Additional styles for .logo to ensure it fits well in the top bar */
 .top-bar a .logo {
@@ -211,8 +241,50 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.03); /* Scale up slightly on hover */
+    transform: scale(1.02); /* Scale up slightly on hover */
 }
+
+.voting-bar {
+    width: 90%;
+    height: 20px;
+    background-color: #ddd;
+    border-radius: 30px !important;
+    margin-top: 0px;
+    display: flex;
+}
+
+.upvotes {
+    height: 100%;
+    background-color: #4caf50;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.downvotes {
+    height: 100%;
+    background-color: #b71c1c;
+    border-radius: 30px !important;
+    transition: width 0.3s ease;
+}
+
+.upvotes, .downvotes {
+    /* Existing styles */
+    position: relative; /* Ensure the position is relative for child positioning */
+}
+
+.upvotes span, .downvotes span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Choose a contrasting color */
+    font-size: 12px; /* Adjust the font size */
+    white-space: nowrap;
+    pointer-events: none; /* Prevents blocking click events */
+}
+
+
+
 
 /* Underline effect for links that do not contain buttons */
 .top-bar a:not(:has(> button))::after {
@@ -232,7 +304,73 @@ margin: auto;
 .top-bar a:not(:has(> button)):hover::after {
     transform: scaleX(1);
 }
+.logged-in-info {
+    text-align: center; /* Centers the text inside the div */
+    padding: 2px 0; /* Adds some padding above and below the text */
+    background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
+    /* Other styling as needed, such as font size, color, etc. */
+}
+
 	
+.filter-bar {
+    background-color: #111111; /* Existing background color */
+    height: 80px; /* Existing height */
+    width: 100%; /* Full width */
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    padding: 0 20px; /* Existing padding */
+    box-sizing: border-box;
+    flex-wrap: nowrap; /* Existing no-wrap */
+}
+
+#filter-form {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center form contents */
+    width: 100%; /* Use the full width of the parent */
+    max-width: 800px; /* Set a max-width if needed */
+}
+
+.filter-item {
+    margin: 0 10px; /* Add some horizontal spacing between items */
+}
+
+/* You might need to adjust the width of inputs/selects inside filter-items */
+.filter-item input, 
+.filter-item select {
+    width: auto; /* Adjust width as needed */
+}
+
+.filter-bar .filter-item label {
+    font-size: 18px; /* Adjust the font size for labels */
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Spacing between filter items */
+}
+
+.filter-item label {
+    color: white;
+    margin-right: 10px; /* Spacing between label and input/select */
+}
+
+/* Apply styles to fields within .filter-bar */
+.filter-bar input,
+.filter-bar select {
+    border-radius: 30px;
+    padding: 15px;
+    background-color: white;
+    font-weight: bold;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+
+
+    
     .index-image {
         width: 100%;
         object-fit: cover; /* Crop the image when necessary */
@@ -282,7 +420,7 @@ margin: auto;
         }
 
         .info-box:hover {
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -343,7 +481,160 @@ margin: auto;
             font-size: 20px;
             color: black;
             margin-top: 10px;
-        }
+			}
+/* Base styles for project thumbnails */
+.project-thumbnail {
+    background-color: rgba(40, 116, 166, 0.3);
+    border-radius: 30px;
+    margin: 10px;
+    padding: 10px;
+    display: flex; /* Changed to flex to better control the layout */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: visible; /* Ensure the content is not clipped */
+}
+
+
+	.user-info {
+    color: white; /* Set the text color to match other links */
+    margin-right: 20px; /* Right margin for spacing */
+    font-size: 18px; /* Font size similar to other links */
+    font-weight: bold; /* Bold text */
+    align-self: center; /* Align vertically within the flex container */
+}
+
+/* Hover effect for project thumbnails */
+.project-thumbnail:hover {
+    transform: scale(1.02);
+}
+
+/* Image style within project thumbnails */
+.project-thumbnail img {
+    width: 90%;
+    margin-top: 20px;
+    height: 400px; /* Fixed height for images */
+    object-fit: cover;
+    border-radius: 30px;
+}
+
+/* Text style inside project thumbnails */
+.project-thumbnail h2, .project-thumbnail p {
+    margin: 0;
+    padding: 5px 0;
+    width: 90%; /* Adjust the width to match the image */
+    text-align: center; /* Center the text */
+}
+
+/* Remove absolute positioning from the description */
+.project-thumbnail p {
+    position: relative; /* Changed from absolute to relative */
+    bottom: auto; /* Remove bottom positioning */
+    overflow: visible; /* Ensure text is not clipped */
+}
+
+/* Desktop screens (larger than 1200px) */
+@media (min-width: 1445px) {
+    .project-thumbnail {
+        width: calc(33.333% - 20px); /* Three items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+}
+
+/* Medium screens (between 1024px and 1199px) */
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .project-thumbnail {
+        width: calc(50% - 20px); /* Two items per row */
+        height: auto; /* Height adjusts based on content */
+    }
+}
+
+/* Mobile screens (less than 1024px) */
+@media (max-width: 1088px) {
+    .project-thumbnail {
+        width: calc(100% - 20px); /* Full width */
+        height: auto; /* Height adjusts based on content */
+    }
+    .project-thumbnail img {
+        height: auto; /* Adjust image height for mobile */
+    }
+}
+
+
+
+.project-list {
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+    /* Overlay styles */
+    .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .overlay-content {
+        background-color: white;
+        border-radius: 30px;
+        padding: 20px;
+        max-width: 80%;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+		display: none;
+    }
+	
+	/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
@@ -353,27 +644,18 @@ margin: auto;
     /* Add any other button-specific styles here */
 }
 }
+
 #hamburger-button {
+    display: none; /* Hidden by default */
+	}
+	
+#hamburger-button-filter {
     display: none; /* Hidden by default */
 	}
 @media only screen and (max-width: 1080px) {
     html, body {
         max-width: 100vw; /* Prevent horizontal overflow */
         overflow-x: hidden; /* Hide horizontal scrollbar */
-    }
-    .top-bar {
-        width: 100%; /* Full width of the screen */
-        display: flex;
-        justify-content: space-between; /* Space items evenly */
-        align-items: center; /* Center items vertically */
-        padding: 0 10px; /* Padding on the sides */
-        box-sizing: border-box; /* Include padding in width calculation */
-    }
-    .hamburger-menu {
-        position: absolute; /* Adjust to absolute positioning */
-        right: 10px; /* Align to the right with some space */
-        top: 10px; /* Align to the top with some space */
-        z-index: 1000; /* Ensure it's above other elements */
     }
 
     body {
@@ -391,7 +673,11 @@ margin: auto;
         font-size: 18px; /* Slightly smaller font size */
         padding: 15px 0; /* Adjust padding */
     }
-
+.filter-bar .filter-button {
+        /* Add any desktop-specific styles here */
+        padding: 10px 20px; /* Example: different padding */
+        margin-left: 10px; /* Add space between button and preceding elements */
+    }
 	
 	/* Hamburger Menu Button */
 #hamburger-button {
@@ -402,7 +688,14 @@ margin: auto;
     border: none; /* No border */
     cursor: pointer; /* Pointer cursor */
 }
-
+#hamburger-button-filter {
+    display: none; /* Hidden by default */
+    font-size: 20px; /* Icon size */
+    color: white; /* Icon color */
+    background-color: #111111; /* No background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor */
+}
 /* Navigation Overlay */
 .nav-overlay {
     display: none; /* Hidden by default */
@@ -417,12 +710,26 @@ margin: auto;
     z-index: 1000; /* High z-index to ensure it's on top */
 }
 
-.nav-overlay-active {
-display: block;
+
+#filter-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    overflow-x: hidden; /* Hide horizontal overflow */
+    transition: 0.5s;
+    z-index: 1000;
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
 }
 .nav-overlay-active .main-content {
     pointer-events: none;
 }
+
+
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
@@ -430,28 +737,115 @@ display: block;
         max-width: 100vw; /* Prevent horizontal overflow */
         overflow-x: hidden; /* Hide horizontal scrollbar */
     }
-    .top-bar {
-        width: 100%; /* Full width of the screen */
-        display: flex;
-        justify-content: space-between; /* Space items evenly */
-        align-items: center; /* Center items vertically */
-        padding: 0 10px; /* Padding on the sides */
-        box-sizing: border-box; /* Include padding in width calculation */
-    }
-    .hamburger-menu {
-        position: absolute; /* Adjust to absolute positioning */
-        right: 10px; /* Align to the right with some space */
-        top: 10px; /* Align to the top with some space */
-        z-index: 1000; /* Ensure it's above other elements */
-    }
 
     #hamburger-button {
         display: block; /* Show the button on mobile */
     }
 
+ #hamburger-button-filter {
+        display: block; /* Show the button on mobile */
+		  width: 100%; /* Make it span the entire width of the screen */
+            text-align: center; /* Center the icon/text inside the button */
+            padding: 10px 0; /* Adjust padding as needed for better touch area */
+      
+    }
     .top-bar a .logo {
         margin-left: auto; /* Adjust logo position */
 		margin-right: auto;
+    }
+	
+	    /* Specific styles for filter form in overlay */
+#filter-form-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Stretch items to fill the width */
+    justify-content: center;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    margin: auto;
+    border-radius: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+#filter-form-mobile .filter-button {
+    padding: 15px 15px;
+    background-color: #003056; /* Adjust the color as needed */
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#filter-form-mobile .filter-button:hover {
+    background-color: #004680; /* Darker shade for hover effect */
+}
+
+
+#filter-form-mobile #search {
+    width: 100%;
+    padding: 15px; /* Adjust padding if necessary */
+    margin-bottom: 10px; /* Consistent margin with other fields */
+    border-radius: 30px; /* Consistent border-radius with other fields */
+    border: 1px solid #ccc; /* Consistent border */
+    font-size: 16px; /* Consistent font size */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+#filter-form-mobile .filter-item {
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center items horizontally */
+    width: 100%; /* Ensure each item takes full width */
+    margin-bottom: 10px; /* Spacing between filter items */
+}
+
+
+
+.filter-input {
+    width: 100%; /* Ensures full width */
+    padding: 10px 15px; /* Consistent padding for all elements */
+    border-radius: 5px; /* Consistent border-radius */
+    border: 1px solid #ccc; /* Consistent border style */
+    font-size: 16px; /* Consistent font size */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Style for input and select elements in filter-form-mobile */
+#filter-form-mobile .filter-item input,
+#filter-form-mobile .filter-item select {
+    width: 100%;
+	outline: 5px solid #003056;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 30px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Style for labels (titles) in filter-form-mobile */
+#filter-overlay #filter-form-mobile .filter-item label {
+    display: block;
+    font-weight: bold;
+    font-size: 30px; /* Increased font size for clarity */
+    margin-bottom: 5px; /* Space between label and field */
+    text-align: center !important; /* Force center align the text */
+}
+
+    /* Ensure filter bar is hidden on mobile */
+    .filter-bar {
+        display: none;
+    }
+
+    /* Additional styles for filter overlay to prevent overflow */
+    #filter-overlay {
+        overflow-y: auto; /* Enable vertical scrolling if needed */
     }
 
     #nav-links {
@@ -474,20 +868,6 @@ display: block;
         max-width: 100vw; /* Prevent horizontal overflow */
         overflow-x: hidden; /* Hide horizontal scrollbar */
     }
-    .top-bar {
-        width: 100%; /* Full width of the screen */
-        display: flex;
-        justify-content: space-between; /* Space items evenly */
-        align-items: center; /* Center items vertically */
-        padding: 0 10px; /* Padding on the sides */
-        box-sizing: border-box; /* Include padding in width calculation */
-    }
-    .hamburger-menu {
-        position: absolute; /* Adjust to absolute positioning */
-        right: 10px; /* Align to the right with some space */
-        top: 10px; /* Align to the top with some space */
-        z-index: 1000; /* Ensure it's above other elements */
-    }
 
     .top-bar {
         flex-direction: row; /* Align items horizontally */
@@ -495,6 +875,10 @@ display: block;
         align-items: center; /* Vertically center items */
         padding: 10px 15px; /* Consistent padding */
     }
+	
+	.filter-bar {
+	display: none;
+	}
 
     .top-bar a {
         display: flex; /* Flex container for the logo */
@@ -512,7 +896,11 @@ display: block;
         margin: 0; /* Remove any margin */
         align-self: center; /* Explicitly center the button vertically */
     }
-
+    #hamburger-button-filter {
+        display: block; /* Show the button on mobile */
+        margin: 0; /* Remove any margin */
+        align-self: center; /* Explicitly center the button vertically */
+    }
    
         #nav-links {
         display: flex;
@@ -526,6 +914,7 @@ display: block;
         font-size: 24px; /* Font size for links */
     }
 }
+}
 
 
     </style>
@@ -533,7 +922,7 @@ display: block;
 
 {% if current_user.is_authenticated %}
     <div class="logged-in-info">
-        Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+        Angemeldet als Admin: {{ current_user.name }}, ID: {{ current_user.id }}
     </div>
 {% endif %}
 <div class="top-bar">
@@ -559,88 +948,90 @@ display: block;
         </div>
     </div>
 </div>
-<div class="form-container">
-
-    <h1>Delete Project Submissions</h1>
-    <form id="sortForm" method="GET" action="{{ url_for('admintools') }}">
-        <label for="search">Search by name:</label>
-        <input type="text" id="search" name="search" value="{{ search_query }}" onkeyup="submitForm()">
-
-   
-        <label for="sort">Sort projects by:</label>
-        <select name="sort" id="sort" onchange="submitForm()">
-            <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Score (Highest first)</option>
-            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
-            <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
-            <option value="category" {% if sort == 'category' %}selected{% endif %}>Category</option>
-            <option value="user_id" {% if sort == 'user_id' %}selected{% endif %}>User ID</option>
-            <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Upvotes</option>
-            <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Downvotes</option>
-            <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Number of Comments</option>
-			<option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Title (A-Z)</option>
-			<option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Title (Z-A)</option>
-	</select>
-    </form>
 
 
 
-<ul>
-    {% for project in projects %}
-        <li>
-            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" width="100" height="100">
-            <strong>{{ project.name }}</strong> - Category: {{ project.category }} <br>
-            Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
-            Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
-            <form method="POST" action="{{ url_for('admintools') }}">
-                <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit" name="delete_project">Delete</button>
-                <button type="submit" name="mark_important">Mark as Important</button>
-                <button type="submit" name="mark_featured">Mark as Featured</button> <!-- New button to mark as featured -->
-            </form>
-            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
-        </li>
-    {% endfor %}
-</ul>
+        <h1>Delete Project Submissions</h1>
+        <!-- Form for sorting and searching projects -->
+        <form id="sortForm" method="GET" action="{{ url_for('admintools') }}">
+            <label for="search">Search by name:</label>
+            <input type="text" id="search" name="search" value="{{ search_query }}" onkeyup="submitForm()">
+
+            <label for="sort">Sort projects by:</label>
+            <select name="sort" id="sort" onchange="submitForm()">
+                <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Score (Highest first)</option>
+                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+                <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
+                <option value="category" {% if sort == 'category' %}selected{% endif %}>Category</option>
+                <option value="user_id" {% if sort == 'user_id' %}selected{% endif %}>User ID</option>
+                <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Upvotes</option>
+                <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Downvotes</option>
+                <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Number of Comments</option>
+                <option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Title (A-Z)</option>
+                <option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Title (Z-A)</option>
+            </select>
+        </form>
+
+<div class="project-list">
+    {% with project_page=paginated_projects.page %}
+        {% include 'partials/project_list_section.html' %}
+    {% endwith %}
+</div>
 
 
+
+
+
+
+<!-- Important Projects Section -->
 <h2>Important Projects</h2>
-<ul>
+<div class="project-list">
     {% for project in important_projects %}
-        <li>
-            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" width="100" height="100">
-            <strong>{{ project.name }}</strong> - Category: {{ project.category }} <br>
-            Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
-            Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+        <div class="project-thumbnail">
+            <h3>{{ project.name }}</h3>
+            <p class="project-date">Category: {{ project.category }}</p>
+            <div class="project-details">
+                Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
+                Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+            </div>
+            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+                <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
+            </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
                 <button type="submit" name="unmark_important">Unmark as Important</button>
             </form>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
-        </li>
+        </div>
     {% else %}
-        <li>No important projects found.</li>
+        <p>No important projects found.</p>
     {% endfor %}
-</ul>
+</div>
 
-
+<!-- Featured Projects Section -->
 <h2>Featured Projects</h2>
-<ul>
+<div class="project-list">
     {% for project in featured_projects %}
-        <li>
-            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" width="100" height="100">
-            <strong>{{ project.name }}</strong> - Category: {{ project.category }} <br>
-            Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
-            Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+        <div class="project-thumbnail">
+            <h3>{{ project.name }}</h3>
+            <p class="project-date">Category: {{ project.category }}</p>
+            <div class="project-details">
+                Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
+                Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+            </div>
+            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+                <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
+            </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
                 <button type="submit" name="unmark_featured">Unmark as Featured</button>
             </form>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
-        </li>
+        </div>
     {% else %}
-        <li>No featured projects found.</li>
+        <p>No featured projects found.</p>
     {% endfor %}
-</ul>
+</div>
 
 
 <h1>Delete Users and Contributions</h1>
@@ -652,23 +1043,116 @@ display: block;
     <input type="text" id="searchUserById" name="searchUserById" value="{{ search_user_id_query }}" onkeyup="submitUserSearchForm()">
 </form>
 
-<ul>
+<div class="project-list">
     {% for user in users %}
-        <li>
-            User: {{ user.name }} (ID: {{ user.id }}) <br>
+        <div class="project-thumbnail">
+            <h3>{{ user.name }} (ID: {{ user.id }})</h3>
+            <div class="project-details">
+                Projects created: {{ user.project_count }} <br>
+                Map objects created: {{ user.map_object_count }} <br>
+                Comments posted: {{ user.comment_count }} <br>
+                Account created on: {{ user.account_creation.strftime('%Y-%m-%d %H:%M:%S') }}
+            </div>
             <form method="POST" action="{{ url_for('delete_user') }}" onsubmit="return confirmUserDeletion()">
                 <input type="hidden" name="user_id" value="{{ user.id }}">
                 <button type="submit">Delete User</button>
             </form>
-        </li>
+        </div>
+    {% else %}
+        <p>No users found.</p>
     {% endfor %}
-</ul>
+</div>
+
+
+
+<h2>Comments</h2>
+<div class="project-list">
+    {% for comment in comments %}
+        <div class="project-thumbnail">
+            <p>"{{ comment.text }}"</p>
+            <div class="project-details">
+                <p>Project commented on: 
+                    <a href="{{ url_for('project_details', project_id=comment.project_id) }}">
+                        {{ comment.project_name }}
+                    </a>
+                </p>
+                <p>Author of comment: {{ comment.author_name }} (ID: {{ comment.author_id }})</p>
+                <p>Time: {{ comment.timestamp }}</p>
+            </div>
+            <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
+                <button type="submit">Delete Comment</button>
+            </form>
+        </div>
+    {% else %}
+        <p>No comments found.</p>
+    {% endfor %}
+</div>
 
 
 
 
-	</div>
 	
 	
 </body>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    attachPaginationEventListeners();
+});
+
+function attachPaginationEventListeners() {
+    const paginationLinks = document.querySelectorAll('.ajax-pagination-link');
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const url = this.getAttribute('href');
+            updatePaginationContent(url);
+        });
+    });
+}
+
+function updatePaginationContent(url) {
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(response => response.text())
+        .then(html => {
+            const container = document.getElementById('project-list-container');
+            container.innerHTML = html;
+            attachPaginationEventListeners(); // Reattach event listeners to new pagination links
+        })
+        .catch(error => console.error('Error:', error));
+}
+</script>
+
+
+
+
+
+<script>
+function deleteComment(commentId) {
+    if (!confirm("Are you sure you want to delete this comment?")) {
+        return; // Do nothing if user cancels the confirmation
+    }
+
+    // Send the AJAX request
+    fetch('/delete_comment/' + commentId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the comment from the DOM
+            const commentElement = document.getElementById('comment-' + commentId);
+            commentElement.remove();
+        } else {
+            alert(data.message); // Show error message
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
+
 </html>
