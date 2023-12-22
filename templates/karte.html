@@ -1904,15 +1904,21 @@ margin: auto;
 
 
 <!-- Marker Placing Overlay -->
+<!-- Marker Placing Overlay -->
 <div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:10000;">
-<div id="overlay-content" style="position:absolute; top:50%; left:50%; text-align: center; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px;">
+    <div id="overlay-content" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px; width: 80%; max-width: 500px; text-align: center;">
         <h2>Add a new marker to the map!</h2>
-        <p>First, choose a category in the dropdown below.</p>
-        <p>Then, write the text of your marker below in the text field.</p>
-        <p>Finally, press the "post a marker" button, for the overlay to disappear. Then, click anywhere on the map. You will then be asked "are you sure you want to place your marker here?" Click "yes", and the marker will be placed where you wanted it!</p>
+  <p style="font-size: 14px;">
+                <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Click here, to get the full experience.</a>
+            </p>        
+        <!-- Wrapper div for the select and the textarea -->
+        <div style="width: 100%; box-sizing: border-box; text-align: center;">
+		
 
-<select id="marker-category" onchange="logSelectedCategory()">
-                        <option value="Transport">Transport</option>
+		        <p>1. Select category:</p>
+
+            <select id="marker-category" onchange="updateMarkerCategoryDescription()" style="width: 100%; box-sizing: border-box; text-align: center;">
+                <option value="Transport">Transport</option>
             <option value="Öffentliche Plätze">Öffentliche Plätze</option>
             <option value="Umwelt">Umwelt</option>
             <option value="Verwaltung">Verwaltung</option>
@@ -1921,16 +1927,25 @@ margin: auto;
             <option value="Gesundheit">Gesundheit</option>
             <option value="Sport">Sport</option>
             <option value="Andere">Andere</option>
-        </select>
-        <br><br>
-        <textarea id="marker-description" rows="7" cols="100"></textarea>
-        <br><br>
-		<div class="button-container">
-        <button onclick="postMarker()" class="register-button">Hinzufügen</button>
-		    </div>
+       </select>
+            <br><br>
+								        <p>What is the selected category used for?</p>
+
+					        <p id="marker-category-description" style="color:#003056;"></p> <!-- Description will appear here -->
+
+
+					        <p>2. Write a description:</p>
+
+            <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left;"></textarea>
+        </div>
+        
+        <br>
+		<p>3. Place it on the map:</p>
+        <div class="button-container">
+            <button onclick="postMarker()" class="register-button">Hinzufügen</button>
+        </div>
     </div>
 </div>
-
 
 <div>
     <div id="mobileCategoryOverlay"></div>
@@ -2263,6 +2278,7 @@ function openMarkerOverlay(event) {
         overlay.style.display = 'block';
         console.log("Marker overlay opened");
         logSelectedCategory();
+		    updateMarkerCategoryDescription(); // Update the category description
  } else {
     console.error('Marker overlay element not found');
 }
@@ -2285,6 +2301,50 @@ function initializeEventListeners() {
 
 // Call the function to initialize the event listeners
 initializeEventListeners();
+
+function updateMarkerCategoryDescription() {
+    const categorySelect = document.getElementById("marker-category");
+    const categoryDescription = document.getElementById("marker-category-description");
+    const selectedOption = categorySelect.value;
+
+    let categoryText = "";
+
+    switch (selectedOption) {
+        case "Transport":
+            categoryText = "Wünschen Sie sich einen neuen Radweg? Eine neue Busverbindung? Gibt es Probleme mit dem Parken?";
+            break;
+        case "Öffentliche Plätze":
+            categoryText = "Sollen öffentliche Plätze umgestaltet werden? Braucht es mehr Grünflächen?";
+            break;
+        case "Umwelt":
+            categoryText = "Ist Ihnen Umweltverschmutzung aufgefallen? Haben Sie Ideen, um die Stadt sauberer, ökologischer oder Zukunftsfit zu machen?";
+            break;
+        case "Verwaltung":
+            categoryText = "Gibt es Ideen für bessere Dienste der Verwaltung? Vorschläge, öffentliche Veranstaltungen betreffen?";
+            break;
+        case "Kultur":
+            categoryText = "Gibt es Ideen für Veranstaltungen, Kunstinstallationen, Theater oder Literatur?";
+            break;
+        case "Bildung":
+            categoryText = "Welche Dinge im Bereich der Bildung, Schulen und Hochschulen können wir als Gemeinde verbessern?";
+            break;
+        case "Gesundheit":
+            categoryText = "Ideen zum Thema Gesundheit? Verbesserungsvorschläge für medizinische Einrichtungen oder gesundheitsfördernde Maßnahmen?";
+            break;
+        case "Sport":
+            categoryText = "Ideen zu Sportveranstaltungen, Sportplätzen oder städtischen Kursen?";
+            break;
+        case "Andere":
+            categoryText = "Haben Sie einen eigenen Vorschlag, der in keine der genannten Kategorien passt? Teilen Sie Ihre Idee uns mit!";
+            break;
+        default:
+            categoryText = "Bitte wählen Sie eine Kategorie aus.";
+            break;
+    }
+
+    categoryDescription.textContent = categoryText;
+}
+
 
 
    // Function to handle posting a marker
