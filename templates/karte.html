@@ -61,17 +61,17 @@ body, html {
 
 .resistant-h3 {
     color: var(--text-color); /* Use the text color based on the current theme */
-    /* Add other styles as needed */
+    /* Add Andere styles as needed */
 }
 
 .filterx-container {
 display:none !important;
 }
 
-/* Add this to your CSS file or within a <style> tag in your HTML */
+/* Add this to your CSS file or within a tag in your HTML */
 .button-hover-effect {
     display: inline-block;
-    background-color: #3a3a3a;
+    background-color: #111111;
     padding: 5px 7px;
     text-decoration: none;
     border-radius: 30px;
@@ -103,7 +103,7 @@ display:none !important;
 
 .downvotes {
     height: 100%;
-    background-color: #b71c1c;
+    background-color: #B71C1C;
     border-radius: 30px !important;
     transition: width 0.3s ease;
 }
@@ -118,7 +118,7 @@ display:none !important;
     height: 100%;
     background-color: black; /* Black background */
     color: white; /* White text color */
-    z-index: 9999; /* Ensure it's on top of other elements */
+    z-index: 9999; /* Ensure it's on top of Andere elements */
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
@@ -145,7 +145,7 @@ display:none !important;
     height: 100%;
     background-color: black; /* Black background */
     color: white; /* White text color */
-    z-index: 9999; /* Ensure it's on top of other elements */
+    z-index: 9999; /* Ensure it's on top of Andere elements */
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
@@ -229,9 +229,9 @@ display:none !important;
 }
 
 	.user-info {
-    color: white; /* Set the text color to match other links */
+    color: white; /* Set the text color to match Andere links */
     margin-right: 20px; /* Right margin for spacing */
-    font-size: 18px; /* Font size similar to other links */
+    font-size: 18px; /* Font size similar to Andere links */
     font-weight: bold; /* Bold text */
     align-self: center; /* Align vertically within the flex container */
 }
@@ -403,8 +403,8 @@ display: none !important;
 
 .leaflet-control-layers-selector {
     color: #ffffff !important;
-	
-    margin: 2px !important;
+
+    margin: 2px;
 }
 
 .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
@@ -445,7 +445,7 @@ display: none !important;
 
 .leaflet-popup-tip {
     display: block; /* Optional: hides the tip arrow for a cleaner look */
-    background-color: var(--popup-bg-color) !important;
+    background-color: #f5f1e4 !important;
 }
 	
 	  .leaflet-popup-close-button {
@@ -682,19 +682,7 @@ display: none !important;
     max-height: 40px;
     width: 100%;
 }
-/* BUTTON SMALL SIDEBAR CSS END */
-  /* HOVER AND SELECTED BUTTON EFFECT CSS START */
-        /* Hover effect */
-        .button-s:hover,
-        .categorybutton:hover,
-        .save-note:hover,
-        .key-div:hover,
-        .pinlist-div:hover,
-        .info-div:hover,
-        .lightswitch-div:hover {
-             filter: brightness(115%) !important;
-    outline: 3px solid var(--outline-hover-color) !important; /* Use custom property */
-}
+
 
 
 /* INFO-POPUP CONTAINER CSS START */
@@ -824,7 +812,7 @@ display: none !important;
 
 
 .hidden {
-    display: none !important; // !important to override any other display property
+    display: none !important; // !important to override any Andere display property
 }
 #popup-overlay {
     display: none;
@@ -835,7 +823,7 @@ display: none !important;
     height: 100%;
     border-radius: 30px;
     background-color: rgba(0, 0, 0, 0.5); /* Overlay background */
-    z-index: 1000; /* Ensure it's above other content */
+    z-index: 1000; /* Ensure it's above Andere content */
 }
 
 #popup-content {
@@ -882,7 +870,7 @@ display: none !important;
 .dismiss-button {
     border-radius: 30px;
 	margin-right: 50px;
-    /* Add other styling as needed, e.g., padding, border, background-color, etc. */
+    /* Add Andere styling as needed, e.g., padding, border, background-color, etc. */
 }
 
 #popup-text .ql-align-center {
@@ -905,11 +893,16 @@ display: none !important;
   text-align: center;
 }
 
+.custom-marker-icon img {
+    display: none !important;
+}
+
+
 .logged-in-info {
     text-align: center; /* Centers the text inside the div */
     padding: 2px 0; /* Adds some padding above and below the text */
     background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
-    /* Other styling as needed, such as font size, color, etc. */
+    /* Andere styling as needed, such as font size, color, etc. */
 }
 
 
@@ -989,7 +982,7 @@ display: none !important;
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 1; /* Ensures the container is above other content */
+    z-index: 1; /* Ensures the container is above Andere content */
 }
 
 
@@ -1068,7 +1061,6 @@ margin-bottom: 50px;
     max-width: 90%;
     height: auto;
     box-sizing: border-box;
-    transition: background-color 0.2s ease-in-out;
     border-radius: 30px;
     text-align: center;
     border: none;
@@ -1080,33 +1072,14 @@ margin-bottom: 50px;
 }
 
 
-    .categorybutton:hover {
-        filter: brightness(115%);
-        outline: 3px solid white;
-        outline-offset: -3px;
-    }
 
-    .categorybutton.selected {
-        filter: brightness(115%);
-        outline: 5px solid white;
-        outline-offset: -5px;
-    }
      
         .categorybutton h3 {
             margin: 0; /* Removes any default margin */
             color: white;
         }
 		
-.button-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-}
+
 #search-filter-section {
     display: none;
 	
@@ -1374,18 +1347,22 @@ margin-bottom: 50px;
         .register-button {
         background-color: #003056; /* Example color */
         color: white;
-        border: none;
+        border: 7px solid white;
         border-radius: 30px;
-        padding: 15px 30px;
+        padding: 5px 5px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        font-size: 16px;
+		font-weight: bold;
+        font-size: 24px;
         margin: auto;
+		margin-top: 0px !important;
+		margin-bottom: 0px;
         cursor: pointer;
         width: 90%; /* Full width */
         box-sizing: border-box; /* Include padding in width */
     }
+
 
 
 .button-container {
@@ -1393,7 +1370,7 @@ margin-bottom: 50px;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically if needed */
     width: 100%; /* Take full width of the parent */
-    margin-top: 20px; /* Add some space on top */
+    margin-top: 0px; /* Add some space on top */
 }
 
 
@@ -1433,7 +1410,7 @@ margin-bottom: 50px;
     padding: 20px 20px; /* Add padding to the left and right */
     box-sizing: border-box; /* Include padding in width calculation */
     align-items: center; /* This ensures vertical alignment */
-    z-index: 10000; /* Ensures the top bar is above other content */
+    z-index: 10000; /* Ensures the top bar is above Andere content */
     position: fixed; /* Fixed positioning to keep the bar at the top */
     top: 0; /* Align to the top */
     left: 0; /* Align to the left */
@@ -1449,7 +1426,7 @@ margin: auto;
 .top-bar a button {
     transition: transform 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
-    /* Add any other button-specific styles here */
+    /* Add any Andere button-specific styles here */
 }
 
 /* Hover effect for buttons inside links in the top bar */
@@ -1671,7 +1648,7 @@ margin: auto;
     transition: transform 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
-    /* Add any other button-specific styles here */
+    /* Add any Andere button-specific styles here */
 }
 
 }
@@ -1863,6 +1840,26 @@ margin: auto;
     }
 }
  </style>
+ 
+ <style>
+    /* Scale logo image on hover */
+    img.logo:hover {
+        transform: scale(1.02);
+        transition: transform 0.3s ease;
+    }
+
+/* Hover effect for category buttons (dynamically generated) */
+#category-toggle-buttons button:hover {
+    transform: scale(0.96);
+	outline: 3px solid #111111;
+}
+    /* Scale register buttons on hover */
+    .register-button:hover {
+        transform: scale(1.02);
+        transition: transform 0.3s ease;
+    }
+</style>
+
 <body>
 
 <!-- Top Bar -->
@@ -1894,31 +1891,42 @@ margin: auto;
     </div>
 </div>
 
+<!-- Custom Confirmation Dialog -->
+<div id="custom-confirm" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.0); z-index: 10000; text-align: center;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 30px;">
+        <p style="font-weight: bold; color: black;  font-size: 1vw;">Are you sure you want to place your marker here?</p>
+        <button id="confirm-yes" class="register-button" style="background-color: #0e3a3a !important;">Yes</button>
+        <button id="confirm-no" class="register-button" style="background-color: #de3a3a !important; margin-top: 10px !important;">No</button>
+    </div>
+</div>
+
 
 
 <!-- Marker Placing Overlay -->
-<div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:1000;">
-    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:10px;">
+<div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:10000;">
+<div id="overlay-content" style="position:absolute; top:50%; left:50%; text-align: center; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px;">
         <h2>Add a new marker to the map!</h2>
         <p>First, choose a category in the dropdown below.</p>
         <p>Then, write the text of your marker below in the text field.</p>
         <p>Finally, press the "post a marker" button, for the overlay to disappear. Then, click anywhere on the map. You will then be asked "are you sure you want to place your marker here?" Click "yes", and the marker will be placed where you wanted it!</p>
 
-        <select id="marker-category">
+<select id="marker-category" onchange="logSelectedCategory()">
                         <option value="Transport">Transport</option>
             <option value="Öffentliche Plätze">Öffentliche Plätze</option>
-            <option value="Environment">Umwelt</option>
+            <option value="Umwelt">Umwelt</option>
             <option value="Verwaltung">Verwaltung</option>
-            <option value="Culture">Kultur</option>
-            <option value="Education">Bildung</option>
-            <option value="Health">Gesundheit</option>
+            <option value="Kultur">Kultur</option>
+            <option value="Bildung">Bildung</option>
+            <option value="Gesundheit">Gesundheit</option>
             <option value="Sport">Sport</option>
-            <option value="Other">Andere</option>
+            <option value="Andere">Andere</option>
         </select>
         <br><br>
-        <textarea id="marker-description" rows="4" cols="50"></textarea>
+        <textarea id="marker-description" rows="7" cols="100"></textarea>
         <br><br>
-        <button onclick="postMarker()">Post a Marker</button>
+		<div class="button-container">
+        <button onclick="postMarker()" class="register-button">Hinzufügen</button>
+		    </div>
     </div>
 </div>
 
@@ -1944,7 +1952,6 @@ margin: auto;
 <div id="sidebar">
 
 
-<button id="hideNonMapMarkers">Hide Non-Map Markers</button>
 
 
 <h3 class="hide-on-mobile resistant-h3" style="display: none; text-align: center; margin-top: 5px;">
@@ -1976,6 +1983,14 @@ margin: auto;
 
 
 
+<div class="button-container">
+        <button id="open-overlay" class="register-button" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
+    </div>
+	
+	<div class="button-container">
+
+	<button id="hideNonMapMarkers" class="register-button" style="margin-bottom: 10px">Hide Non-Map Markers</button>
+    </div>
 
 <?php CITY LOGO START ?>
 <img class="hide-on-mobile resistant-image" id="overlay-image" src="static/overlay.jpg" style="max-width: 97%; height: auto; display: block; margin-left:auto; margin-right:auto; margin-top: 3px; margin-bottom: 20px; border-radius: 30px; max-height: 368px;"/>
@@ -1991,9 +2006,7 @@ margin: auto;
       Klicken Sie zum ein- und ausblenden.
      </h3>
 <div id="category-toggle-buttons">
-<div class="button-container">
-        <button id="open-overlay" class="register-button" onclick="openMarkerOverlay()">Open Marker placing overlay</button>
-    </div>
+
     <!-- Buttons will be added here dynamically -->
 </div>
 
@@ -2145,6 +2158,13 @@ map.on('baselayerchange', function(e) {
 L.control.layers(baseLayers).addTo(map);
 
 
+// Global variable to store the future marker icon and details
+let futureMarker = {
+    icon: null,
+    category: '',
+    description: ''
+};
+
     // Function to create a colored circle icon
 // Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor) {
@@ -2167,17 +2187,10 @@ function createIcon(pinSize, outlineSize, fillColor) {
     });
 }
 
-function addMarker(latlng, category, description) {
-    console.log("Adding marker at:", latlng);
 
-    var fillColor = getCategoryColor(category);
-    var markerIcon = createIcon(24, 2, fillColor);
 
-    var marker = L.marker(latlng, { icon: markerIcon });
-    marker.bindPopup(`<strong>${category}</strong><br>${description}`).addTo(map);
 
-    console.log("Marker added to the map:", marker);
-}
+
 
 // Function to create a simple SVG icon for cursor
 function createCursorIcon(fillColor) {
@@ -2188,15 +2201,48 @@ function createCursorIcon(fillColor) {
 }
 
 // Function to set map cursor
-function setMapCursor(category, fillColor) {
-    console.log("Attempting to set map cursor...");
-
-    var cursorIconUrl = createCursorIcon(fillColor);
+function setMapCursor() {
+    var cursorIconUrl = futureMarker.icon;
     document.getElementById('map').style.cursor = `url('${cursorIconUrl}') 12 12, auto`;
-    
-    console.log("ready to place, custom cursor icon activated");
-    console.log(`Map cursor set to category icon: ${category}`);
+    console.log("Map cursor set to future marker icon");
+
+    // Add a one-time click event listener to the map for placing the marker
+    map.once('click', function(e) {
+        console.log("Map clicked at:", e.latlng);
+
+        // Create a temporary marker
+        var tempMarker = L.marker(e.latlng, {
+            icon: createIcon(24, 2, getCategoryColor(futureMarker.category))
+        }).addTo(map);
+        console.log("Temporary marker created at:", e.latlng); // Debug
+
+        // Show custom confirmation
+        showCustomConfirm(e.latlng, tempMarker);
+    });
 }
+
+function showCustomConfirm(latlng, tempMarker) {
+    var confirmDiv = document.getElementById('custom-confirm');
+    confirmDiv.style.display = 'block';
+    
+    // Handle Yes button click
+    document.getElementById('confirm-yes').onclick = function() {
+        addMarker(latlng, futureMarker.category, futureMarker.description);
+        confirmDiv.style.display = 'none';
+        console.log("Marker placed at:", latlng);
+        resetMapCursor();
+    };
+
+    // Handle No button click
+    document.getElementById('confirm-no').onclick = function() {
+        map.removeLayer(tempMarker);
+        confirmDiv.style.display = 'none';
+        console.log("Marker placement cancelled");
+        resetMapCursor();
+    };
+}
+
+
 
 // Function to reset map cursor
 function resetMapCursor() {
@@ -2210,32 +2256,63 @@ function resetMapCursor() {
 
 
 // Function to open marker overlay
-    function openMarkerOverlay() {
-    document.getElementById('marker-overlay').style.display = 'block';
-    console.log("Marker overlay opened");
+function openMarkerOverlay(event) {
+    var overlay = document.getElementById('marker-overlay');
+    if (overlay) {
+        overlay.style.display = 'block';
+        console.log("Marker overlay opened");
+        logSelectedCategory();
+ } else {
+    console.error('Marker overlay element not found');
 }
+
+    // Stop propagation to document
+    if (event) {
+        event.stopPropagation();
+    }
+}
+
+
 	
-   // Function to handle posting a marker
-    function postMarker() {
-    document.getElementById('marker-overlay').style.display = 'none';
-    console.log("Ready to place marker on map");
-    console.log("postMarker function called");
-
-    var selectedCategory = document.getElementById('marker-category').value;
-    var fillColor = getCategoryColor(selectedCategory);
-    setMapCursor(selectedCategory, fillColor);
-
-    map.once('click', function(e) {
-        if (confirm("Are you sure you want to place your marker here?")) {
-            addMarker(e.latlng, selectedCategory, document.getElementById('marker-description').value);
-            console.log("Marker placed at:", e.latlng);
-            resetMapCursor();
-        } else {
-            console.log("Marker placement cancelled");
-            resetMapCursor();
-        }
+	// Function to initialize event listeners
+function initializeEventListeners() {
+    // Attach a click event listener to the "marker-description" text area
+    document.getElementById('marker-description').addEventListener('click', function() {
+        console.log("marker-description text area clicked");
     });
 }
+
+// Call the function to initialize the event listeners
+initializeEventListeners();
+
+
+   // Function to handle posting a marker
+function postMarker() {
+    console.log("postMarker function called");
+
+    var markerOverlay = document.getElementById('marker-overlay');
+    if (markerOverlay) {
+        markerOverlay.style.display = 'none';
+        console.log("Marker overlay hidden");
+    } else {
+        console.error("Marker overlay element not found");
+        return;
+    }
+
+    // Get the selected category and description from the form
+    var selectedCategory = document.getElementById('marker-category').value;
+    var selectedDescription = document.getElementById('marker-description').value;
+
+    // Prepare the future marker details
+    futureMarker.category = selectedCategory;
+    futureMarker.description = selectedDescription;
+    var fillColor = getCategoryColor(selectedCategory);
+    futureMarker.icon = createCursorIcon(fillColor);
+
+    // Change the cursor to the future marker icon
+    setMapCursor();
+}
+
 
 
 	
@@ -2254,35 +2331,71 @@ function updateMarkerIcons() {
     }
 }
 
+// Example of adding console.log for debugging
+document.addEventListener('click', function(event) {
+    var overlay = document.getElementById('marker-overlay');
+    // console.log("Debug: overlay element", overlay); // Add this line for debugging
+
+    if (overlay && overlay.style.display === 'block' && event.target === overlay) {
+        overlay.style.display = 'none';
+        console.log("Marker overlay closed");
+    }
+});
 
 
-    // Function to get color based on category
-    function getCategoryColor(category) {
-        switch (category) {
-            case 'Transport':
-                return '#6f5cff';
-            case 'Öffentliche Plätze':
-                return '#3d3d3d';
-            case 'Environment':
-                return '#4CAF50';
-            case 'Verwaltung':
-                return '#71e5d7';
-            case 'Culture':
-                return '#494731';
-            case 'Education':
-                return '#ba82d4';
-            case 'Health':
-                return '#966577';
-            case 'Sport':
-                return '#49225a';
-            case 'Other':
-                return '#4C5454';
-            default:
-                return '#888'; // Default color
-        }
+
+
+// Function to get color based on category with added debugging
+function getCategoryColor(category) {
+    console.log("Getting color for category:", category); // Debugging: Log the category
+
+    var color;
+    switch (category) {
+        case 'Transport':
+            color = '#1565C0';
+            break;
+        case 'Öffentliche Plätze':
+            color = '#FF7043';
+            break;
+        case 'Umwelt':
+            color = '#4CAF50';
+            break;
+        case 'Verwaltung':
+            color = '#B38A58';
+            break;
+        case 'Kultur':
+            color = '#3B1C32';
+            break;
+        case 'Bildung':
+            color = '#264027';
+            break;
+        case 'Gesundheit':
+            color = '#B71C1C';
+            break;
+        case 'Sport':
+            color = '#4A001F';
+            break;
+        case 'Andere':
+            color = '#212121';
+            break;
+        default:
+            color = '#888'; // Default color
+            break;
     }
 
+    console.log(`Assigned color for category '${category}': ${color}`); // Debugging: Log the assigned color
+    return color;
+}
+
+
 var categoryLayers = {}; // Global object to hold category layers
+
+
+function logSelectedCategory() {
+    var selectedCategory = document.getElementById('marker-category').value;
+    console.log("Selected category:", selectedCategory);
+}
+
 
 function addMarkers(projects) {
     projects.forEach(project => {
@@ -2290,29 +2403,60 @@ function addMarkers(projects) {
             var coords = project.geoloc.split(',');
             var latLng = L.latLng(parseFloat(coords[0]), parseFloat(coords[1]));
             var fillColor = getCategoryColor(project.category);
+            var popupContent;
+        var isMapObject = project.is_mapobject === false; // Ensures a boolean value
 
-            // Check if descriptionwhy exists and use it, else show an empty string
-            var description = project.descriptionwhy ? project.descriptionwhy : "";
+            // Check if the project is a map object or not
+            if (project.is_mapobject) {
+                // For map objects, show simple description
+                popupContent = `<div style="text-align: center;">${project.descriptionwhy}</div>`;
+            } else {
+                // For non-map objects, show detailed popup
+                var votingDetailsHtml = `
+                    <div style="text-align: center; margin-bottom: 1px; font-size: 14px; font-weight: bold;">
+                        Gefällt: ${project.upvotes} (${project.upvote_percentage}%),
+                        Gefällt nicht: ${project.downvotes} (${project.downvote_percentage}%)
+                    </div>
+                `;
 
-            var popupContent = `
-                <div style="text-align: center;">
-                    ${description}
-                </div>
-            `;
+                var votingBarHtml = `
+                    <div class="voting-bar" style="margin-top: 1px;">
+                        <div class="upvotes" style="width: ${project.upvote_percentage}%;"></div>
+                        <div class="downvotes" style="width: ${project.downvote_percentage}%;"></div>
+                    </div>
+                `;
+
+                popupContent = `
+                    <div style="text-align: center;">
+                        <b>${project.name}</b><br>
+                        <img src="/static/usersubmissions/${project.image_file}" style="width:300px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
+                        ${votingDetailsHtml}
+                        ${votingBarHtml}
+                        <a href="/project_details/${project.id}" target="_blank" class="button-hover-effect" style="font-size: 14px; font-weight: bold; color:white !important;">
+                            Details anzeigen
+                        </a>
+                    </div>
+                `;
+            }
 
             var marker = L.marker(latLng, {
                 icon: createIcon(24, 2, fillColor),
-                category: project.category // Make sure this line is present when creating markers
+                category: project.category,
+				            isMapObject: isMapObject // Set this property
+
             }).addTo(map);
 
             marker.bindPopup(popupContent);
 
+            // Log the type of button created
             console.log(`Created a marker for the category: ${project.category}`);
-
+            
+            // Check if the layer for the category exists, if not create a new one
             if (!categoryLayers[project.category]) {
                 categoryLayers[project.category] = L.layerGroup().addTo(map);
             }
 
+            // Add the marker to the respective category layer
             marker.addTo(categoryLayers[project.category]);
         }
     });
@@ -2320,8 +2464,11 @@ function addMarkers(projects) {
 
 
 
+
+console.log("Map Initialization Started");
 fetch('/get_projects')
     .then(response => response.json())
+	
     .then(data => {
         console.log("Received data:", data);
         addMarkers(data);
@@ -2357,7 +2504,7 @@ function createCategoryButtons() {
         button.style.transition = 'background-color 0.2s ease-in-out';
         button.style.borderRadius = '30px';
         button.style.textAlign = 'center';
-        button.style.border = '3px solid #3a3a3a'; // Added black border
+        button.style.border = '3px solid #111111'; // Added black border
         button.style.flexGrow = '1';
         button.style.flexShrink = '1';
         button.style.padding = '7px';
@@ -2399,6 +2546,31 @@ function applyButtonStyles(button) {
     // ... rest of the styling ...
 }
 
+function toggleMarkerVisibility() {
+    var showMapObjectsOnly = document.getElementById('hideNonMapMarkers').innerText === "Hide Non-Map Markers";
+
+    for (var category in categoryLayers) {
+        categoryLayers[category].eachLayer(function(marker) {
+            if (showMapObjectsOnly) {
+                // Show only map objects and hide others
+                if (marker.options.isMapObject) {
+                    map.addLayer(marker);
+                } else {
+                    map.removeLayer(marker);
+                }
+            } else {
+                // Show all markers
+                map.addLayer(marker);
+            }
+        });
+    }
+
+    // Toggle button text
+    document.getElementById('hideNonMapMarkers').innerText = showMapObjectsOnly ? "Show All Markers" : "Hide Non-Map Markers";
+}
+
+
+document.getElementById('hideNonMapMarkers').addEventListener('click', toggleMarkerVisibility);
 
 function toggleCategory(categoryName) {
     for (var category in categoryLayers) {
@@ -2408,10 +2580,12 @@ function toggleCategory(categoryName) {
             if (categoryName === `${category} (${layer.getLayers().length} Beiträge)`) {
                 if (map.hasLayer(layer)) {
                     map.removeLayer(layer);
-                    button.classList.remove('faded');
+                    button.classList.add('faded');
+                    console.log("Category hidden:", category); // Debug message for hiding category
                 } else {
                     map.addLayer(layer);
-                    button.classList.add('faded');
+                    button.classList.remove('faded');
+                    console.log("Category shown:", category); // Debug message for showing category
                 }
             }
         }
@@ -2420,21 +2594,24 @@ function toggleCategory(categoryName) {
 
 function updateCategoryButtonColors() {
     const categoryColors = {
-        'Transport': '#6f5cff',
-        'Öffentliche Plätze': '#3d3d3d',
-        'Environment': '#4CAF50',
-        'Verwaltung': '#71e5d7',
-        'Culture': '#494731',
-        'Education': '#ba82d4',
-        'Health': '#966577',
-        'Sport': '#49225a',
-        'Other': '#4C5454'
+        'Transport': '#1565C0',
+        'Öffentliche Plätze': '#FF7043',
+        'Umwelt': '#4CAF50',
+        'Verwaltung': '#B38A58',
+        'Kultur': '#3B1C32',
+        'Bildung': '#264027',
+        'Gesundheit': '#B71C1C',
+        'Sport': '#4A001F',
+        'Andere': '#212121'
     };
 
     const categoryButtons = document.querySelectorAll('#category-toggle-buttons button');
 
     categoryButtons.forEach(button => {
-        const category = button.textContent.trim(); // Assuming the button's text content is the category name
+        const buttonText = button.textContent.trim();
+        const categoryMatch = buttonText.match(/^(.*?)(?=\s*\()/); // Use regex to extract the category name before the "("
+        const category = categoryMatch ? categoryMatch[0].trim() : "";
+
         const color = categoryColors[category];
         if (color) {
             button.style.backgroundColor = color;
@@ -2446,44 +2623,51 @@ function updateCategoryButtonColors() {
 updateCategoryButtonColors();
 
 
-// Inside your existing script tag or in a separate JS file
+
 
 let selectedLatLng;
 
-map.on('click', function(e) {
-    selectedLatLng = e.latlng;
-    document.getElementById('marker-input-form').style.display = 'block';
-});
 
-function addMarker() {
-    const category = document.getElementById('marker-category').value;
-    const description = document.getElementById('marker-description').value;
 
-    // Close the overlay
-    document.getElementById('marker-overlay').style.display = 'none';
-
-    // Create marker at the previously selected location
-    const marker = L.marker(selectedLatLng).addTo(map);
+function addMarker(latlng, category, description) {
+    // Ensure fillColor is set based on category
+     var fillColor = getCategoryColor(category);
+    var markerIcon = createIcon(24, 2, fillColor);
+    var marker = L.marker(latlng, {icon: markerIcon}).addTo(map);
     marker.bindPopup(`<strong>${category}</strong><br>${description}`);
 
-    // Send data to server
-    saveMarkerData(selectedLatLng, category, description);
 
-    // Clear form inputs
-    document.getElementById('marker-category').value = '';
-    document.getElementById('marker-description').value = '';
+    // Add the marker to the map
+    marker.addTo(map);
+	    saveMarkerData(selectedLatLng, category, description);
 
-    console.log("Marker added with category:", category, "and description:", description);
+    console.log("Custom marker added with category:", category, "and description:", description);
+
+    // Add the marker to its respective category layer
+    if (!categoryLayers[category]) {
+        categoryLayers[category] = L.layerGroup().addTo(map);
+    }
+    marker.addTo(categoryLayers[category]);
+	
+	initializeEventListeners();
+
 }
+
+
+
+
 
 // Variable to store the selected latitude and longitude
 
 // Event listener for map click
 map.on('click', function(e) {
-    selectedLatLng = e.latlng;
-    document.getElementById('marker-input-form').style.display = 'block';
-    console.log("Map clicked at:", selectedLatLng);
+    console.log("Map clicked at:", e.latlng);
+    
+    selectedLatLng = e.latlng; // Set the selectedLatLng
+    console.log("selectedLatLng set to:", selectedLatLng);
+
 });
+
 
 	// Add this function in your JavaScript
 
@@ -2503,18 +2687,22 @@ function saveMarkerData(latlng, category, description) {
 
     // Send the data using AJAX
     $.ajax({
-        url: '/add_marker', // Server endpoint that handles marker data
+        url: '/add_marker',
         method: 'POST',
         data: JSON.stringify(dataToSend),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         success: function(response) {
             console.log('Marker saved:', response);
-            // Optionally, you can handle any post-success actions here
+            // Create and add the marker after successful save
+            var fillColor = getCategoryColor(category);
+            var markerIcon = createIcon(24, 2, fillColor);
+            var marker = L.marker(latlng, { icon: markerIcon }).addTo(map);
+            marker.bindPopup(`<strong>${category}</strong><br>${description}`);
+            console.log(`Marker with text "${description}" of category "${category}" just created, creating an icon for it.`);
         },
         error: function(error) {
             console.error('Error saving marker:', error);
-            // Optionally, handle any error scenarios here
         }
     });
 }
