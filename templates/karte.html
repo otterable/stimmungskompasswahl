@@ -1345,23 +1345,25 @@ margin-bottom: 50px;
 }
 
         .register-button {
-        background-color: #003056; /* Example color */
-        color: white;
-        border: 7px solid white;
-        border-radius: 30px;
-        padding: 5px 5px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-		font-weight: bold;
-        font-size: 24px;
-        margin: auto;
-		margin-top: 0px !important;
-		margin-bottom: 0px;
-        cursor: pointer;
-        width: 90%; /* Full width */
-        box-sizing: border-box; /* Include padding in width */
-    }
+    background-color: #003056; /* Example color */
+    color: white;
+    border: none; /* Remove the border */
+    outline: none; /* Remove the outline */
+    box-shadow: none; /* Remove any shadow that might appear as an outline */
+    border-radius: 30px;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 24px;
+    margin: auto;
+    margin-top: 0px !important;
+    margin-bottom: 0px;
+    cursor: pointer;
+    width: 60%; /* Full width */
+    box-sizing: border-box; /* Include padding in width */
+}
 
 
 
@@ -1850,8 +1852,7 @@ margin: auto;
 
 /* Hover effect for category buttons (dynamically generated) */
 #category-toggle-buttons button:hover {
-    transform: scale(0.96);
-	outline: 3px solid #111111;
+    transform: scale(1.02);
 }
     /* Scale register buttons on hover */
     .register-button:hover {
@@ -1983,14 +1984,7 @@ margin: auto;
 
 
 
-<div class="button-container">
-        <button id="open-overlay" class="register-button" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
-    </div>
-	
-	<div class="button-container">
 
-	<button id="hideNonMapMarkers" class="register-button" style="margin-bottom: 10px">Hide Non-Map Markers</button>
-    </div>
 
 <?php CITY LOGO START ?>
 <img class="hide-on-mobile resistant-image" id="overlay-image" src="static/overlay.jpg" style="max-width: 97%; height: auto; display: block; margin-left:auto; margin-right:auto; margin-top: 3px; margin-bottom: 20px; border-radius: 30px; max-height: 368px;"/>
@@ -1998,7 +1992,14 @@ margin: auto;
 
 
 
+<div class="button-container">
+        <button id="open-overlay" class="register-button" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
+    </div>
+	
+	<div class="button-container">
 
+	<button id="hideNonMapMarkers" class="register-button" style="margin-bottom: 10px">Show full projects only</button>
+    </div>
 
 
 <h3 style="display: block; text-align: center; margin-top: 5px;">
@@ -2489,29 +2490,30 @@ function createCategoryButtons() {
         button.innerText = `${category} (${categoryLayers[category].getLayers().length} Beiträge)`;
         button.setAttribute('category-name', category);
 
-
-        // Apply custom styles to the button
-        button.style.fontWeight = 'bold';
-        button.style.lineHeight = '1';
-        button.style.cursor = 'pointer';
-        button.style.textDecoration = 'none';
-        button.style.display = 'flex';
-        button.style.alignItems = 'center';
-        button.style.justifyContent = 'center';
-        button.style.width = '97%';
-        button.style.height = 'auto';
-        button.style.boxSizing = 'border-box';
-        button.style.transition = 'background-color 0.2s ease-in-out';
-        button.style.borderRadius = '30px';
-        button.style.textAlign = 'center';
-        button.style.border = '3px solid #111111'; // Added black border
-        button.style.flexGrow = '1';
-        button.style.flexShrink = '1';
-        button.style.padding = '7px';
-        button.style.margin = '7px auto';
-        button.style.fontSize = '18px';
-        button.style.color = 'white';
-        button.style.backgroundColor = getCategoryColor(category);
+// Apply custom styles to the button
+button.style.fontWeight = 'bold';
+button.style.lineHeight = '1';
+button.style.cursor = 'pointer';
+button.style.textDecoration = 'none';
+button.style.display = 'flex';
+button.style.alignItems = 'center';
+button.style.justifyContent = 'center';
+button.style.width = '97%';
+button.style.height = 'auto';
+button.style.boxSizing = 'border-box';
+button.style.transition = 'background-color 0.2s ease-in-out';
+button.style.borderRadius = '30px';
+button.style.textAlign = 'center';
+button.style.border = 'none'; // Ensure no border is applied
+button.style.outline = 'none'; // Remove any focus outline
+button.style.boxShadow = 'none'; // Remove any shadow that might appear as an outline
+button.style.flexGrow = '1';
+button.style.flexShrink = '1';
+button.style.padding = '7px';
+button.style.margin = '7px auto';
+button.style.fontSize = '18px';
+button.style.color = 'white';
+button.style.backgroundColor = getCategoryColor(category);
 
 
         applyButtonStyles(button);
@@ -2547,7 +2549,7 @@ function applyButtonStyles(button) {
 }
 
 function toggleMarkerVisibility() {
-    var showMapObjectsOnly = document.getElementById('hideNonMapMarkers').innerText === "Hide Non-Map Markers";
+    var showMapObjectsOnly = document.getElementById('hideNonMapMarkers').innerText === "Show full projects only";
 
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
@@ -2566,7 +2568,7 @@ function toggleMarkerVisibility() {
     }
 
     // Toggle button text
-    document.getElementById('hideNonMapMarkers').innerText = showMapObjectsOnly ? "Show All Markers" : "Hide Non-Map Markers";
+    document.getElementById('hideNonMapMarkers').innerText = showMapObjectsOnly ? "Show All Markers" : "Show full projects only";
 }
 
 
