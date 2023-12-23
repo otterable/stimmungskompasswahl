@@ -355,6 +355,8 @@ display: none !important;
 }
 
 
+
+
 .leaflet-control-layers-toggle {
     font-size: 30px;
     line-height: 24px;
@@ -1906,6 +1908,11 @@ margin: auto;
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 30px; width: 80%; max-width: 500px; text-align: center;">
         <h2>Markers List</h2>
         <p>Here is a list of all markers on the map, and their descriptions.</p>
+	<div id="category-filter" style="text-align: center; margin-bottom: 20px;"></div>
+<div id="sort-filter" style="text-align: center; margin-bottom: 20px;"></div>
+<div id="full-project-filter" style="text-align: center; margin-bottom: 20px;"></div>
+
+	
         <ul id="markers-list" style="list-style: none; padding: 0;">
             <!-- Marker items will be added here dynamically -->
         </ul>
@@ -2397,58 +2404,181 @@ function postMarker() {
     setMapCursor();
 }
 
-// Function to add markers to the overlay
-// Function to add markers to the overlay
 function addMarkersToOverlay(markers) {
-    const markersPerPage = 10; // Number of markers per page
+    const markersPerPage = 20; // Number of markers per page
     let currentPage = 1; // Start with the first page
+    let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to newest
+    let showFullProjectsOnly = false;
+
+    const categoryColors = {
+        'Transport': '#1565C0',
+        'Öffentliche Plätze': '#FF7043',
+        'Umwelt': '#4CAF50',
+        'Verwaltung': '#B38A58',
+        'Kultur': '#3B1C32',
+        'Bildung': '#264027',
+        'Gesundheit': '#B71C1C',
+        'Sport': '#4A001F',
+        'Andere': '#212121'
+    };
+
+    function filterByCategory(category) {
+        let tempMarkers = markers;
+        if (category !== "Alle") {
+            tempMarkers = tempMarkers.filter(marker => marker.category === category);
+        }
+        if (showFullProjectsOnly) {
+            tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
+        }
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+        console.log(`Category ${category} selected in filter in the list overlay, showing ${filteredMarkers.length} markers`);
+        renderPage(1); // Reset to the first page after filtering
+    }
+
+    function sortMarkers(sortType) {
+        if (sortType === "newest") {
+            filteredMarkers.sort((a, b) => b.id - a.id);
+            console.log("Sorting markers list by newest");
+        } else if (sortType === "oldest") {
+            filteredMarkers.sort((a, b) => a.id - b.id);
+            console.log("Sorting markers list by oldest");
+        }
+        renderPage(1); // Reset to the first page after sorting
+    }
+
+    function createCategoryFilter() {
+        const filterDiv = document.getElementById('category-filter');
+        filterDiv.innerHTML = '<label for="category-select">Search by category:</label>';
+
+        const select = document.createElement('select');
+        select.id = 'category-select';
+        select.onchange = function() { filterByCategory(this.value); };
+
+        const categories = ["Alle", ...new Set(markers.map(marker => marker.category))];
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.innerText = category;
+            select.appendChild(option);
+        });
+
+        filterDiv.appendChild(select);
+    }
+
+    function createSortFilter() {
+        const sortDiv = document.getElementById('sort-filter');
+        sortDiv.innerHTML = '<label for="sort-select">Sort by:</label>';
+
+        const select = document.createElement('select');
+        select.id = 'sort-select';
+        select.onchange = function() { sortMarkers(this.value); };
+
+        const sortOptions = ["newest", "oldest"];
+        sortOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.innerText = option.charAt(0).toUpperCase() + option.slice(1); // Capitalize first letter
+            select.appendChild(optionElement);
+        });
+
+        sortDiv.appendChild(select);
+    }
 
     function paginateMarkers(page) {
         const startIndex = (page - 1) * markersPerPage;
         const endIndex = startIndex + markersPerPage;
-        return markers.slice(startIndex, endIndex);
+        return filteredMarkers.slice(startIndex, endIndex);
     }
 
-     function renderPage(page) {
-        currentPage = parseInt(page); // Convert page to an integer
+    function renderPage(page) {
+        currentPage = parseInt(page);
         const paginatedMarkers = paginateMarkers(page);
         const list = document.getElementById('markers-list');
-        list.innerHTML = ''; // Clear existing list items
+        list.innerHTML = '';
 
-        paginatedMarkers.forEach(marker => {
-            if (marker.geoloc) {
-                const listItem = document.createElement('li');
-                const displayText = marker.is_mapobject ? marker.descriptionwhy : marker.name;
-                listItem.innerHTML = `<a href="#" onclick="centerMapOnMarker('${marker.id}')">${displayText}</a>`;
-                list.appendChild(listItem);
-            }
-        });
+        if (paginatedMarkers.length === 0) {
+            const noMarkersMessage = document.createElement('p');
+            noMarkersMessage.textContent = "No markers found!";
+            noMarkersMessage.style.textAlign = 'center';
+            list.appendChild(noMarkersMessage);
+        } else {
+            paginatedMarkers.forEach(marker => {
+                if (marker.geoloc) {
+                    const listItem = document.createElement('li');
+                    const displayText = marker.is_mapobject ? marker.descriptionwhy : marker.name;
+                    const link = document.createElement('a');
+                    link.href = "#";
+                    link.style.color = categoryColors[marker.category] || 'black';
+                    link.style.fontWeight = marker.is_mapobject ? 'normal' : 'bold';
+                    link.style.textDecoration = 'none';
+                    link.innerHTML = displayText;
+                    link.onclick = function() { centerMapOnMarker(marker.id); return false; };
+                    listItem.appendChild(link);
+                    list.appendChild(listItem);
+                    console.log(`Marker ${marker.id} loaded into the list, with category ${marker.category}. Adapting its color`);
+                }
+            });
+        }
 
         updatePaginationControls(page);
     }
+	
+   function applyFilters() {
+        let tempMarkers = markers;
+        if (showFullProjectsOnly) {
+            tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
+        }
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+        renderPage(1); // Reset to the first page after filtering
+    }
+	
+	 function createFullProjectFilter() {
+        const filterDiv = document.getElementById('full-project-filter');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'full-project-checkbox';
+        checkbox.onchange = function() {
+            showFullProjectsOnly = this.checked;
+            console.log(showFullProjectsOnly ? "Checkbox clicked, only markers with is_mapobject=false will be shown" : "Checkbox unchecked, all markers will be shown");
+            applyFilters();
+        };
+
+        const label = document.createElement('label');
+        label.htmlFor = 'full-project-checkbox';
+        label.textContent = 'Show full projects only';
+
+        filterDiv.appendChild(checkbox);
+        filterDiv.appendChild(label);
+    }
+
+	
 
     function updatePaginationControls(page) {
-        const totalPages = Math.ceil(markers.length / markersPerPage);
+        const totalPages = Math.ceil(filteredMarkers.length / markersPerPage);
         const paginationDiv = document.getElementById('pagination-controls');
         paginationDiv.innerHTML = '';
+        paginationDiv.style.display = 'flex';
+        paginationDiv.style.justifyContent = 'center';
+        paginationDiv.style.alignItems = 'center';
+        paginationDiv.style.margin = '20px 0 30px';
 
         for (let i = 1; i <= totalPages; i++) {
             const pageButton = document.createElement('button');
             pageButton.innerText = i;
+            // [rest of the pageButton styles]
             pageButton.onclick = function() { renderPage(i); };
             if (i === page) {
-                pageButton.style.fontWeight = 'bold';
+                pageButton.style.transform = 'scale(1.2)';
             }
             paginationDiv.appendChild(pageButton);
         }
     }
-
+	
+    createCategoryFilter(); // Create category filter
+    createSortFilter(); // Create sort filter
+    createFullProjectFilter(); // Create full project filter
     renderPage(currentPage);
 }
-
-
-
-
 	
 
 function updateMarkerIcons() {
@@ -2601,16 +2731,17 @@ function addMarkers(projects) {
 
 
 console.log("Map Initialization Started");
-fetch('/get_projects')
-    .then(response => response.json())
-    .then(data => {
-        console.log("Received data:", data);
-        addMarkers(data); // Add markers to the map
-        addMarkersToOverlay(data); // Update the overlay with the markers
-        createCategoryButtons();
-        updateCategoryButtonColors(); // Update category button colors after buttons are created
-    })
-    .catch(error => console.error('Error fetching projects:', error));
+    fetch('/get_projects')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Received data:", data);
+            addMarkers(data); // Add markers to the map
+            addMarkersToOverlay(data); // Update the overlay with the markers
+            createCategoryButtons();
+            updateCategoryButtonColors(); // Update category button colors after buttons are created
+        })
+        .catch(error => console.error('Error fetching projects:', error));
+
 
 
 var markersListOverlay = document.getElementById('markers-list-overlay');
