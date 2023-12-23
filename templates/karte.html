@@ -2409,40 +2409,40 @@ function addMarkersToOverlay(markers) {
         return markers.slice(startIndex, endIndex);
     }
 
-    function updatePaginationControls(page) {
-        const totalPages = Math.ceil(markers.length / markersPerPage);
-        const pageIndicator = document.getElementById('page-indicator');
-        pageIndicator.textContent = `Page ${page} of ${totalPages}`;
-
-        const prevButton = document.getElementById('prev-page-button');
-        const nextButton = document.getElementById('next-page-button');
-        prevButton.disabled = page === 1;
-        nextButton.disabled = page === totalPages;
-    }
-
-    function renderPage(page) {
-        currentPage = parseInt(page, 10); // Convert page to an integer
-        const paginatedMarkers = paginateMarkers(currentPage);
+     function renderPage(page) {
+        currentPage = parseInt(page); // Convert page to an integer
+        const paginatedMarkers = paginateMarkers(page);
         const list = document.getElementById('markers-list');
         list.innerHTML = ''; // Clear existing list items
 
         paginatedMarkers.forEach(marker => {
             if (marker.geoloc) {
                 const listItem = document.createElement('li');
-                const displayText = marker.is_mapobject ? `<span>${marker.descriptionwhy}</span>` : `<span style="font-weight:bold;">${marker.name}</span>`; // Bold for is_mapobject=false
+                const displayText = marker.is_mapobject ? marker.descriptionwhy : marker.name;
                 listItem.innerHTML = `<a href="#" onclick="centerMapOnMarker('${marker.id}')">${displayText}</a>`;
                 list.appendChild(listItem);
             }
         });
 
-        updatePaginationControls(currentPage);
+        updatePaginationControls(page);
     }
 
-    // Event listeners for pagination buttons
-    document.getElementById('prev-page-button').addEventListener('click', () => renderPage(currentPage - 1));
-    document.getElementById('next-page-button').addEventListener('click', () => renderPage(currentPage + 1));
+    function updatePaginationControls(page) {
+        const totalPages = Math.ceil(markers.length / markersPerPage);
+        const paginationDiv = document.getElementById('pagination-controls');
+        paginationDiv.innerHTML = '';
 
-    // Initial render
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.innerText = i;
+            pageButton.onclick = function() { renderPage(i); };
+            if (i === page) {
+                pageButton.style.fontWeight = 'bold';
+            }
+            paginationDiv.appendChild(pageButton);
+        }
+    }
+
     renderPage(currentPage);
 }
 
