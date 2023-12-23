@@ -64,6 +64,41 @@ body, html {
     /* Add Andere styles as needed */
 }
 
+#pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Spacing between elements */
+}
+
+#page-indicator {
+    background-color: #003056;
+    color: white;
+    border-radius: 50%; /* Make it circular */
+    width: 30px; /* Fixed width */
+    height: 30px; /* Fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+#pagination-controls button {
+    background-color: #003056; /* Same background as the page indicator */
+    color: white;
+    border: none;
+	font-weight: bold;
+    border-radius: 30px; /* Slightly rounded corners */
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#pagination-controls button:hover {
+    background-color: #024a70; /* Slightly darker on hover */
+}
+
+
 .filterx-container {
 display:none !important;
 }
@@ -174,10 +209,31 @@ display:none !important;
 
     }
 
+ /* CSS for sidebar visibility toggle */
+   #map.sidebar-visible {
+    /* Adjust the following styles according to your layout */
+    width: calc(100% - 300px) !ui; /* Assuming the sidebar width is 300px */
+    /* Other styles if necessary */
+}
+		
     #map {
         left: 15px;
         right: calc(30% + 15px);
     }
+.markers-sidebar {
+    position: absolute;
+    top: 95px; /* Increased from 15px to 95px to accommodate the top bar's height */
+    left: 15px;
+    bottom: 15px; /* Adjusted bottom position */
+    width: 20%;
+    background: white;
+    border-radius: 30px !important;
+    overflow-y: auto;
+    z-index: 1001;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    display: none; /* Initially hidden */
+}
 
     #sidebar {
         position: absolute;
@@ -196,6 +252,10 @@ display:none !important;
     .desktop-only {
         display: none;
     }
+	
+	 .sidebar-visible #map {
+                right: 15px; /* Full width map on smaller screens */
+            }
 }
 
 
@@ -637,6 +697,21 @@ display: none !important;
         }
 /* SMALL OPTIONS MENU BUTTON CSS END */
 
+
+@media (max-width: 767px) {
+    .markers-sidebar {
+        /* Keep the existing styles for the overlay */
+        display: none; /* Ensure it's hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        overflow: auto;
+    }
+}
 
 /* BUTTON MAIN UNIVERSAL CSS START */
 .button-u {
@@ -1212,6 +1287,37 @@ margin-bottom: 50px;
         max-height: 50%; /* Ensure content does not exceed the list item's height */
         max-width: 50%; /* Ensure content does not exceed the list item's width */
         font-size: 2.5vw; /* Responsive font size for the content */
+    }
+}
+
+/* Mobile and Tablet Styles */
+@media (max-width: 1024px) {
+    .markers-sidebar {
+        position: fixed; /* Changed to fixed positioning */
+        top: 0;
+        left: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+        z-index: 1001; /* High z-index to ensure it's on top */
+        padding: 20px;
+        box-sizing: border-box;
+        display: none; /* Initially hidden */
+        overflow-y: auto; /* Allows scrolling */
+    }
+
+    .markers-sidebar > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 30px;
+        width: 80%;
+        max-width: 500px; /* Adjust max-width as needed */
+        text-align: center;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Optional: Add some shadow for better visibility */
     }
 }
 
@@ -1904,10 +2010,8 @@ margin: auto;
 </div>
 
 <!-- Overlay for displaying the list of markers -->
-<div id="markers-list-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 10000; overflow: auto;">
+<div id="markers-list-overlay" class="markers-sidebar">
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 30px; width: 80%; max-width: 500px; text-align: center;">
-        <h2>Markers List</h2>
-        <p>Here is a list of all markers on the map, and their descriptions.</p>
 	<div id="category-filter" style="text-align: center; margin-bottom: 20px;"></div>
 <div id="sort-filter" style="text-align: center; margin-bottom: 20px;"></div>
 <div id="full-project-filter" style="text-align: center; margin-bottom: 20px;"></div>
@@ -1928,20 +2032,16 @@ margin: auto;
 
 
 <!-- Marker Placing Overlay -->
-<!-- Marker Placing Overlay -->
 <div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:10000;">
     <div id="overlay-content" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px; width: 80%; max-width: 500px; text-align: center;">
         <h2>Add a new marker to the map!</h2>
-  <p style="font-size: 14px;">
-                <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Click here, to get the full experience.</a>
-            </p>        
+        <p style="font-size: 14px;">
+            <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Click here, to get the full experience.</a>
+        </p>        
         <!-- Wrapper div for the select and the textarea -->
         <div style="width: 100%; box-sizing: border-box; text-align: center;">
-		
-
-		        <p>1. Select category:</p>
-
-            <select id="marker-category" onchange="updateMarkerCategoryDescription()" style="width: 100%; box-sizing: border-box; text-align: center;">
+            <p>1. Select category:</p>
+            <select id="marker-category" onchange="updateMarkerCategoryDescription()" style="width: 100%; box-sizing: border-box; text-align: center; border: 1px solid black;">
                 <option value="Transport">Transport</option>
             <option value="Öffentliche Plätze">Öffentliche Plätze</option>
             <option value="Umwelt">Umwelt</option>
@@ -1951,20 +2051,16 @@ margin: auto;
             <option value="Gesundheit">Gesundheit</option>
             <option value="Sport">Sport</option>
             <option value="Andere">Andere</option>
-       </select>
+     </select>
             <br><br>
-								        <p>What is the selected category used for?</p>
-
-					        <p id="marker-category-description" style="color:#003056;"></p> <!-- Description will appear here -->
-
-
-					        <p>2. Write a description:</p>
-
-            <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left;"></textarea>
+            <p>What is the selected category used for?</p>
+            <p id="marker-category-description" style="color:#003056;"></p> <!-- Description will appear here -->
+            <p>2. Write a description:</p>
+            <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black;"></textarea>
         </div>
         
         <br>
-		<p>3. Place it on the map:</p>
+        <p>3. Place it on the map:</p>
         <div class="button-container">
             <button onclick="postMarker()" class="register-button">Hinzufügen</button>
         </div>
@@ -2302,22 +2398,25 @@ function resetMapCursor() {
 
 
 // Function to open marker overlay
+// Function to open marker overlay with forceful display style
 function openMarkerOverlay(event) {
     var overlay = document.getElementById('marker-overlay');
     if (overlay) {
-        overlay.style.display = 'block';
+        overlay.style.display = 'flex'; // Force display flex
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = '10000'; // Ensure it's above other content
         console.log("Marker overlay opened");
-        logSelectedCategory();
-		    updateMarkerCategoryDescription(); // Update the category description
- } else {
-    console.error('Marker overlay element not found');
-}
+    } else {
+        console.error('Marker overlay element not found');
+    }
 
-    // Stop propagation to document
+    // Stop propagation if it's a user-triggered event
     if (event) {
         event.stopPropagation();
     }
 }
+
 
 
 	
@@ -2404,10 +2503,23 @@ function postMarker() {
     setMapCursor();
 }
 
+// Function to toggle the sidebar visibility and adjust map size
+function toggleMarkerSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    var mapElement = document.getElementById('map');
+    if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+        sidebar.style.display = 'block';
+        mapElement.classList.add('sidebar-visible'); // Add class to resize map
+    } else {
+        sidebar.style.display = 'none';
+        mapElement.classList.remove('sidebar-visible'); // Remove class to resize map
+    }
+}
+
 function addMarkersToOverlay(markers) {
     const markersPerPage = 20; // Number of markers per page
     let currentPage = 1; // Start with the first page
-    let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to newest
+    let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to Sort by newest
     let showFullProjectsOnly = false;
 
     const categoryColors = {
@@ -2430,50 +2542,62 @@ function addMarkersToOverlay(markers) {
         if (showFullProjectsOnly) {
             tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
         }
-        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by Sort by newest
         console.log(`Category ${category} selected in filter in the list overlay, showing ${filteredMarkers.length} markers`);
         renderPage(1); // Reset to the first page after filtering
     }
 
     function sortMarkers(sortType) {
-        if (sortType === "newest") {
+        if (sortType === "Sort by newest") {
             filteredMarkers.sort((a, b) => b.id - a.id);
-            console.log("Sorting markers list by newest");
-        } else if (sortType === "oldest") {
+            console.log("Sorting markers list by Sort by newest");
+        } else if (sortType === "Sort by oldest") {
             filteredMarkers.sort((a, b) => a.id - b.id);
-            console.log("Sorting markers list by oldest");
+            console.log("Sorting markers list by Sort by oldest");
         }
         renderPage(1); // Reset to the first page after sorting
     }
+function createCategoryFilter() {
+    const filterDiv = document.getElementById('category-filter');
+    filterDiv.innerHTML = '<label for="category-select">Search by category:</label>';
 
-    function createCategoryFilter() {
-        const filterDiv = document.getElementById('category-filter');
-        filterDiv.innerHTML = '<label for="category-select">Search by category:</label>';
+    const select = document.createElement('select');
+    select.id = 'category-select';
+    select.onchange = function() { filterByCategory(this.value); };
 
-        const select = document.createElement('select');
-        select.id = 'category-select';
-        select.onchange = function() { filterByCategory(this.value); };
+    const categories = ["Alle", ...new Set(markers.map(marker => marker.category))];
+    const categoryColors = {
+        'Transport': '#1565C0',
+        'Öffentliche Plätze': '#FF7043',
+        'Umwelt': '#4CAF50',
+        'Verwaltung': '#B38A58',
+        'Kultur': '#3B1C32',
+        'Bildung': '#264027',
+        'Gesundheit': '#B71C1C',
+        'Sport': '#4A001F',
+        'Andere': '#212121'
+    };
 
-        const categories = ["Alle", ...new Set(markers.map(marker => marker.category))];
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category;
-            option.innerText = category;
-            select.appendChild(option);
-        });
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.innerText = category;
+        option.style.color = categoryColors[category] || "#000"; // Default to black if color not found
+        select.appendChild(option);
+    });
 
-        filterDiv.appendChild(select);
-    }
+    filterDiv.appendChild(select);
+}
 
     function createSortFilter() {
         const sortDiv = document.getElementById('sort-filter');
-        sortDiv.innerHTML = '<label for="sort-select">Sort by:</label>';
+        sortDiv.innerHTML = '';
 
         const select = document.createElement('select');
         select.id = 'sort-select';
         select.onchange = function() { sortMarkers(this.value); };
 
-        const sortOptions = ["newest", "oldest"];
+        const sortOptions = ["Sort by newest", "Sort by oldest"];
         sortOptions.forEach(option => {
             const optionElement = document.createElement('option');
             optionElement.value = option;
@@ -2528,7 +2652,7 @@ function addMarkersToOverlay(markers) {
         if (showFullProjectsOnly) {
             tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
         }
-        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by Sort by newest
         renderPage(1); // Reset to the first page after filtering
     }
 	
@@ -2595,12 +2719,13 @@ function updateMarkerIcons() {
     }
 }
 
-// Example of adding console.log for debugging
 document.addEventListener('click', function(event) {
     var overlay = document.getElementById('marker-overlay');
-    // console.log("Debug: overlay element", overlay); // Add this line for debugging
+    var overlayContent = document.getElementById('overlay-content');
 
-    if (overlay && overlay.style.display === 'block' && event.target === overlay) {
+    console.log("Click detected, overlay state: ", overlay.style.display);
+
+    if (overlay && overlay.style.display !== 'none' && !overlayContent.contains(event.target)) {
         overlay.style.display = 'none';
         console.log("Marker overlay closed");
     }
@@ -2746,25 +2871,46 @@ console.log("Map Initialization Started");
 
 var markersListOverlay = document.getElementById('markers-list-overlay');
 
-
-// Function to center map on marker and open its popup
 function centerMapOnMarker(markerId) {
     var marker = markersById[markerId];
     if (marker) {
-        console.log("Marker with ID", markerId, "clicked in list"); // Debugging log for marker click
-        map.setView(marker.getLatLng(), map.getZoom());
-        marker.openPopup();
+        var mapBounds = map.getBounds();
+        var markerLatLng = marker.getLatLng();
 
-        // Hide the overlay when a marker is clicked
-        if (markersListOverlay) {
-            markersListOverlay.style.display = 'none';
-            console.log("Overlay hidden"); // Debugging log for overlay hide
+        // Calculate the visible center of the map
+        var sidebar = document.getElementById('markers-list-overlay');
+        var isSidebarVisible = sidebar && sidebar.style.display !== 'none';
+        var sidebarWidth = isSidebarVisible ? sidebar.offsetWidth : 0;
+
+        var southWest = mapBounds.getSouthWest();
+        var northEast = mapBounds.getNorthEast();
+        var lngSpan = northEast.lng - southWest.lng;
+
+        // Adjust the longitude of the center based on the sidebar width
+        var centerLng = isSidebarVisible 
+            ? markerLatLng.lng - (lngSpan * sidebarWidth / map.getSize().x) / 2 
+            : markerLatLng.lng;
+
+        var newCenter = new L.LatLng(markerLatLng.lat, centerLng);
+
+        // Set the map view to the new position
+        map.setView(newCenter, map.getZoom());
+
+        // Open the popup after a short delay to allow the map to finish moving
+        setTimeout(function() {
+            marker.openPopup();
+        }, 300); // 300 milliseconds delay
+
+        console.log("Marker with ID", markerId, "centered on map");
+
+        // Close the markers list overlay on mobile and tablet
+        if (window.innerWidth <= 1024) { // Adjust 1024 to include tablets
+            sidebar.style.display = 'none';
         }
     } else {
         console.error("Marker with ID", markerId, "not found");
     }
 }
-
 
 
 
