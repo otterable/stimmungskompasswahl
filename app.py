@@ -510,8 +510,6 @@ def project_details(project_id):
         logging.error("Error in project_details route: %s", str(e))
         return str(e)  # Or redirect to a generic error page
 
-
-
 @app.route('/admintools', methods=['GET', 'POST'])
 @login_required
 def admintools():
@@ -604,9 +602,15 @@ def admintools():
     sort = request.args.get('sort', 'score_desc')
     search_query = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
-    per_page = 2
+    per_page = 3
 
-    query = Project.query
+    map_object_page = request.args.get('map_object_page', 1, type=int)
+    map_object_per_page = 6  # Define the number of map objects per page
+
+   
+
+    query = Project.query.filter(Project.is_mapobject == False)  # Filter for non-mapobject projects
+
     if search_query:
         query = query.filter(Project.name.contains(search_query))
 
@@ -642,9 +646,13 @@ def admintools():
         query = query.outerjoin(Vote, Project.id == Vote.project_id) \
                     .group_by(Project.id) \
                     .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
-
+                    
+  
+    paginated_map_objects = Project.query.filter_by(is_mapobject=True).paginate(page=map_object_page, per_page=map_object_per_page, error_out=False)
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
-
+    print("Total items:", paginated_projects.total)
+    print("Total pages:", paginated_projects.pages)
+    
     # Calculate upvotes and downvotes for each project
     for project in paginated_projects.items:
         upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
@@ -683,22 +691,23 @@ def admintools():
 
     # Check if it's an AJAX request
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return render_template('partials/project_list_section.html', 
-                               paginated_projects=paginated_projects, 
-                               sort=sort, 
-                               search_query=search_query)
+        request_type = request.args.get('request_type')
+        if request_type == 'map_object':
+            return render_template('partials/mapobject_list_section.html', paginated_map_objects=paginated_map_objects)
+        elif request_type == 'project':
+            return render_template('partials/project_list_section.html', paginated_projects=paginated_projects, sort=sort, search_query=search_query)
 
     # Normal request
     return render_template('admintools.html', 
                            paginated_projects=paginated_projects,
+                           paginated_map_objects=paginated_map_objects,
                            comments=comments, 
                            sort=sort, 
                            search_query=search_query, 
                            users=users, 
                            important_projects=important_projects, 
                            featured_projects=featured_projects)
-
-
+                           
 @app.route('/verify_admin_otp', methods=['GET', 'POST'])
 @login_required
 def verify_admin_otp():

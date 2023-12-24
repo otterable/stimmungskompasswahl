@@ -18,13 +18,15 @@
    <style>
    
    
-      body {
-        font-family: 'Roboto', sans-serif;
-        background-color: #f5f1e4;
-        color: black;
-        margin: 0; /* Remove default margin */
-        padding: 0; /* Remove default padding */
-    }
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f1e4;
+    color: black;
+    margin: 0;
+    padding: 0;
+    text-align: center; /* Center text globally */
+}
+
 #filter-form-mobile {
     display: none; /* Hidden by default */
 }
@@ -980,7 +982,11 @@ nav[aria-label="Page navigation"] {
 
 
 
-
+<div class="project-list">
+{% with paginated_map_objects=paginated_map_objects %}
+    {% include 'partials/mapobject_list_section.html' %}
+{% endwith %}
+</div>
 
 
 <!-- Important Projects Section -->
@@ -1097,31 +1103,124 @@ nav[aria-label="Page navigation"] {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Replace 'None' with '...' in the initial pagination
+    const initialPagination = document.querySelector('.pagination');
+    if (initialPagination) {
+        replaceNoneWithEllipsis(initialPagination);
+    }
+
     attachPaginationEventListeners();
 });
 
 function attachPaginationEventListeners() {
     const paginationLinks = document.querySelectorAll('.ajax-pagination-link');
+    console.log('Attaching event listeners to', paginationLinks.length, 'links');
     paginationLinks.forEach(link => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            const url = this.getAttribute('href');
-            updatePaginationContent(url);
-        });
+        link.removeEventListener('click', handlePaginationClick);
+        link.addEventListener('click', handlePaginationClick);
     });
 }
 
-function updatePaginationContent(url) {
-    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-        .then(response => response.text())
-        .then(html => {
-            const container = document.getElementById('project-list-container');
-            container.innerHTML = html;
-            attachPaginationEventListeners(); // Reattach event listeners to new pagination links
-        })
-        .catch(error => console.error('Error:', error));
+function handlePaginationClick(event) {
+    event.preventDefault();
+    const url = this.getAttribute('href');
+    console.log('Pagination link clicked:', url);
+
+    // Find the closest parent with the class .pagination-container
+    const paginationContainer = this.closest('.pagination-container');
+    if (!paginationContainer) {
+        console.error('Pagination container not found for link:', this);
+        return; // Exit the function if no container is found
+    }
+
+    const sectionType = paginationContainer.getAttribute('data-pagination-type');
+    console.log('Section type:', sectionType);
+
+    updatePaginationContent(url, sectionType);
 }
+
+function updatePaginationContent(url, sectionType) {
+    console.log('Fetching URL:', url, 'for section:', sectionType);
+    fetch(url + '&request_type=' + sectionType, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        method: 'GET',
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        console.log('Response received for', sectionType);
+        return response.text();
+    })
+    .then(html => {
+        console.log('HTML received for', sectionType, ':', html);
+        const newContent = document.createElement('div');
+        newContent.innerHTML = html;
+
+        let oldContainer, newContainer;
+        if (sectionType === 'project') {
+            oldContainer = document.getElementById('project-list-container');
+            newContainer = newContent.querySelector('#project-list-container');
+        } else {
+            oldContainer = document.getElementById('map-object-list-container');
+            newContainer = newContent.querySelector('#map-object-list-container');
+        }
+
+        if (oldContainer && newContainer) {
+            oldContainer.innerHTML = newContainer.innerHTML;
+            console.log('Content updated for', sectionType);
+        } else {
+            console.error('Container elements not found for', sectionType);
+        }
+
+        reconstructPaginationButtons(newContent, sectionType);
+        attachPaginationEventListeners();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+
+function updatePageParam(url, newPage) {
+    const urlObj = new URL(url);
+    urlObj.searchParams.set('page', newPage);
+    return urlObj.toString();
+}
+
+
+function reconstructPaginationButtons(newContent, sectionType) {
+    const oldPagination = document.querySelector(`.pagination-container[data-pagination-type="${sectionType}"] .pagination`);
+    const newPagination = newContent.querySelector('.pagination');
+
+    if (oldPagination && newPagination) {
+        oldPagination.innerHTML = newPagination.innerHTML;
+        replaceNoneWithEllipsis(oldPagination);
+        console.log('Pagination reconstructed for', sectionType);
+    } else {
+        console.error('Pagination elements not found in new content for', sectionType);
+    }
+}
+
+function replaceNoneWithEllipsis(paginationElement) {
+    const pageLinks = paginationElement.querySelectorAll('.page-link');
+    pageLinks.forEach(link => {
+        if (link.textContent.trim() === 'None') {
+            link.textContent = '...'; // Replace 'None' with '...'
+            link.href = '#'; // Set href to '#' to prevent any action
+            link.addEventListener('click', (e) => e.preventDefault()); // Prevent default action
+        }
+    });
+}
+
+
+function extractTotalPages() {
+    const pageItems = Array.from(document.querySelectorAll('.pagination .page-link'));
+    const pageNumbers = pageItems.map(item => parseInt(item.textContent.trim())).filter(num => !isNaN(num));
+    return pageNumbers.length > 0 ? Math.max(...pageNumbers) : 1;
+}
+
 </script>
+
 
 
 

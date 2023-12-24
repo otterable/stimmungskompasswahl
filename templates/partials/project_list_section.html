@@ -1,44 +1,45 @@
 <div class="my-projects centered-text">
     {% if paginated_projects and paginated_projects.items %}
-
-
         <div class="project-list" id="project-list-container"> 
-    {% for project in paginated_projects.items %}
-                <div class="project-thumbnail">
-                    <h3>{{ project.name }}</h3>
-                    <p class="project-date">Posted on: {{ project.date.strftime('%d.%m.%Y') }}</p>
-                    <div class="voting-bar">
-                        {% if project.upvotes > 0 %}
-                            <div class="upvotes" style="width: {{ project.upvote_percentage|round(1) }}%;">
-                                <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
-                            </div>
-                            <div class="downvotes" style="width: {{ project.downvote_percentage|round(1) }}%;">
-                                <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
-                            </div>
-                        {% endif %}
+            {% for project in paginated_projects.items %}
+                {% if not project.is_mapobject %}  <!-- Check if project is not a map object -->
+                    <div class="project-thumbnail">
+                        <h3>{{ project.name }}</h3>
+                        <p class="project-date">Posted on: {{ project.date.strftime('%d.%m.%Y') }}</p>
+                        <div class="voting-bar">
+                            {% if project.upvotes > 0 %}
+                                <div class="upvotes" style="width: {{ project.upvote_percentage|round(1) }}%;">
+                                    <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                                </div>
+                                <div class="downvotes" style="width: {{ project.downvote_percentage|round(1) }}%;">
+                                    <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+                            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
+                        </a>
+                        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
+                        <!-- Admin actions for each project -->
+                        <form method="POST" action="{{ url_for('admintools') }}">
+                            <input type="hidden" name="project_id" value="{{ project.id }}">
+                            <button type="submit" name="delete_project" class="register-button" style="font-weight: bold;">Delete</button>
+                            <button type="submit" name="mark_important">Mark as Important</button>
+                            <button type="submit" name="mark_featured">Mark as Featured</button>
+                        </form>
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
                     </div>
-                    <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
-                        <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
-                    </a>
-                    <div class="project-description">{{ project.descriptionwhy|safe }}</div>
-                    <!-- Admin actions for each project -->
-                    <form method="POST" action="{{ url_for('admintools') }}">
-                        <input type="hidden" name="project_id" value="{{ project.id }}">
-                        <button type="submit" name="delete_project" class="register-button" style="font-weight: bold;">Delete</button>
-                        <button type="submit" name="mark_important">Mark as Important</button>
-                        <button type="submit" name="mark_featured">Mark as Featured</button>
-                    </form>
-                    <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
-    {% else %}
-        <p>No projects found.</p>
+        {% if not paginated_projects.items %}
+            <p>No projects found.</p>
+        {% endif %}
     {% endif %}
 
  <!-- Pagination for Projects -->
 {% if paginated_projects.pages > 1 %}
-<nav aria-label="Project Page navigation">
+<nav aria-label="Project Page navigation" class="pagination-container" data-pagination-type="project">
     <ul class="pagination">
         {% if paginated_projects.has_prev %}
             <li class="page-item">
