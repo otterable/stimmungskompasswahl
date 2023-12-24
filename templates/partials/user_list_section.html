@@ -1,0 +1,44 @@
+<div class="project-list" id="user-list-container">
+    {% if paginated_users.items %}
+        {% for user in paginated_users.items %}
+            <div class="project-thumbnail">
+                <h3>{{ user.name }} (ID: {{ user.id }})</h3>
+                <div class="project-details">
+                    Projects created: {{ user.project_count }} <br>
+                    Map objects created: {{ user.map_object_count }} <br>
+                    Comments posted: {{ user.comment_count }} <br>
+                    Account created on: {{ user.account_creation.strftime('%Y-%m-%d %H:%M:%S') }}
+                </div>
+                <form method="POST" action="{{ url_for('delete_user') }}" onsubmit="return confirmUserDeletion()">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <button type="submit">Delete User</button>
+                </form>
+            </div>
+        {% endfor %}
+
+        <!-- Pagination for Users -->
+        {% if paginated_users.pages > 1 %}
+        <nav aria-label="User Page navigation" class="pagination-container" data-pagination-type="user">
+            <ul class="pagination">
+                {% if paginated_users.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', user_page=paginated_users.prev_num) }}">Previous</a>
+                    </li>
+                {% endif %}
+                {% for page in paginated_users.iter_pages() %}
+                    <li class="page-item {{ 'active' if page == paginated_users.page else '' }}">
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', user_page=page) }}">{{ page }}</a>
+                    </li>
+                {% endfor %}
+                {% if paginated_users.has_next %}
+                    <li class="page-item">
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', user_page=paginated_users.next_num) }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+</div>

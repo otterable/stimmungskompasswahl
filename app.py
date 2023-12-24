@@ -606,6 +606,10 @@ def admintools():
 
     map_object_page = request.args.get('map_object_page', 1, type=int)
     map_object_per_page = 6  # Define the number of map objects per page
+    
+    comment_page = request.args.get('comment_page', 1, type=int)
+    comment_per_page = 6  # Adjust the number of comments per page as needed
+
 
    
 
@@ -647,7 +651,7 @@ def admintools():
                     .group_by(Project.id) \
                     .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
                     
-  
+    paginated_comments = Comment.query.paginate(page=comment_page, per_page=comment_per_page, error_out=False)
     paginated_map_objects = Project.query.filter_by(is_mapobject=True).paginate(page=map_object_page, per_page=map_object_per_page, error_out=False)
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
     print("Total items:", paginated_projects.total)
@@ -696,12 +700,15 @@ def admintools():
             return render_template('partials/mapobject_list_section.html', paginated_map_objects=paginated_map_objects)
         elif request_type == 'project':
             return render_template('partials/project_list_section.html', paginated_projects=paginated_projects, sort=sort, search_query=search_query)
+        elif request_type == 'comment':
+            return render_template('partials/comments_section.html', paginated_comments=paginated_comments)
+
 
     # Normal request
     return render_template('admintools.html', 
                            paginated_projects=paginated_projects,
                            paginated_map_objects=paginated_map_objects,
-                           comments=comments, 
+                           paginated_comments=paginated_comments,
                            sort=sort, 
                            search_query=search_query, 
                            users=users, 

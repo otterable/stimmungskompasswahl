@@ -371,6 +371,11 @@ nav[aria-label="Page navigation"] {
     cursor: pointer;
 }
 
+.comment-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Adjusts space between items */
+}
 
     
     .index-image {
@@ -564,6 +569,50 @@ nav[aria-label="Page navigation"] {
     }
 }
 
+.comment-thumbnail {
+    background-color: rgba(40, 116, 166, 0.3); /* Similar background color */
+    border-radius: 30px; /* Rounded corners */
+    margin: 10px; /* Margin around each thumbnail */
+    padding: 10px; /* Padding inside each thumbnail */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    box-sizing: border-box; /* Include padding and border in width/height */
+    transition: transform 0.3s ease; /* Smooth scaling on hover */
+    position: relative; /* Position relative for any positioned children */
+    overflow: hidden; /* Hide overflow */
+    width: calc(33.333% - 20px); /* Three items per row */
+}
+
+/* Hover effect for comment thumbnails */
+.comment-thumbnail:hover {
+    transform: scale(1.02); /* Slight scale on hover */
+}
+
+/* Style for the details inside comment thumbnails */
+.comment-thumbnail .comment-details {
+    text-align: center; /* Center the text */
+    width: 100%; /* Take full width */
+}
+
+/* Responsive design for different screen sizes */
+@media (min-width: 1445px) {
+    .comment-thumbnail {
+        width: calc(33.333% - 20px); /* Three items per row */
+    }
+}
+
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .comment-thumbnail {
+        width: calc(50% - 20px); /* Two items per row */
+    }
+}
+
+@media (max-width: 1088px) {
+    .comment-thumbnail {
+        width: calc(100% - 20px); /* Full width on smaller screens */
+    }
+}
 
 
 .project-list {
@@ -953,7 +1002,7 @@ nav[aria-label="Page navigation"] {
 
 
 
-        <h1>Delete Project Submissions</h1>
+        <h1>Project Submissions:</h1>
         <!-- Form for sorting and searching projects -->
         <form id="sortForm" method="GET" action="{{ url_for('admintools') }}">
             <label for="search">Search by name:</label>
@@ -981,12 +1030,21 @@ nav[aria-label="Page navigation"] {
 </div>
 
 
+        <h1>Map objects:</h1>
 
 <div class="project-list">
 {% with paginated_map_objects=paginated_map_objects %}
     {% include 'partials/mapobject_list_section.html' %}
 {% endwith %}
 </div>
+
+<h1>Comments:</h1>
+<div class="project-list">
+{% with paginated_comments=paginated_comments %}
+    {% include 'partials/comments_section.html' %}
+{% endwith %}
+</div>
+
 
 
 <!-- Important Projects Section -->
@@ -1071,29 +1129,6 @@ nav[aria-label="Page navigation"] {
 
 
 
-<h2>Comments</h2>
-<div class="project-list">
-    {% for comment in comments %}
-        <div class="project-thumbnail">
-            <p>"{{ comment.text }}"</p>
-            <div class="project-details">
-                <p>Project commented on: 
-                    <a href="{{ url_for('project_details', project_id=comment.project_id) }}">
-                        {{ comment.project_name }}
-                    </a>
-                </p>
-                <p>Author of comment: {{ comment.author_name }} (ID: {{ comment.author_id }})</p>
-                <p>Time: {{ comment.timestamp }}</p>
-            </div>
-            <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
-                <button type="submit">Delete Comment</button>
-            </form>
-        </div>
-    {% else %}
-        <p>No comments found.</p>
-    {% endfor %}
-</div>
-
 
 
 
@@ -1159,9 +1194,12 @@ function updatePaginationContent(url, sectionType) {
         if (sectionType === 'project') {
             oldContainer = document.getElementById('project-list-container');
             newContainer = newContent.querySelector('#project-list-container');
-        } else {
+        } else if (sectionType === 'map_object') {
             oldContainer = document.getElementById('map-object-list-container');
             newContainer = newContent.querySelector('#map-object-list-container');
+        } else if (sectionType === 'comment') {
+            oldContainer = document.getElementById('comment-list-container');
+            newContainer = newContent.querySelector('#comment-list-container');
         }
 
         if (oldContainer && newContainer) {
