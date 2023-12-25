@@ -610,13 +610,28 @@ def admintools():
     comment_page = request.args.get('comment_page', 1, type=int)
     comment_per_page = 6  # Adjust the number of comments per page as needed
 
+    user_page = request.args.get('user_page', 1, type=int)
+    user_per_page = 1  # Define the number of users per page
 
+    search_user_id = request.args.get('searchUserById', type=int)
+    search_user_name = request.args.get('searchUserByName', '')
    
+    search_map_object_query = request.args.get('searchMapObject', '')
+
+    map_object_query = Project.query.filter_by(is_mapobject=True)
+    if search_map_object_query:
+        map_object_query = map_object_query.filter(Project.description.ilike(f'%{search_map_object_query}%'))
 
     query = Project.query.filter(Project.is_mapobject == False)  # Filter for non-mapobject projects
 
     if search_query:
         query = query.filter(Project.name.contains(search_query))
+  # User query with optional search
+    user_query = User.query
+    if search_user_id:
+        user_query = user_query.filter(User.id == search_user_id)
+    if search_user_name:
+        user_query = user_query.filter(User.name.ilike(f'%{search_user_name}%'))
 
     # Adjust the sorting logic
     if sort == 'comments':
@@ -650,9 +665,10 @@ def admintools():
         query = query.outerjoin(Vote, Project.id == Vote.project_id) \
                     .group_by(Project.id) \
                     .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
-                    
+       
+    paginated_users = user_query.paginate(page=user_page, per_page=user_per_page, error_out=False)
     paginated_comments = Comment.query.paginate(page=comment_page, per_page=comment_per_page, error_out=False)
-    paginated_map_objects = Project.query.filter_by(is_mapobject=True).paginate(page=map_object_page, per_page=map_object_per_page, error_out=False)
+    paginated_map_objects = map_object_query.paginate(page=map_object_page, per_page=map_object_per_page, error_out=False)
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
     print("Total items:", paginated_projects.total)
     print("Total pages:", paginated_projects.pages)
@@ -702,13 +718,15 @@ def admintools():
             return render_template('partials/project_list_section.html', paginated_projects=paginated_projects, sort=sort, search_query=search_query)
         elif request_type == 'comment':
             return render_template('partials/comments_section.html', paginated_comments=paginated_comments)
-
+        elif request_type == 'user':
+            return render_template('partials/user_list_section.html', paginated_users=paginated_users)
 
     # Normal request
     return render_template('admintools.html', 
                            paginated_projects=paginated_projects,
                            paginated_map_objects=paginated_map_objects,
                            paginated_comments=paginated_comments,
+                           paginated_users=paginated_users,
                            sort=sort, 
                            search_query=search_query, 
                            users=users, 

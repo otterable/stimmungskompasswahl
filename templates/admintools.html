@@ -489,6 +489,62 @@ nav[aria-label="Page navigation"] {
             color: black;
             margin-top: 10px;
 			}
+			
+			   .project-list#user-list-container {
+        width: 100%; /* Full width */
+        display: flex; /* Use flexbox for layout */
+        flex-wrap: wrap; /* Allow items to wrap */
+        justify-content: space-evenly; /* Even spacing between items */
+        align-items: flex-start; /* Align items to start vertically */
+    }
+	
+			    /* Base styles for user thumbnails */
+    .user-thumbnail {
+        background-color: rgba(40, 116, 166, 0.3); /* Similar background color */
+        border-radius: 30px; /* Rounded corners */
+        padding: 10px; /* Padding inside each thumbnail */
+        display: flex; /* Use flexbox for layout */
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center items horizontally */
+        box-sizing: border-box; /* Include padding and border in width/height */
+        transition: transform 0.3s ease; /* Smooth scaling on hover */
+        position: relative; /* Position relative for any positioned children */
+        overflow: hidden; /* Hide overflow */
+        width: calc(33.333% - 20px); /* Three items per row */
+        margin: 10px; /* Adjust margin as needed */
+        flex-basis: calc(33.333% - 20px); /* Adjust basis for three items per row */
+    }
+
+
+    /* Hover effect for user thumbnails */
+    .user-thumbnail:hover {
+        transform: scale(1.02); /* Slight scale on hover */
+    }
+
+    /* Style for the details inside user thumbnails */
+    .user-thumbnail .project-details {
+        text-align: center; /* Center the text */
+        width: 100%; /* Take full width */
+    }
+
+    /* Responsive design for different screen sizes */
+    @media (min-width: 1445px) {
+        .user-thumbnail {
+            width: calc(33.333% - 20px); /* Three items per row */
+        }
+    }
+
+    @media (min-width: 1080px) and (max-width: 1445px) {
+        .user-thumbnail {
+            flex-basis: calc(50% - 20px); /* Two items per row */
+        }
+    }
+
+    @media (max-width: 1088px) {
+        .user-thumbnail {
+            flex-basis: calc(100% - 20px); /* Full width on smaller screens */
+        }
+    }
 /* Base styles for project thumbnails */
 .project-thumbnail {
     background-color: rgba(40, 116, 166, 0.3);
@@ -614,14 +670,18 @@ nav[aria-label="Page navigation"] {
     }
 }
 
-
+.pagination-container {
+        width: 100%; /* Make the container take full width */
+        display: flex; /* Use flexbox for layout */
+        justify-content: center; /* Center pagination horizontally */
+        margin-top: 20px; /* Add some space above the pagination */
+    }
 .project-list {
-    text-align: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
+        display: flex; /* Use flexbox for layout */
+        flex-wrap: wrap; /* Allow items to wrap to next line */
+        justify-content: center; /* Center items horizontally */
+        align-items: flex-start; /* Align items to the start of the container vertically */
+    }
     /* Overlay styles */
     .overlay {
         display: none;
@@ -1098,37 +1158,12 @@ nav[aria-label="Page navigation"] {
 </div>
 
 
-<h1>Delete Users and Contributions</h1>
-<form id="userSearchForm" method="GET" action="{{ url_for('admintools') }}">
-    <label for="searchUserByName">Search by name:</label>
-    <input type="text" id="searchUserByName" name="searchUserByName" value="{{ search_user_query }}" onkeyup="submitUserSearchForm()">
-   
-    <label for="searchUserById">Search by ID:</label>
-    <input type="text" id="searchUserById" name="searchUserById" value="{{ search_user_id_query }}" onkeyup="submitUserSearchForm()">
-</form>
-
+<h1>Users:</h1>
 <div class="project-list">
-    {% for user in users %}
-        <div class="project-thumbnail">
-            <h3>{{ user.name }} (ID: {{ user.id }})</h3>
-            <div class="project-details">
-                Projects created: {{ user.project_count }} <br>
-                Map objects created: {{ user.map_object_count }} <br>
-                Comments posted: {{ user.comment_count }} <br>
-                Account created on: {{ user.account_creation.strftime('%Y-%m-%d %H:%M:%S') }}
-            </div>
-            <form method="POST" action="{{ url_for('delete_user') }}" onsubmit="return confirmUserDeletion()">
-                <input type="hidden" name="user_id" value="{{ user.id }}">
-                <button type="submit">Delete User</button>
-            </form>
-        </div>
-    {% else %}
-        <p>No users found.</p>
-    {% endfor %}
+    {% with paginated_users=paginated_users %}
+        {% include 'partials/user_list_section.html' %}
+    {% endwith %}
 </div>
-
-
-
 
 
 
@@ -1200,6 +1235,9 @@ function updatePaginationContent(url, sectionType) {
         } else if (sectionType === 'comment') {
             oldContainer = document.getElementById('comment-list-container');
             newContainer = newContent.querySelector('#comment-list-container');
+        } else if (sectionType === 'user') {
+            oldContainer = document.getElementById('user-list-container');
+            newContainer = newContent.querySelector('#user-list-container');
         }
 
         if (oldContainer && newContainer) {
@@ -1217,6 +1255,55 @@ function updatePaginationContent(url, sectionType) {
     });
 }
 
+function searchMapObjects() {
+    const searchQuery = document.getElementById('searchMapObject').value;
+
+    fetch(`/admintools?map_object_page=1&searchMapObject=${searchQuery}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const newContent = document.createElement('div');
+        newContent.innerHTML = html;
+        const newContainer = newContent.querySelector('#map-object-list-container');
+        const oldContainer = document.getElementById('map-object-list-container');
+        if (oldContainer && newContainer) {
+            oldContainer.innerHTML = newContainer.innerHTML;
+        } else {
+            console.error('Map object list container not found');
+        }
+        attachPaginationEventListeners(); // Reattach event listeners to new pagination links
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+function searchUsers() {
+    const searchName = document.getElementById('searchUserByName').value;
+    const searchId = document.getElementById('searchUserById').value;
+
+    fetch(`/admintools?user_page=1&searchUserByName=${searchName}&searchUserById=${searchId}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const newContent = document.createElement('div');
+        newContent.innerHTML = html;
+        const newContainer = newContent.querySelector('#user-list-container');
+        const oldContainer = document.getElementById('user-list-container');
+        if (oldContainer && newContainer) {
+            oldContainer.innerHTML = newContainer.innerHTML;
+        } else {
+            console.error('User list container not found');
+        }
+        attachPaginationEventListeners(); // Reattach event listeners to new pagination links
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
 
 
 function updatePageParam(url, newPage) {

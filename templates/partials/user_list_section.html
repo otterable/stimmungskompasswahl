@@ -1,7 +1,12 @@
+<div class="user-search-container">
+    <input type="text" id="searchUserByName" placeholder="Search by username" onkeyup="searchUsers()">
+    <input type="text" id="searchUserById" placeholder="Search by user ID" onkeyup="searchUsers()">
+</div>
+
 <div class="project-list" id="user-list-container">
     {% if paginated_users.items %}
         {% for user in paginated_users.items %}
-            <div class="project-thumbnail">
+            <div class="user-thumbnail">
                 <h3>{{ user.name }} (ID: {{ user.id }})</h3>
                 <div class="project-details">
                     Projects created: {{ user.project_count }} <br>
