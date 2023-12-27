@@ -12,13 +12,18 @@
 </head>
 
    <style>
-        body {
-        font-family: 'Roboto', sans-serif;
-        background-color: #f5f1e4;
-        color: black;
-        margin: 0; /* Remove default margin */
-        padding: 0; /* Remove default padding */
-    }
+body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f1e4;
+            color: black;
+            margin: 0;
+            padding: 0;
+            background-image: url('static/background1.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
 
         img {
             border-radius: 30px;
@@ -901,6 +906,8 @@ setTimeout(function() {
             {% endwith %}
         });
 </script>
+
+
 
 {% if not current_user.is_authenticated %}
     <script>

@@ -2501,7 +2501,11 @@ function postMarker() {
 
     // Change the cursor to the future marker icon
     setMapCursor();
+
+    // Clear the textarea
+    document.getElementById('marker-description').value = '';
 }
+
 
 // Function to toggle the sidebar visibility and adjust map size
 function toggleMarkerSidebar() {
@@ -3132,29 +3136,33 @@ function saveMarkerData(latlng, category, description) {
     };
 
     // Send the data using AJAX
-    $.ajax({
-        url: '/add_marker',
-        method: 'POST',
-        data: JSON.stringify(dataToSend),
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-        success: function(response) {
-            console.log('Marker saved:', response);
-            // Create and add the marker after successful save
-            var fillColor = getCategoryColor(category);
-            var markerIcon = createIcon(24, 2, fillColor);
-            var marker = L.marker(latlng, { icon: markerIcon }).addTo(map);
-            marker.bindPopup(`<strong>${category}</strong><br>${description}`);
-            console.log(`Marker with text "${description}" of category "${category}" just created, creating an icon for it.`);
-        },
-        error: function(error) {
-            console.error('Error saving marker:', error);
+$.ajax({
+    url: '/add_marker',
+    method: 'POST',
+    data: JSON.stringify(dataToSend),
+    contentType: 'application/json; charset=utf-8',
+    dataType: 'json',
+    success: function(response) {
+        console.log('Marker saved:', response);
+        // Create and add the marker after successful save
+        var fillColor = getCategoryColor(category);
+        var markerIcon = createIcon(24, 2, fillColor);
+        var marker = L.marker(latlng, { icon: markerIcon }).addTo(map);
+        marker.bindPopup(`<strong>${category}</strong><br>${description}`);
+        console.log(`Marker with text "${description}" of category "${category}" just created, creating an icon for it.`);
+    },
+    error: function(xhr, textStatus, errorThrown) {
+        if(xhr.status === 429) {
+            // Display alert when status code is 429 (Too Many Requests)
+            alert("Sie haben kürzlich ein Projekt gepostet. Versuchen Sie es in Kürze noch einmal!");
+        } else {
+            // Log other types of errors
+            console.error('Error saving marker:', errorThrown);
         }
-    });
+    }
+});
+
 }
-
-
-
 </script>
    
    <script>

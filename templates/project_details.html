@@ -905,34 +905,47 @@ display: block;
     }
 </script>
 <script>
-    document.getElementById('comment-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+document.getElementById('comment-form').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-        var formData = new FormData(this);
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', this.action, true);
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        
-        xhr.onload = function() {
-            if (this.status >= 200 && this.status < 400) {
-                // Success! Parse response and update comments
-                var response = JSON.parse(this.response);
-                var commentsContainer = document.getElementById('comments-container');
-                var newCommentHtml = `
-                    <div class="comment">
-                        <p>"${response.text}"</p>
-                        <p>${response.author_name} am ${response.timestamp}</p>
-                    </div>
-                `;
-                commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
-            } else {
-                // Error handling
-                console.error('Error occurred in comment submission');
-            }
-        };
+    var formData = new FormData(this);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', this.action, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    
+    xhr.onload = function() {
+        if (this.status === 429) {
+            // Handle rate limiting
+            alert("Sie haben zu viele Kommentare gepostet! Versuchen Sie es in 15 Minuten erneut.");
+        } else if (this.status >= 200 && this.status < 400) {
+            // Success! Parse response and update comments
+            var response = JSON.parse(this.response);
+            var commentsContainer = document.getElementById('comments-container');
+            var newCommentHtml = `
+                <div class="comment">
+                    <p>"${response.text}"</p>
+                    <p>${response.author_name} am ${response.timestamp}</p>
+                </div>
+            `;
+            commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
 
-        xhr.send(formData);
-    });
+            // Clear the textarea
+            document.querySelector('#comment-form textarea').value = '';
+        } else {
+            // General error handling
+            console.error('Error occurred in comment submission');
+        }
+    };
+
+    xhr.onerror = function() {
+        // Network error handling
+        console.error('Network error occurred during the request');
+    };
+
+    xhr.send(formData);
+});
+
+
 </script>
 
 <script>

@@ -21,6 +21,9 @@ import string
 import json
 import zipfile
 import pytz
+import time
+import threading
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -55,10 +58,28 @@ login_manager.login_view = 'login'
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+ip_last_posted = {}
+
+
 # Create the database tables before the first request
 def create_tables():
     db.create_all()
 
+
+def can_user_post_comment(user_id):
+    # Define the time limit and max comments
+    time_limit = datetime.now() - timedelta(minutes=15)
+    max_comments = 5
+
+    # Query the number of comments in the last 15 minutes for this user
+    recent_comments_count = Comment.query.filter(
+        Comment.user_id == user_id,
+        Comment.timestamp > time_limit
+    ).count()
+
+    # Return True if the user has posted less than max_comments in the time limit
+    return recent_comments_count < max_comments
+    
 def zip_user_submissions():
     try:
         # Path for the directory to be zipped
@@ -214,9 +235,31 @@ def register():
     return render_template('register.html')
 
 
+# Function to clean up old IP addresses
+def cleanup_ip_addresses():
+    while True:
+        time.sleep(60)  # Check every minute
+        current_time = datetime.now()
+        for ip in list(ip_last_posted.keys()):
+            if (current_time - ip_last_posted[ip]).seconds > 900:  # 15 minutes
+                del ip_last_posted[ip]
+                print(f"Removed IP {ip} from tracking")
+
+# Start the background thread for cleanup
+cleanup_thread = threading.Thread(target=cleanup_ip_addresses, daemon=True)
+cleanup_thread.start()
+
+
 @app.route('/add_marker', methods=['POST'])
 def add_marker():
     data = request.json
+    ip_address = request.remote_addr
+
+    # Check if the IP address has posted in the last 15 minutes
+    if ip_address in ip_last_posted and (datetime.now() - ip_last_posted[ip_address]).seconds < 900:
+        app.logger.warning(f"IP {ip_address} blocked from posting a new marker")
+        return jsonify({'error': 'You can only post once every 15 minutes'}), 429
+
     try:
         author_id = current_user.id if current_user.is_authenticated and hasattr(current_user, 'id') else 0
 
@@ -225,24 +268,27 @@ def add_marker():
         image_file = data.get('image_file', 'default_image.jpg')  # Assuming 'default_image.jpg' is a valid placeholder
 
         new_project = Project(
-            name="User Generated Marker",  # Modify as needed
+            name="User Generated Marker",
             category=data['category'],
             descriptionwhy=data['description'],
             public_benefit=public_benefit,
-            image_file=image_file,  # Use the determined image file
+            image_file=image_file,
             geoloc=f"{data['lat']}, {data['lng']}",
-            author=author_id,  # Use the determined author_id
-            is_mapobject=True  # Explicitly set is_mapobject to True for markers
-            # Add other necessary fields
+            author=author_id,
+            is_mapobject=True
         )
         db.session.add(new_project)
         db.session.commit()
+
+        # Update the IP tracking dictionary
+        ip_last_posted[ip_address] = datetime.now()
+        app.logger.info(f"IP {ip_address} recorded for posting a marker")
+
         return jsonify({'message': 'Marker added successfully', 'id': new_project.id}), 200
+
     except Exception as e:
-        app.logger.error('Error saving marker: %s', str(e))
+        app.logger.error(f'Error saving marker: {e}')
         return jsonify({'error': str(e)}), 500
-
-
 
 
         
@@ -342,6 +388,13 @@ def neuerbeitrag():
 @login_required
 def submit_project():
     if request.method == 'POST':
+        ip_address = request.remote_addr
+
+        # Check if the IP address has posted a project in the last 15 minutes
+        if ip_address in ip_last_posted and (datetime.now() - ip_last_posted[ip_address]).seconds < 900:
+            app.logger.warning(f"IP {ip_address} blocked from submitting a new project")
+            return jsonify({'error': 'You can only submit one project every 15 minutes'}), 429
+
         # Debugging: Print form data
         logging.debug("Form data received: %s", request.form)
         logging.debug("Files received: %s", request.files)
@@ -384,6 +437,10 @@ def submit_project():
             db.session.add(new_project)
             db.session.commit()
 
+            # Update the IP tracking dictionary after successful submission
+            ip_last_posted[ip_address] = datetime.now()
+            app.logger.info(f"IP {ip_address} recorded for submitting a project")
+
             # Debugging: Confirm database commit
             logging.debug("New project added to database with ID: %s", new_project.id)
 
@@ -394,6 +451,7 @@ def submit_project():
 
     # Display the form for GET request
     return render_template('neuerbeitrag.html')
+
 
 
 
@@ -902,6 +960,14 @@ def vote(project_id, vote_type):
 @app.route('/comment/<int:project_id>', methods=['POST'])
 @login_required
 def comment(project_id):
+    # Check if the user can post a comment
+    if not can_user_post_comment(current_user.id):
+        # If the user has exceeded the comment limit, return an appropriate response
+        return jsonify({
+            'success': False,
+            'message': 'Comment limit reached. Please wait before posting another comment.'
+        }), 429  # 429 Too Many Requests
+
     project = Project.query.get_or_404(project_id)
     comment_text = request.form.get('comment')
 
@@ -913,10 +979,12 @@ def comment(project_id):
     db.session.commit()
 
     return jsonify({
+        'success': True,
         'text': new_comment.text,
         'author_name': f"{current_user.name}",
         'timestamp': new_comment.timestamp.strftime('%d.%m.%Y %H:%M')
     })
+
     
 @app.route('/profil')
 @app.route('/profil/projects/<int:project_page>/map_objects/<int:map_object_page>/comments/<int:comment_page>')
