@@ -2062,7 +2062,7 @@ margin: auto;
         <br>
         <p>3. Place it on the map:</p>
         <div class="button-container">
-            <button onclick="postMarker()" class="register-button">Hinzufügen</button>
+<button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>
         </div>
     </div>
 </div>
@@ -2159,6 +2159,8 @@ margin: auto;
 <?php SIDEBAR BODY END ?>
 
 <script type="text/javascript">
+
+
 // Initialize the map
 var map = L.map('map').setView([48.4102, 15.6022], 15);
 var currentDrawnLayer = null;
@@ -2213,6 +2215,8 @@ var innerBounds = [
     bounds.getSouthEast(),
     bounds.getSouthWest()
 ];
+
+var boundary = L.latLngBounds(innerBounds);
 
 // Create a polygon with a hole (inverted polygon)
 var invertedPolygon = L.polygon([outerBounds, innerBounds], {color: 'grey', fillColor: 'grey', fillOpacity: 0.5}).addTo(map);
@@ -2342,59 +2346,73 @@ function createCursorIcon(fillColor) {
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgCursorIcon)))}`;
 }
 
-// Function to set map cursor
+var isMarkerCreationActive = false;
+
+// Function to set the map cursor and activate marker creation process
 function setMapCursor() {
     var cursorIconUrl = futureMarker.icon;
     document.getElementById('map').style.cursor = `url('${cursorIconUrl}') 12 12, auto`;
     console.log("Map cursor set to future marker icon");
 
-    // Add a one-time click event listener to the map for placing the marker
-    map.once('click', function(e) {
-        console.log("Map clicked at:", e.latlng);
-
-        // Create a temporary marker
-        var tempMarker = L.marker(e.latlng, {
-            icon: createIcon(24, 2, getCategoryColor(futureMarker.category))
-        }).addTo(map);
-        console.log("Temporary marker created at:", e.latlng); // Debug
-
-        // Show custom confirmation
-        showCustomConfirm(e.latlng, tempMarker);
-    });
+    isMarkerCreationActive = true; // Activate marker creation process
 }
 
+// Function to handle map click for placing a marker
+function handleMapClick(e) {
+    // Only process click if marker creation is active
+    if (isMarkerCreationActive) {
+        console.log("Map clicked at:", e.latlng);
+
+        // Check if the clicked location is inside the boundary
+        if (boundary.contains(e.latlng)) {
+            selectedLatLng = e.latlng;
+            console.log("selectedLatLng set to:", selectedLatLng);
+            console.log("Clicked location is inside of the boundary, showCustomConfirm triggered");
+
+            var tempMarker = L.marker(e.latlng, {
+                icon: createIcon(24, 2, getCategoryColor(futureMarker.category))
+            }).addTo(map);
+            console.log("Temporary marker created at:", e.latlng);
+
+            showCustomConfirm(selectedLatLng, tempMarker);
+        } else {
+            console.log("Clicked location is outside the boundary. No actions will be taken.");
+        }
+    }
+}
+
+// Register the map click event listener
+map.on('click', handleMapClick);
+
+// Function to show the custom confirmation dialog
 function showCustomConfirm(latlng, tempMarker) {
     var confirmDiv = document.getElementById('custom-confirm');
     confirmDiv.style.display = 'block';
-    
-    // Handle Yes button click
+
     document.getElementById('confirm-yes').onclick = function() {
         addMarker(latlng, futureMarker.category, futureMarker.description);
         confirmDiv.style.display = 'none';
         console.log("Marker placed at:", latlng);
         resetMapCursor();
+        isMarkerCreationActive = false; // Deactivate marker creation process
     };
 
-    // Handle No button click
     document.getElementById('confirm-no').onclick = function() {
         map.removeLayer(tempMarker);
         confirmDiv.style.display = 'none';
         console.log("Marker placement cancelled");
         resetMapCursor();
+        isMarkerCreationActive = false; // Deactivate marker creation process
     };
 }
 
-
-
 // Function to reset map cursor
 function resetMapCursor() {
-    console.log("Attempting to reset map cursor...");
-
     document.getElementById('map').style.cursor = '';
-    
-    console.log("marker has been placed, custom cursor deactivated");
+    isMarkerCreationActive = false; // Deactivate marker creation process
     console.log("Map cursor reset to default");
 }
+
 
 
 // Function to open marker overlay
@@ -2724,16 +2742,22 @@ function updateMarkerIcons() {
 }
 
 document.addEventListener('click', function(event) {
-    var overlay = document.getElementById('marker-overlay');
+    var markerOverlay = document.getElementById('marker-overlay');
     var overlayContent = document.getElementById('overlay-content');
+    var navOverlay = document.getElementById('nav-overlay');
 
-    console.log("Click detected, overlay state: ", overlay.style.display);
+    // Check if the clicked element is not part of the nav-overlay
+    if (navOverlay && !navOverlay.contains(event.target)) {
+        console.log("Click detected, marker overlay state: ", markerOverlay.style.display);
 
-    if (overlay && overlay.style.display !== 'none' && !overlayContent.contains(event.target)) {
-        overlay.style.display = 'none';
-        console.log("Marker overlay closed");
+        // Close the marker overlay if it is open and the click is outside its content
+        if (markerOverlay && markerOverlay.style.display !== 'none' && !overlayContent.contains(event.target)) {
+            markerOverlay.style.display = 'none';
+            console.log("Marker overlay closed");
+        }
     }
 });
+
 
 
 
@@ -3109,14 +3133,6 @@ function addMarker(latlng, category, description) {
 
 // Variable to store the selected latitude and longitude
 
-// Event listener for map click
-map.on('click', function(e) {
-    console.log("Map clicked at:", e.latlng);
-    
-    selectedLatLng = e.latlng; // Set the selectedLatLng
-    console.log("selectedLatLng set to:", selectedLatLng);
-
-});
 
 
 	// Add this function in your JavaScript
@@ -3165,7 +3181,7 @@ $.ajax({
 }
 </script>
    
-   <script>
+  <script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');
@@ -3244,6 +3260,63 @@ $.ajax({
 
 <script type="text/javascript">
     var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
+</script>
+<script type="text/javascript">
+    // Check marker posting limit on page load
+    window.onload = function() {
+        fetch('/check_limit')
+            .then(response => response.json())
+            .then(data => {
+                var addButton = document.getElementById('add-marker-button');
+                var overlayButton = document.getElementById('open-overlay');
+
+                if (data.limit_reached) {
+                    console.log("This IP already reached posting limits for today. Limits expire at:", data.reset_time);
+                    
+                    // Disable buttons immediately
+                    addButton.disabled = true;
+                    overlayButton.disabled = true;
+
+                    // Immediately update the timer text for both buttons
+                    updateTimerText(data.reset_time, addButton, overlayButton);
+
+                    console.log("Buttons now show a timer and are unclickable.");
+                    startTimer(data.reset_time, addButton, overlayButton);
+                }
+            })
+            .catch(error => console.error('Error checking limit:', error));
+    };
+
+    function updateTimerText(expiryTime, addButton, overlayButton) {
+        var now = new Date().getTime();
+        var countDownDate = new Date(expiryTime).getTime();
+        var distance = countDownDate - now;
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        var timerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
+        addButton.innerText = timerText;
+        overlayButton.innerText = timerText;
+    }
+
+    // Function to start a countdown timer
+    function startTimer(expiryTime, addButton, overlayButton) {
+        var countDownDate = new Date(expiryTime).getTime();
+
+        var x = setInterval(function() {
+            updateTimerText(expiryTime, addButton, overlayButton);
+
+            if (new Date().getTime() > countDownDate) {
+                clearInterval(x);
+                addButton.innerText = "Hinzufügen";
+                overlayButton.innerText = "Hinzufügen";
+                addButton.disabled = false; // Enable the buttons
+                overlayButton.disabled = false; // Enable the buttons
+                console.log("Buttons are now clickable and ready for new submissions.");
+            }
+        }, 1000);
+    }
 </script>
 
 

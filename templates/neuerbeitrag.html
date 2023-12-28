@@ -907,6 +907,48 @@ setTimeout(function() {
         });
 </script>
 
+<script>
+    // Check submission limit on page load
+    window.onload = function() {
+        fetch('/check_project_limit')
+            .then(response => response.json())
+            .then(data => {
+                var publishButton = document.querySelector('.publish-button');
+
+                if (data.limit_reached) {
+                    console.log("Submission limit reached. Limit expires at:", data.reset_time);
+                    
+                    // Update the publish button
+                    publishButton.innerText = `Limit reached, expires at ${data.reset_time}`;
+                    publishButton.disabled = true;
+
+                    startTimer(data.reset_time, publishButton);
+                }
+            })
+            .catch(error => console.error('Error checking submission limit:', error));
+    };
+
+    // Function to start a countdown timer
+    function startTimer(expiryTime, publishButton) {
+        var countDownDate = new Date(expiryTime).getTime();
+
+        var x = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            publishButton.innerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
+
+            if (distance < 0) {
+                clearInterval(x);
+                publishButton.innerText = "Veröffentlichen";
+                publishButton.disabled = false;
+            }
+        }, 1000);
+    }
+</script>
 
 
 {% if not current_user.is_authenticated %}

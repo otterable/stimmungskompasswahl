@@ -59,7 +59,10 @@ login_manager.login_view = 'login'
 logging.basicConfig(level=logging.DEBUG)
 
 ip_last_posted = {}
-
+ip_last_submitted_project = {}
+ip_last_added_marker = {}
+ip_marker_additions = {}  # Initialize the dictionary to track marker additions
+ip_project_submissions = {}
 
 # Create the database tables before the first request
 def create_tables():
@@ -67,18 +70,24 @@ def create_tables():
 
 
 def can_user_post_comment(user_id):
-    # Define the time limit and max comments
     time_limit = datetime.now() - timedelta(minutes=15)
     max_comments = 5
-
-    # Query the number of comments in the last 15 minutes for this user
     recent_comments_count = Comment.query.filter(
         Comment.user_id == user_id,
         Comment.timestamp > time_limit
     ).count()
-
-    # Return True if the user has posted less than max_comments in the time limit
     return recent_comments_count < max_comments
+    
+def get_reset_time(user_id):
+    earliest_comment = Comment.query.filter(
+        Comment.user_id == user_id
+    ).order_by(Comment.timestamp.asc()).first()
+
+    if earliest_comment:
+        return earliest_comment.timestamp + timedelta(minutes=15)
+    else:
+        return datetime.now()
+        
     
 def zip_user_submissions():
     try:
@@ -101,6 +110,24 @@ def zip_user_submissions():
         logging.error("Error creating zip file: %s", e)
         return None
 
+@app.route('/check_comment_limit')
+def check_comment_limit():
+    if not current_user.is_authenticated:
+        return jsonify({'limit_reached': False})
+
+    user_id = current_user.id
+    time_limit = datetime.utcnow() - timedelta(minutes=15)
+    recent_comments = Comment.query.filter(
+        Comment.user_id == user_id,
+        Comment.timestamp > time_limit
+    ).order_by(Comment.timestamp.asc()).all()  # Order by ascending to get the oldest comment first
+
+    if len(recent_comments) >= 5:
+        oldest_comment_time = recent_comments[0].timestamp  # Get the time of the oldest comment
+        reset_time = oldest_comment_time + timedelta(minutes=15)
+        return jsonify({'limit_reached': True, 'reset_time': reset_time.isoformat() + 'Z'})
+    else:
+        return jsonify({'limit_reached': False})
 
 
 
@@ -240,10 +267,18 @@ def cleanup_ip_addresses():
     while True:
         time.sleep(60)  # Check every minute
         current_time = datetime.now()
-        for ip in list(ip_last_posted.keys()):
-            if (current_time - ip_last_posted[ip]).seconds > 900:  # 15 minutes
-                del ip_last_posted[ip]
-                print(f"Removed IP {ip} from tracking")
+        
+        # Cleanup for ip_last_submitted_project
+        for ip in list(ip_last_submitted_project.keys()):
+            if (current_time - ip_last_submitted_project[ip]).seconds > 86400:  # 24 hours
+                del ip_last_submitted_project[ip]
+                print(f"Removed IP {ip} from submitted project tracking")
+
+        # Cleanup for ip_last_added_marker
+        for ip in list(ip_last_added_marker.keys()):
+            if (current_time - ip_last_added_marker[ip]).seconds > 86400:  # 24 hours
+                del ip_last_added_marker[ip]
+                print(f"Removed IP {ip} from added marker tracking")
 
 # Start the background thread for cleanup
 cleanup_thread = threading.Thread(target=cleanup_ip_addresses, daemon=True)
@@ -255,10 +290,13 @@ def add_marker():
     data = request.json
     ip_address = request.remote_addr
 
-    # Check if the IP address has posted in the last 15 minutes
-    if ip_address in ip_last_posted and (datetime.now() - ip_last_posted[ip_address]).seconds < 900:
-        app.logger.warning(f"IP {ip_address} blocked from posting a new marker")
-        return jsonify({'error': 'You can only post once every 15 minutes'}), 429
+    # Check and update the rate limit for marker additions
+    additions = ip_marker_additions.get(ip_address, [])
+    # Remove timestamps older than 24 hours
+    additions = [time for time in additions if datetime.now() - time < timedelta(days=1)]
+    if len(additions) >= 2:
+        app.logger.warning(f"IP {ip_address} blocked from adding new markers due to rate limit")
+        return jsonify({'error': 'Rate limit exceeded. You can only add 20 markers every 24 hours'}), 429
 
     try:
         author_id = current_user.id if current_user.is_authenticated and hasattr(current_user, 'id') else 0
@@ -280,17 +318,16 @@ def add_marker():
         db.session.add(new_project)
         db.session.commit()
 
-        # Update the IP tracking dictionary
-        ip_last_posted[ip_address] = datetime.now()
-        app.logger.info(f"IP {ip_address} recorded for posting a marker")
+        # Update IP tracking dictionary
+        additions.append(datetime.now())
+        ip_marker_additions[ip_address] = additions
 
+        app.logger.info(f"IP {ip_address} recorded for posting a marker")
         return jsonify({'message': 'Marker added successfully', 'id': new_project.id}), 200
 
     except Exception as e:
         app.logger.error(f'Error saving marker: {e}')
         return jsonify({'error': str(e)}), 500
-
-
         
 @app.route('/get_projects')
 def get_projects():
@@ -316,6 +353,26 @@ def get_projects():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/check_limit', methods=['GET'])
+def check_limit():
+    ip_address = request.remote_addr
+    additions = ip_marker_additions.get(ip_address, [])
+    additions = [time for time in additions if datetime.now() - time < timedelta(days=1)]
+
+    if len(additions) >= 2:
+        reset_time = max(additions) + timedelta(days=1)
+        return jsonify({'limit_reached': True, 'reset_time': reset_time.strftime('%Y-%m-%d %H:%M:%S')})
+
+    return jsonify({'limit_reached': False})
+
+@app.route('/check_project_limit')
+def check_project_limit():
+    ip_address = request.remote_addr
+    submissions = ip_project_submissions.get(ip_address, [])
+    submissions = [time for time in submissions if datetime.now() - time < timedelta(days=1)]
+    limit_reached = len(submissions) >= 1  # Assuming 1 submission per day limit
+    reset_time = (submissions[0] + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S') if limit_reached else None
+    return jsonify({'limit_reached': limit_reached, 'reset_time': reset_time})
 
 
 def generate_otp_and_send(phone_number):
@@ -390,35 +447,28 @@ def submit_project():
     if request.method == 'POST':
         ip_address = request.remote_addr
 
-        # Check if the IP address has posted a project in the last 15 minutes
-        if ip_address in ip_last_posted and (datetime.now() - ip_last_posted[ip_address]).seconds < 900:
-            app.logger.warning(f"IP {ip_address} blocked from submitting a new project")
-            return jsonify({'error': 'You can only submit one project every 15 minutes'}), 429
-
-        # Debugging: Print form data
-        logging.debug("Form data received: %s", request.form)
-        logging.debug("Files received: %s", request.files)
-
+        # Check and update the rate limit for project submissions
+        submissions = ip_project_submissions.get(ip_address, [])
+        # Remove timestamps older than 24 hours
+        submissions = [time for time in submissions if datetime.now() - time < timedelta(days=1)]
+        if len(submissions) >= 1:
+            app.logger.warning(f"IP {ip_address} blocked from submitting new projects due to rate limit")
+            return jsonify({'error': 'Rate limit exceeded. You can only submit 5 projects every 24 hours'}), 429
+        
         # Extract form data
-        name = request.form.get('name')  # Instead of 'title'
+        name = request.form.get('name')
         category = request.form.get('category')
         descriptionwhy = request.form.get('descriptionwhy')
         public_benefit = request.form.get('public_benefit')
-        image = request.files.get('image_file')  # Ensure this matches the 'name' attribute in your HTML form
-        geoloc = request.form.get('geoloc')  # Optional geolocation data
-
-        # Debugging: Print extracted data
-        logging.debug("Project name: %s, Category: %s, Description: %s", name, category, descriptionwhy)
+        image = request.files.get('image_file')
+        geoloc = request.form.get('geoloc')
 
         if image:
             image_filename = secure_filename(image.filename)
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
             image.save(image_path)
 
-            # Debugging: Confirm image saving
-            logging.debug("Image saved to: %s", image_path)
-
-            current_time = datetime.now(pytz.utc) + timedelta(hours=1)  # Adjusting time to your timezone
+            current_time = datetime.now(pytz.utc) + timedelta(hours=1)
 
             new_project = Project(
                 name=name,
@@ -428,28 +478,20 @@ def submit_project():
                 image_file=image_filename,
                 geoloc=geoloc,
                 author=current_user.id,
-                date=current_time  # Corrected field for the timestamp
+                date=current_time
             )
-
-            # Debugging: Print new project details
-            logging.debug("New project details: %s", new_project.to_dict())
 
             db.session.add(new_project)
             db.session.commit()
 
-            # Update the IP tracking dictionary after successful submission
-            ip_last_posted[ip_address] = datetime.now()
-            app.logger.info(f"IP {ip_address} recorded for submitting a project")
+            # Update IP tracking dictionary
+            submissions.append(datetime.now())
+            ip_project_submissions[ip_address] = submissions
 
-            # Debugging: Confirm database commit
-            logging.debug("New project added to database with ID: %s", new_project.id)
-
-            # Redirect to the project details page of the newly created project
             return redirect(url_for('project_details', project_id=new_project.id))
         else:
             return redirect(url_for('submit_project'))
 
-    # Display the form for GET request
     return render_template('neuerbeitrag.html')
 
 
@@ -524,11 +566,19 @@ def get_project_by_id(project_id):
 @app.route('/project_details/<int:project_id>', methods=['GET', 'POST'])
 def project_details(project_id):
     try:
-        project = get_project_by_id(project_id)
+        project = Project.query.get(project_id)
         comments = Comment.query.filter_by(project_id=project_id).all()
 
         if request.method == 'POST' and current_user.is_authenticated:
-            comment_text = request.form.get('comment')
+            comment_text = request.form.get('comment', '').strip()
+            if not (20 <= len(comment_text) <= 500):
+                flash('Kommentare müssen zwischen 20 und 500 Zeichen lang sein.', 'error')
+                return redirect(url_for('project_details', project_id=project_id))
+
+            if not can_user_post_comment(current_user.id):
+                flash('Kommentarlimit erreicht. Bitte warten Sie, bevor Sie einen weiteren Kommentar posten.', 'error')
+                return redirect(url_for('project_details', project_id=project_id))
+
             new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=project_id)
             db.session.add(new_comment)
             db.session.commit()
@@ -543,7 +593,6 @@ def project_details(project_id):
 
         project_author = User.query.get(project.author)
         author_name = project_author.name if project_author else "Unknown"
-
         comments_with_authors = [
             {
                 "text": comment.text,
@@ -553,7 +602,6 @@ def project_details(project_id):
             for comment in comments
         ]
 
-        # Ensure is_mapobject is explicitly checked and assigned
         is_mapobject = getattr(project, 'is_mapobject', False)
 
         return render_template('project_details.html', project=project, 
@@ -565,8 +613,10 @@ def project_details(project_id):
                                comments=comments_with_authors, 
                                is_mapobject=is_mapobject)
     except Exception as e:
-        logging.error("Error in project_details route: %s", str(e))
+        app.logger.error("Error in project_details route: %s", str(e))
         return str(e)  # Or redirect to a generic error page
+
+
 
 @app.route('/admintools', methods=['GET', 'POST'])
 @login_required

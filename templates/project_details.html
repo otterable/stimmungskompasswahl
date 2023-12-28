@@ -7,13 +7,17 @@
 <body>
 
    <style>
-      body {
-        font-family: 'Roboto', sans-serif;
-        background-color: #f5f1e4;
-        color: black;
-        margin: 0; /* Remove default margin */
-        padding: 0; /* Remove default padding */
-    }
+   body {
+      font-family: 'Roboto', sans-serif;
+background-image: url('{{ url_for('static', filename='background5.png') }}');
+      background-size: cover; /* Ensure it covers the entire body */
+      background-position: center; /* Center the background image */
+      background-attachment: fixed; /* Fixed background */
+      color: black;
+      margin: 0; /* Remove default margin */
+      padding: 0; /* Remove default padding */
+   }
+
 
         img {
             border-radius: 30px;
@@ -771,7 +775,7 @@ display: block;
                 {% if current_user.is_authenticated %}
                     <div class="comment-form">
                         <form id="comment-form" action="{{ url_for('comment', project_id=project.id) }}" method="POST">
-                            <textarea name="comment" class="full-width-textarea" required></textarea>
+<textarea name="comment" class="full-width-textarea" required minlength="20" maxlength="500"></textarea>
                             <button type="submit" class="button comment-button">Speichern 💬</button>
                         </form>
                     </div>
@@ -794,7 +798,7 @@ display: block;
 </body>
 
 
-   <script>
+<script>
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');
@@ -905,6 +909,56 @@ display: block;
     }
 </script>
 <script>
+
+
+</script>
+
+<script>
+// Check comment posting limit on page load
+window.onload = function() {
+    fetch('/check_comment_limit')  // Assuming you have an endpoint to check the limit
+        .then(response => response.json())
+        .then(data => {
+            var commentButton = document.querySelector('.comment-button');
+            if (data.limit_reached) {
+                console.log("This IP already reached comment posting limits for today. Limits expire at:", data.reset_time);
+                console.log("Transforming the comment button into a timer.");
+                commentButton.innerText = `Limit reached, checking timer...`;
+                commentButton.disabled = true;
+                startTimer(data.reset_time, commentButton);
+            } else {
+                console.log("Comment limit not reached. Button remains active.");
+                commentButton.disabled = false; // Ensure button is enabled if limit is not reached
+                commentButton.innerText = "Speichern 💬"; // Reset button text
+            }
+        })
+        .catch(error => console.error('Error checking comment limit:', error));
+};
+
+// Function to start a countdown timer and update the button text
+function startTimer(expiryTime, button) {
+    var countDownDate = new Date(expiryTime).getTime();
+
+    var x = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        if (distance > 0) {
+            button.innerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
+        } else {
+            clearInterval(x);
+            button.innerText = "Speichern 💬";
+            button.disabled = false;
+            console.log("Timer expired. Comment button is now active again.");
+        }
+    }, 1000);
+}
+
+
+// Event listener for comment form submission
 document.getElementById('comment-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -914,38 +968,41 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     
     xhr.onload = function() {
-        if (this.status === 429) {
-            // Handle rate limiting
-            alert("Sie haben zu viele Kommentare gepostet! Versuchen Sie es in 15 Minuten erneut.");
-        } else if (this.status >= 200 && this.status < 400) {
-            // Success! Parse response and update comments
-            var response = JSON.parse(this.response);
-            var commentsContainer = document.getElementById('comments-container');
-            var newCommentHtml = `
-                <div class="comment">
-                    <p>"${response.text}"</p>
-                    <p>${response.author_name} am ${response.timestamp}</p>
-                </div>
-            `;
-            commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
+    if (this.status === 429) {
+        // Handle rate limiting
+        // alert("Sie haben zu viele Kommentare gepostet! Versuchen Sie es in 15 Minuten erneut.");
+        console.log("Comment posting limit reached. Please wait for the timer to expire.");
+    } else if (this.status >= 200 && this.status < 400) {
+        // Success! Parse response and update comments
+        var response = JSON.parse(this.response);
+        var commentsContainer = document.getElementById('comments-container');
+        var newCommentHtml = `
+            <div class="comment">
+                <p>"${response.text}"</p>
+                <p>${response.author_name} am ${response.timestamp}</p>
+            </div>
+        `;
+        commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
 
-            // Clear the textarea
-            document.querySelector('#comment-form textarea').value = '';
-        } else {
-            // General error handling
-            console.error('Error occurred in comment submission');
-        }
-    };
+        // Clear the textarea
+        document.querySelector('#comment-form textarea').value = '';
+        console.log("Comment posted successfully.");
+    } else {
+        // General error handling
+        console.error('Error occurred in comment submission: ' + this.status);
+        alert("Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.");
+    }
+};
 
-    xhr.onerror = function() {
-        // Network error handling
-        console.error('Network error occurred during the request');
-    };
+xhr.onerror = function() {
+    // Network error handling
+    console.error('Network error occurred during the request');
+    alert("Netzwerkfehler aufgetreten. Bitte überprüfen Sie Ihre Internetverbindung.");
+};
+
 
     xhr.send(formData);
 });
-
-
 </script>
 
 <script>
