@@ -21,11 +21,11 @@
         color: white;
         border: none;
         border-radius: 30px;
-        padding: 15px 30px;
+        padding: 10px 10px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        font-size: 16px;
+        font-size: 14px;
         margin: 10px 0;
         cursor: pointer;
         width: 100%; /* Full width */
@@ -787,7 +787,7 @@ display: block;
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
-            <span class="user-info">
+            <span class="user-info" style="margin-top: 10px;">
                 Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
@@ -802,13 +802,13 @@ display: block;
    {% if current_user.is_authenticated %}
    
    
-    <h1>Meine Projekte:</h1>
+    <h1>My Projects:</h1>
     <div class="my-statistics centered-text">
-        <p>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projekt(e)</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentar(e) </span>gepostet.</p>
+        <p>You have posted <span style="color: #003056;">{{ user_statistics.num_projects }} project(s)</span> and <span style="color: #003056;">{{ user_statistics.num_comments }} comment(s)</span>.</p>
         {% if user_statistics.most_successful_project %}
             <p>Your most successful project is <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, with <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} upvote(s)</span>.</p>
         {% else %}
-            <p>Sie haben noch keine Projekte.</p>
+            <p>Your projects have not yet been rated.</p>
         {% endif %}
     </div>
 	</div>
@@ -831,18 +831,18 @@ display: block;
 <!-- My Comments Section -->
 <div id="comments-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
-        {% include 'partials/comments_section_profil.html' %}
+        {% include 'partials/comments_section.html' %}
     {% endwith %}
 </div>
 </div>
 
 <div class="my-account centered-text">
-    <h1>Mein Konto:</h1>
+    <h1>My Account:</h1>
     {% if current_user.is_authenticated %}
-        <p>Ihr Benutzername lautet: <span style="color: #003056;">{{ current_user.name }}</span></p>
-        <p>Ihr Konto ist mit folgender Telefonnummer verbunden: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
-        <p>Ihr Konto wurde erstellt am: <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
-        <p>Um Ihr Passwort zurückzusetzen, klicken Sie auf: <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Passwort zurücksetzen</a>.</p>
+        <p>Your account name is <span style="color: #003056;">{{ current_user.name }}</span></p>
+        <p>Your account is bound to phone number <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
+        <p>Your account was created on <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
+        <p>To reset your password, head to <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Password Recovery</a>.</p>
     {% else %}
     {% endif %}
 </div>
@@ -852,7 +852,7 @@ display: block;
 		
   {% else %}
         <div class="login-prompt centered-text">
-            <p>Sie müssen angemeldet sein, um Details zu sehen.</p>
+            <p>You must be logged in to view details.</p>
         </div>
     {% endif %}
 
@@ -871,20 +871,20 @@ display: block;
             <h1>Data:</h1>
 
             <!-- Download My Data Section -->
-            <h2>Meine Daten herunterladen</h2>
-            <p>Laden Sie alle persönlichen Daten herunter, die mit Ihrem Konto gepeichert sind.</p>
-            <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold;">Daten herunternladen</a>
+            <h2>Download My Data</h2>
+            <p>Download all data associated with your account from the server.</p>
+            <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold;">Download My Data</a>
 
-            <h2>Website herunterladen</h2>
-            <p>Laden Sie die gesamte Website als .json Datei herunter.</p>
-            <p>Enthalten sind alle Daten zu Projekten inklusive deren Orte, Kategorien, Beschreibungen und noch mehr.</p>
-            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Website herunterladen</a>
-            <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Bilder herunterladen</a>
+            <h2>Download all website data</h2>
+            <p>This will download the data of the entire website, in a machine-readable .json file.</p>
+            <p>The data contains all project data, including geolocations, their categories, descriptions, and more.</p>
+            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Download Website Data</a>
+            <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Download Images</a>
 
-            <h2>Konto löschen</h2>
-            <p>Möchten Sie alle von Ihren Daten von der Website löschen? Dieser Schritt ist nicht umkehrbar.</p>
-            <p>Ihr Konto, von Ihnen vorgeschlagene Pojekte, Ihre Abstimmungen, Kommentare und Bilder werden dauerhaft gelöscht.</p>
-            <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold;" id="delete-data-btn">Alle Daten löschen</a>
+            <h2>Delete Account</h2>
+            <p>Would you like to delete all your data from the website? This action is irreversible.</p>
+            <p>Your account, your project, votes, comments, and images will be deleted from the server.</p>
+            <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold;" id="delete-data-btn">Delete All My Data</a>
         </div>
     </div>
 {% endif %}

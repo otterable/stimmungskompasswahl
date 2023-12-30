@@ -109,21 +109,20 @@ body {
 .filter-bar .filter-button:hover {
     background-color: #002244; /* Darker shade for hover effect */
 }
-		.register-button {
-    background-color: #003056; /* Example color */
-    color: white;
-	font-weight: bold;
-    border: none;
-    border-radius: 30px;
-    padding: 15px 30px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block; /* Adjusted to inline-block */
-    font-size: 16px;
-    margin: 10px 0;
-    cursor: pointer;
-    box-sizing: border-box; /* Include padding in width */
-}
+		      .register-button {
+        background-color: #003056; /* Example color */
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 10px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        margin: 10px 0;
+        cursor: pointer;
+        box-sizing: border-box; /* Include padding in width */
+    }
 		.register-button:hover {
 
     transform: scale(1.02); /* Scale up on hover */
@@ -1069,7 +1068,7 @@ nav[aria-label="Page navigation"] {
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
-            <span class="user-info">
+            <span class="user-info" style="margin-top: 10px;">
                 Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
@@ -1096,7 +1095,7 @@ nav[aria-label="Page navigation"] {
                 <option value="user_id" {% if sort == 'user_id' %}selected{% endif %}>User ID</option>
                 <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Upvotes</option>
                 <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Downvotes</option>
-                <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Number of Comments</option>
+                <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Number of Kommentare</option>
                 <option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Title (A-Z)</option>
                 <option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Title (Z-A)</option>
 				</select>
@@ -1144,7 +1143,7 @@ nav[aria-label="Page navigation"] {
     {% for project in important_projects %}
         <div class="project-thumbnail">
             <h3>{{ project.name }}</h3>
-            <p class="project-date">Category: {{ project.category }}</p>
+            <p class="project-date">Kategorie: {{ project.category }}</p>
             <div class="project-details">
                 Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
                 Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
@@ -1156,7 +1155,7 @@ nav[aria-label="Page navigation"] {
                 <input type="hidden" name="project_id" value="{{ project.id }}">
                 <button type="submit" class="register-button" name="unmark_important">Unmark as Important</button>
             </form>
-            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">View</a>
+            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
         </div>
     {% else %}
         <p>No important projects found.</p>
@@ -1169,7 +1168,7 @@ nav[aria-label="Page navigation"] {
     {% for project in featured_projects %}
         <div class="project-thumbnail">
             <h3>{{ project.name }}</h3>
-            <p class="project-date">Category: {{ project.category }}</p>
+            <p class="project-date">Kategorie: {{ project.category }}</p>
             <div class="project-details">
                 Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
                 Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
@@ -1181,7 +1180,7 @@ nav[aria-label="Page navigation"] {
                 <input type="hidden" name="project_id" value="{{ project.id }}">
                 <button type="submit" name="unmark_featured"  class="register-button" >Unmark as Featured</button>
             </form>
-            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">View</a>
+            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
         </div>
     {% else %}
         <p>No featured projects found.</p>
@@ -1202,7 +1201,7 @@ nav[aria-label="Page navigation"] {
     <h2>Alle Beiträge löschen</h2>
     <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
     <form method="POST" action="{{ url_for('delete_all_projects') }}">
-        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to delete all projects? This action cannot be undone.');">Delete All Projects</button>
+        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to Alle Beiträge löschen? This action cannot be undone.');">Alle Beiträge löschen</button>
     </form>
 </div>
 

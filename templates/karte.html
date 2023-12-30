@@ -417,17 +417,7 @@ display: none !important;
 
 
 
-.leaflet-control-layers-toggle {
-    font-size: 30px;
-    line-height: 24px;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 30px;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 36px;
-    height: 36px;
-}
+
 
 .leaflet-control-layers {
     border-radius: 30px;
@@ -456,17 +446,18 @@ display: none !important;
 }
 
 .leaflet-control-layers-expanded .leaflet-control-layers-list {
-    color: #ffffff !important;
+   margin-top: 0px !important; /* Reduces the top margin of each label */
+    margin-bottom: 0px !important; /* Adjusts the space between each item */
 
-    font-size: 15px;
+    font-size: 7px !important;
     font-weight: bold;
     padding: 10px;  /* Added padding here */
 }
 
-.leaflet-control-layers-selector {
-    color: #ffffff !important;
 
-    margin: 2px;
+.leaflet-control-layers-separator {
+    margin-top: 5px; /* Adjusts the space above the separator line */
+    margin-bottom: 5px; /* Adjusts the space below the separator line */
 }
 
 .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
@@ -623,6 +614,8 @@ display: none !important;
         border-radius: 30px; /* Maintain the border radius */
     }
 }
+
+
 
 @media (min-width: 768px) and (max-width: 1271px) {
     .button-s {
@@ -1003,7 +996,7 @@ display: none !important;
 }
 
 .leaflet-control-layers-toggle {
-    background-image: url('static/mapicon.png');  /* Check if this path is correct */
+    background-image: url('static/mapicon.png') !important;  /* Check if this path is correct */
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center;
@@ -1182,7 +1175,7 @@ margin-bottom: 50px;
 
     #map {
         position: absolute;
-        top: calc(9vh + 35px); /* Estimate based on viewport height and gap */
+        top: calc(9vh + 15px); /* Estimate based on viewport height and gap */
         bottom: 165px; /* Adjust for the fixed height of the sidebar (150px + 15px gap) */
         left: 15px;
         right: 15px;
@@ -1420,7 +1413,8 @@ margin-bottom: 50px;
 
         label {
             display: block;
-            margin-bottom: 10px;
+			margin-top: 5px;
+            margin-bottom: 5px;
             font-size: 18px;
             color: #333;
         }
@@ -1473,7 +1467,26 @@ margin-bottom: 50px;
     box-sizing: border-box; /* Include padding in width */
 }
 
-
+        .register-button-m {
+    background-color: #003056; /* Example color */
+    color: white;
+    border: none; /* Remove the border */
+    outline: none; /* Remove the outline */
+    box-shadow: none; /* Remove any shadow that might appear as an outline */
+    border-radius: 30px;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 24px;
+    margin: auto;
+    margin-top: 0px !important;
+    margin-bottom: 0px;
+    cursor: pointer;
+        width: 97%;
+    box-sizing: border-box; /* Include padding in width */
+}
 
 .button-container {
     display: flex;
@@ -1494,6 +1507,11 @@ margin-bottom: 50px;
     border: none; /* No border by default */
     cursor: pointer; /* Pointer cursor on hover */
     transition: transform 0.3s ease, border 0.3s ease; /* Smooth transition for transform and border */
+}
+
+.register-button-m:hover {
+    transform: scale(1.02); /* Scale up on hover */
+    filter: brightness(110%); /* Increase brightness by 10% */
 }
 
 .publish-button:hover {
@@ -1753,6 +1771,13 @@ margin: auto;
             margin-top: 10px;
         }
 
+
+
+input[type="text"], select, #description-editor, #benefit-editor {
+margin-bottom: 0px !important; 
+}
+
+
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
     transition: transform 0.3s ease; /* Transition for the transform property */
@@ -1818,6 +1843,23 @@ margin: auto;
         display: block; /* Show the button on mobile */
     }
 
+      label {
+            display: block;
+            font-size: 12px;
+            color: #333;
+        }
+		
+		    .register-button-m {
+        width: calc(100% - 10px); /* Full width minus the left and right margins */
+        margin-left: 5px; /* 5px gap on the left */
+        margin-right: 5px; /* 5px gap on the right */
+        display: block; /* Change display to block for full width */
+    }
+
+    .button-container {
+        padding: 0; /* Remove padding if any */
+    }
+	
     .top-bar a .logo {
         margin-left: auto; /* Adjust logo position */
 		margin-right: auto;
@@ -1836,6 +1878,7 @@ margin: auto;
         font-size: 24px; /* Larger font size */
     }
 }
+
 
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
@@ -1989,7 +2032,7 @@ margin: auto;
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
-            <span class="user-info">
+            <span class="user-info" style="margin-top: 10px;">
                 Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
@@ -2128,18 +2171,18 @@ margin: auto;
 
 
 <div class="button-container">
-        <button id="open-overlay" class="register-button" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
+        <button id="open-overlay" class="register-button-m" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
    </div>
 	
 	<div class="button-container">
 
-	<button id="show-markers-btn" class="register-button">Show list of markers</button>
+	<button id="show-markers-btn" class="register-button-m">Liste anzeigen</button>
    </div>
 
 
 	<div class="button-container">
 
-	<button id="hideNonMapMarkers" class="register-button" style="margin-bottom: 10px; margin-top: 10px !important;">Show full projects only</button>
+	<button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Nur volle Beiträge anzeigen</button>
     </div>
 
 
@@ -3261,7 +3304,7 @@ $.ajax({
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        var timerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
+        var timerText = `Beitragslimit erreicht. Läuft in ${hours}h ${minutes}m ab`;
         addButton.innerText = timerText;
         overlayButton.innerText = timerText;
     }

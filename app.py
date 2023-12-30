@@ -1076,20 +1076,20 @@ def comment(project_id):
 @app.route('/profil/projects/<int:project_page>/map_objects/<int:map_object_page>/comments/<int:comment_page>')
 def profil(project_page=1, map_object_page=1, comment_page=1):
     per_page = 9  # Number of items per page
-    user_statistics = None  # Initialize to None
+    user_statistics = {}
+    paginated_projects = []
+    paginated_map_objects = []
+    paginated_comments = []
 
     if current_user.is_authenticated:
-        # Pagination for user projects (excluding map objects), ordered by newest first
         paginated_projects = Project.query.filter_by(
             author=current_user.id, is_mapobject=False
         ).order_by(Project.date.desc()).paginate(page=project_page, per_page=per_page, error_out=False)
 
-        # Pagination for map objects, ordered by newest first
         paginated_map_objects = Project.query.filter_by(
             author=current_user.id, is_mapobject=True
         ).order_by(Project.date.desc()).paginate(page=map_object_page, per_page=per_page, error_out=False)
 
-        # Pagination for comments, already ordered by newest first
         paginated_comments = db.session.query(Comment, Project.name).join(
             Project, Comment.project_id == Project.id
         ).filter(Comment.user_id == current_user.id).order_by(Comment.timestamp.desc()).paginate(

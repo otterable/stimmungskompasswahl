@@ -927,7 +927,7 @@ nav[aria-label="Page navigation"] {
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
-            <span class="user-info">
+            <span class="user-info" style="margin-top: 10px;">
                 Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>

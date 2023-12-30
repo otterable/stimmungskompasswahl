@@ -578,7 +578,7 @@ display: block;
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
-            <span class="user-info">
+            <span class="user-info" style="margin-top: 10px;">
                 Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
@@ -669,11 +669,51 @@ display: block;
 // Initialize the map
 var map = L.map('map').setView([48.4102, 15.6022], 15);
 
-// Load and display tile layer on the map
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
-}).addTo(map);
+    // Load and display tile layer on the map
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Define the boundaries for the grey area
+    var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
+    var horizontalOffset = 1125;
+    var verticalOffset = 594;
+    var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
+    var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
+    var bounds = L.latLngBounds(southWest, northEast);
+
+    // Define the coordinates for a very large outer rectangle
+    var outerBounds = [
+        L.latLng(-90, -180),
+        L.latLng(90, -180),
+        L.latLng(90, 180),
+        L.latLng(-90, 180),
+        L.latLng(-90, -180)
+    ];
+
+    // Define the coordinates for the inner rectangle (the boundary)
+    var innerBounds = [
+        bounds.getSouthWest(),
+        bounds.getNorthWest(),
+        bounds.getNorthEast(),
+        bounds.getSouthEast(),
+        bounds.getSouthWest()
+    ];
+
+    // Create a polygon with a hole (inverted polygon)
+    L.polygon([outerBounds, innerBounds], {
+        color: 'grey',
+        fillColor: 'grey',
+        fillOpacity: 0.5
+    }).addTo(map);
+
+    // Draw the boundary rectangle
+    L.rectangle(bounds, {
+        color: "#808080",
+        weight: 2,
+        fill: false
+    }).addTo(map);
 
 // Fix for broken marker image
 var icon = new L.Icon({
@@ -688,29 +728,65 @@ var icon = new L.Icon({
 
 // Add event listener for map click
 var marker;
+// Existing map click event handler in neuerbeitrag.html
+// Define the coordinates for the boundary
+var bounds = L.latLngBounds([
+    L.latLng([48.405, 15.597]), // Southwest corner of the boundary
+    L.latLng([48.415, 15.607])  // Northeast corner of the boundary
+]);
+
+console.log("Bounds set to SW: [48.405, 15.597], NE: [48.415, 15.607]");
+
+// Initialize the map
+
+// Define the boundaries using the method from karte.html
+var horizontalOffset = 1125; // Adjust as per your requirement
+var verticalOffset = 594; // Adjust as per your requirement
+var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
+var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
+var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
+var bounds = L.latLngBounds(southWest, northEast);
+
+// Define the coordinates for the inverted polygon (grey area)
+var outerBounds = [L.latLng(-90, -180), L.latLng(90, -180), L.latLng(90, 180), L.latLng(-90, 180), L.latLng(-90, -180)];
+var innerBounds = [bounds.getSouthWest(), bounds.getNorthWest(), bounds.getNorthEast(), bounds.getSouthEast(), bounds.getSouthWest()];
+
+// Create the inverted polygon
+var invertedPolygon = L.polygon([outerBounds, innerBounds], {color: 'grey', fillColor: 'grey', fillOpacity: 0.5}).addTo(map);
+
+// Add or update the click event handler
+var marker;
 map.on('click', function(e) {
     var coord = e.latlng;
     var lat = coord.lat;
     var lng = coord.lng;
-    console.log("You clicked the map at latitude: " + lat + " and longitude: " + lng); // Debugging
 
-    // Update the hidden input field
-    document.getElementById('geoloc').value = lat + ',' + lng;
+    // Check if the clicked location is inside the boundary
+    if (bounds.contains(e.latlng)) {
+        console.log("You clicked the map within bounds at latitude: " + lat + " and longitude: " + lng);
 
-    // Add or update marker
-    if (marker) {
-        marker.setLatLng(coord);
+        // Update the hidden input field
+        document.getElementById('geoloc').value = lat + ',' + lng;
+
+        // Add or update marker
+        if (marker) {
+            marker.setLatLng(coord);
+        } else {
+            marker = L.marker(coord, { icon: icon }).addTo(map);
+        }
     } else {
-        marker = L.marker(coord, { icon: icon }).addTo(map);
+        console.log("You clicked the map in THE GREY AREA (marker is not allowed!) at latitude: " + lat + " and longitude: " + lng);
     }
 });
+
 
 // Call invalidateSize after the map is visible/loaded
 map.invalidateSize();
 
 setTimeout(function() {
     map.invalidateSize();
-}, 100); // Adjust the timeout as needed
+}, 100); // Adjust the timeout as needed.
+
 
 </script>
   <script>
@@ -787,6 +863,7 @@ setTimeout(function() {
         x.style.display = "block";
     }
 }
+
 
     </script>
 	<script>
