@@ -1,12 +1,8 @@
-<div class="map-object-search-container">
-    <input type="text" id="searchMapObject" placeholder="Search map objects" onkeyup="searchMapObjects()">
-</div>
-
 <div class="my-projects centered-text">
     {% if paginated_map_objects and paginated_map_objects.items %}
         <div class="project-list" id="map-object-list-container"> 
             {% for project in paginated_map_objects.items %}
-                {% if project.is_mapobject %}  <!-- Check if project is a map object -->
+                {% if project.is_mapobject %}
                     <div class="project-thumbnail">
                         <div class="project-description">{{ project.descriptionwhy|safe }}</div>
                         <p class="project-date">Posted on: {{ project.date.strftime('%d.%m.%Y') }}</p>
@@ -24,26 +20,26 @@
         {% endif %}
     {% endif %}
 
-    <!-- Correct Pagination for Map Objects -->
+    <!-- Pagination for Map Objects -->
     {% if paginated_map_objects.pages > 1 %}
-<nav aria-label="Map Object Page navigation" class="pagination-container" data-pagination-type="map_object">
-        <ul class="pagination">
-           {% if paginated_map_objects.has_prev %}
-    <li class="page-item">
-        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.prev_num, sort=sort, search=search_query) }}">Previous</a>
-    </li>
-{% endif %}
-  {% for page in paginated_map_objects.iter_pages() %}
-    <li class="page-item {{ 'active' if page == paginated_map_objects.page else '' }}">
-        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=page, sort=sort, search=search_query) }}">{{ page }}</a>
-    </li>
-{% endfor %}
-     {% if paginated_map_objects.has_next %}
-    <li class="page-item">
-        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.next_num, sort=sort, search=search_query) }}">Next</a>
-    </li>
-{% endif %}
-        </ul>
-    </nav>
+        <nav aria-label="Map Object Page navigation" class="pagination-container" data-pagination-type="map_object">
+            <ul class="pagination">
+                {% if paginated_map_objects.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.prev_num) }}">Previous</a>
+                    </li>
+                {% endif %}
+                {% for page in paginated_map_objects.iter_pages() %}
+                    <li class="page-item {{ 'active' if page == paginated_map_objects.page else '' }}">
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=page) }}">{{ page }}</a>
+                    </li>
+                {% endfor %}
+                {% if paginated_map_objects.has_next %}
+                    <li class="page-item">
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.next_num) }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
     {% endif %}
 </div>

@@ -14,7 +14,7 @@
                         <p>Time: {{ comment.timestamp }}</p>
                     </div>
                     <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
-                        <button type="submit">Delete Comment</button>
+                        <button type="submit"  class="register-button">Delete Comment</button>
                     </form>
                 </div>
             {% endfor %}

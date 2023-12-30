@@ -2746,15 +2746,20 @@ document.addEventListener('click', function(event) {
     var overlayContent = document.getElementById('overlay-content');
     var navOverlay = document.getElementById('nav-overlay');
 
-    // Check if the clicked element is not part of the nav-overlay
-    if (navOverlay && !navOverlay.contains(event.target)) {
-        console.log("Click detected, marker overlay state: ", markerOverlay.style.display);
+    console.log("Document clicked, checking target element...");
 
-        // Close the marker overlay if it is open and the click is outside its content
-        if (markerOverlay && markerOverlay.style.display !== 'none' && !overlayContent.contains(event.target)) {
-            markerOverlay.style.display = 'none';
-            console.log("Marker overlay closed");
-        }
+    // Check if the clicked element is part of the nav-overlay
+    if (navOverlay && navOverlay.contains(event.target)) {
+        console.log("Click inside nav-overlay, no action on marker overlay.");
+        return; // Exit the function if clicked inside nav-overlay
+    }
+
+    // Close the marker overlay if it is open and the click is outside its content
+    if (markerOverlay && markerOverlay.style.display !== 'none' && !overlayContent.contains(event.target)) {
+        markerOverlay.style.display = 'none';
+        console.log("Click outside overlayContent, marker overlay closed.");
+    } else {
+        console.log("Click inside overlayContent or marker overlay not displayed, no action taken.");
     }
 });
 
@@ -3181,82 +3186,43 @@ $.ajax({
 }
 </script>
    
-  <script>
-    // Toggle the navigation overlay when the hamburger button is clicked
-    document.getElementById('hamburger-button').addEventListener('click', function() {
+<script>
+    // Toggle the navigation overlay
+    function toggleNavOverlay() {
         var navOverlay = document.getElementById('nav-overlay');
-        navOverlay.classList.toggle('nav-overlay-active');
-    });
+        if (navOverlay.style.display === 'block') {
+            navOverlay.style.display = 'none';
+        } else {
+            navOverlay.style.display = 'block';
+        }
+    }
 
     // Close the navigation overlay when clicking on the overlay background or on a non-button element
     document.getElementById('nav-overlay').addEventListener('click', function(event) {
-        // Close only if the clicked element is not a button or a link
         if (!event.target.closest('button, a')) {
-            closeNavOverlay();
+            toggleNavOverlay();
         }
     });
 
-    // Function to close the navigation overlay
-    function closeNavOverlay() {
-        var navOverlay = document.getElementById('nav-overlay');
-        navOverlay.classList.remove('nav-overlay-active');
-    }
-
-    // Prevent closing when clicking on buttons (delegation)
-    document.getElementById('nav-links').addEventListener('click', function(event) {
-        if (event.target.tagName === 'BUTTON' || event.target.tagName === 'A') {
-            event.stopPropagation();
-        }
-    });
+    // Event listener for hamburger button
+    document.getElementById('hamburger-button').addEventListener('click', toggleNavOverlay);
 
     // Resize event listener
     window.addEventListener('resize', function() {
-        // Check if the window width is greater than the threshold for mobile view
+        var navOverlay = document.getElementById('nav-overlay');
         if (window.innerWidth > 1080) {
-            // Make sure the nav-overlay is displayed
-            document.getElementById('nav-overlay').classList.add('nav-overlay-active');
+            navOverlay.style.display = 'block';
         } else {
-            // For mobile view, revert back to the default behavior
-            document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+            navOverlay.style.display = 'none';
         }
     });
-
-    // Call the function on page load to set the initial state
-
-	function toggleOverlay() {
-    var overlay = document.getElementById("category-choices");
-    if (overlay.style.display === "none") {
-        overlay.style.display = "flex";
-    } else {
-        overlay.style.display = "none";
-    }
-}
-
-        // JavaScript function to handle redirection to Stimmungskarte
-        function redirectToStimmungskarte() {
-            window.location.href = '/karte';
-        }
-
-        // JavaScript function to handle redirection to Suggest an Idea
-        function redirectToList() {
-            window.location.href = '/list';
-        }
-
-        // JavaScript function to handle redirection to List of Current Suggestions
-        function redirectToneuerbeitrag() {
-            window.location.href = '/neuerbeitrag';
-        }
-		
-	function toggleMenu() {
-    var x = document.getElementById("nav-links");
-    if (x.style.display === "block") {
-        x.style.display = "none";
-    } else {
-        x.style.display = "block";
-    }
-}
-
-    </script>
+    
+    // Set initial state of the nav-overlay
+    window.onload = function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        navOverlay.style.display = 'none'; // Set initial state to 'none'
+    };
+</script>
 
 <script type="text/javascript">
     var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};

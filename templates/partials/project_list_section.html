@@ -24,10 +24,10 @@
                         <form method="POST" action="{{ url_for('admintools') }}">
                             <input type="hidden" name="project_id" value="{{ project.id }}">
                             <button type="submit" name="delete_project" class="register-button" style="font-weight: bold;">Delete</button>
-                            <button type="submit" name="mark_important">Mark as Important</button>
-                            <button type="submit" name="mark_featured">Mark as Featured</button>
+                            <button type="submit"  class="register-button" name="mark_important">Mark as Important</button>
+                            <button type="submit"  class="register-button" name="mark_featured">Mark as Featured</button>
                         </form>
-                        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button"   target="_blank">View</a>
                     </div>
                 {% endif %}
             {% endfor %}

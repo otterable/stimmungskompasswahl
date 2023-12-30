@@ -110,6 +110,7 @@ def zip_user_submissions():
         logging.error("Error creating zip file: %s", e)
         return None
 
+
 @app.route('/check_comment_limit')
 def check_comment_limit():
     if not current_user.is_authenticated:
@@ -120,14 +121,43 @@ def check_comment_limit():
     recent_comments = Comment.query.filter(
         Comment.user_id == user_id,
         Comment.timestamp > time_limit
-    ).order_by(Comment.timestamp.asc()).all()  # Order by ascending to get the oldest comment first
+    ).order_by(Comment.timestamp.asc()).all()
 
     if len(recent_comments) >= 5:
-        oldest_comment_time = recent_comments[0].timestamp  # Get the time of the oldest comment
+        oldest_comment_time = recent_comments[0].timestamp
         reset_time = oldest_comment_time + timedelta(minutes=15)
-        return jsonify({'limit_reached': True, 'reset_time': reset_time.isoformat() + 'Z'})
+        formatted_expiry_time = reset_time.isoformat() + "Z"  # Format the expiry time in ISO 8601 format
+        return jsonify({'limit_reached': True, 'reset_time': formatted_expiry_time})
     else:
         return jsonify({'limit_reached': False})
+
+@app.route('/delete_all_projects', methods=['POST'])
+@login_required
+def delete_all_projects():
+    # Check if the user is the admin
+    if current_user.id != 1:
+        flash('Access Denied: You are not authorized to perform this action.', 'danger')
+        return redirect(url_for('index'))
+
+    try:
+        # Fetch all projects
+        projects = Project.query.all()
+
+        # Delete each project to trigger cascade deletion for comments
+        for project in projects:
+            db.session.delete(project)
+
+        # Commit the changes to the database
+        db.session.commit()
+        flash('All projects and associated comments have been successfully deleted.', 'success')
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of error
+        flash(f'An error occurred while deleting all projects and comments: {e}', 'danger')
+
+    return redirect(url_for('admintools'))
+
+
+
 
 
 
@@ -726,9 +756,12 @@ def admintools():
    
     search_map_object_query = request.args.get('searchMapObject', '')
 
+    # Query map objects with the search filter
     map_object_query = Project.query.filter_by(is_mapobject=True)
     if search_map_object_query:
-        map_object_query = map_object_query.filter(Project.description.ilike(f'%{search_map_object_query}%'))
+        map_object_query = map_object_query.filter(Project.descriptionwhy.ilike(f'%{search_map_object_query}%'))
+
+
 
     query = Project.query.filter(Project.is_mapobject == False)  # Filter for non-mapobject projects
 

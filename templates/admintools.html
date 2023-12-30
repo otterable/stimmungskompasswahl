@@ -109,6 +109,25 @@ body {
 .filter-bar .filter-button:hover {
     background-color: #002244; /* Darker shade for hover effect */
 }
+		.register-button {
+    background-color: #003056; /* Example color */
+    color: white;
+	font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    padding: 15px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block; /* Adjusted to inline-block */
+    font-size: 16px;
+    margin: 10px 0;
+    cursor: pointer;
+    box-sizing: border-box; /* Include padding in width */
+}
+		.register-button:hover {
+
+    transform: scale(1.02); /* Scale up on hover */
+}
 
 	
  .top-bar {
@@ -1091,12 +1110,15 @@ nav[aria-label="Page navigation"] {
 </div>
 
 
-        <h1>Map objects:</h1>
+<!-- Map Objects Search Input -->
+<div class="map-object-search-container">
+    <input type="text" id="searchMapObject" placeholder="Search map objects" onkeyup="searchMapObjects()">
+</div>
 
 <div class="project-list">
-{% with paginated_map_objects=paginated_map_objects %}
-    {% include 'partials/mapobject_list_section.html' %}
-{% endwith %}
+    {% with paginated_map_objects=paginated_map_objects %}
+        {% include 'partials/mapobject_list_section.html' %}
+    {% endwith %}
 </div>
 
 <h1>Comments:</h1>
@@ -1124,9 +1146,9 @@ nav[aria-label="Page navigation"] {
             </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit" name="unmark_important">Unmark as Important</button>
+                <button type="submit" class="register-button" name="unmark_important">Unmark as Important</button>
             </form>
-            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
+            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">View</a>
         </div>
     {% else %}
         <p>No important projects found.</p>
@@ -1149,9 +1171,9 @@ nav[aria-label="Page navigation"] {
             </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit" name="unmark_featured">Unmark as Featured</button>
+                <button type="submit" name="unmark_featured"  class="register-button" >Unmark as Featured</button>
             </form>
-            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">View</a>
+            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">View</a>
         </div>
     {% else %}
         <p>No featured projects found.</p>
@@ -1167,12 +1189,26 @@ nav[aria-label="Page navigation"] {
 </div>
 
 
+<!-- Section for Deleting All Projects -->
+<div class="delete-all-projects-section">
+    <h2>Delete All Projects</h2>
+    <p>Warning: This will permanently delete all projects from the database.</p>
+    <form method="POST" action="{{ url_for('delete_all_projects') }}">
+        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to delete all projects? This action cannot be undone.');">Delete All Projects</button>
+    </form>
+</div>
+
 
 	
 	
 </body>
 
+
+
 <script>
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Replace 'None' with '...' in the initial pagination
     const initialPagination = document.querySelector('.pagination');
@@ -1279,6 +1315,7 @@ function searchMapObjects() {
         console.error('Error:', error);
     });
 }
+
 
 
 function searchUsers() {

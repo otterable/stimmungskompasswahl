@@ -916,18 +916,15 @@ display: block;
 <script>
 // Check comment posting limit on page load
 window.onload = function() {
-    fetch('/check_comment_limit')  // Assuming you have an endpoint to check the limit
+    fetch('/check_comment_limit')
         .then(response => response.json())
         .then(data => {
             var commentButton = document.querySelector('.comment-button');
             if (data.limit_reached) {
                 console.log("This IP already reached comment posting limits for today. Limits expire at:", data.reset_time);
-                console.log("Transforming the comment button into a timer.");
-                commentButton.innerText = `Limit reached, checking timer...`;
                 commentButton.disabled = true;
                 startTimer(data.reset_time, commentButton);
             } else {
-                console.log("Comment limit not reached. Button remains active.");
                 commentButton.disabled = false; // Ensure button is enabled if limit is not reached
                 commentButton.innerText = "Speichern 💬"; // Reset button text
             }
@@ -937,23 +934,27 @@ window.onload = function() {
 
 // Function to start a countdown timer and update the button text
 function startTimer(expiryTime, button) {
-    var countDownDate = new Date(expiryTime).getTime();
+    // Ensure the expiry time is in ISO 8601 format
+    var countDownDate = new Date(expiryTime).getTime(); // Parses the ISO 8601 date string
 
     var x = setInterval(function() {
-        var now = new Date().getTime();
+        var now = new Date().getTime(); // Current time in UTC
         var distance = countDownDate - now;
-        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        if (distance > 0) {
-            button.innerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
-        } else {
+        // If the timer is expired, reset the button
+        if (distance < 0) {
             clearInterval(x);
             button.innerText = "Speichern 💬";
             button.disabled = false;
             console.log("Timer expired. Comment button is now active again.");
+            return;
         }
+
+        // Otherwise, update the timer
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        button.innerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
     }, 1000);
 }
 
