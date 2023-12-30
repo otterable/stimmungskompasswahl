@@ -753,7 +753,7 @@ def admintools():
 
     search_user_id = request.args.get('searchUserById', type=int)
     search_user_name = request.args.get('searchUserByName', '')
-   
+    search_comment_query = request.args.get('searchComment', '')
     search_map_object_query = request.args.get('searchMapObject', '')
 
     # Query map objects with the search filter
@@ -761,6 +761,9 @@ def admintools():
     if search_map_object_query:
         map_object_query = map_object_query.filter(Project.descriptionwhy.ilike(f'%{search_map_object_query}%'))
 
+    comment_query = Comment.query
+    if search_comment_query:
+        comment_query = comment_query.filter(Comment.text.ilike(f'%{search_comment_query}%'))
 
 
     query = Project.query.filter(Project.is_mapobject == False)  # Filter for non-mapobject projects
@@ -808,7 +811,7 @@ def admintools():
                     .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
        
     paginated_users = user_query.paginate(page=user_page, per_page=user_per_page, error_out=False)
-    paginated_comments = Comment.query.paginate(page=comment_page, per_page=comment_per_page, error_out=False)
+    paginated_comments = comment_query.paginate(page=comment_page, per_page=comment_per_page, error_out=False)
     paginated_map_objects = map_object_query.paginate(page=map_object_page, per_page=map_object_per_page, error_out=False)
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
     print("Total items:", paginated_projects.total)

@@ -1082,15 +1082,14 @@ nav[aria-label="Page navigation"] {
 
 
 
-        <h1>Project Submissions:</h1>
-        <!-- Form for sorting and searching projects -->
-        <form id="sortForm" method="GET" action="{{ url_for('admintools') }}">
-            <label for="search">Search by name:</label>
-            <input type="text" id="search" name="search" value="{{ search_query }}" onkeyup="submitForm()">
+        <h1>Volle Beiträge:</h1>
+ <div>
+    <label for="search">Search by name:</label>
+    <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()">
 
-            <label for="sort">Sort projects by:</label>
-            <select name="sort" id="sort" onchange="submitForm()">
-                <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Score (Highest first)</option>
+    <label for="sort">Sort projects by:</label>
+    <select id="sort" onchange="submitForm()">
+     <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Score (Highest first)</option>
                 <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
                 <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
                 <option value="category" {% if sort == 'category' %}selected{% endif %}>Category</option>
@@ -1100,14 +1099,17 @@ nav[aria-label="Page navigation"] {
                 <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Number of Comments</option>
                 <option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Title (A-Z)</option>
                 <option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Title (Z-A)</option>
-            </select>
-        </form>
+				</select>
+</div>    
 
 <div class="project-list">
     {% with project_page=paginated_projects.page %}
         {% include 'partials/project_list_section.html' %}
     {% endwith %}
 </div>
+
+
+        <h1>Kleine Beiträge:</h1>
 
 
 <!-- Map Objects Search Input -->
@@ -1121,17 +1123,23 @@ nav[aria-label="Page navigation"] {
     {% endwith %}
 </div>
 
-<h1>Comments:</h1>
+
+
+<h1>Kommentare:</h1>
+<!-- Comments Search Input -->
+<div class="comment-search-container">
+    <input type="text" id="searchComment" placeholder="Search comments" onkeyup="searchComments()">
+</div>
 <div class="project-list">
-{% with paginated_comments=paginated_comments %}
-    {% include 'partials/comments_section.html' %}
-{% endwith %}
+    {% with paginated_comments=paginated_comments %}
+        {% include 'partials/comments_section.html' %}
+    {% endwith %}
 </div>
 
 
 
 <!-- Important Projects Section -->
-<h2>Important Projects</h2>
+<h2>Markierte Beiträge (Nur auf dieser Seite sichtbar)</h2>
 <div class="project-list">
     {% for project in important_projects %}
         <div class="project-thumbnail">
@@ -1155,8 +1163,8 @@ nav[aria-label="Page navigation"] {
     {% endfor %}
 </div>
 
-<!-- Featured Projects Section -->
-<h2>Featured Projects</h2>
+]<!-- Featured Projects Section -->
+<h2>Markierte Beiträge</h2>
 <div class="project-list">
     {% for project in featured_projects %}
         <div class="project-thumbnail">
@@ -1191,8 +1199,8 @@ nav[aria-label="Page navigation"] {
 
 <!-- Section for Deleting All Projects -->
 <div class="delete-all-projects-section">
-    <h2>Delete All Projects</h2>
-    <p>Warning: This will permanently delete all projects from the database.</p>
+    <h2>Alle Beiträge löschen</h2>
+    <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
     <form method="POST" action="{{ url_for('delete_all_projects') }}">
         <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to delete all projects? This action cannot be undone.');">Delete All Projects</button>
     </form>
@@ -1210,14 +1218,15 @@ nav[aria-label="Page navigation"] {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Replace 'None' with '...' in the initial pagination
-    const initialPagination = document.querySelector('.pagination');
-    if (initialPagination) {
-        replaceNoneWithEllipsis(initialPagination);
-    }
+    // Replace 'None' with '...' in all initial paginations
+    const paginationContainers = document.querySelectorAll('.pagination-container');
+    paginationContainers.forEach(container => {
+        replaceNoneWithEllipsis(container);
+    });
 
     attachPaginationEventListeners();
 });
+
 
 function attachPaginationEventListeners() {
     const paginationLinks = document.querySelectorAll('.ajax-pagination-link');
@@ -1243,8 +1252,20 @@ function handlePaginationClick(event) {
     const sectionType = paginationContainer.getAttribute('data-pagination-type');
     console.log('Section type:', sectionType);
 
-    updatePaginationContent(url, sectionType);
+    // Prepare the updated URL based on the section type
+    let updatedUrl = url;
+    if (sectionType === 'map_object') {
+        const searchQuery = document.getElementById('searchMapObject').value;
+        updatedUrl = `${url}&searchMapObject=${searchQuery}`;
+    } else if (sectionType === 'comment') {
+        const searchQuery = document.getElementById('searchComment').value; // Assuming you have a search input for comments with this ID
+        updatedUrl = `${url}&searchComment=${searchQuery}`;
+    }
+
+    updatePaginationContent(updatedUrl, sectionType);
 }
+
+
 
 function updatePaginationContent(url, sectionType) {
     console.log('Fetching URL:', url, 'for section:', sectionType);
@@ -1292,6 +1313,55 @@ function updatePaginationContent(url, sectionType) {
     });
 }
 
+
+function searchComments() {
+    const searchQuery = document.getElementById('searchComment').value;
+
+    fetch(`/admintools?comment_page=1&searchComment=${searchQuery}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const newContent = document.createElement('div');
+        newContent.innerHTML = html;
+
+        const oldCommentContainer = document.getElementById('comment-list-container');
+        let newCommentContainer = newContent.querySelector('#comment-list-container');
+
+        // Handle 'No results found' scenario
+        if (!newCommentContainer) {
+            newCommentContainer = document.createElement('div');
+            newCommentContainer.innerHTML = "<p>No comments found.</p>";
+        }
+
+        if (oldCommentContainer) {
+            oldCommentContainer.innerHTML = newCommentContainer.innerHTML;
+        } else {
+            console.error('Comment list container not found');
+        }
+
+        // Update pagination
+        const oldPagination = document.querySelector('.pagination-container[data-pagination-type="comment"]');
+        const newPagination = newContent.querySelector('.pagination-container[data-pagination-type="comment"]');
+
+        if (oldPagination) {
+            if (newPagination && newPagination.innerHTML.trim()) {
+                oldPagination.innerHTML = newPagination.innerHTML;
+                replaceNoneWithEllipsis(oldPagination);
+                oldPagination.style.display = 'block';
+            } else {
+                oldPagination.style.display = 'none';
+            }
+        }
+
+        attachPaginationEventListeners();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
 function searchMapObjects() {
     const searchQuery = document.getElementById('searchMapObject').value;
 
@@ -1302,13 +1372,36 @@ function searchMapObjects() {
     .then(html => {
         const newContent = document.createElement('div');
         newContent.innerHTML = html;
-        const newContainer = newContent.querySelector('#map-object-list-container');
-        const oldContainer = document.getElementById('map-object-list-container');
-        if (oldContainer && newContainer) {
-            oldContainer.innerHTML = newContainer.innerHTML;
+
+        const oldMapObjectContainer = document.getElementById('map-object-list-container');
+        let newMapObjectContainer = newContent.querySelector('#map-object-list-container');
+
+        // Handle 'No results found' scenario
+        if (!newMapObjectContainer) {
+            newMapObjectContainer = document.createElement('div');
+            newMapObjectContainer.innerHTML = "<p>No results found.</p>";
+        }
+
+        if (oldMapObjectContainer) {
+            oldMapObjectContainer.innerHTML = newMapObjectContainer.innerHTML;
         } else {
             console.error('Map object list container not found');
         }
+
+        // Update pagination
+        const oldPagination = document.querySelector('.pagination-container[data-pagination-type="map_object"]');
+const newPagination = newContent.querySelector('.pagination-container[data-pagination-type="map_object"]');
+
+if (oldPagination) {
+    if (newPagination && newPagination.innerHTML.trim()) {
+        oldPagination.innerHTML = newPagination.innerHTML;
+        replaceNoneWithEllipsis(oldPagination); // Call the function here
+        oldPagination.style.display = 'block'; // Show pagination if there are links
+    } else {
+        oldPagination.style.display = 'none'; // Hide pagination if no links or no results
+    }
+}
+
         attachPaginationEventListeners(); // Reattach event listeners to new pagination links
     })
     .catch(error => {
@@ -1316,6 +1409,67 @@ function searchMapObjects() {
     });
 }
 
+
+
+function searchAndSortProjects() {
+    const searchQuery = document.getElementById('search').value;
+    const sortOption = document.getElementById('sort').value;
+
+    fetch(`/admintools?page=1&search=${searchQuery}&sort=${sortOption}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const newContent = document.createElement('div');
+        newContent.innerHTML = html;
+
+        const oldProjectContainer = document.getElementById('project-list-container');
+        let newProjectContainer = newContent.querySelector('#project-list-container');
+
+        // Handle 'No results found' scenario
+        if (!newProjectContainer) {
+            newProjectContainer = document.createElement('div');
+            newProjectContainer.innerHTML = "<p>No results found.</p>";
+        }
+
+        if (oldProjectContainer) {
+            oldProjectContainer.innerHTML = newProjectContainer.innerHTML;
+        } else {
+            console.error('Project list container not found');
+        }
+
+        // Update pagination
+        const oldPagination = document.querySelector('.pagination-container[data-pagination-type="project"]');
+        const newPagination = newContent.querySelector('.pagination-container[data-pagination-type="project"]');
+
+        if (oldPagination) {
+            if (newPagination && newPagination.innerHTML.trim()) {
+                oldPagination.innerHTML = newPagination.innerHTML;
+                replaceNoneWithEllipsis(oldPagination); // Update pagination content
+                oldPagination.style.display = 'block'; // Show pagination if there are links
+            } else {
+                oldPagination.style.display = 'none'; // Hide pagination if no links or no results
+            }
+        }
+
+        attachPaginationEventListeners(); // Reattach event listeners to new pagination links
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function extractTotalPagesFromPagination(paginationElement) {
+    const pageLinks = paginationElement.querySelectorAll('.page-link');
+    const pageNumbers = Array.from(pageLinks).map(link => parseInt(link.textContent.trim())).filter(num => !isNaN(num));
+    return pageNumbers.length > 0 ? Math.max(...pageNumbers) : 1;
+}
+
+
+// Submit form when sorting options change or search input keyup event
+function submitForm() {
+    searchAndSortProjects();
+}
 
 
 function searchUsers() {
@@ -1374,6 +1528,7 @@ function replaceNoneWithEllipsis(paginationElement) {
         }
     });
 }
+
 
 
 function extractTotalPages() {
