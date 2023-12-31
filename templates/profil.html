@@ -802,13 +802,13 @@ display: block;
    {% if current_user.is_authenticated %}
    
    
-    <h1>My Projects:</h1>
+    <h1>Meine Projektvorschläge:</h1>
     <div class="my-statistics centered-text">
-        <p>You have posted <span style="color: #003056;">{{ user_statistics.num_projects }} project(s)</span> and <span style="color: #003056;">{{ user_statistics.num_comments }} comment(s)</span>.</p>
+        <p>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span>.</p>
         {% if user_statistics.most_successful_project %}
-            <p>Your most successful project is <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, with <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} upvote(s)</span>.</p>
+            <p>Ihr erfolgreichstes Projekt ist: <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, mit <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} positiven Bewertungen</span>.</p>
         {% else %}
-            <p>Your projects have not yet been rated.</p>
+            <p>Ihre Projekte wurden noch nicht bewertet.</p>
         {% endif %}
     </div>
 	</div>
@@ -837,12 +837,12 @@ display: block;
 </div>
 
 <div class="my-account centered-text">
-    <h1>My Account:</h1>
+    <h1>Mein Konto:</h1>
     {% if current_user.is_authenticated %}
-        <p>Your account name is <span style="color: #003056;">{{ current_user.name }}</span></p>
-        <p>Your account is bound to phone number <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
-        <p>Your account was created on <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
-        <p>To reset your password, head to <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Password Recovery</a>.</p>
+        <p>Ihr Benutzername ist: <span style="color: #003056;">{{ current_user.name }}</span></p>
+        <p>Die verknüpfte Telefonnummer lautet: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
+        <p>Das Konto wurde erstellt am: <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
+        <p>Hier klicken, um das Passwort  zurückzusetzen:<a href="{{ url_for('password_recovery') }}" style="color: #003056;">Passwort zurücksetzen</a>.</p>
     {% else %}
     {% endif %}
 </div>
@@ -852,7 +852,7 @@ display: block;
 		
   {% else %}
         <div class="login-prompt centered-text">
-            <p>You must be logged in to view details.</p>
+            <p>Sie müssen angemeldet sein, um due Details zu sehen.</p>
         </div>
     {% endif %}
 
@@ -868,23 +868,23 @@ display: block;
 {% if is_authenticated %}
     <div class="info-text-field2">
         <div class="centered-text" style="margin-top:30px">
-            <h1>Data:</h1>
+            <h1>Daten:</h1>
 
             <!-- Download My Data Section -->
-            <h2>Download My Data</h2>
-            <p>Download all data associated with your account from the server.</p>
-            <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold;">Download My Data</a>
+            <h2>Meine Daten herunterladen</h2>
+ 
+            <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold;">Daten herunterladen</a>
 
-            <h2>Download all website data</h2>
-            <p>This will download the data of the entire website, in a machine-readable .json file.</p>
-            <p>The data contains all project data, including geolocations, their categories, descriptions, and more.</p>
-            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Download Website Data</a>
-            <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Download Images</a>
+            <h2>Gesamte Website herunterladen</h2>
+         
+            <p>Alle Daten zu Projhektvorschlägen, Notizen, Kommentaren und mehr herunterladen.</p>
+            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Website herunterladen</a>
+            <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Bilder herunterladen</a>
 
-            <h2>Delete Account</h2>
-            <p>Would you like to delete all your data from the website? This action is irreversible.</p>
-            <p>Your account, your project, votes, comments, and images will be deleted from the server.</p>
-            <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold;" id="delete-data-btn">Delete All My Data</a>
+            <h2>Konto löschen</h2>
+            <p>Möchten Sie Ihr Konto und Ihre gesamten Aktivitäten inklusive Ihrer Notizen und Projektvorschläge von der Website löschen? </p>
+      
+            <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold;" id="delete-data-btn">Meine gesamten Daten löschen</a>
         </div>
     </div>
 {% endif %}

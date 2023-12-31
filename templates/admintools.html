@@ -1081,23 +1081,23 @@ nav[aria-label="Page navigation"] {
 
 
 
-        <h1>Volle Beiträge:</h1>
+        <h1>Projektvorschläge:</h1>
  <div>
-    <label for="search">Search by name:</label>
+    <label for="search">Suchen nach Namen:</label>
     <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()">
 
-    <label for="sort">Sort projects by:</label>
+    <label for="sort">Sortieren nach:</label>
     <select id="sort" onchange="submitForm()">
-     <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Score (Highest first)</option>
-                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
-                <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest</option>
-                <option value="category" {% if sort == 'category' %}selected{% endif %}>Category</option>
-                <option value="user_id" {% if sort == 'user_id' %}selected{% endif %}>User ID</option>
-                <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Upvotes</option>
-                <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Downvotes</option>
-                <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Number of Kommentare</option>
-                <option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Title (A-Z)</option>
-                <option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Title (Z-A)</option>
+     <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Höchste Bewertung zuerst</option>
+                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Neuester Beitrtag</option>
+                <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Ältester Beitrag</option>
+                <option value="category" {% if sort == 'category' %}selected{% endif %}>Kategorie</option>
+                <option value="user_id" {% if sort == 'user_id' %}selected{% endif %}>Benutzer ID</option>
+                <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Positive Bewertungen</option>
+                <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Negative Bewertungen</option>
+                <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Anzahl der Kommentare</option>
+                <option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Titel (A-Z)</option>
+                <option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Titel (Z-A)</option>
 				</select>
 </div>    
 
@@ -1108,12 +1108,12 @@ nav[aria-label="Page navigation"] {
 </div>
 
 
-        <h1>Kleine Beiträge:</h1>
+        <h1>Notizen:</h1>
 
 
 <!-- Map Objects Search Input -->
 <div class="map-object-search-container">
-    <input type="text" id="searchMapObject" placeholder="Search map objects" onkeyup="searchMapObjects()">
+    <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()">
 </div>
 
 <div class="project-list">
@@ -1127,7 +1127,7 @@ nav[aria-label="Page navigation"] {
 <h1>Kommentare:</h1>
 <!-- Comments Search Input -->
 <div class="comment-search-container">
-    <input type="text" id="searchComment" placeholder="Search comments" onkeyup="searchComments()">
+    <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()">
 </div>
 <div class="project-list">
     {% with paginated_comments=paginated_comments %}
@@ -1138,57 +1138,57 @@ nav[aria-label="Page navigation"] {
 
 
 <!-- Important Projects Section -->
-<h2>Markierte Beiträge (Nur auf dieser Seite sichtbar)</h2>
+<h2>Wichtige Beiträge (Nur auf dieser Seite sichtbar)</h2>
 <div class="project-list">
     {% for project in important_projects %}
         <div class="project-thumbnail">
             <h3>{{ project.name }}</h3>
             <p class="project-date">Kategorie: {{ project.category }}</p>
             <div class="project-details">
-                Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
-                Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+                Verfasser: {{ project.author_name }} (ID: {{ project.author }}) <br>
+                Kommentare: {{ project.comments_count }}, Positive Bewertungen: {{ project.upvotes }}, Negative Bewertungen: {{ project.downvotes }}, Punkte: {{ project.score }}
             </div>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
                 <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
             </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit" class="register-button" name="unmark_important">Unmark as Important</button>
+                <button type="submit" class="register-button" name="unmark_important">Von "wichtig" entfernen</button>
             </form>
             <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
         </div>
     {% else %}
-        <p>No important projects found.</p>
+        <p>Keine Projektvorschläge gefunden.</p>
     {% endfor %}
 </div>
 
 ]<!-- Featured Projects Section -->
-<h2>Markierte Beiträge</h2>
+<h2>Ausgewählte Beiträge</h2>
 <div class="project-list">
     {% for project in featured_projects %}
         <div class="project-thumbnail">
             <h3>{{ project.name }}</h3>
             <p class="project-date">Kategorie: {{ project.category }}</p>
             <div class="project-details">
-                Author: {{ project.author_name }} (ID: {{ project.author }}) <br>
-                Comments: {{ project.comments_count }}, Upvotes: {{ project.upvotes }}, Downvotes: {{ project.downvotes }}, Score: {{ project.score }}
+                Verfasser: {{ project.author_name }} (ID: {{ project.author }}) <br>
+                Kommentare: {{ project.comments_count }}, Positive Bewertungen: {{ project.upvotes }}, Negative Bewertungen: {{ project.downvotes }}, Punkte: {{ project.score }}
             </div>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
                 <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
             </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit" name="unmark_featured"  class="register-button" >Unmark as Featured</button>
+                <button type="submit" name="unmark_featured"  class="register-button" >Von "ausgewählt" entferen</button>
             </form>
             <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
         </div>
     {% else %}
-        <p>No featured projects found.</p>
+        <p>Keine Projekte gefunden.</p>
     {% endfor %}
 </div>
 
 
-<h1>Users:</h1>
+<h1>Benutzer:</h1>
 <div class="project-list">
     {% with paginated_users=paginated_users %}
         {% include 'partials/user_list_section.html' %}

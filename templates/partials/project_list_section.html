@@ -5,7 +5,7 @@
                 {% if not project.is_mapobject %}  <!-- Check if project is not a map object -->
                     <div class="project-thumbnail">
                         <h3>{{ project.name }}</h3>
-                        <p class="project-date">Posted on: {{ project.date.strftime('%d.%m.%Y') }}</p>
+                        <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
                         <div class="voting-bar">
                             {% if project.upvotes > 0 %}
                                 <div class="upvotes" style="width: {{ project.upvote_percentage|round(1) }}%;">
@@ -24,8 +24,8 @@
                         <form method="POST" action="{{ url_for('admintools') }}">
                             <input type="hidden" name="project_id" value="{{ project.id }}">
                             <button type="submit" name="delete_project" class="register-button" style="font-weight: bold;">Löschen</button>
-                            <button type="submit"  class="register-button" name="mark_important">Beitrag markieren</button>
-                            <button type="submit"  class="register-button" name="mark_featured">Als "Ausgewältes Projekt" markieren</button>
+                            <button type="submit"  class="register-button" name="mark_important">Beitrag als "wichtig" markieren</button>
+                            <button type="submit"  class="register-button" name="mark_featured">Als "Ausgewähltes Projekt" markieren</button>
                         </form>
                         <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button"   target="_blank">Anzeigen</a>
                     </div>
@@ -33,7 +33,7 @@
             {% endfor %}
         </div>
         {% if not paginated_projects.items %}
-            <p>No projects found.</p>
+            <p>Keine Projekte gefunden.</p>
         {% endif %}
     {% endif %}
 

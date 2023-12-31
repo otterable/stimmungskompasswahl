@@ -2046,9 +2046,9 @@ margin-bottom: 0px !important;
 <!-- Custom Confirmation Dialog -->
 <div id="custom-confirm" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.0); z-index: 10000; text-align: center;">
     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 30px;">
-        <p style="font-weight: bold; color: black;  font-size: 1vw;">Are you sure you want to place your marker here?</p>
-        <button id="confirm-yes" class="register-button" style="background-color: #0e3a3a !important;">Yes</button>
-        <button id="confirm-no" class="register-button" style="background-color: #de3a3a !important; margin-top: 10px !important;">No</button>
+        <p style="font-weight: bold; color: black;  font-size: 1vw;">Möchten Sie die Notiz hier platzieren?</p>
+        <button id="confirm-yes" class="register-button" style="background-color: #0e3a3a !important;">Ja</button>
+        <button id="confirm-no" class="register-button" style="background-color: #de3a3a !important; margin-top: 10px !important;">Nein</button>
     </div>
 </div>
 
@@ -2064,11 +2064,11 @@ margin-bottom: 0px !important;
             <!-- Marker items will be added here dynamically -->
         </ul>
         <div id="pagination-controls" style="margin-top: 20px;">
-            <button onclick="changePage(-1)">Previous</button>
-            <span id="page-indicator">Page 1</span>
-            <button onclick="changePage(1)">Next</button>
+            <button onclick="changePage(-1)">zurück</button>
+            <span id="page-indicator">Seite 1</span>
+            <button onclick="changePage(1)">weiter</button>
         </div>
-        <button onclick="document.getElementById('markers-list-overlay').style.display='none'" class="register-button" style="margin-top: 20px;">Close</button>
+        <button onclick="document.getElementById('markers-list-overlay').style.display='none'" class="register-button" style="margin-top: 20px;">Schließen</button>
     </div>
 </div>
 
@@ -2077,13 +2077,13 @@ margin-bottom: 0px !important;
 <!-- Marker Placing Overlay -->
 <div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:10000;">
     <div id="overlay-content" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px; width: 80%; max-width: 500px; text-align: center;">
-        <h2>Add a new marker to the map!</h2>
+        <h2>Notiz hinzufügen</h2>
         <p style="font-size: 14px;">
-            <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Click here, to get the full experience.</a>
+            <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Hier klicken, um Projektvorschläge zu psoten.</a>
         </p>        
         <!-- Wrapper div for the select and the textarea -->
         <div style="width: 100%; box-sizing: border-box; text-align: center;">
-            <p>1. Select category:</p>
+            <p>1. Kategorie auswählen:</p>
             <select id="marker-category" onchange="updateMarkerCategoryDescription()" style="width: 100%; box-sizing: border-box; text-align: center; border: 1px solid black;">
                 <option value="Transport">Transport</option>
             <option value="Öffentliche Plätze">Öffentliche Plätze</option>
@@ -2096,14 +2096,14 @@ margin-bottom: 0px !important;
             <option value="Andere">Andere</option>
      </select>
             <br><br>
-            <p>What is the selected category used for?</p>
+            <p>Die ausgewählte Kategorie betrifft Themen wie:</p>
             <p id="marker-category-description" style="color:#003056;"></p> <!-- Description will appear here -->
-            <p>2. Write a description:</p>
+            <p>2. Beschreiben Sie die Umstände:</p>
             <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black;"></textarea>
         </div>
         
         <br>
-        <p>3. Place it on the map:</p>
+        <p>3. Wählen Sie den betrffenden Ort auf der Karte:</p>
         <div class="button-container">
 <button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>
         </div>
@@ -2182,7 +2182,7 @@ margin-bottom: 0px !important;
 
 	<div class="button-container">
 
-	<button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Nur volle Beiträge anzeigen</button>
+	<button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Nur Projektvorschläge anzeigen</button>
     </div>
 
 
@@ -2624,7 +2624,7 @@ function addMarkersToOverlay(markers) {
     }
 function createCategoryFilter() {
     const filterDiv = document.getElementById('category-filter');
-    filterDiv.innerHTML = '<label for="category-select">Search by category:</label>';
+    filterDiv.innerHTML = '<label for="category-select">Suchen nach Kategorie:</label>';
 
     const select = document.createElement('select');
     select.id = 'category-select';
@@ -2662,7 +2662,7 @@ function createCategoryFilter() {
         select.id = 'sort-select';
         select.onchange = function() { sortMarkers(this.value); };
 
-        const sortOptions = ["Sort by newest", "Sort by oldest"];
+        const sortOptions = ["Neueste zuerst", "Älteste zuerst"];
         sortOptions.forEach(option => {
             const optionElement = document.createElement('option');
             optionElement.value = option;
@@ -2734,7 +2734,7 @@ function createCategoryFilter() {
 
         const label = document.createElement('label');
         label.htmlFor = 'full-project-checkbox';
-        label.textContent = 'Show full projects only';
+        label.textContent = 'Nur Projektvorschläge anzeigen';
 
         filterDiv.appendChild(checkbox);
         filterDiv.appendChild(label);
@@ -3069,7 +3069,7 @@ function applyButtonStyles(button) {
 }
 
 function toggleMarkerVisibility() {
-    var showMapObjectsOnly = document.getElementById('hideNonMapMarkers').innerText === "Show full projects only";
+    var showMapObjectsOnly = document.getElementById('hideNonMapMarkers').innerText === "Nur Projektvorschläge anzeigen";
 
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
@@ -3088,7 +3088,7 @@ function toggleMarkerVisibility() {
     }
 
     // Toggle button text
-    document.getElementById('hideNonMapMarkers').innerText = showMapObjectsOnly ? "Show All Markers" : "Show full projects only";
+    document.getElementById('hideNonMapMarkers').innerText = showMapObjectsOnly ? "Alles anzeigen" : "Nur Projektvorschläge anzeigen";
 }
 
 

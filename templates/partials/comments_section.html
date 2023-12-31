@@ -5,16 +5,16 @@
                 <div class="comment-thumbnail">
                     <p>"{{ comment.text }}"</p>
                     <div class="comment-details">
-                        <p>Project commented on: 
+                        <p>Projektvorschlag: 
                             <a href="{{ url_for('project_details', project_id=comment.project_id) }}">
                                 {{ comment.project_name }}
                             </a>
                         </p>
-                        <p>Author of comment: {{ comment.author_name }} (ID: {{ comment.author_id }})</p>
-                        <p>Time: {{ comment.timestamp }}</p>
+                        <p>Verfasser des Kommtenars: {{ comment.author_name }} (ID: {{ comment.author_id }})</p>
+                        <p>Datum: {{ comment.timestamp }}</p>
                     </div>
                     <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
-                        <button type="submit"  class="register-button">Delete Comment</button>
+                        <button type="submit"  class="register-button">Kommentar löschen</button>
                     </form>
                 </div>
             {% endfor %}
@@ -26,7 +26,7 @@
                 <ul class="pagination">
                     {% if paginated_comments.has_prev %}
                         <li class="page-item">
-                            <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.prev_num) }}">Previous</a>
+                            <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.prev_num) }}">zurück</a>
                         </li>
                     {% endif %}
                     {% for page in paginated_comments.iter_pages() %}
@@ -36,13 +36,13 @@
                     {% endfor %}
                     {% if paginated_comments.has_next %}
                         <li class="page-item">
-                            <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.next_num) }}">Next</a>
+                            <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.next_num) }}">weiter</a>
                         </li>
                     {% endif %}
                 </ul>
             </nav>
         {% endif %}
     {% else %}
-        <p>No comments found.</p>
+        <p>Keine Kommentare gefunden.</p>
     {% endif %}
 </div>
