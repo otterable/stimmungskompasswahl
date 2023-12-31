@@ -302,7 +302,7 @@ nav[aria-label="Page navigation"] {
     text-align: center; /* Centers the text inside the div */
     padding: 2px 0; /* Adds some padding above and below the text */
     background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
-    /* Other styling as needed, such as font size, color, etc. */
+    /* Andere styling as needed, such as font size, color, etc. */
 }
 
 	
@@ -956,13 +956,13 @@ nav[aria-label="Page navigation"] {
                 {% set current_category = request.args.get('category', '') %}
                 <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
                 <option value="Öffentliche Plätze" {% if current_category == 'Öffentliche Plätze' %}selected{% endif %}>Öffentliche Plätze</option>
-                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Umwelt</option>
+                <option value="Umwelt" {% if current_category == 'Umwelt' %}selected{% endif %}>Umwelt</option>
                 <option value="Verwaltung" {% if current_category == 'Verwaltung' %}selected{% endif %}>Verwaltung</option>
-                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Kultur</option>
-                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Bildung</option>
-                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Gesundheit</option>
+                <option value="Kultur" {% if current_category == 'Kultur' %}selected{% endif %}>Kultur</option>
+                <option value="Bildung" {% if current_category == 'Bildung' %}selected{% endif %}>Bildung</option>
+                <option value="Gesundheit" {% if current_category == 'Gesundheit' %}selected{% endif %}>Gesundheit</option>
                 <option value="Sport" {% if current_category == 'Sport' %}selected{% endif %}>Sport</option>
-                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Andere</option>
+                <option value="Andere" {% if current_category == 'Andere' %}selected{% endif %}>Andere</option>
             </select>
         </div>
 
@@ -997,13 +997,13 @@ nav[aria-label="Page navigation"] {
                 {% set current_category = request.args.get('category', '') %}
                 <option value="Transport" {% if current_category == 'Transport' %}selected{% endif %}>Transport</option>
                 <option value="Öffentliche Plätze" {% if current_category == 'Öffentliche Plätze' %}selected{% endif %}>Öffentliche Plätze</option>
-                <option value="Environment" {% if current_category == 'Environment' %}selected{% endif %}>Umwelt</option>
+                <option value="Umwelt" {% if current_category == 'Umwelt' %}selected{% endif %}>Umwelt</option>
                 <option value="Verwaltung" {% if current_category == 'Verwaltung' %}selected{% endif %}>Verwaltung</option>
-                <option value="Culture" {% if current_category == 'Culture' %}selected{% endif %}>Kultur</option>
-                <option value="Education" {% if current_category == 'Education' %}selected{% endif %}>Bildung</option>
-                <option value="Health" {% if current_category == 'Health' %}selected{% endif %}>Gesundheit</option>
+                <option value="Kultur" {% if current_category == 'Kultur' %}selected{% endif %}>Kultur</option>
+                <option value="Bildung" {% if current_category == 'Bildung' %}selected{% endif %}>Bildung</option>
+                <option value="Gesundheit" {% if current_category == 'Gesundheit' %}selected{% endif %}>Gesundheit</option>
                 <option value="Sport" {% if current_category == 'Sport' %}selected{% endif %}>Sport</option>
-                <option value="Other" {% if current_category == 'Other' %}selected{% endif %}>Andere</option>
+                <option value="Andere" {% if current_category == 'Andere' %}selected{% endif %}>Andere</option>
             </select>
         </div>
 

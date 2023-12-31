@@ -266,7 +266,7 @@ margin: auto;
     text-align: center; /* Centers the text inside the div */
     padding: 2px 0; /* Adds some padding above and below the text */
     background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
-    /* Other styling as needed, such as font size, color, etc. */
+    /* Andere styling as needed, such as font size, color, etc. */
 }
 
 
@@ -606,14 +606,14 @@ display: block;
             <label for="category">2. Wählen Sie eine Kategorie</label>
             <select id="category" name="category" required>
                 <option value="Transport">Transport</option>
-                <option value="Public spaces">Öffentliche Plätze</option>
-                <option value="Environment">Umwelt</option>
+                <option value="Öffentliche Plätze">Öffentliche Plätze</option>
+                <option value="Umwelt">Umwelt</option>
                 <option value="Verwaltung">Verwaltung</option>
-                <option value="Culture">Kultur</option>
-                <option value="Education">Bildung</option>
-                <option value="Health">Gesundheit</option>
+                <option value="Kultur">Kultur</option>
+                <option value="Bildung">Bildung</option>
+                <option value="Gesundheit">Gesundheit</option>
                 <option value="Sport">Sport</option>
-                <option value="Other">Andere</option>
+                <option value="Andere">Andere</option>
             </select>
         </div>
 		<div id="category-description">
@@ -884,25 +884,25 @@ setTimeout(function() {
             case "Public spaces":
                 categoryText = "Sollen öffentliche Plätze umgestaltet werden? Braucht es mehr Grünflächen?";
                 break;
-            case "Environment":
+            case "Umwelt":
                 categoryText = "Ist Ihnen Umweltverschmutzung aufgefallen? Haben Sie Ideen, um die Stadt sauberer, ökologischer oder Zukunftsfit zu machen?";
                 break;
             case "Verwaltung":
                 categoryText = "Gibt es Ideen für bessere Dienste der Verwaltung?. Vorschläge, öffentliche Veranstaltungen betreffen?";
                 break;
-            case "Culture":
+            case "Kultur":
                 categoryText = "Gibt es Ideen für Verstaltungen, Kunstinstallationen, Theater oder Literatur?";
                 break;
-            case "Education":
+            case "Bildung":
                 categoryText = "Welche Dinge im Bereich der Bildungen, Schulen und Hochschulen können wir als Gemeinde verbessern?";
                 break;
-            case "Health":
+            case "Gesundheit":
                 categoryText = "Ideen zum Thema Gesundheit?";
                 break;
             case "Sport":
                 categoryText = "Ideen zu Sportveranstaltungen, Sportplätzen oder städitschen Kursen?";
                 break;
-            case "Other":
+            case "Andere":
 				categoryText = "Haben Sie einen eigenen Vorschlag, der in keine der genannten Kategorien passt? Teilen Sie Ihre Idee uns mit!";
 				break;
 			default:
@@ -987,26 +987,42 @@ setTimeout(function() {
 <script>
     // Check submission limit on page load
     window.onload = function() {
-        fetch('/check_project_limit')
+        console.log("Checking project submission limit...");
+fetch('/check_project_limit?_=' + new Date().getTime())
             .then(response => response.json())
             .then(data => {
+                console.log("Received data from /check_project_limit:", data);
                 var publishButton = document.querySelector('.publish-button');
 
                 if (data.limit_reached) {
                     console.log("Submission limit reached. Limit expires at:", data.reset_time);
-                    
-                    // Update the publish button
-                    publishButton.innerText = `Limit reached, expires at ${data.reset_time}`;
-                    publishButton.disabled = true;
-
+                    updateButtonState(publishButton, `Limit reached, expires at ${data.reset_time}`, true);
                     startTimer(data.reset_time, publishButton);
+                } else {
+                    console.log("Submission limit not reached.");
+                    updateButtonState(publishButton, "Veröffentlichen", false);
                 }
             })
-            .catch(error => console.error('Error checking submission limit:', error));
+            .catch(error => {
+                console.error('Error checking submission limit:', error);
+                var publishButton = document.querySelector('.publish-button');
+                updateButtonState(publishButton, "Veröffentlichen", false); // Default state if error occurs
+            });
     };
 
+
+   function updateButtonState(button, text, disabled) {
+        button.innerText = text;
+        button.disabled = disabled;
+        if (disabled) {
+            button.classList.add('disabled-button'); // Style the disabled button
+        } else {
+            button.classList.remove('disabled-button'); // Remove the style if enabled
+        }
+    }
+	
     // Function to start a countdown timer
-    function startTimer(expiryTime, publishButton) {
+ function startTimer(expiryTime, publishButton) {
         var countDownDate = new Date(expiryTime).getTime();
 
         var x = setInterval(function() {
@@ -1020,8 +1036,7 @@ setTimeout(function() {
 
             if (distance < 0) {
                 clearInterval(x);
-                publishButton.innerText = "Veröffentlichen";
-                publishButton.disabled = false;
+                updateButtonState(publishButton, "Veröffentlichen", false);
             }
         }, 1000);
     }

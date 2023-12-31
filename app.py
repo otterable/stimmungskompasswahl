@@ -127,9 +127,12 @@ def check_comment_limit():
         oldest_comment_time = recent_comments[0].timestamp
         reset_time = oldest_comment_time + timedelta(minutes=15)
         formatted_expiry_time = reset_time.isoformat() + "Z"  # Format the expiry time in ISO 8601 format
+        app.logger.debug(f"Comment limit reached for user {user_id}. Reset time: {formatted_expiry_time}")
         return jsonify({'limit_reached': True, 'reset_time': formatted_expiry_time})
     else:
+        app.logger.debug(f"Comment limit not reached for user {user_id}.")
         return jsonify({'limit_reached': False})
+
 
 @app.route('/delete_all_projects', methods=['POST'])
 @login_required
@@ -389,7 +392,7 @@ def check_limit():
     additions = ip_marker_additions.get(ip_address, [])
     additions = [time for time in additions if datetime.now() - time < timedelta(days=1)]
 
-    if len(additions) >= 2:
+    if len(additions) >= 10:
         reset_time = max(additions) + timedelta(days=1)
         return jsonify({'limit_reached': True, 'reset_time': reset_time.strftime('%Y-%m-%d %H:%M:%S')})
 
@@ -399,10 +402,21 @@ def check_limit():
 def check_project_limit():
     ip_address = request.remote_addr
     submissions = ip_project_submissions.get(ip_address, [])
+    
+    # Filter submissions within the last 24 hours
     submissions = [time for time in submissions if datetime.now() - time < timedelta(days=1)]
-    limit_reached = len(submissions) >= 1  # Assuming 1 submission per day limit
+
+    limit_reached = len(submissions) >= 5  # Assuming a limit of 5 submissions per day
     reset_time = (submissions[0] + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S') if limit_reached else None
+
+    # Log for debugging
+    app.logger.debug(f"IP Address: {ip_address}")
+    app.logger.debug(f"Submissions: {submissions}")
+    app.logger.debug(f"Limit Reached: {limit_reached}")
+    app.logger.debug(f"Reset Time: {reset_time}")
+
     return jsonify({'limit_reached': limit_reached, 'reset_time': reset_time})
+
 
 
 def generate_otp_and_send(phone_number):
@@ -481,7 +495,7 @@ def submit_project():
         submissions = ip_project_submissions.get(ip_address, [])
         # Remove timestamps older than 24 hours
         submissions = [time for time in submissions if datetime.now() - time < timedelta(days=1)]
-        if len(submissions) >= 1:
+        if len(submissions) >= 5:
             app.logger.warning(f"IP {ip_address} blocked from submitting new projects due to rate limit")
             return jsonify({'error': 'Rate limit exceeded. You can only submit 5 projects every 24 hours'}), 429
         
@@ -1051,7 +1065,7 @@ def comment(project_id):
         # If the user has exceeded the comment limit, return an appropriate response
         return jsonify({
             'success': False,
-            'message': 'Comment limit reached. Please wait before posting another comment.'
+            'message': 'Kommentarlimit erreicht. Bitte warten Sie, bevor Sie einen weiteren Kommentar veröffentlichen.'
         }), 429  # 429 Too Many Requests
 
     project = Project.query.get_or_404(project_id)

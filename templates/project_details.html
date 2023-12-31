@@ -7,13 +7,19 @@
 <body>
 
    <style>
-      body {
-        font-family: 'Roboto', sans-serif;
-        background-color: #f5f1e4;
-        color: black;
-        margin: 0; /* Remove default margin */
-        padding: 0; /* Remove default padding */
-    }
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f1e4;
+    color: black;
+    background-image: url('/static/background2.png'); /* Updated path */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+}
+
+
 
         img {
             border-radius: 30px;
@@ -188,7 +194,7 @@
     text-align: center; /* Centers the text inside the div */
     padding: 2px 0; /* Adds some padding above and below the text */
     background-color: #f5f1e4; /* Optional: background color, if you want to highlight the div */
-    /* Other styling as needed, such as font size, color, etc. */
+    /* Andere styling as needed, such as font size, color, etc. */
 }
  .top-bar {
     background-color: #003056; /* Background color of the top bar */
@@ -287,7 +293,7 @@ margin: auto;
    .share-button-container {
         text-align: center; /* Center the button */
         margin-top: 20px; /* Add some space above the button */
-        /* Other styling as needed */
+        /* Andere styling as needed */
     }
 
 /* Exclude the logo link from having the underline effect */
@@ -788,8 +794,61 @@ display: block;
 
 
     <script>
-        // JavaScript to fetch and display project details
-        // This can be similar to your current overlay JavaScript but modified to update this page's content
+       // When the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        checkCommentLimitAndUpdateButton();
+    });
+
+    function checkCommentLimitAndUpdateButton() {
+        fetch('/check_comment_limit?_=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                console.log("Received data from /check_comment_limit:", data);
+                var commentButton = document.querySelector('.comment-button');
+
+                if (data.limit_reached) {
+                    console.log("Comment submission limit reached. Limit expires at:", data.reset_time);
+                    updateButtonState(commentButton, `Limit reached, expires at ${data.reset_time}`, true);
+                    startTimer(data.reset_time, commentButton);
+                } else {
+                    console.log("Comment submission limit not reached.");
+                    updateButtonState(commentButton, "Speichern", false);
+                }
+            })
+            .catch(error => {
+                console.error('Error checking comment submission limit:', error);
+                updateButtonState(commentButton, "Speichern", false); // Default state if error occurs
+            });
+    }
+
+    function updateButtonState(button, text, disabled) {
+        button.innerText = text;
+        button.disabled = disabled;
+        if (disabled) {
+            button.classList.add('disabled-button'); // Style the disabled button
+        } else {
+            button.classList.remove('disabled-button'); // Remove the style if enabled
+        }
+    }
+
+    function startTimer(expiryTime, button) {
+        var countDownDate = new Date(expiryTime).getTime();
+
+        var x = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = countDownDate - now;
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            button.innerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
+
+            if (distance < 0) {
+                clearInterval(x);
+                updateButtonState(button, "Speichern", false);
+            }
+        }, 1000);
+    }
     </script>
 </body>
 
