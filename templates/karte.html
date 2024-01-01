@@ -2429,25 +2429,32 @@ let futureMarker = {
 
     // Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
-    // Adjustments for pin size and stroke based on base layer
     var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
     var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
     var strokeWidth = currentBaseLayer === 'Satellit' ? 5 : outlineSize * 10;
     var strokeOpacity = currentBaseLayer === 'Satellit' ? 1 : 0.5;
+    var starSize = adjustedPinSize / 2; // Star emoji size
+    var starEmoji = isFeatured ? `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
+
+    var blackOutline = isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : ''; // Thinner black outline
 
     var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
         <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" fill="${fillColor}" />
         <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
-        ${isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="yellow" stroke-width="4" fill="none" />` : ''}
+        ${blackOutline}
+        ${starEmoji}
     </svg>`;
 
     return L.icon({
-        iconUrl: `data:image/svg+xml;base64,${btoa(svgIcon)}`,
+        iconUrl: `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgIcon)))}`,
         iconSize: [adjustedPinSize, adjustedPinSize],
         iconAnchor: [adjustedPinSize / 2, adjustedPinSize / 2],
         popupAnchor: [0, -adjustedPinSize / 2]
     });
 }
+
+
+
 
 
 
@@ -3193,16 +3200,16 @@ function applyButtonStyles(button) {
 }
 
 function toggleMarkerVisibility() {
-    var showMapObjectsOnly = document.getElementById('hideNonMapMarkers').innerText === "Nur Projektvorschläge anzeigen";
+    var hideMapObjects = document.getElementById('hideNonMapMarkers').innerText === "Nur Projektvorschläge anzeigen";
 
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
-            if (showMapObjectsOnly) {
-                // Show only map objects and hide others
+            if (hideMapObjects) {
+                // Hide map objects and show others
                 if (marker.options.isMapObject) {
-                    map.addLayer(marker);
-                } else {
                     map.removeLayer(marker);
+                } else {
+                    map.addLayer(marker);
                 }
             } else {
                 // Show all markers
@@ -3212,11 +3219,11 @@ function toggleMarkerVisibility() {
     }
 
     // Toggle button text
-    document.getElementById('hideNonMapMarkers').innerText = showMapObjectsOnly ? "Alles anzeigen" : "Nur Projektvorschläge anzeigen";
+    document.getElementById('hideNonMapMarkers').innerText = hideMapObjects ? "Alles anzeigen" : "Nur Projektvorschläge anzeigen";
 }
 
-
 document.getElementById('hideNonMapMarkers').addEventListener('click', toggleMarkerVisibility);
+
 
 function toggleCategory(categoryName) {
     for (var category in categoryLayers) {
