@@ -2428,8 +2428,7 @@ let futureMarker = {
 };
 
     // Function to create a colored circle icon
-// Function to create a colored circle icon
-function createIcon(pinSize, outlineSize, fillColor) {
+function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
     // Adjustments for pin size and stroke based on base layer
     var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
     var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
@@ -2439,6 +2438,7 @@ function createIcon(pinSize, outlineSize, fillColor) {
     var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
         <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" fill="${fillColor}" />
         <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
+        ${isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="yellow" stroke-width="4" fill="none" />` : ''}
     </svg>`;
 
     return L.icon({
@@ -2448,6 +2448,7 @@ function createIcon(pinSize, outlineSize, fillColor) {
         popupAnchor: [0, -adjustedPinSize / 2]
     });
 }
+
 
 
 
@@ -2987,10 +2988,9 @@ function addMarkers(projects) {
             var coords = project.geoloc.split(',');
             var latLng = L.latLng(parseFloat(coords[0]), parseFloat(coords[1]));
             var fillColor = getCategoryColor(project.category);
+            var isFeatured = project.is_featured; // Check if the project is featured
             var popupContent;
-        var isMapObject = project.is_mapobject === false; // Ensures a boolean value
 
-            // Check if the project is a map object or not
             if (project.is_mapobject) {
                 // For map objects, show simple description
                 popupContent = `<div style="text-align: center;">${project.descriptionwhy}</div>`;
@@ -3024,10 +3024,9 @@ function addMarkers(projects) {
             }
 
             var marker = L.marker(latLng, {
-                icon: createIcon(24, 2, fillColor),
+                icon: createIcon(24, 2, fillColor, isFeatured), // Now passing isFeatured to createIcon
                 category: project.category,
-				            isMapObject: isMapObject // Set this property
-
+                isMapObject: project.is_mapobject
             }).addTo(map);
 
             marker.bindPopup(popupContent);
@@ -3046,6 +3045,7 @@ function addMarkers(projects) {
         }
     });
 }
+
 
 
 console.log("Map Initialization Started");

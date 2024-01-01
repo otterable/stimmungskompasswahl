@@ -1229,12 +1229,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // Delayed search functionality for the filter form
-    document.getElementById('search').addEventListener('input', function() {
-        clearTimeout(window.searchTimer);
-        window.searchTimer = setTimeout(function() {
-            document.getElementById('filter-form').submit();
-        }, 500); // Adjust delay as needed
-    });
+   // document.getElementById('search').addEventListener('input', function() {
+     //   clearTimeout(window.searchTimer);
+       // window.searchTimer = setTimeout(function() {
+         //   document.getElementById('filter-form').submit();
+        // }, 500); // Adjust delay as needed
+    // });
 
     // Event listener for filter form changes
     document.getElementById('filter-form').addEventListener('change', function() {
