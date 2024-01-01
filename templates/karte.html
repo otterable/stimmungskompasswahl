@@ -2427,17 +2427,21 @@ let futureMarker = {
     description: ''
 };
 
-    // Function to create a colored circle icon
+// Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
     var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
     var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
     var strokeWidth = currentBaseLayer === 'Satellit' ? 5 : outlineSize * 10;
     var strokeOpacity = currentBaseLayer === 'Satellit' ? 1 : 0.5;
+
+    // Star emoji
     var starSize = adjustedPinSize / 2; // Star emoji size
     var starEmoji = isFeatured ? `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
 
-    var blackOutline = isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : ''; // Thinner black outline
+    // Black outline for featured project
+    var blackOutline = isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : '';
 
+    // SVG icon with conditional star and outline
     var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
         <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" fill="${fillColor}" />
         <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
@@ -2898,12 +2902,12 @@ function createFullProjectFilter() {
 function updateMarkerIcons() {
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
-            // Assuming 'outlineSize' value is constant for all markers, adjust if necessary
             var pinSize = 24; // Base pin size
             var outlineSize = 2;
-            var fillColor = getCategoryColor(marker.options.category); // Assuming each marker has a 'category' option
+            var fillColor = getCategoryColor(marker.options.category);
+            var isFeatured = marker.options.isFeatured; // Use the isFeatured option set on the marker
 
-            var newIcon = createIcon(pinSize, outlineSize, fillColor);
+            var newIcon = createIcon(pinSize, outlineSize, fillColor, isFeatured);
             marker.setIcon(newIcon);
         });
     }
@@ -3031,9 +3035,10 @@ function addMarkers(projects) {
             }
 
             var marker = L.marker(latLng, {
-                icon: createIcon(24, 2, fillColor, isFeatured), // Now passing isFeatured to createIcon
-                category: project.category,
-                isMapObject: project.is_mapobject
+            icon: createIcon(24, 2, fillColor, isFeatured), 
+            category: project.category,
+            isMapObject: project.is_mapobject,
+            isFeatured: isFeatured // Set isFeatured
             }).addTo(map);
 
             marker.bindPopup(popupContent);
