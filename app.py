@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from models import db, User, Project, Vote, Comment
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from forms import RegistrationForm, LoginForm, CommentForm  # Import CommentForm
@@ -41,6 +42,7 @@ print("Twilio Phone Number:", twilio_number)
 # Initialize the Flask app
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+oauth = OAuth(app)
 
 # Configure the database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project_voting.db'
@@ -63,6 +65,52 @@ ip_last_submitted_project = {}
 ip_last_added_marker = {}
 ip_marker_additions = {}  # Initialize the dictionary to track marker additions
 ip_project_submissions = {}
+
+
+google = oauth.register(
+    'google',
+    client_id='695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com',
+    client_secret='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',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    access_token_params=None,
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    authorize_params=None,
+    api_base_url='https://www.googleapis.com/oauth2/v1/',
+    client_kwargs={'scope': 'openid email profile'},
+)
+
+
+@app.route('/login/google')
+def google_login():
+    redirect_uri = url_for('authorized', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@app.route('/login/google/authorized')
+def authorized():
+    token = oauth.google.authorize_access_token()
+    user_info = oauth.google.parse_id_token(token)
+
+    # Check if user already exists
+    existing_user = User.query.filter_by(phone_number=user_info.get('email')).first()
+
+    if not existing_user:
+        new_user = User(
+            phone_number=user_info.get('email'),  # Assuming email as a substitute for phone_number
+            name=user_info.get('name', 'Unknown'),
+            account_creation=datetime.utcnow(),
+            is_googleaccount=True,
+            is_admin=False  # Default to False
+            # Other fields as needed
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+    else:
+        login_user(existing_user)
+
+    return redirect(url_for('index'))
+
+
 
 # Create the database tables before the first request
 def create_tables():

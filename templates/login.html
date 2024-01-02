@@ -320,6 +320,8 @@
         <div style="text-align: center !important;">
             <h2>Melden Sie sich ein, um Vorschläge zu posten.</h2>
         </div>
+		<a href="{{ url_for('google_login') }}" class="button">Sign in with Google</a>
+
         <div class="login-form">
             <form action="{{ url_for('login', next=next) }}" method="post">
                 <input type="text" name="username_or_phone" placeholder="Phone number / e-mail" required>

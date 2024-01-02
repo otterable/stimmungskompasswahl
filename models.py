@@ -14,13 +14,14 @@ class User(db.Model, UserMixin):
     highlight_id = db.Column(db.Integer)  # Optional, assumed to be an integer
     account_creation = db.Column(db.DateTime, default=datetime.utcnow)
     is_admin = db.Column(db.Boolean, default=False)  # New field to indicate admin status
-
+    is_googleaccount = db.Column(db.Boolean, default=False)  # New field to indicate Google account
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
