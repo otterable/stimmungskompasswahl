@@ -2427,19 +2427,28 @@ let futureMarker = {
     description: ''
 };
 
-// Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
     var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
     var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
     var strokeWidth = currentBaseLayer === 'Satellit' ? 5 : outlineSize * 10;
     var strokeOpacity = currentBaseLayer === 'Satellit' ? 1 : 0.5;
 
-    // Star emoji
-    var starSize = adjustedPinSize / 2; // Star emoji size
-    var starEmoji = isFeatured ? `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
+    // Calculate star size and position
+    var starSize, starX, starY;
+    if (currentBaseLayer === 'Satellit') {
+        starSize = adjustedPinSize / 1.9;
+        starX = "50%";
+        starY = "50%";
+    } else {
+        starSize = adjustedPinSize / 1.3; // Bigger star size for normal layout
+        starX = "50%";
+        starY = "50%";
+    }
 
-    // Black outline for featured project
-    var blackOutline = isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : '';
+    var starEmoji = isFeatured ? `<text x="${starX}" y="${starY}" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
+
+    // Add black outline only for satellite layout if is_featured is true
+    var blackOutline = (isFeatured && currentBaseLayer === 'Satellit') ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : '';
 
     // SVG icon with conditional star and outline
     var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
@@ -2456,6 +2465,11 @@ function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
         popupAnchor: [0, -adjustedPinSize / 2]
     });
 }
+
+
+
+
+
 
 
 
