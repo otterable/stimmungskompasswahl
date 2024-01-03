@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
+from werkzeug.middleware.proxy_fix import ProxyFix
 from forms import RegistrationForm, LoginForm, CommentForm  # Import CommentForm
 from random import randint
 from urllib.parse import quote, unquote
@@ -36,12 +37,13 @@ twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
 print("Twilio Account SID:", account_sid)
 print("Twilio Auth Token:", auth_token)
-print("Twilio Phone Number:", twilio_number)
+print("Twilio Ihre Handynummer:", twilio_number)
 
 
 # Initialize the Flask app
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
+app.secret_key = 'mangoOttersFTWx123'
 oauth = OAuth(app)
 
 # Configure the database
@@ -71,36 +73,44 @@ google = oauth.register(
     'google',
     client_id='695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com',
     client_secret='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',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    access_token_params=None,
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    authorize_params=None,
-    api_base_url='https://www.googleapis.com/oauth2/v1/',
-    client_kwargs={'scope': 'openid email profile'},
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
 )
+
+
 
 
 @app.route('/login/google')
 def google_login():
+    # Generate a nonce and store it in the session
+    nonce = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+    session['google_auth_nonce'] = nonce
+
     redirect_uri = url_for('authorized', _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
+    return oauth.google.authorize_redirect(redirect_uri, nonce=nonce, prompt='select_account')
+
 
 @app.route('/login/google/authorized')
 def authorized():
     token = oauth.google.authorize_access_token()
-    user_info = oauth.google.parse_id_token(token)
+    
+    nonce = session.pop('google_auth_nonce', None)
+    user_info = oauth.google.parse_id_token(token, nonce=nonce)
 
-    # Check if user already exists
     existing_user = User.query.filter_by(phone_number=user_info.get('email')).first()
 
     if not existing_user:
+        # Convert UTC time to desired timezone
+        tz = pytz.timezone('Europe/Berlin')  # Replace 'Europe/Berlin' with your desired timezone
+        account_creation_time = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(tz)
+
         new_user = User(
-            phone_number=user_info.get('email'),  # Assuming email as a substitute for phone_number
+            phone_number=user_info.get('email'),
             name=user_info.get('name', 'Unknown'),
-            account_creation=datetime.utcnow(),
+            account_creation=account_creation_time,
             is_googleaccount=True,
-            is_admin=False  # Default to False
-            # Other fields as needed
+            is_admin=False,
+            password_hash='google_oauth'  # Set a default value
         )
         db.session.add(new_user)
         db.session.commit()
@@ -109,6 +119,7 @@ def authorized():
         login_user(existing_user)
 
     return redirect(url_for('index'))
+
 
 
 
@@ -311,12 +322,12 @@ def register():
         name = request.form.get('name')
         ip_address = request.remote_addr  # Capture IP address from request
 
-        # Check for existing user with the same phone number
+        # Check for existing user with the same Ihre Handynummer
         existing_user = User.query.filter_by(phone_number=phone_number).first()
         if existing_user:
-            # flash('An account with this phone number already exists.', 'danger')
-            logging.debug("Account registration failed: Phone number already exists")
-            return jsonify({'success': False, 'message': 'Diese Telefonnummer ist bereits registriert.'}), 400
+            # flash('An account with this Ihre Handynummer already exists.', 'danger')
+            logging.debug("Account registration failed: Ihre Handynummer already exists")
+            return jsonify({'success': False, 'message': 'Diese Handynummer ist bereits registriert.'}), 400
 
         # Generate OTP and handle verification
         otp = randint(100000, 999999)
@@ -337,7 +348,7 @@ def register():
             'otp': otp
         }
 
-        logging.debug("OTP sent for verification to phone number: %s", phone_number)
+        logging.debug("OTP sent for verification to Ihre Handynummer: %s", phone_number)
         return jsonify({'success': True, 'message': 'OTP sent successfully'})
 
     return render_template('register.html')
@@ -503,11 +514,11 @@ def request_otp():
         if otp:
             session['reset_otp'] = otp
             session['phone_number'] = phone_number
-            logging.debug(f"OTP generated and session updated for phone number {phone_number}")
+            logging.debug(f"OTP generated and session updated for Ihre Handynummer {phone_number}")
             return jsonify(success=True, message="OTP sent to your phone.")
         else:
             return jsonify(success=False, message="Failed to send OTP.")
-    return jsonify(success=False, message="Phone number not found.")
+    return jsonify(success=False, message="Ihre Handynummer not found.")
 
 @app.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
@@ -520,11 +531,11 @@ def reset_password():
             if user:
                 user.set_password(new_password)
                 db.session.commit()
-                logging.debug(f"Password reset for user with phone number {phone_number}")
+                logging.debug(f"Password reset for user with Ihre Handynummer {phone_number}")
                 # flash('Your password has been reset successfully.', 'success')
                 return redirect(url_for('login'))
             # else:
-                # flash('Invalid phone number.', 'danger')
+                # flash('Invalid Ihre Handynummer.', 'danger')
         # else:
             # flash('Invalid OTP. Please try again.', 'danger')
     return render_template('reset_password.html')
@@ -961,6 +972,9 @@ def verify_admin_otp():
     return render_template('verify_admin_otp.html')  # Ensure this template exists for OTP input
         
         
+import os
+import shutil
+
 @app.route('/delete_my_data', methods=['POST'])
 @login_required
 def delete_my_data():
@@ -975,10 +989,11 @@ def delete_my_data():
 
         # Delete user's projects and associated files
         projects = Project.query.filter_by(author=user_id).all()
-        for project in paginated_projects.items:
+        for project in projects:
             total_votes = sum(vote.upvote + vote.downvote for vote in project.votes)
             project.upvotes = sum(vote.upvote for vote in project.votes)
             project.downvotes = sum(vote.downvote for vote in project.votes)
+
             if total_votes > 0:
                 project.upvote_percentage = project.upvotes / total_votes * 100
                 project.downvote_percentage = project.downvotes / total_votes * 100
@@ -986,9 +1001,18 @@ def delete_my_data():
                 project.upvote_percentage = 0
                 project.downvote_percentage = 0
 
+            # Delete associated files (if applicable)
+            project_files_path = os.path.join('actual/path/to/project_files', str(project.id))
+            if os.path.exists(project_files_path):
+                shutil.rmtree(project_files_path)
+
+            # Delete the project record from the database
+            db.session.delete(project)
 
         # Delete user account
-        User.query.filter_by(id=user_id).delete()
+        user = User.query.filter_by(id=user_id).first()
+        if user:
+            db.session.delete(user)
 
         # Commit changes to the database
         db.session.commit()
@@ -996,12 +1020,13 @@ def delete_my_data():
         # Log out the user
         logout_user()
 
-        # flash message or return JSON response
+        # Return JSON response
         return jsonify({'success': True, 'message': 'Your data has been deleted successfully.'})
     except Exception as e:
         logging.error(f"Error in delete_my_data: {e}")
-        # flash message or return JSON response
         return jsonify({'success': False, 'message': 'An error occurred while deleting your data.'}), 500
+
+
 
 
 @app.route('/delete_user', methods=['POST'])
@@ -1353,7 +1378,7 @@ def verify_otp():
                 new_password = request.form.get('new_password')
                 user.set_password(new_password)
                 db.session.commit()
-                logging.debug(f"Password reset for user with phone number {phone_number}")
+                logging.debug(f"Password reset for user with Ihre Handynummer {phone_number}")
                 flash('Your password has been reset successfully.', 'success')
                 return redirect(url_for('login'))
             else:
@@ -1384,7 +1409,7 @@ def password_recovery():
             session['otp'] = otp
             return redirect(url_for('verify_otp'))
         else:
-            flash('Phone number not found', 'error')
+            flash('Ihre Handynummer not found', 'error')
     return render_template('password_recovery.html')
 
 

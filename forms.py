@@ -6,7 +6,7 @@ from models import User
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
-    phone_number = StringField('Phone Number', validators=[DataRequired(), Length(min=10, max=20)])
+    phone_number = StringField('Ihre Handynummer', validators=[DataRequired(), Length(min=10, max=20)])
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     name = StringField('Name', validators=[DataRequired()])
@@ -17,10 +17,10 @@ class RegistrationForm(FlaskForm):
     def validate_phone_number(self, phone_number):
         user = User.query.filter_by(phone_number=phone_number.data).first()
         if user:
-            raise ValidationError('That phone number is already in use. Please choose a different one.')
+            raise ValidationError('That Ihre Handynummer is already in use. Please choose a different one.')
 
 class LoginForm(FlaskForm):
-    username_or_phone = StringField('Username or Phone Number', validators=[DataRequired()])
+    username_or_phone = StringField('Username or Ihre Handynummer', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 

@@ -58,45 +58,59 @@ body, html {
     background-color: var(--background-color); /* Apply background color */
     color: var(--text-color); /* Apply text color */
 }
+.leaflet-tile {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important; /* Removes rounded corners */
+}
 
 .resistant-h3 {
     color: var(--text-color); /* Use the text color based on the current theme */
     /* Add Andere styles as needed */
 }
 
-#pagination-controls {
+
+
+#category-filter, #sort-filter {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 10px; /* Spacing between elements */
+    margin-bottom: 10px;
 }
 
-#page-indicator {
-    background-color: #003056;
-    color: white;
-    border-radius: 50%; /* Make it circular */
-    width: 30px; /* Fixed width */
-    height: 30px; /* Fixed height */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
+#category-select, #sort-select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-#pagination-controls button {
-    background-color: #003056; /* Same background as the page indicator */
-    color: white;
-    border: none;
-	font-weight: bold;
-    border-radius: 30px; /* Slightly rounded corners */
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+/* Adjust the #markers-list-overlay */
+#markers-list-overlay {
+    overflow: auto; /* Allow scrolling inside the overlay */
+    padding-bottom: 20px; /* Add some padding at the bottom for better spacing */
 }
 
-#pagination-controls button:hover {
-    background-color: #024a70; /* Slightly darker on hover */
+/* Ensure the #markers-list has enough space and doesn't overflow */
+#markers-list {
+    max-height: calc(100% - 60px); /* Set maximum height, subtracting the height of other elements */
+    overflow-y: auto; /* Enable vertical scrolling */
+    margin: 0; /* Reset default margins */
+    padding: 0 10px; /* Add horizontal padding for better readability */
 }
+
+/* Additional styling for list items to ensure proper spacing */
+#markers-list li {
+    margin-bottom: 10px; /* Add some space between list items */
+    list-style: none; /* Remove default list styling */
+}
+
+/* Adjust the #markers-list for smaller devices */
+@media (max-width: 768px) {
+    #markers-list {
+        max-height: calc(100% - 40px); /* Adjust maximum height for smaller screens */
+    }
+}
+
+
 
 
 .filterx-container {
@@ -220,6 +234,7 @@ display:none !important;
         left: 15px;
         right: calc(30% + 15px);
     }
+	
 .markers-sidebar {
     position: absolute;
     top: 95px; /* Increased from 15px to 95px to accommodate the top bar's height */
@@ -2126,23 +2141,18 @@ margin-bottom: 0px !important;
 </div>
 
 <!-- Overlay for displaying the list of markers -->
+<!-- Overlay for displaying the list of markers -->
 <div id="markers-list-overlay" class="markers-sidebar">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 30px; width: 80%; max-width: 500px; text-align: center;">
-	<div id="category-filter" style="text-align: center; margin-bottom: 20px;"></div>
-<div id="sort-filter" style="text-align: center; margin-bottom: 20px;"></div>
-<div id="full-project-filter" style="text-align: center; margin-bottom: 20px;"></div>
-
-	
+    <div style="...">
+        <div id="category-filter" style="..."></div>
+        <div id="sort-filter" style="..."></div>
+        <div id="full-project-filter" style="..."></div>
         <ul id="markers-list" style="list-style: none; padding: 0;">
             <!-- Marker items will be added here dynamically -->
         </ul>
-        <div id="pagination-controls" style="margin-top: 20px;">
-            <button onclick="changePage(-1)">zurück</button>
-            <span id="page-indicator">Seite 1</span>
-            <button onclick="changePage(1)">weiter</button>
-        </div>
-<button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button" style="margin-top: 10px !important;">Schließen</button>
     </div>
+	<button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button" style="margin-top: 10px !important;">Schließen</button>
+
 </div>
 
 
@@ -2427,28 +2437,19 @@ let futureMarker = {
     description: ''
 };
 
+// Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
     var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
     var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
     var strokeWidth = currentBaseLayer === 'Satellit' ? 5 : outlineSize * 10;
     var strokeOpacity = currentBaseLayer === 'Satellit' ? 1 : 0.5;
 
-    // Calculate star size and position
-    var starSize, starX, starY;
-    if (currentBaseLayer === 'Satellit') {
-        starSize = adjustedPinSize / 1.9;
-        starX = "50%";
-        starY = "50%";
-    } else {
-        starSize = adjustedPinSize / 1.3; // Bigger star size for normal layout
-        starX = "50%";
-        starY = "50%";
-    }
+    // Star emoji
+    var starSize = adjustedPinSize / 2; // Star emoji size
+    var starEmoji = isFeatured ? `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
 
-    var starEmoji = isFeatured ? `<text x="${starX}" y="${starY}" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
-
-    // Add black outline only for satellite layout if is_featured is true
-    var blackOutline = (isFeatured && currentBaseLayer === 'Satellit') ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : '';
+    // Black outline for featured project
+    var blackOutline = isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : '';
 
     // SVG icon with conditional star and outline
     var svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
@@ -2465,11 +2466,6 @@ function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
         popupAnchor: [0, -adjustedPinSize / 2]
     });
 }
-
-
-
-
-
 
 
 
@@ -2731,39 +2727,27 @@ function sortMarkers(sortType) {
 
 function createCategoryFilter() {
     const filterDiv = document.getElementById('category-filter');
-	filterDiv.innerHTML = '<label for="category-select" class="category-label">Suchen nach Kategorie:</label>';
+    filterDiv.innerHTML = ''; // Clear existing content
 
     const select = document.createElement('select');
     select.id = 'category-select';
     select.onchange = function() { filterByCategory(this.value); };
 
-    const categories = ["Alle", ...new Set(markers.map(marker => marker.category))];
-    const categoryColors = {
-        'Transport': '#1565C0',
-        'Öffentliche Plätze': '#FF7043',
-        'Umwelt': '#4CAF50',
-        'Verwaltung': '#B38A58',
-        'Kultur': '#3B1C32',
-        'Bildung': '#264027',
-        'Gesundheit': '#B71C1C',
-        'Sport': '#4A001F',
-        'Andere': '#212121'
-    };
-
+    const categories = ["Alle", "Transport", "Öffentliche Plätze", "Umwelt", "Verwaltung", "Kultur", "Bildung", "Gesundheit", "Sport", "Andere"];
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
         option.innerText = category;
-        option.style.color = categoryColors[category] || "#000"; // Default to black if color not found
         select.appendChild(option);
     });
 
     filterDiv.appendChild(select);
 }
 
+
 function createSortFilter() {
     const sortDiv = document.getElementById('sort-filter');
-    sortDiv.innerHTML = '';
+    sortDiv.innerHTML = ''; // Clear existing content
 
     const select = document.createElement('select');
     select.id = 'sort-select';
@@ -2773,17 +2757,16 @@ function createSortFilter() {
     sortOptions.forEach(option => {
         const optionElement = document.createElement('option');
         optionElement.value = option;
-        optionElement.innerText = option.charAt(0).toUpperCase() + option.slice(1); // Capitalize first letter
+        optionElement.innerText = option;
         select.appendChild(optionElement);
     });
 
-    // Set default sorting to 'Neueste' (newest)
-    select.value = 'Neueste';
-    sortMarkers('Neueste');
-
     sortDiv.appendChild(select);
 }
-	
+
+// Call these functions to create filters
+createCategoryFilter();
+createSortFilter();
 	
 
 function paginateMarkers(page, markersPerPage) {
@@ -2792,26 +2775,9 @@ function paginateMarkers(page, markersPerPage) {
     return filteredMarkers.slice(startIndex, endIndex);
 }
 
-function adjustMarkersPerPage() {
-    const overlayDiv = document.getElementById('markers-list-overlay');
-    const listDiv = document.getElementById('markers-list');
-    const paginationControls = document.getElementById('pagination-controls');
 
-    // Adjust these values based on your CSS styling
-    const markerHeight = 40; // Estimated height of a single list item in pixels
-    const extraSpace = 500; // Extra space to account for padding, margins, and non-list content
-
-    // Calculate available height for the list
-    const availableHeight = overlayDiv.clientHeight - extraSpace;
-
-    // Determine the number of markers that can fit in the available height
-    const markersPerPage = Math.floor(availableHeight / markerHeight);
-
-    return markersPerPage > 0 ? markersPerPage : 10; // Fallback to 10 if the calculation is off
-}
 
 function renderPage(page) {
-    const markersPerPage = adjustMarkersPerPage();
     currentPage = parseInt(page);
     const paginatedMarkers = paginateMarkers(page, markersPerPage);
     const list = document.getElementById('markers-list');
@@ -2840,19 +2806,10 @@ function renderPage(page) {
         });
     }
 
-    updatePaginationControls(page, markersPerPage);
 }
 
 
-	
-   function applyFilters() {
-    let tempMarkers = markers;
-    if (showFullProjectsOnly) {
-        tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
-    }
-    filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by Sort by newest
-    renderPage(1); // Reset to the first page after filtering
-}
+
 	
 	
 	window.addEventListener('resize', function() {
@@ -2860,24 +2817,64 @@ function renderPage(page) {
 });
 
 document.getElementById('show-markers-btn').addEventListener('click', function() {
-   console.log("Show markers button clicked, opening overlay and sorting markers by newest");
-    createSortFilter(); // Initialize sorting filter
-    document.getElementById('markers-list-overlay').style.display = 'block';
-    renderPage(1); // Render the first page of markers
+    var markersListOverlay = document.getElementById('markers-list-overlay');
+    var showMarkersBtn = document.getElementById('show-markers-btn');
+    
+    if (markersListOverlay.style.display === 'block') {
+        // Hide the overlay and change button text to "Liste anzeigen"
+        markersListOverlay.style.display = 'none';
+        showMarkersBtn.innerText = 'Liste anzeigen';
+        console.log("Markers list overlay hidden");
+    } else {
+        // Show the overlay and change button text to "Liste ausblenden"
+        createSortFilter(); // Initialize sorting filter
+        markersListOverlay.style.display = 'block';
+        renderPage(1); // Render the first page of markers
+        showMarkersBtn.innerText = 'Liste ausblenden';
+        console.log("Markers list overlay shown");
+    }
 });
-document.getElementById('show-markers-btn').addEventListener('click', adjustMarkersPerPage);
 
+// Global variable to track the filter state
 
+// Function to update marker visibility
+function updateMarkerVisibility() {
+    showFullProjectsOnly = !showFullProjectsOnly;
+
+    let tempMarkers = markers;
+    if (showFullProjectsOnly) {
+        tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
+    }
+    filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+    renderPage(1); // Reset to the first page after filtering
+
+    // Update the UI
+    document.getElementById('full-project-checkbox').checked = showFullProjectsOnly;
+    document.getElementById('hideNonMapMarkers').innerText = showFullProjectsOnly ? "Alles anzeigen" : "Nur Projektvorschläge anzeigen";
+
+    // Update map layers
+    for (var category in categoryLayers) {
+        categoryLayers[category].eachLayer(function(marker) {
+            if (showFullProjectsOnly) {
+                if (marker.options.isMapObject) {
+                    map.removeLayer(marker);
+                } else {
+                    map.addLayer(marker);
+                }
+            } else {
+                map.addLayer(marker);
+            }
+        });
+    }
+}
+
+// Function to create the full project filter
 function createFullProjectFilter() {
     const filterDiv = document.getElementById('full-project-filter');
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = 'full-project-checkbox';
-    checkbox.onchange = function() {
-        showFullProjectsOnly = this.checked;
-        console.log(showFullProjectsOnly ? "Checkbox clicked, only markers with is_mapobject=false will be shown" : "Checkbox unchecked, all markers will be shown");
-        applyFilters();
-    };
+    checkbox.onchange = updateMarkerVisibility;
 
     const label = document.createElement('label');
     label.htmlFor = 'full-project-checkbox';
@@ -2888,6 +2885,10 @@ function createFullProjectFilter() {
     filterDiv.appendChild(label);
 }
 
+// Button event listener
+document.getElementById('hideNonMapMarkers').addEventListener('click', updateMarkerVisibility);
+
+// Call to create the filter UI
 	
 
     function updatePaginationControls(page, markersPerPage) {
@@ -3140,10 +3141,7 @@ function centerMapOnMarker(markerId) {
 
 
 
-    // Event listener for the button
-    document.getElementById('show-markers-btn').addEventListener('click', function() {
-        document.getElementById('markers-list-overlay').style.display = 'block';
-    });
+
 	
 
 
@@ -3217,31 +3215,6 @@ function applyButtonStyles(button) {
     button.style.fontWeight = 'bold';
     // ... rest of the styling ...
 }
-
-function toggleMarkerVisibility() {
-    var hideMapObjects = document.getElementById('hideNonMapMarkers').innerText === "Nur Projektvorschläge anzeigen";
-
-    for (var category in categoryLayers) {
-        categoryLayers[category].eachLayer(function(marker) {
-            if (hideMapObjects) {
-                // Hide map objects and show others
-                if (marker.options.isMapObject) {
-                    map.removeLayer(marker);
-                } else {
-                    map.addLayer(marker);
-                }
-            } else {
-                // Show all markers
-                map.addLayer(marker);
-            }
-        });
-    }
-
-    // Toggle button text
-    document.getElementById('hideNonMapMarkers').innerText = hideMapObjects ? "Alles anzeigen" : "Nur Projektvorschläge anzeigen";
-}
-
-document.getElementById('hideNonMapMarkers').addEventListener('click', toggleMarkerVisibility);
 
 
 function toggleCategory(categoryName) {
@@ -3378,6 +3351,7 @@ $.ajax({
 
 }
 </script>
+   
    
 <script>
     // Toggle the navigation overlay

@@ -840,12 +840,18 @@ display: block;
     <h1>Mein Konto:</h1>
     {% if current_user.is_authenticated %}
         <p>Ihr Benutzername ist: <span style="color: #003056;">{{ current_user.name }}</span></p>
-        <p>Die verknüpfte Telefonnummer lautet: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
+
+        {% if not current_user.is_googleaccount %}
+            <p>Die verknüpfte Handynummer lautet: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
+            <p>Hier klicken, um das Passwort zurückzusetzen:<a href="{{ url_for('password_recovery') }}" style="color: #003056;">Passwort zurücksetzen</a>.</p>
+        {% else %}
+            <p>Das verknüpfte Google-Konto ist: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
+        {% endif %}
+
         <p>Das Konto wurde erstellt am: <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
-        <p>Hier klicken, um das Passwort  zurückzusetzen:<a href="{{ url_for('password_recovery') }}" style="color: #003056;">Passwort zurücksetzen</a>.</p>
-    {% else %}
     {% endif %}
 </div>
+
 
 
 
