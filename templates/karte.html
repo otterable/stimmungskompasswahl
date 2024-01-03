@@ -772,21 +772,28 @@ display: none !important;
         }
 /* SMALL OPTIONS MENU BUTTON CSS END */
 
-
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .markers-sidebar {
-        /* Keep the existing styles for the overlay */
-        display: none; /* Ensure it's hidden by default */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 10000;
-        overflow: auto;
+        position: fixed; /* Overlay the entire screen */
+        top: 50%; /* Adjust vertical position to better fit the screen */
+        left: 50%; /* Center horizontally */
+        transform: translate(-50%, -50%); /* Adjust for the centering */
+        width: 80%; /* Set a relative width for mobile devices */
+        max-width: 400px; /* Maximum width */
+        max-height: 80vh; /* Adjusted maximum height relative to the viewport height */
+        height: auto; /* Auto height based on content, but not exceeding the viewport */
+        overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+        background: white;
+        border-radius: 30px;
+        z-index: 1001;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Optional: Add some shadow for visibility */
+        display: none; /* Keep it hidden initially */
     }
 }
+
+
 
 /* BUTTON MAIN UNIVERSAL CSS START */
 .button-u {
@@ -1371,36 +1378,6 @@ margin-bottom: 50px;
     }
 }
 
-/* Mobile and Tablet Styles */
-@media (max-width: 1080px) {
-    .markers-sidebar {
-        position: fixed; /* Changed to fixed positioning */
-        top: 0;
-        left: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
-        z-index: 1001; /* High z-index to ensure it's on top */
-        padding: 20px;
-        box-sizing: border-box;
-        display: none; /* Initially hidden */
-        overflow-y: auto; /* Allows scrolling */
-    }
-
-    .markers-sidebar > div {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 20px;
-        border-radius: 30px;
-        width: 80%;
-        max-width: 500px; /* Adjust max-width as needed */
-        text-align: center;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Optional: Add some shadow for better visibility */
-    }
-}
 
 
 /* Media query for tablet devices */
@@ -1576,6 +1553,26 @@ margin-bottom: 50px;
     box-sizing: border-box; /* Include padding in width */
 }
 
+        .register-button-f {
+    background-color: #003056; /* Example color */
+    color: white;
+    border: none; /* Remove the border */
+    outline: none; /* Remove the outline */
+    box-shadow: none; /* Remove any shadow that might appear as an outline */
+    border-radius: 30px;
+    padding: 5px 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 16px;
+    margin: auto;
+    margin-top: 0px !important;
+    margin-bottom: 20px;
+    cursor: pointer;
+        width: 97%;
+    box-sizing: border-box; /* Include padding in width */
+}
 .button-container {
     display: flex;
     justify-content: center; /* Center horizontally */
@@ -2141,19 +2138,19 @@ margin-bottom: 0px !important;
 </div>
 
 <!-- Overlay for displaying the list of markers -->
-<!-- Overlay for displaying the list of markers -->
 <div id="markers-list-overlay" class="markers-sidebar">
-    <div style="...">
-        <div id="category-filter" style="..."></div>
-        <div id="sort-filter" style="..."></div>
-        <div id="full-project-filter" style="..."></div>
-        <ul id="markers-list" style="list-style: none; padding: 0;">
+    <div class="scrollable-content">
+        <!-- All your filters and the list go here -->
+        <div id="category-filter"></div>
+        <div id="sort-filter"></div>
+        <div id="full-project-filter"></div>
+        <ul id="markers-list">
             <!-- Marker items will be added here dynamically -->
         </ul>
     </div>
-	<button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button" style="margin-top: 10px !important;">Schließen</button>
-
+    <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-f" style="margin-top: 10px !important;">Schließen</button>
 </div>
+
 
 
 
@@ -2838,6 +2835,7 @@ document.getElementById('show-markers-btn').addEventListener('click', function()
 // Global variable to track the filter state
 
 // Function to update marker visibility
+// Function to update marker visibility and synchronize button states
 function updateMarkerVisibility() {
     showFullProjectsOnly = !showFullProjectsOnly;
 
@@ -2848,45 +2846,51 @@ function updateMarkerVisibility() {
     filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
     renderPage(1); // Reset to the first page after filtering
 
-    // Update the UI
-    document.getElementById('full-project-checkbox').checked = showFullProjectsOnly;
-    document.getElementById('hideNonMapMarkers').innerText = showFullProjectsOnly ? "Alles anzeigen" : "Nur Projektvorschläge anzeigen";
-
-    // Update map layers
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
-            if (showFullProjectsOnly) {
-                if (marker.options.isMapObject) {
-                    map.removeLayer(marker);
-                } else {
-                    map.addLayer(marker);
-                }
+            if (showFullProjectsOnly && marker.options.isMapObject) {
+                map.removeLayer(marker);
             } else {
                 map.addLayer(marker);
             }
         });
+    }
+
+    // Update the text of both buttons
+    const filterButton = document.getElementById('full-project-filter-button');
+    const hideMarkersButton = document.getElementById('hideNonMapMarkers');
+
+    if (filterButton) {
+        filterButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
+    }
+
+    if (hideMarkersButton) {
+        hideMarkersButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
     }
 }
 
 // Function to create the full project filter
 function createFullProjectFilter() {
     const filterDiv = document.getElementById('full-project-filter');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = 'full-project-checkbox';
-    checkbox.onchange = updateMarkerVisibility;
+    filterDiv.innerHTML = ''; // Clear existing content
 
-    const label = document.createElement('label');
-    label.htmlFor = 'full-project-checkbox';
-    label.textContent = 'Nur Projektvorschläge anzeigen';
-    label.className = 'project-filter-label'; // Add a class name
+    // Create the button
+    const filterButton = document.createElement('button');
+    filterButton.id = 'full-project-filter-button';
+    filterButton.className = 'register-button-f'; // Use your desired class
+    filterButton.textContent = 'Nur Projektvorschläge anzeigen';
 
-    filterDiv.appendChild(checkbox);
-    filterDiv.appendChild(label);
+    // Event listener for the button
+    filterButton.addEventListener('click', updateMarkerVisibility);
+
+    filterDiv.appendChild(filterButton);
 }
 
-// Button event listener
+// Button event listener for hideNonMapMarkers button
 document.getElementById('hideNonMapMarkers').addEventListener('click', updateMarkerVisibility);
+
+// Initialize the filter button
+createFullProjectFilter();
 
 // Call to create the filter UI
 	
