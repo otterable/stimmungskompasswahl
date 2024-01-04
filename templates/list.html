@@ -922,8 +922,8 @@ nav[aria-label="Page navigation"] {
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
             <a href="/karte">Karte</a>
-            <a href="/list">Beiträge</a>
-            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
+            <a href="/list">Projektvorschläge</a>
+            <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
@@ -938,15 +938,15 @@ nav[aria-label="Page navigation"] {
     </div>
 </div>
 
-			<button id="hamburger-button-filter">&#9776; Filter</button>
+			<button id="hamburger-button-filter">&#9776; Filtern</button>
 
 
-<!-- Filter Bar -->
+<!-- Filtern Bar -->
 <div class="filter-bar">
     <form id="filter-form" action="{{ url_for('list_view') }}" method="get" style="display: flex; align-items: center;">
         <div class="filter-item">
             <label for="search">Suchen:</label>
-            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Beiträgen...">
+            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Projektvorschläge...">
         </div>
 
         <div class="filter-item">
@@ -968,7 +968,7 @@ nav[aria-label="Page navigation"] {
 
 
         <div class="filter-item">
-    <label for="sort">Sort:</label>
+    <label for="sort">Sortieren:</label>
     <select name="sort" id="sort">
 		<option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
         <option value="lowest" {% if request.args.get('sort', '') == 'lowest' %}selected{% endif %}>Niedrigste Bewertung zuerst </option>
@@ -978,7 +978,7 @@ nav[aria-label="Page navigation"] {
     </select>
 </div>
 
-		        <button type="submit" class="filter-button">Filter</button>
+		        <button type="submit" class="filter-button">Filtern</button>
     </form>
 </div>
 
@@ -987,7 +987,7 @@ nav[aria-label="Page navigation"] {
     <form id="filter-form-mobile" action="{{ url_for('list_view') }}" method="get">
         <div class="filter-item">
             <label for="search">Suchen:</label>
-            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Beiträgen...">
+            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Projektvorschläge...">
         </div>
 
         <div class="filter-item">
@@ -1025,15 +1025,15 @@ nav[aria-label="Page navigation"] {
                 <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Niedrigste Bewertung</option>
             </select>
         </div>
-		        <button type="submit" class="filter-button">Filter</button>
+		        <button type="submit" class="filter-button">Filtern</button>
 
     </form>
 </div>
 
 <div class="projects-header">
-    <h1>Eingebrachte Vorschläge</h1>
+    <h1>Eingebrachte Projektvorschläge</h1>
     {% if projects %}
-        <p>Klicken Sie auf einen Vorschlag, nähere Informatioinen zu sehen.</p>
+        <p>Klicken Sie auf einen Vorschlag, nähere Informationen zu sehen.</p>
     {% endif %}
 </div>
 

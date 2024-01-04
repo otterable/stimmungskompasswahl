@@ -462,7 +462,7 @@ def check_project_limit():
     ip_address = request.remote_addr
     submissions = ip_project_submissions.get(ip_address, [])
     
-    # Filter submissions within the last 24 hours
+    # Filtern submissions within the last 24 hours
     submissions = [time for time in submissions if datetime.now() - time < timedelta(days=1)]
 
     limit_reached = len(submissions) >= 5  # Assuming a limit of 5 submissions per day
@@ -839,7 +839,7 @@ def admintools():
         comment_query = comment_query.filter(Comment.text.ilike(f'%{search_comment_query}%'))
 
 
-    query = Project.query.filter(Project.is_mapobject == False)  # Filter for non-mapobject projects
+    query = Project.query.filter(Project.is_mapobject == False)  # Filtern for non-mapobject projects
 
     if search_query:
         query = query.filter(Project.name.contains(search_query))

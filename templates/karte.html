@@ -2131,8 +2131,8 @@ margin-bottom: 0px !important;
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
             <a href="/karte">Karte</a>
-            <a href="/list">Beiträge</a>
-            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
+            <a href="/list">Projektvorschläge</a>
+            <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
@@ -2180,7 +2180,7 @@ margin-bottom: 0px !important;
     <div id="overlay-content" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px; width: 80%; max-width: 500px; text-align: center;">
         <h2>Notiz hinzufügen</h2>
         <p style="font-size: 14px;">
-            <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Hier klicken, um Projektvorschläge zu psoten.</a>
+            <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Hier klicken, um Projektvorschläge zu posten.</a>
         </p>        
         <!-- Wrapper div for the select and the textarea -->
         <div style="width: 100%; box-sizing: border-box; text-align: center;">
@@ -2625,7 +2625,7 @@ function updateMarkerCategoryDescription() {
             categoryText = "Ist Ihnen Umweltverschmutzung aufgefallen? Haben Sie Ideen, um die Stadt sauberer, ökologischer oder Zukunftsfit zu machen?";
             break;
         case "Verwaltung":
-            categoryText = "Gibt es Ideen für bessere Dienste der Verwaltung? Vorschläge, öffentliche Veranstaltungen betreffen?";
+            categoryText = "Gibt es Ideen für bessere Dienste der Verwaltung? Projektvorschläge, öffentliche Veranstaltungen betreffen?";
             break;
         case "Kultur":
             categoryText = "Gibt es Ideen für Veranstaltungen, Kunstinstallationen, Theater oder Literatur?";
@@ -2760,7 +2760,7 @@ function addMarkersToOverlay(markers) {
     loadMoreMarkers(); // Load initial set of markers
 	const sortedMarkers = sortMarkersByNewest(markers);
     let currentPage = 1; // Start with the first page
-    let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to Sort by newest
+    let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to Sortieren by newest
     let showFullProjectsOnly = false;
 
     const categoryColors = {
@@ -2783,7 +2783,7 @@ function addMarkersToOverlay(markers) {
         if (showFullProjectsOnly) {
             tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
         }
-        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by Sort by newest
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sortieren by Sortieren by newest
         console.log(`Category ${category} selected in filter in the list overlay, showing ${filteredMarkers.length} markers`);
         renderPage(1); // Reset to the first page after filtering
     }
@@ -2930,7 +2930,7 @@ function updateMarkerVisibility() {
     if (selectedCategory !== "Alle") {
         tempMarkers = tempMarkers.filter(marker => marker.category === selectedCategory);
     }
-    filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+    filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sortieren by newest
     renderPage(1); // Reset to the first page after filtering
 
     for (var category in categoryLayers) {
@@ -3204,7 +3204,7 @@ fetch('/get_projects')
     .then(response => response.json())
     .then(data => {
         console.log("Received data:", data);
-        const sortedData = sortMarkersByNewest(data); // Sort data by newest
+        const sortedData = sortMarkersByNewest(data); // Sortieren data by newest
         addMarkers(sortedData); // Add markers to the map in sorted order
         createCategoryButtons();
         updateCategoryButtonColors(); // Update category button colors
@@ -3346,7 +3346,7 @@ function toggleCategory(categoryName) {
         if (categoryLayers.hasOwnProperty(category)) {
             var layer = categoryLayers[category];
             var button = document.querySelector(`button[category-name="${category}"]`);
-            if (categoryName === `${category} (${layer.getLayers().length} Beiträge)`) {
+            if (categoryName === `${category} (${layer.getLayers().length} Projektvorschläge)`) {
                 if (map.hasLayer(layer)) {
                     map.removeLayer(layer);
                     button.classList.add('faded');
@@ -3465,7 +3465,7 @@ $.ajax({
     error: function(xhr, textStatus, errorThrown) {
         if(xhr.status === 429) {
             // Display alert when status code is 429 (Too Many Requests)
-            alert("Sie haben kürzlich ein Projekt gepostet. Versuchen Sie es in Kürze noch einmal!");
+            alert("Sie haben kürzlich ein Projekt gepostet Versuchen Sie es in Kürze noch einmal!");
         } else {
             // Log other types of errors
             console.error('Error saving marker:', errorThrown);

@@ -782,8 +782,8 @@ display: block;
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
             <a href="/karte">Karte</a>
-            <a href="/list">Beiträge</a>
-            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
+            <a href="/list">Projektvorschläge</a>
+            <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
@@ -843,7 +843,7 @@ display: block;
 
         {% if not current_user.is_googleaccount %}
             <p>Die verknüpfte Handynummer lautet: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
-            <p>Hier klicken, um das Passwort zurückzusetzen:<a href="{{ url_for('password_recovery') }}" style="color: #003056;">Passwort zurücksetzen</a>.</p>
+            <p>Hier klicken, um das Passwort zurückzusetzen: <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Passwort zurücksetzen</a>.</p>
         {% else %}
             <p>Das verknüpfte Google-Konto ist: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
         {% endif %}

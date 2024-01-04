@@ -869,8 +869,8 @@ display: block;
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
             <a href="/karte">Karte</a>
-            <a href="/list">Beiträge</a>
-            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
+            <a href="/list">Projektvorschläge</a>
+            <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
@@ -896,21 +896,21 @@ display: block;
 <div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer; margin: 10px">
 <img alt="Map Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_map.png') }}">
 <p class="info-box-title">Karte</p>
-<p class="info-box-undertitle">Posten Sie Beiträge auf der Stadtkarte und sehen Sie sich andere Beiträge an!</p>
+<p class="info-box-undertitle">Posten Sie Projektvorschläge auf der Stadtkarte und sehen Sie sich andere Projektvorschläge an!</p>
 </div>
 <!-- Box 2 -->
 <div class="info-box box-blue" onclick="redirectToneuerbeitrag()" style="cursor: pointer; margin: 10px">
 <img alt="Public Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_public.png') }}">
 <p class="info-box-title">Machen Sie einen Vorschlag!</p>
 <p class="info-box-undertitle">Teilen Sie Ihrer Stadt mit, welche Veränderungen oder Verbesserungen Sie sich wünschen!</p>
-<p class="info-box-undertitle">Aktuelle Vorschläge: {{ project_count }}</p>
-<p class="info-box-undertitle">Aktuelle Mapobjekte: {{ mapobject_count }}</p>
+<p class="info-box-undertitle">Aktuelle Projektvorschläge: {{ project_count }}</p>
+<p class="info-box-undertitle">Aktuelle Notizen: {{ mapobject_count }}</p>
 </div>
 <!-- Box 3 -->
 <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
 <img alt="List Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_list.png') }}" >
-<p class="info-box-title">Aktuelle Vorschläge</p>
-<p class="info-box-undertitle">Stimmen Sie über Vorschläge ab und verhelfen Sie ihnen zum Erfolg!</p>
+<p class="info-box-title">Aktuelle Projektvorschläge</p>
+<p class="info-box-undertitle">Stimmen Sie über Projektvorschläge ab und verhelfen Sie ihnen zum Erfolg!</p>
 </div>
 </div>
 <!-- Info text field with wrapped text container -->
@@ -918,7 +918,7 @@ display: block;
 <div class="info-text-container">
 
 <p class="info-text-undertitle">Der Stimmungskompass eine Plattform zur Bürgerinnen- und Bürgerbeteiligung.</p>
-<p class="info-text-undertitle">Helfen Sie der Stadt bei Entscheidungen, die das öffentliche Leben betreffen. Teilen Sie Ihre Ideen und stimmen Sie über die Vorschläge anderer ab tragen Sie zur  Verbesserung der Lebensqualität bei.</p>
+<p class="info-text-undertitle">Helfen Sie der Stadt bei Entscheidungen, die das öffentliche Leben betreffen. Teilen Sie Ihre Ideen und stimmen Sie über die Projektvorschläge anderer ab tragen Sie zur  Verbesserung der Lebensqualität bei.</p>
 
 </div>
 </div>
