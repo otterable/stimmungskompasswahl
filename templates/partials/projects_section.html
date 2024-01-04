@@ -34,10 +34,10 @@
             {% if project_pagination.pages > 1 %}
                 <nav aria-label="Page navigation" class="pagination-container">
                     <ul class="pagination">
-                        <!-- Previous Page -->
+                        <!-- Zurück Page -->
                         {% if project_pagination.has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.prev_num, map_object_page=map_object_page, comment_page=comment_page) }}">Previous</a>
+                                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.prev_num, map_object_page=map_object_page, comment_page=comment_page) }}">Zurück</a>
                             </li>
                         {% endif %}
 
@@ -48,10 +48,10 @@
                             </li>
                         {% endfor %}
 
-                        <!-- Next Page -->
+                        <!-- Weiter Page -->
                         {% if project_pagination.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.next_num, map_object_page=map_object_page, comment_page=comment_page) }}">Next</a>
+                                <a class="page-link" href="{{ url_for('profil', project_page=project_pagination.next_num, map_object_page=map_object_page, comment_page=comment_page) }}">Weiter</a>
                             </li>
                         {% endif %}
                     </ul>

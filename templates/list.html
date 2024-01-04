@@ -946,7 +946,7 @@ nav[aria-label="Page navigation"] {
     <form id="filter-form" action="{{ url_for('list_view') }}" method="get" style="display: flex; align-items: center;">
         <div class="filter-item">
             <label for="search">Suchen:</label>
-            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Projektvorschläge...">
+            <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Nach Titel suchen...">
         </div>
 
         <div class="filter-item">

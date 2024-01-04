@@ -29,7 +29,7 @@
                 <!-- Update links to include project_page and map_object_page -->
                 {% if comment_pagination.has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('profil', project_page=project_page, map_object_page=map_object_page, comment_page=comment_pagination.prev_num) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('profil', project_page=project_page, map_object_page=map_object_page, comment_page=comment_pagination.prev_num) }}">Zurück</a>
                     </li>
                 {% endif %}
                 {% for page in comment_pagination.iter_pages() %}
@@ -39,7 +39,7 @@
                 {% endfor %}
                 {% if comment_pagination.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('profil', project_page=project_page, map_object_page=map_object_page, comment_page=comment_pagination.next_num) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('profil', project_page=project_page, map_object_page=map_object_page, comment_page=comment_pagination.next_num) }}">Weiter</a>
                     </li>
                 {% endif %}
             </ul>

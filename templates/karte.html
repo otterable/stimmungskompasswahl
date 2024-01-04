@@ -1909,14 +1909,7 @@ margin-bottom: 0px !important;
 
 	
 	/* Hamburger Menu Button */
-#hamburger-button {
-    display: none; /* Hidden by default */
-    font-size: 30px; /* Icon size */
-    color: white; /* Icon color */
-    background: none; /* No background */
-    border: none; /* No border */
-    cursor: pointer; /* Pointer cursor */
-}
+
 
 /* Navigation Overlay */
 .nav-overlay {
@@ -1936,12 +1929,10 @@ margin-bottom: 0px !important;
     pointer-events: none;
 }
 
-
+}
 /* Mobile Devices */
 @media only screen and (max-width: 1080px) {
-    #hamburger-button {
-        display: block; /* Show the button on mobile */
-    }
+
 
       label {
             display: block;
@@ -3346,7 +3337,7 @@ function toggleCategory(categoryName) {
         if (categoryLayers.hasOwnProperty(category)) {
             var layer = categoryLayers[category];
             var button = document.querySelector(`button[category-name="${category}"]`);
-            if (categoryName === `${category} (${layer.getLayers().length} Projektvorschläge)`) {
+            if (categoryName === `${category} (${layer.getLayers().length} Beiträge)`) {
                 if (map.hasLayer(layer)) {
                     map.removeLayer(layer);
                     button.classList.add('faded');
@@ -3492,7 +3483,8 @@ $.ajax({
 
     // Close the navigation overlay when clicking on the overlay background or on a non-button element
     document.getElementById('nav-overlay').addEventListener('click', function(event) {
-        if (!event.target.closest('button, a')) {
+        // Close only if on mobile
+        if (window.innerWidth <= 1080 && !event.target.closest('button, a')) {
             toggleNavOverlay();
         }
     });
@@ -3502,8 +3494,8 @@ $.ajax({
 
     // Resize event listener
     window.addEventListener('resize', function() {
-	
         var navOverlay = document.getElementById('nav-overlay');
+        // Show on desktop, hide on mobile
         if (window.innerWidth > 1080) {
             navOverlay.style.display = 'block';
         } else {
@@ -3511,10 +3503,15 @@ $.ajax({
         }
     });
     
-    // Set initial state of the nav-overlay
+    // Set initial state of the nav-overlay based on device width
     window.onload = function() {
         var navOverlay = document.getElementById('nav-overlay');
-        navOverlay.style.display = 'none'; // Set initial state to 'none'
+        // Show on desktop, hide on mobile
+        if (window.innerWidth > 1080) {
+            navOverlay.style.display = 'block';
+        } else {
+            navOverlay.style.display = 'none';
+        }
     };
 </script>
 

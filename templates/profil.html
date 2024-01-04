@@ -154,10 +154,12 @@
 .project-thumbnail img {
     width: 90%;
     margin-top: 20px;
-    height: 400px; /* Fixed height for images */
+    height: auto; /* Adjusted for aspect ratio */
+    aspect-ratio: 4 / 3; /* Ensuring 4:3 aspect ratio */
     object-fit: cover;
     border-radius: 30px;
 }
+
 
 /* Text style inside project thumbnails */
 .project-thumbnail h2, .project-thumbnail p {
@@ -804,7 +806,7 @@ display: block;
    
     <h1>Meine Projektvorschläge:</h1>
     <div class="my-statistics centered-text">
-        <p>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span>.</p>
+        <p>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span></p>
         {% if user_statistics.most_successful_project %}
             <p>Ihr erfolgreichstes Projekt ist: <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, mit <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} positiven Bewertungen</span>.</p>
         {% else %}
@@ -858,7 +860,7 @@ display: block;
 		
   {% else %}
         <div class="login-prompt centered-text">
-            <p>Sie müssen angemeldet sein, um due Details zu sehen.</p>
+            <p>Sie müssen angemeldet sein, um die Details zu sehen.</p>
         </div>
     {% endif %}
 
