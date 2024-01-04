@@ -8,7 +8,9 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
- 
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
 </head>
 
    <style>
@@ -602,7 +604,7 @@ display: block;
 	<div class="input-field">
 		<label for="title">1. Geben Sie Ihrem Vorschlag einen Namen</label>
 		<p style="color: #003056;">Worum geht es? (Formuliert in ein paar Worten)</p> <!-- Added description -->
-		<input type="text" id="title" name="name" required>
+<input type="text" id="title" name="name" required="">
 	</div>
 
 
@@ -631,6 +633,7 @@ display: block;
     <label for="descriptionwhy">3. Beschreiben Sie Ihren Vorschlag und schreiben Sie, warum es Ihnen ein Anliegen ist.</label>
 	<p style="color: #003056;">Erklären Sie verständlich, worum es geht und beschreiben Sie, was und warum es verbessert oder verändert werden soll. </p>
     <div id="description-editor"></div> <!-- Quill container -->
+
 <textarea id="descriptionwhy" name="descriptionwhy" style="display:none;"></textarea>
 </div>
 
@@ -647,6 +650,9 @@ display: block;
             <label for="image">5. Fügen Sie ein Bild hinzu.</label>
 <p style="color: #003056;">Wählen Sie ein passendes Bild, dass den Vorschlag verständlich macht.</p>
 <input type="file" id="image" name="image_file" accept="image/*" required>
+<img id="image-preview" style="display:none; max-width: 100%;"> <!-- Hidden initially -->
+<div id="image-preview-container"></div>
+
         </div>
 
 
@@ -795,6 +801,78 @@ setTimeout(function() {
 
 </script>
   <script>
+  
+var cropper;
+
+function handleImageChange(event) {
+    var file = event.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            // Destroy the existing cropper instance if it exists
+            if (cropper && typeof cropper.destroy === 'function') {
+                cropper.destroy();
+                cropper = null;
+            }
+
+            // Create and append the image element
+            var imageContainer = document.getElementById('image-preview-container');
+            imageContainer.innerHTML = ''; // Clear any previous content
+            var img = new Image();
+            img.id = 'image-preview'; // Assign an ID for the cropper to latch onto
+            img.style.maxWidth = '100%'; // Use 100% to make it responsive
+            imageContainer.appendChild(img);
+
+            // Set the image source and initialize the cropper
+            img.onload = function() {
+                cropper = new Cropper(img, {
+                    aspectRatio: 4 / 3,
+                    viewMode: 1,
+                    zoomable: false, // Disable zoom
+                    crop: function(event) {
+                        console.log(event.detail.x);
+                        console.log(event.detail.y);
+                        console.log(event.detail.width);
+                        console.log(event.detail.height);
+                        console.log(event.detail.rotate);
+                        console.log(event.detail.scaleX);
+                        console.log(event.detail.scaleY);
+                    }
+                });
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Event listener for image file input change
+document.getElementById('image').addEventListener('change', handleImageChange);
+
+
+document.querySelector('form').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        if (cropper) {
+            cropper.getCroppedCanvas().toBlob(function(blob) {
+                console.log('Publish button clicked, image cropped will be processed and saved.');
+
+                // Replace the original file with the cropped image blob
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(new File([blob], 'cropped-image.jpg', { type: 'image/jpeg' }));
+                document.getElementById('image').files = dataTransfer.files;
+
+                // Now submit the form
+                event.target.submit();
+            });
+        } else {
+            console.log('No image selected or cropper not initialized.');
+            // Submit the form without image cropping
+            event.target.submit();
+        }
+    });
+
+
     // Toggle the navigation overlay when the hamburger button is clicked
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');
@@ -927,16 +1005,81 @@ setTimeout(function() {
     categorySelect.addEventListener("change", updateCategoryText);
 	
 	
-    // Initialize Quill editor for 'descriptionwhy'
-    var descriptionEditor = new Quill('#description-editor', {
-        theme: 'snow'
-    });
+function updateQuillCharCountFeedback(editor, feedbackElement, minLimit, maxLimit) {
+    var text = editor.getText().trim();
+    var charCount = text.length;
+    var charRemaining = maxLimit - charCount;
 
-    // Initialize Quill editor for 'public_benefit'
-    var benefitEditor = new Quill('#benefit-editor', {
-        theme: 'snow'
-    });
+    if (charCount < minLimit) {
+        feedbackElement.textContent = `Sie müssen noch ${minLimit - charCount} Zeichen eingeben.`;
+        feedbackElement.style.color = '#003056';
+    } else if (charCount <= maxLimit) {
+        feedbackElement.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
+        feedbackElement.style.color = '#003056';
+    } else {
+        // Truncate the text to the maximum limit
+        editor.setText(text.substring(0, maxLimit));
+        feedbackElement.textContent = "Zeichenlimit erreicht.";
+        feedbackElement.style.color = '#003056';
+    }
+}
 
+// Function for updating character count on input field
+function updateInputCharCountFeedback(inputElement, feedbackElement, minLimit, maxLimit) {
+    var charCount = inputElement.value.length;
+    var charRemaining = maxLimit - charCount;
+
+    if (charCount < minLimit) {
+        feedbackElement.textContent = `Sie müssen noch ${minLimit - charCount} Zeichen eingeben.`;
+    } else if (charCount <= maxLimit) {
+        feedbackElement.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
+    } else {
+        feedbackElement.textContent = "Zeichenlimit erreicht.";
+        inputElement.value = inputElement.value.substring(0, maxLimit); // Truncate to maxLimit
+    }
+    feedbackElement.style.color = '#003056';
+}
+
+// Initialize Quill editor for 'descriptionwhy'
+var descriptionEditor = new Quill('#description-editor', { theme: 'snow' });
+var descriptionFeedback = document.createElement('div');
+descriptionFeedback.id = 'descriptionFeedback';
+document.getElementById('description-editor').parentNode.insertBefore(descriptionFeedback, document.getElementById('description-editor').nextSibling);
+
+// Initialize Quill editor for 'public_benefit'
+var benefitEditor = new Quill('#benefit-editor', { theme: 'snow' });
+var benefitFeedback = document.createElement('div');
+benefitFeedback.id = 'benefitFeedback';
+document.getElementById('benefit-editor').parentNode.insertBefore(benefitFeedback, document.getElementById('benefit-editor').nextSibling);
+
+// Event listener for Quill editors
+descriptionEditor.on('text-change', function() {
+    updateQuillCharCountFeedback(descriptionEditor, descriptionFeedback, 20, 500);
+});
+
+benefitEditor.on('text-change', function() {
+    updateQuillCharCountFeedback(benefitEditor, benefitFeedback, 20, 500);
+});
+
+// Character count for the input field
+var titleInput = document.getElementById('title');
+var titleFeedback = document.createElement('div');
+titleFeedback.id = 'titleFeedback';
+titleInput.parentNode.insertBefore(titleFeedback, titleInput.nextSibling);
+
+titleInput.addEventListener('input', function() {
+    updateInputCharCountFeedback(titleInput, titleFeedback, 20, 100);
+});
+updateInputCharCountFeedback(titleInput, titleFeedback, 20, 100); // Initial update
+
+// Function to copy Quill content to textarea on form submission
+document.querySelector('form').addEventListener('submit', function(event) {
+    document.getElementById('descriptionwhy').value = descriptionEditor.root.innerHTML;
+    document.getElementById('public_benefit').value = benefitEditor.root.innerHTML;
+});
+
+	
+	
     // Function to check if the editor content is effectively empty
     function isEditorContentEmpty(editor) {
         return editor.getText().trim().length === 0;

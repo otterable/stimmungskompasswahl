@@ -781,7 +781,8 @@ display: block;
                 {% if current_user.is_authenticated %}
                     <div class="comment-form">
                         <form id="comment-form" action="{{ url_for('comment', project_id=project.id) }}" method="POST">
-                            <textarea name="comment" class="full-width-textarea" required></textarea>
+<textarea name="comment" class="full-width-textarea" required></textarea>
+<div id="charCountFeedback" style="text-align: center; color: #003056;"></div>
                             <button type="submit" class="button comment-button">Speichern 💬</button>
                         </form>
                     </div>
@@ -798,6 +799,33 @@ display: block;
 
 
     <script>
+document.addEventListener('DOMContentLoaded', function() {
+    var commentTextarea = document.querySelector('textarea[name="comment"]');
+    var charCountFeedback = document.getElementById('charCountFeedback');
+    var minCharLimit = 20;
+    var maxCharLimit = 500;
+
+    function updateCharCountFeedback() {
+        var charCount = commentTextarea.value.length;
+        var charNeeded = minCharLimit - charCount;
+        var charRemaining = maxCharLimit - charCount;
+
+        if (charCount >= maxCharLimit) {
+            commentTextarea.value = commentTextarea.value.substring(0, maxCharLimit);
+            charCountFeedback.textContent = "Zeichenlimit erreicht.";
+        } else if (charNeeded > 0) {
+            charCountFeedback.textContent = `Sie müssen noch ${charNeeded} Zeichen eingeben.`;
+        } else {
+            charCountFeedback.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
+        }
+    }
+
+    commentTextarea.addEventListener('input', updateCharCountFeedback);
+    updateCharCountFeedback(); // Initial update when the page loads
+});
+
+
+
        // When the page loads
     document.addEventListener('DOMContentLoaded', function() {
         checkCommentLimitAndUpdateButton();
@@ -968,34 +996,43 @@ display: block;
     }
 </script>
 <script>
-    document.getElementById('comment-form').addEventListener('submit', function(e) {
-        e.preventDefault();
+document.getElementById('comment-form').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-        var formData = new FormData(this);
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', this.action, true);
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        
-        xhr.onload = function() {
-            if (this.status >= 200 && this.status < 400) {
-                // Success! Parse response and update comments
-                var response = JSON.parse(this.response);
-                var commentsContainer = document.getElementById('comments-container');
-                var newCommentHtml = `
-                    <div class="comment">
-                        <p>"${response.text}"</p>
-                        <p>${response.author_name} am ${response.timestamp}</p>
-                    </div>
-                `;
-                commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
-            } else {
-                // Error handling
-                console.error('Error occurred in comment submission');
-            }
-        };
+    var commentText = this.querySelector('textarea[name="comment"]').value;
 
-        xhr.send(formData);
-    });
+    // Check if comment length is less than 20 characters
+    if (commentText.length < 20) {
+        alert('Comment must be at least 20 characters long.');
+        return;
+    }
+
+    var formData = new FormData(this);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', this.action, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    
+    xhr.onload = function() {
+        if (this.status >= 200 && this.status < 400) {
+            // Success! Parse response and update comments
+            var response = JSON.parse(this.response);
+            var commentsContainer = document.getElementById('comments-container');
+            var newCommentHtml = `
+                <div class="comment">
+                    <p>"${response.text}"</p>
+                    <p>${response.author_name} am ${response.timestamp}</p>
+                </div>
+            `;
+            commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
+        } else {
+            // Error handling
+            console.error('Error occurred in comment submission');
+        }
+    };
+
+    xhr.send(formData);
+});
+
 </script>
 
 <script>

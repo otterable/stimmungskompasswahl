@@ -591,6 +591,21 @@ display: none !important;
     display: none;
 }	
   
+@media (max-width: 1080px) {
+    .leaflet-popup-content {
+        width: 200px; /* Adjust the width as needed for smaller screens */
+    }
+    .leaflet-popup-content img {
+        width: 100%; /* Adjust the image width to fit the popup */
+        height: auto; /* Maintain aspect ratio */
+        max-width: 200px; /* Maximum width of the image */
+    }
+     .leaflet-popup .leaflet-popup-tip-container {
+        width: 200px; /* Align the tip container with the popup width */
+        margin-left: -100px; /* Half of the width to center it */
+        left: 50%; /* Center the tip container */
+    }
+}
 
    #shape-note {
         border-radius: 10px;
@@ -2551,7 +2566,6 @@ function resetMapCursor() {
 
 
 // Function to open marker overlay
-// Function to open marker overlay with forceful display style
 function openMarkerOverlay(event) {
     var overlay = document.getElementById('marker-overlay');
     if (overlay) {
@@ -2560,6 +2574,9 @@ function openMarkerOverlay(event) {
         overlay.style.alignItems = 'center';
         overlay.style.zIndex = '10000'; // Ensure it's above other content
         console.log("Marker overlay opened");
+
+        // Update the category description when the overlay is opened
+        updateMarkerCategoryDescription();
     } else {
         console.error('Marker overlay element not found');
     }
@@ -2839,9 +2856,15 @@ document.getElementById('show-markers-btn').addEventListener('click', function()
 function updateMarkerVisibility() {
     showFullProjectsOnly = !showFullProjectsOnly;
 
+    // Retrieve the currently selected category
+    const selectedCategory = document.getElementById('category-select').value;
+
     let tempMarkers = markers;
     if (showFullProjectsOnly) {
         tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
+    }
+    if (selectedCategory !== "Alle") {
+        tempMarkers = tempMarkers.filter(marker => marker.category === selectedCategory);
     }
     filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
     renderPage(1); // Reset to the first page after filtering
