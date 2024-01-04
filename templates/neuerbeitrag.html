@@ -33,7 +33,6 @@ body {
 
 
         img {
-            border-radius: 30px;
             transition: transform 0.3s ease;
         }
 
@@ -650,8 +649,8 @@ display: block;
             <label for="image">5. Fügen Sie ein Bild hinzu.</label>
 <p style="color: #003056;">Wählen Sie ein passendes Bild, dass den Vorschlag verständlich macht.</p>
 <input type="file" id="image" name="image_file" accept="image/*" required>
-<img id="image-preview" style="display:none; max-width: 100%;"> <!-- Hidden initially -->
-<div id="image-preview-container"></div>
+<img id="image-preview" style="display:none; max-width: 100%; border-radius: 0px !important;"> <!-- Hidden initially -->
+<div id="image-preview-container" style="border-radius: 0px !important;"></div>
 
         </div>
 
@@ -803,74 +802,164 @@ setTimeout(function() {
   <script>
   
 var cropper;
+var originalSizeDisplayed = false; // Flag to track if original size has been displayed
 
 function handleImageChange(event) {
     var file = event.target.files[0];
     if (file) {
         var reader = new FileReader();
         reader.onload = function(e) {
-            // Destroy the existing cropper instance if it exists
             if (cropper && typeof cropper.destroy === 'function') {
                 cropper.destroy();
                 cropper = null;
             }
 
-            // Create and append the image element
             var imageContainer = document.getElementById('image-preview-container');
-            imageContainer.innerHTML = ''; // Clear any previous content
-            var img = new Image();
-            img.id = 'image-preview'; // Assign an ID for the cropper to latch onto
-            img.style.maxWidth = '100%'; // Use 100% to make it responsive
-            imageContainer.appendChild(img);
+            imageContainer.innerHTML = '';
 
-            // Set the image source and initialize the cropper
+            var img = new Image();
             img.onload = function() {
-                cropper = new Cropper(img, {
-                    aspectRatio: 4 / 3,
-                    viewMode: 1,
-                    zoomable: false, // Disable zoom
-                    crop: function(event) {
-                        console.log(event.detail.x);
-                        console.log(event.detail.y);
-                        console.log(event.detail.width);
-                        console.log(event.detail.height);
-                        console.log(event.detail.rotate);
-                        console.log(event.detail.scaleX);
-                        console.log(event.detail.scaleY);
-                    }
-                });
+                // Display original size only once
+                if (!originalSizeDisplayed) {
+                    var originalSizeText = `Originalbildgröße: ${this.naturalWidth} x ${this.naturalHeight} Pixel, ${formatBytes(file.size)}`;
+                    var originalSizeDiv = document.createElement('div');
+                    originalSizeDiv.textContent = originalSizeText;
+                    imageContainer.appendChild(originalSizeDiv);
+                    originalSizeDisplayed = true; // Set flag to true after displaying
+                }
+
+                if (this.naturalWidth > 1920 || this.naturalHeight > 1440) {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = 1920;
+                    canvas.height = 1440;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(function(blob) {
+                        var compressedSizeText = `Komprimiert auf 1920x1440, ${formatBytes(blob.size)}`;
+                        var compressedSizeDiv = document.createElement('div');
+                        compressedSizeDiv.textContent = compressedSizeText;
+                        imageContainer.appendChild(compressedSizeDiv);
+
+                        var dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(new File([blob], 'komprimiertes-bild.jpg', { type: 'image/jpeg' }));
+                        document.getElementById('image').files = dataTransfer.files;
+
+                        img.src = URL.createObjectURL(blob);
+                    }, 'image/jpeg', 0.85);
+                } else {
+                    cropper = new Cropper(img, {
+                        aspectRatio: 4 / 3,
+                        viewMode: 1,
+                        zoomable: false
+                    });
+                }
             };
+            img.id = 'image-preview';
+            img.style.maxWidth = '100%';
             img.src = e.target.result;
+            imageContainer.appendChild(img);
         };
         reader.readAsDataURL(file);
     }
 }
 
-// Event listener for image file input change
 document.getElementById('image').addEventListener('change', handleImageChange);
 
-
 document.querySelector('form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
+    event.preventDefault(); // Prevent default form submission
 
-        if (cropper) {
-            cropper.getCroppedCanvas().toBlob(function(blob) {
-                console.log('Publish button clicked, image cropped will be processed and saved.');
+    // Check if a marker has been placed
+    var geolocInput = document.getElementById('geoloc');
+    if (!geolocInput.value) {
+        alert('Bitte platzieren Sie zuerst einen Marker auf der Karte.');
+        return; // Do not proceed with form submission
+    }
 
-                // Replace the original file with the cropped image blob
-                var dataTransfer = new DataTransfer();
-                dataTransfer.items.add(new File([blob], 'cropped-image.jpg', { type: 'image/jpeg' }));
-                document.getElementById('image').files = dataTransfer.files;
+    // Fetch the swear words list
+    fetch('/static/filter.json')
+        .then(response => response.json())
+        .then(filter => {
+            // Get the values from the input and Quill editors
+            var titleText = document.getElementById('title').value;
+            var descriptionContent = descriptionEditor.root.innerText;
+            var benefitContent = benefitEditor.root.innerText;
 
-                // Now submit the form
-                event.target.submit();
-            });
-        } else {
-            console.log('No image selected or cropper not initialized.');
-            // Submit the form without image cropping
+            // Check for swear words
+            if (containsSwearWords(titleText, filter) || 
+                containsSwearWords(descriptionContent, filter) || 
+                containsSwearWords(benefitContent, filter)) {
+                alert('Bitte entfernen Sie unangebrachte Ausdrücke aus Ihrer Beschreibung.');
+            } else {
+                // No swear words found, proceed with image handling and form submission
+                handleImageAndSubmitForm(event);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching filter:', error);
+            // Optionally submit the form even if the filter can't be loaded
+            handleImageAndSubmitForm(event);
+        });
+});
+
+function containsSwearWords(text, filter) {
+    var words = text.toLowerCase().split(/\s+/);
+    var swearWords = filter.de.concat(filter.en); // Assuming you want to check both German and English words
+    return words.some(word => swearWords.includes(word));
+}
+
+function handleImageAndSubmitForm(event) {
+    var titleText = document.getElementById('title').value;
+    var descriptionContent = descriptionEditor.root.innerText;
+    var benefitContent = benefitEditor.root.innerText;
+
+    if (titleText.length < 20 || descriptionContent.length < 20 || benefitContent.length < 20) {
+        alert('Jeder Text muss mindestens 20 Zeichen enthalten.');
+        return;
+    }
+
+    if (cropper) {
+        cropper.getCroppedCanvas({
+            width: 1920,
+            height: 1440,
+            fillColor: '#fff'
+        }).toBlob(function(blob) {
+            console.log('Veröffentlichungs-Button geklickt, das zugeschnittene Bild wird verarbeitet und gespeichert.');
+
+            // Generate a random 20 digit string
+            var randomFileName = 'cropped-' + generateRandomString(20) + '.jpg';
+
+            var dataTransfer = new DataTransfer();
+            dataTransfer.items.add(new File([blob], randomFileName, { type: 'image/jpeg' }));
+            document.getElementById('image').files = dataTransfer.files;
+
+            // Submit the form
             event.target.submit();
-        }
-    });
+        }, 'image/jpeg');
+    } else {
+        console.log('Kein Bild ausgewählt oder Cropper nicht initialisiert.');
+        // Submit the form if no image is selected or cropper is not initialized
+        event.target.submit();
+    }
+}
+
+function generateRandomString(length) {
+    var result = '';
+    var characters = '0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
 
 
     // Toggle the navigation overlay when the hamburger button is clicked
@@ -1144,7 +1233,7 @@ fetch('/check_project_limit?_=' + new Date().getTime())
 
                 if (data.limit_reached) {
                     console.log("Submission limit reached. Limit expires at:", data.reset_time);
-                    updateButtonState(publishButton, `Limit reached, expires at ${data.reset_time}`, true);
+                    // updateButtonState(publishButton, `Limit erreicht, läuft um ${data.reset_time} ab`, true);
                     startTimer(data.reset_time, publishButton);
                 } else {
                     console.log("Submission limit not reached.");
@@ -1180,7 +1269,7 @@ fetch('/check_project_limit?_=' + new Date().getTime())
             var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            publishButton.innerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
+            publishButton.innerText = `Limit erreicht, läuft in ${hours}h ${minutes}m ${seconds}s ab`;
 
             if (distance < 0) {
                 clearInterval(x);

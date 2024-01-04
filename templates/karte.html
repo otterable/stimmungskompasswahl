@@ -543,7 +543,7 @@ display: none !important;
 }
 
 .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
-    font-size: 25px !important;
+    font-size: 18px !important;
 }
 
 
@@ -2110,6 +2110,10 @@ margin-bottom: 0px !important;
         transform: scale(1.02);
         transition: transform 0.3s ease;
     }
+	.register-button-f:hover {
+        transform: scale(1.02);
+        transition: transform 0.3s ease;
+    }
 </style>
 
 <body>
@@ -2162,6 +2166,8 @@ margin-bottom: 0px !important;
         <ul id="markers-list">
             <!-- Marker items will be added here dynamically -->
         </ul>
+		    <button id="show-more-markers" onclick="loadMoreMarkers()" style="display: none;">Mehr anzeigen</button>
+
     </div>
     <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-f" style="margin-top: 10px !important;">Schließen</button>
 </div>
@@ -2644,10 +2650,52 @@ function updateMarkerCategoryDescription() {
     categoryDescription.textContent = categoryText;
 }
 
+var swearWords = {
+    "de": [],
+    "en": []
+};
+
+// Function to load swear words from filter.json
+function loadSwearWords() {
+    fetch('/static/filter.json')
+        .then(response => response.json())
+        .then(data => {
+            swearWords = data;
+        })
+        .catch(error => console.error('Error loading swear words:', error));
+}
+
+// Call this function when the page loads
+loadSwearWords();
+
+// Function to check for swear words in a given text
+function containsSwearWords(text, language) {
+    var words = swearWords[language] || [];
+    var textWords = text.toLowerCase().split(/\s+/);
+    return textWords.some(word => words.includes(word));
+}
+
+
+
 
 
    // Function to handle posting a marker
+// Function to handle posting a marker
 function postMarker() {
+    // Get the textarea and its value
+    var markerDescriptionTextarea = document.getElementById('marker-description');
+    var description = markerDescriptionTextarea.value;
+	if (containsSwearWords(description, 'de')) {
+        alert("Bitte entfernen Sie unangebrachte Ausdrücke aus Ihrer Beschreibung.");
+        return; // Stop the function here if swear words are found
+    }
+    // Check if the description meets the minimum character requirement
+    if (description.length < 15) {
+        alert("Bitte geben Sie mindestens 15 Zeichen ein.");
+        return; // Stop the function if the condition is not met
+    }
+
+    // Continue with the rest of your function if the condition is met
     console.log("postMarker function called");
 
     var markerOverlay = document.getElementById('marker-overlay');
@@ -2659,13 +2707,12 @@ function postMarker() {
         return;
     }
 
-    // Get the selected category and description from the form
+    // Get the selected category from the form
     var selectedCategory = document.getElementById('marker-category').value;
-    var selectedDescription = document.getElementById('marker-description').value;
 
     // Prepare the future marker details
     futureMarker.category = selectedCategory;
-    futureMarker.description = selectedDescription;
+    futureMarker.description = description;
     var fillColor = getCategoryColor(selectedCategory);
     futureMarker.icon = createCursorIcon(fillColor);
 
@@ -2675,6 +2722,7 @@ function postMarker() {
     // Clear the textarea
     document.getElementById('marker-description').value = '';
 }
+
 
 
 // Function to toggle the sidebar visibility and adjust map size
@@ -2690,8 +2738,26 @@ function toggleMarkerSidebar() {
     }
 }
 
+var allMarkers = []; // Store all markers
+var displayedMarkersCount = 0;
+const markersPerPage = 20; // Number of markers per page
+
+   const categoryColors = {
+        'Transport': '#1565C0',
+        'Öffentliche Plätze': '#FF7043',
+        'Umwelt': '#4CAF50',
+        'Verwaltung': '#B38A58',
+        'Kultur': '#3B1C32',
+        'Bildung': '#264027',
+        'Gesundheit': '#B71C1C',
+        'Sport': '#4A001F',
+        'Andere': '#212121'
+    };
+	
 function addMarkersToOverlay(markers) {
-    const markersPerPage = 20; // Number of markers per page
+    allMarkers = markers; // Store all markers
+    displayedMarkersCount = 0; // Reset displayed markers count
+    loadMoreMarkers(); // Load initial set of markers
 	const sortedMarkers = sortMarkersByNewest(markers);
     let currentPage = 1; // Start with the first page
     let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to Sort by newest
@@ -2735,8 +2801,6 @@ function sortMarkers(sortType) {
     console.log("Markers sorted:", filteredMarkers.map(m => ({ id: m.id, date: m.date })));
     renderPage(1); // Reset to the first page after sorting
 }
-
-
 
 
 function createCategoryFilter() {
@@ -3051,8 +3115,8 @@ function addMarkers(projects) {
                 // For non-map objects, show detailed popup
                 var votingDetailsHtml = `
                     <div style="text-align: center; margin-bottom: 1px; font-size: 14px; font-weight: bold;">
-                        Gefällt: ${project.upvotes} (${project.upvote_percentage}%),
-                        Gefällt nicht: ${project.downvotes} (${project.downvote_percentage}%)
+                        👍: ${project.upvotes} (${project.upvote_percentage}%),
+                        👎: ${project.downvotes} (${project.downvote_percentage}%)
                     </div>
                 `;
 
@@ -3098,6 +3162,39 @@ function addMarkers(projects) {
             marker.addTo(categoryLayers[project.category]);
         }
     });
+}
+
+function loadMoreMarkers() {
+    const list = document.getElementById('markers-list');
+    const showMoreBtn = document.getElementById('show-more-markers');
+
+    // Determine the next set of markers to display
+    const nextMarkers = allMarkers.slice(displayedMarkersCount, displayedMarkersCount + markersPerPage);
+    nextMarkers.forEach(marker => {
+        // Create list item for each marker
+        const listItem = document.createElement('li');
+        const displayText = marker.is_mapobject ? marker.descriptionwhy : marker.name;
+        const link = document.createElement('a');
+        link.href = "#";
+        link.style.color = categoryColors[marker.category] || 'black';
+        link.style.fontWeight = marker.is_mapobject ? 'normal' : 'bold';
+        link.style.textDecoration = 'none';
+        link.innerHTML = displayText;
+        link.onclick = function() { centerMapOnMarker(marker.id); return false; };
+        listItem.appendChild(link);
+        list.appendChild(listItem);
+    });
+
+    // Update the count of displayed markers
+    displayedMarkersCount += nextMarkers.length;
+
+    // Check if there are more markers to show
+    if (displayedMarkersCount < allMarkers.length) {
+        showMoreBtn.style.display = 'block'; // Show the "Show More" button
+		showMoreBtn.classList.add('register-button-f');
+    } else {
+        showMoreBtn.style.display = 'none'; // Hide the button if no more markers
+    }
 }
 
 
@@ -3377,6 +3474,8 @@ $.ajax({
 });
 
 }
+
+
 </script>
    
    
@@ -3478,6 +3577,36 @@ $.ajax({
             }
         }, 1000);
     }
+	
+	// Function for updating character count on textarea
+function updateTextareaCharCountFeedback(textareaElement, feedbackElement, minLimit, maxLimit) {
+    var charCount = textareaElement.value.length;
+    var charRemaining = maxLimit - charCount;
+
+    if (charCount < minLimit) {
+        feedbackElement.textContent = `Sie müssen noch ${minLimit - charCount} Zeichen eingeben.`;
+    } else if (charCount <= maxLimit) {
+        feedbackElement.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
+    } else {
+        feedbackElement.textContent = "Zeichenlimit erreicht.";
+        textareaElement.value = textareaElement.value.substring(0, maxLimit); // Truncate to maxLimit
+    }
+    feedbackElement.style.color = '#003056';
+}
+
+// Create a feedback element for the marker description textarea
+var markerDescriptionTextarea = document.getElementById('marker-description');
+var markerDescriptionFeedback = document.createElement('div');
+markerDescriptionFeedback.id = 'markerDescriptionFeedback';
+markerDescriptionTextarea.parentNode.insertBefore(markerDescriptionFeedback, markerDescriptionTextarea.nextSibling);
+
+// Event listener for the marker description textarea
+markerDescriptionTextarea.addEventListener('input', function() {
+    updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 100);
+});
+updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 100); // Initial update
+
+
 </script>
 
 

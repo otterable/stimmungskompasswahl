@@ -706,8 +706,8 @@ display: block;
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
             <a href="/karte">Karte</a>
-            <a href="/list">Beiträge</a>
-            <a href="/neuerbeitrag">Beitrag hinzufügen</a>
+            <a href="/list">Projektvorschläge</a>
+            <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
@@ -997,24 +997,48 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
 document.getElementById('comment-form').addEventListener('submit', function(e) {
-    e.preventDefault();
+        e.preventDefault();
 
-    var commentText = this.querySelector('textarea[name="comment"]').value;
+        var commentText = this.querySelector('textarea[name="comment"]').value;
 
-    // Check if comment length is less than 20 characters
-    if (commentText.length < 20) {
-        alert('Comment must be at least 20 characters long.');
-        return;
+        // Check if comment length is less than 20 characters
+        if (commentText.length < 20) {
+            alert('Der Kommentar muss mindestens 20 Zeichen lang sein.');
+            return;
+        }
+
+        // Fetch the swear words list and proceed with the submission
+        fetch('/static/filter.json')
+            .then(response => response.json())
+            .then(filter => {
+                if (containsSwearWords(commentText, filter)) {
+                    alert('Bitte entfernen Sie unangebrachte Ausdrücke aus Ihrer Beschreibung.');
+                } else {
+                    submitCommentForm(this, commentText);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching filter:', error);
+                // Optionally submit the form even if the filter can't be loaded
+                submitCommentForm(this, commentText);
+            });
+    });
+
+    function containsSwearWords(text, filter) {
+        var words = text.toLowerCase().split(/\s+/);
+        var swearWords = filter.de.concat(filter.en); // Assuming you want to check both German and English words
+        return words.some(word => swearWords.includes(word));
     }
 
-    var formData = new FormData(this);
+function submitCommentForm(form, commentText) {
+    var formData = new FormData(form);
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', this.action, true);
+    xhr.open('POST', form.action, true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-    
+
     xhr.onload = function() {
         if (this.status >= 200 && this.status < 400) {
-            // Success! Parse response and update comments
+            // Success! Parse response, update comments, and clear textarea
             var response = JSON.parse(this.response);
             var commentsContainer = document.getElementById('comments-container');
             var newCommentHtml = `
@@ -1024,6 +1048,9 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
                 </div>
             `;
             commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
+            
+            // Clear the textarea after successful submission
+            form.querySelector('textarea[name="comment"]').value = '';
         } else {
             // Error handling
             console.error('Error occurred in comment submission');
@@ -1031,7 +1058,7 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
     };
 
     xhr.send(formData);
-});
+}
 
 </script>
 
