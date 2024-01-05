@@ -205,7 +205,7 @@ def delete_all_projects():
         # Fetch all projects
         projects = Project.query.all()
 
-        # Delete each project to trigger cascade deletion for comments
+        # Löschen each project to trigger cascade deletion for comments
         for project in projects:
             db.session.delete(project)
 
@@ -981,13 +981,13 @@ def delete_my_data():
     try:
         user_id = current_user.id
 
-        # Delete user's votes
+        # Löschen user's votes
         Vote.query.filter_by(user_id=user_id).delete()
 
-        # Delete user's comments
+        # Löschen user's comments
         Comment.query.filter_by(user_id=user_id).delete()
 
-        # Delete user's projects and associated files
+        # Löschen user's projects and associated files
         projects = Project.query.filter_by(author=user_id).all()
         for project in projects:
             total_votes = sum(vote.upvote + vote.downvote for vote in project.votes)
@@ -1001,15 +1001,15 @@ def delete_my_data():
                 project.upvote_percentage = 0
                 project.downvote_percentage = 0
 
-            # Delete associated files (if applicable)
+            # Löschen associated files (if applicable)
             project_files_path = os.path.join('actual/path/to/project_files', str(project.id))
             if os.path.exists(project_files_path):
                 shutil.rmtree(project_files_path)
 
-            # Delete the project record from the database
+            # Löschen the project record from the database
             db.session.delete(project)
 
-        # Delete user account
+        # Löschen user account
         user = User.query.filter_by(id=user_id).first()
         if user:
             db.session.delete(user)
@@ -1036,26 +1036,26 @@ def delete_user():
         user_id_to_delete = request.form.get('user_id')
         user_to_delete = User.query.get(user_id_to_delete)
         if user_to_delete:
-            # Delete user's votes
+            # Löschen user's votes
             Vote.query.filter_by(user_id=user_id_to_delete).delete()
 
-            # Delete user's comments
+            # Löschen user's comments
             Comment.query.filter_by(user_id=user_id_to_delete).delete()
 
-            # Delete user's projects and associated files
+            # Löschen user's projects and associated files
             projects_to_delete = Project.query.filter_by(author=user_id_to_delete).all()
             for project in projects_to_delete:
-                # Delete associated votes and comments for each project
+                # Löschen associated votes and comments for each project
                 Vote.query.filter_by(project_id=project.id).delete()
                 Comment.query.filter_by(project_id=project.id).delete()
 
-                # Delete project files (you may need to implement this logic)
+                # Löschen project files (you may need to implement this logic)
                 # For example, if you store project images in a folder, you can delete them here
 
                 # Finally, delete the project itself
                 db.session.delete(project)
 
-            # Delete user account
+            # Löschen user account
             db.session.delete(user_to_delete)
 
             # Commit changes to the database
@@ -1225,7 +1225,7 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
         requested_section = request.args.get('section')
 
         if requested_section == 'comments':
-            return render_template('partials/comments_section.html', 
+            return render_template('partials/comments_section_profil.html', 
                                    comment_pagination=paginated_comments,
                                    project_page=project_page, 
                                    map_object_page=map_object_page,

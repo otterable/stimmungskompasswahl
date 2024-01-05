@@ -6,12 +6,14 @@
                     <div class="project-thumbnail">
                         <h3>{{ project.name }}</h3>
                         <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
-                        <div class="voting-bar">
+                              <div class="voting-bar">
                             {% if project.upvotes > 0 %}
-                                <div class="upvotes" style="width: {{ project.upvote_percentage|round(1) }}%;">
+                                <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
                                     <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
                                 </div>
-                                <div class="downvotes" style="width: {{ project.downvote_percentage|round(1) }}%;">
+                            {% endif %}
+                            {% if project.downvotes > 0 %}
+                                <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
                                     <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
                                 </div>
                             {% endif %}
@@ -24,10 +26,11 @@
                         <form method="POST" action="{{ url_for('admintools') }}">
                             <input type="hidden" name="project_id" value="{{ project.id }}">
                             <button type="submit" name="delete_project" class="register-button" style="font-weight: bold;">Löschen</button>
-                            <button type="submit"  class="register-button" name="mark_important">Beitrag als "wichtig" markieren</button>
-                            <button type="submit"  class="register-button" name="mark_featured">Als "Ausgewähltes Projekt" markieren</button>
+                            <button type="submit"  class="register-button" name="mark_important">Als "Wichtig" markieren</button>
+                            <button type="submit"  class="register-button" name="mark_featured">Als "Ausgewählt" markieren</button>
+							                        <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button"   target="_blank">Anzeigen</a>
+
                         </form>
-                        <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button"   target="_blank">Anzeigen</a>
                     </div>
                 {% endif %}
             {% endfor %}

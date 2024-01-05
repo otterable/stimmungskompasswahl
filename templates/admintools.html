@@ -113,8 +113,9 @@ body {
         background-color: #003056; /* Example color */
         color: white;
         border: none;
-        border-radius: 30px;
-        padding: 10px 10px;
+        border-radius: 10px;
+		font-weight: bold !important;
+        padding: 5px 5px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
@@ -127,6 +128,17 @@ body {
 
     transform: scale(1.00); /* Scale up on hover */
 }
+
+h3 {
+    display: block;
+    font-size: 1.17em;
+    margin-block-start: 0.3em;  /* Adjusted margin at the start */
+    margin-block-end: 0.3em;    /* Adjusted margin at the end */
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
 
 	
  .top-bar {
@@ -389,11 +401,7 @@ nav[aria-label="Page navigation"] {
     cursor: pointer;
 }
 
-.comment-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between; /* Adjusts space between items */
-}
+
 
     
     .index-image {
@@ -611,10 +619,15 @@ nav[aria-label="Page navigation"] {
 
 /* Remove absolute positioning from the description */
 .project-thumbnail p {
-    position: relative; /* Changed from absolute to relative */
-    bottom: auto; /* Remove bottom positioning */
-    overflow: visible; /* Ensure text is not clipped */
+    position: relative;
+    bottom: auto;
+    overflow: visible;
+    text-align: center;
+    width: 100%;
+    display: block;
+    font-weight: normal; /* Set font weight to normal */
 }
+
 
 /* Desktop screens (larger than 1200px) */
 @media (min-width: 1445px) {
@@ -642,20 +655,46 @@ nav[aria-label="Page navigation"] {
         height: auto; /* Adjust image height for mobile */
     }
 }
+.comment-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center items */
+    align-items: flex-start;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
 
 .comment-thumbnail {
-    background-color: rgba(40, 116, 166, 0.3); /* Similar background color */
-    border-radius: 30px; /* Rounded corners */
+    flex-basis: calc(33.333% - 20px); /* Three items per row, adjust margin as needed */
+    width: calc(33.333% - 20px); /* Explicitly set width */
     margin: 10px; /* Margin around each thumbnail */
-    padding: 10px; /* Padding inside each thumbnail */
-    display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Stack items vertically */
-    align-items: center; /* Center items horizontally */
-    box-sizing: border-box; /* Include padding and border in width/height */
-    transition: transform 0.3s ease; /* Smooth scaling on hover */
-    position: relative; /* Position relative for any positioned children */
-    overflow: hidden; /* Hide overflow */
-    width: calc(33.333% - 20px); /* Three items per row */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  background-color: rgba(40, 116, 166, 0.3); /* Similar to project-thumbnail */
+    border-radius: 30px; /* Similar to project-thumbnail */
+	    transition: transform 0.3s ease; /* Smooth scaling on hover */
+
+	}
+
+
+   
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .comment-thumbnail {
+        flex-basis: calc(50% - 20px); /* Two items per row */
+        width: calc(50% - 20px); /* Explicitly set width */
+    }
+}
+
+@media (max-width: 1088px) {
+    .comment-thumbnail {
+        flex-basis: 100%; /* Full width on smaller screens */
+        width: 100%; /* Explicitly set width */
+    }
 }
 
 /* Hover effect for comment thumbnails */
@@ -669,14 +708,9 @@ nav[aria-label="Page navigation"] {
     width: 100%; /* Take full width */
 }
 
-/* Responsive design for different screen sizes */
-@media (min-width: 1445px) {
-    .comment-thumbnail {
-        width: calc(33.333% - 20px); /* Three items per row */
-    }
-}
 
-@media (min-width: 1080px) and (max-width: 1445px) {
+
+@media (min-width: 1080px) {
     .comment-thumbnail {
         width: calc(50% - 20px); /* Two items per row */
     }
@@ -1092,7 +1126,6 @@ nav[aria-label="Page navigation"] {
                 <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Neuester Beitrtag</option>
                 <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Ältester Beitrag</option>
                 <option value="category" {% if sort == 'category' %}selected{% endif %}>Kategorie</option>
-                <option value="user_id" {% if sort == 'user_id' %}selected{% endif %}>Benutzer ID</option>
                 <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Positive Bewertungen</option>
                 <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Negative Bewertungen</option>
                 <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Anzahl der Kommentare</option>
@@ -1129,11 +1162,9 @@ nav[aria-label="Page navigation"] {
 <div class="comment-search-container">
     <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()">
 </div>
-<div class="project-list">
     {% with paginated_comments=paginated_comments %}
         {% include 'partials/comments_section.html' %}
     {% endwith %}
-</div>
 
 
 
@@ -1146,16 +1177,17 @@ nav[aria-label="Page navigation"] {
             <p class="project-date">Kategorie: {{ project.category }}</p>
             <div class="project-details">
                 Verfasser: {{ project.author_name }} (ID: {{ project.author }}) <br>
-                Kommentare: {{ project.comments_count }}, Positive Bewertungen: {{ project.upvotes }}, Negative Bewertungen: {{ project.downvotes }}, Punkte: {{ project.score }}
+                Kommentare: {{ project.comments_count }}, 👍 {{ project.upvotes }}, 👎 {{ project.downvotes }}
             </div>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
                 <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
             </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit" class="register-button" name="unmark_important">Von "wichtig" entfernen</button>
+                <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
+				            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
+
             </form>
-            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
         </div>
     {% else %}
         <p>Keine Projektvorschläge gefunden.</p>
@@ -1170,17 +1202,18 @@ nav[aria-label="Page navigation"] {
             <h3>{{ project.name }}</h3>
             <p class="project-date">Kategorie: {{ project.category }}</p>
             <div class="project-details">
-                Verfasser: {{ project.author_name }} (ID: {{ project.author }}) <br>
-                Kommentare: {{ project.comments_count }}, Positive Bewertungen: {{ project.upvotes }}, Negative Bewertungen: {{ project.downvotes }}, Punkte: {{ project.score }}
+                Verfasser: ID {{ project.author }}<br>
+                Kommentare: {{ project.comments_count }}, 👍 {{ project.upvotes }}, 👎 {{ project.downvotes }}
             </div>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
                 <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
             </a>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
-                <button type="submit" name="unmark_featured"  class="register-button" >Von "ausgewählt" entferen</button>
+                <button type="submit" name="unmark_featured"  class="register-button" >Von "Ausgewählt" entferen</button>
+				            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
+
             </form>
-            <a href="{{ url_for('project_details', project_id=project.id) }}"  class="register-button" target="_blank">Anzeigen</a>
         </div>
     {% else %}
         <p>Keine Projekte gefunden.</p>

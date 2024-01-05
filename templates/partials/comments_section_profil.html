@@ -12,9 +12,9 @@
                     <p>Commented on project: <a href="{{ url_for('project_details', project_id=comment.project_id) }}">{{ project_name }}</a></p>
                     <!-- Posted Date -->
                     <p>Gepostet am: {{ comment.timestamp.strftime('%d.%m.%Y') }}</p>
-                    <!-- Delete Button for Comment -->
+                    <!-- Löschen Button for Comment -->
                     <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST">
-                        <input type="submit" class="register-button" style="font-weight: bold;" value="Delete Comment">
+                        <input type="submit" class="register-button" style="font-weight: bold;" value="Löschen">
                     </form>
                 </div>
             {% endfor %}
