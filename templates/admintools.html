@@ -41,7 +41,7 @@ body {
         }
 
         img:hover {
-            transform: scale(1.02);
+            transform: scale(1.00);
         }
 
         .button {
@@ -125,7 +125,7 @@ body {
     }
 		.register-button:hover {
 
-    transform: scale(1.02); /* Scale up on hover */
+    transform: scale(1.00); /* Scale up on hover */
 }
 
 	
@@ -155,7 +155,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.00); /* Scale up slightly on hover */
 }
 
 
@@ -261,7 +261,7 @@ nav[aria-label="Page navigation"] {
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.00); /* Scale up slightly on hover */
 }
 
 .voting-bar {
@@ -445,7 +445,7 @@ nav[aria-label="Page navigation"] {
         }
 
         .info-box:hover {
-            transform: scale(1.02);
+            transform: scale(1.00);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -536,7 +536,7 @@ nav[aria-label="Page navigation"] {
 
     /* Hover effect for user thumbnails */
     .user-thumbnail:hover {
-        transform: scale(1.02); /* Slight scale on hover */
+        transform: scale(1.00); /* Slight scale on hover */
     }
 
     /* Style for the details inside user thumbnails */
@@ -589,7 +589,7 @@ nav[aria-label="Page navigation"] {
 
 /* Hover effect for project thumbnails */
 .project-thumbnail:hover {
-    transform: scale(1.02);
+    transform: scale(1.00);
 }
 
 /* Image style within project thumbnails */
@@ -660,7 +660,7 @@ nav[aria-label="Page navigation"] {
 
 /* Hover effect for comment thumbnails */
 .comment-thumbnail:hover {
-    transform: scale(1.02); /* Slight scale on hover */
+    transform: scale(1.00); /* Slight scale on hover */
 }
 
 /* Style for the details inside comment thumbnails */
@@ -1162,7 +1162,7 @@ nav[aria-label="Page navigation"] {
     {% endfor %}
 </div>
 
-]<!-- Featured Projects Section -->
+<!-- Featured Projects Section -->
 <h2>Ausgewählte Projektvorschläge</h2>
 <div class="project-list">
     {% for project in featured_projects %}
@@ -1198,10 +1198,10 @@ nav[aria-label="Page navigation"] {
 
 <!-- Section for Deleting All Projects -->
 <div class="delete-all-projects-section">
-    <h2>Alle Projektvorschläge löschen</h2>
-    <p>Achtung: Dadurch werden alle Projektvorschläge dauerhaft aus der Datenbank gelöscht.</p>
+    <h2>Alle Beiträge löschen</h2>
+    <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
     <form method="POST" action="{{ url_for('delete_all_projects') }}">
-        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to Alle Projektvorschläge löschen? This action cannot be undone.');">Alle Projektvorschläge löschen</button>
+        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to Alle Projektvorschläge löschen? This action cannot be undone.');">Alle Beiträge löschen</button>
     </form>
 </div>
 

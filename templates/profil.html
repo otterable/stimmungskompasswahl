@@ -15,6 +15,17 @@
         margin: 0; /* Remove default margin */
         padding: 0; /* Remove default padding */
     }
+		.register-button:hover {
+
+    transform: scale(1.02); /* Scale up on hover */
+}
+.project-description {
+    text-align: center !important; /* Center text horizontally */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically if the container has a specified height */
+}
+
 
 		      .register-button {
         background-color: #003056; /* Example color */
@@ -166,15 +177,20 @@
     margin: 0;
     padding: 5px 0;
     width: 90%; /* Adjust the width to match the image */
-    text-align: center; /* Center the text */
+    text-align: center !important; /* Center the text */
 }
 
 /* Remove absolute positioning from the description */
 .project-thumbnail p {
-    position: relative; /* Changed from absolute to relative */
-    bottom: auto; /* Remove bottom positioning */
-    overflow: visible; /* Ensure text is not clipped */
+    position: relative;
+    bottom: auto;
+    overflow: visible;
+    text-align: center;
+    width: 100%;
+    display: block;
+    font-weight: normal !important; /* Set font weight to normal */
 }
+
 
 
 

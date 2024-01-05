@@ -961,7 +961,7 @@ def verify_admin_otp():
     if request.method == 'POST':
         entered_otp = request.form.get('otp')
 
-        # Verify OTP
+        # Passwort bestätigen
         if 'admin_otp' in session and str(session['admin_otp']) == entered_otp:
             session['admin_verified'] = True
             flash('OTP Verified. Access granted to admin tools.', 'success')
@@ -1368,7 +1368,7 @@ def verify_otp():
 
             login_user(new_user)
             logging.debug("New user registered: %s", new_user.phone_number)
-            return jsonify({'success': True, 'message': 'Account successfully created'})
+            return jsonify({'success': True, 'message': 'Konto erfolgreich erstellt'})
 
         elif 'reset_otp' in session and session['reset_otp'] == int(user_otp):
             # Handle Password Reset

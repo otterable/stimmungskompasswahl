@@ -1143,11 +1143,11 @@ document.getElementById('benefit-editor').parentNode.insertBefore(benefitFeedbac
 
 // Event listener for Quill editors
 descriptionEditor.on('text-change', function() {
-    updateQuillCharCountFeedback(descriptionEditor, descriptionFeedback, 20, 500);
+    updateQuillCharCountFeedback(descriptionEditor, descriptionFeedback, 20, 5000);
 });
 
 benefitEditor.on('text-change', function() {
-    updateQuillCharCountFeedback(benefitEditor, benefitFeedback, 20, 500);
+    updateQuillCharCountFeedback(benefitEditor, benefitFeedback, 20, 5000);
 });
 
 // Character count for the input field
