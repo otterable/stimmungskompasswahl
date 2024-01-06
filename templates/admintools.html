@@ -14,6 +14,7 @@
     </script>
 </head>
 
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
    <style>
    
@@ -617,16 +618,17 @@ nav[aria-label="Page navigation"] {
     text-align: center; /* Center the text */
 }
 
-/* Remove absolute positioning from the description */
 .project-thumbnail p {
+    font-family: 'Open Sans', sans-serif; /* Change to your preferred font */
     position: relative;
     bottom: auto;
     overflow: visible;
     text-align: center;
     width: 100%;
     display: block;
-    font-weight: normal; /* Set font weight to normal */
+    font-weight: normal; /* Ensure the font weight is normal */
 }
+
 
 
 /* Desktop screens (larger than 1200px) */
@@ -1115,7 +1117,7 @@ nav[aria-label="Page navigation"] {
 
 
 
-        <h1>Projektvorschläge:</h1>
+        <h2>Projektvorschläge</h2>
  <div>
     <label for="search">Suchen nach Namen:</label>
     <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()">
@@ -1134,14 +1136,12 @@ nav[aria-label="Page navigation"] {
 				</select>
 </div>    
 
-<div class="project-list">
     {% with project_page=paginated_projects.page %}
         {% include 'partials/project_list_section.html' %}
     {% endwith %}
-</div>
 
 
-        <h1>Notizen:</h1>
+        <h2>Notizen</h2>
 
 
 <!-- Map Objects Search Input -->
@@ -1149,22 +1149,23 @@ nav[aria-label="Page navigation"] {
     <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()">
 </div>
 
-<div class="project-list">
     {% with paginated_map_objects=paginated_map_objects %}
         {% include 'partials/mapobject_list_section.html' %}
     {% endwith %}
-</div>
 
 
 
-<h1>Kommentare:</h1>
+<h2>Kommentare</h2>
 <!-- Comments Search Input -->
 <div class="comment-search-container">
     <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()">
+    <input type="text" id="searchCommentByUserId" placeholder="Nach Benutzer-ID suchen" onkeyup="searchCommentsByUserId()">
+	
 </div>
-    {% with paginated_comments=paginated_comments %}
-        {% include 'partials/comments_section.html' %}
-    {% endwith %}
+{% with paginated_comments=paginated_comments %}
+    {% include 'partials/comments_section.html' %}
+{% endwith %}
+
 
 
 
@@ -1176,7 +1177,7 @@ nav[aria-label="Page navigation"] {
             <h3>{{ project.name }}</h3>
             <p class="project-date">Kategorie: {{ project.category }}</p>
             <div class="project-details">
-                Verfasser: {{ project.author_name }} (ID: {{ project.author }}) <br>
+                Verfasser: ID {{ project.author }} <br>
                 Kommentare: {{ project.comments_count }}, 👍 {{ project.upvotes }}, 👎 {{ project.downvotes }}
             </div>
             <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
@@ -1221,7 +1222,7 @@ nav[aria-label="Page navigation"] {
 </div>
 
 
-<h1>Benutzer:</h1>
+<h2>Benutzer</h2>
 <div class="project-list">
     {% with paginated_users=paginated_users %}
         {% include 'partials/user_list_section.html' %}
@@ -1299,6 +1300,52 @@ function handlePaginationClick(event) {
 
 
 
+function updateCommentList() {
+    const userId = document.getElementById('searchCommentByUserId').value;
+    const searchQuery = document.getElementById('searchComment').value;
+
+    let queryParams = new URLSearchParams();
+    if (userId) queryParams.set('searchCommentByUserId', userId);
+    if (searchQuery) queryParams.set('searchComment', searchQuery);
+
+    fetch(`/admintools?${queryParams.toString()}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.text())
+    .then(html => {
+        const newContent = document.createElement('div');
+        newContent.innerHTML = html;
+
+        const oldCommentContainer = document.getElementById('comment-list-container');
+        const newCommentContainer = newContent.querySelector('#comment-list-container') || document.createElement('div');
+        newCommentContainer.innerHTML = newCommentContainer.innerHTML || "<p>Keine Kommentare gefunden.</p>";
+
+        oldCommentContainer.innerHTML = newCommentContainer.innerHTML;
+
+        const oldPagination = document.querySelector('.pagination-container[data-pagination-type="comment"]');
+        const newPagination = newContent.querySelector('.pagination-container[data-pagination-type="comment"]');
+
+        if (oldPagination) {
+            oldPagination.innerHTML = newPagination ? newPagination.innerHTML : '';
+            oldPagination.style.display = newPagination && newPagination.innerHTML.trim() ? 'block' : 'none';
+        }
+
+        attachPaginationEventListeners();
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+function searchComments() {
+    updateCommentList();
+}
+
+
+function searchCommentsByUserId() {
+    updateCommentList();
+}
+
+
 function updatePaginationContent(url, sectionType) {
     console.log('Fetching URL:', url, 'for section:', sectionType);
     fetch(url + '&request_type=' + sectionType, {
@@ -1346,13 +1393,9 @@ function updatePaginationContent(url, sectionType) {
 }
 
 
-function searchComments() {
-    const searchQuery = document.getElementById('searchComment').value;
 
-    fetch(`/admintools?comment_page=1&searchComment=${searchQuery}`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    })
-    .then(response => response.text())
+function handleResponse(response) {
+    response.text()
     .then(html => {
         const newContent = document.createElement('div');
         newContent.innerHTML = html;
@@ -1360,37 +1403,56 @@ function searchComments() {
         const oldCommentContainer = document.getElementById('comment-list-container');
         let newCommentContainer = newContent.querySelector('#comment-list-container');
 
-        // Handle 'No results found' scenario
-        if (!newCommentContainer) {
-            newCommentContainer = document.createElement('div');
-            newCommentContainer.innerHTML = "<p>No comments found.</p>";
-        }
+        oldCommentContainer.innerHTML = newCommentContainer ? newCommentContainer.innerHTML : "<p>Keine Kommentare gefunden.</p>";
 
-        if (oldCommentContainer) {
-            oldCommentContainer.innerHTML = newCommentContainer.innerHTML;
-        } else {
-            console.error('Comment list container not found');
-        }
-
-        // Update pagination
         const oldPagination = document.querySelector('.pagination-container[data-pagination-type="comment"]');
         const newPagination = newContent.querySelector('.pagination-container[data-pagination-type="comment"]');
 
-        if (oldPagination) {
-            if (newPagination && newPagination.innerHTML.trim()) {
-                oldPagination.innerHTML = newPagination.innerHTML;
-                replaceNoneWithEllipsis(oldPagination);
-                oldPagination.style.display = 'block';
-            } else {
-                oldPagination.style.display = 'none';
-            }
+        if (newPagination) {
+            oldPagination.innerHTML = newPagination.innerHTML;
+        } else {
+            oldPagination.innerHTML = '';
         }
 
         attachPaginationEventListeners();
-    })
-    .catch(error => {
-        console.error('Error:', error);
     });
+}
+
+function handleError(error) {
+    console.error('Error:', error);
+}
+
+function updateCommentSection(html) {
+    const newContent = document.createElement('div');
+    newContent.innerHTML = html;
+
+    const oldCommentContainer = document.getElementById('comment-list-container');
+    let newCommentContainer = newContent.querySelector('#comment-list-container');
+
+    if (!newCommentContainer) {
+        newCommentContainer = document.createElement('div');
+        newCommentContainer.innerHTML = "<p>Keine Kommentare gefunden.</p>";
+    }
+
+    if (oldCommentContainer) {
+        oldCommentContainer.innerHTML = newCommentContainer.innerHTML;
+    } else {
+        console.error('Comment list container not found');
+    }
+
+    const oldPagination = document.querySelector('.pagination-container[data-pagination-type="comment"]');
+    const newPagination = newContent.querySelector('.pagination-container[data-pagination-type="comment"]');
+
+    if (oldPagination) {
+        if (newPagination && newPagination.innerHTML.trim()) {
+            oldPagination.innerHTML = newPagination.innerHTML;
+            replaceNoneWithEllipsis(oldPagination);
+        } else {
+            oldPagination.innerHTML = ''; // Clear the pagination if no results or single page
+        }
+    }
+
+    attachPaginationEventListeners();
 }
 
 

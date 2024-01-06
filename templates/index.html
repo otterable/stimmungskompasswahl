@@ -65,7 +65,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.01); /* Scale up slightly on hover */
 }
 
 
@@ -130,7 +130,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.01); /* Scale up slightly on hover */
 }
 
 /* Underline effect for links that do not contain buttons */
@@ -173,7 +173,7 @@ margin: auto;
         }
 
         img:hover {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
 
    .form-container {
@@ -237,7 +237,7 @@ margin: auto;
 }
 
 .publish-button:hover {
-    transform: scale(1.02); /* Scale up on hover */
+    transform: scale(1.01); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 
@@ -268,7 +268,7 @@ margin: auto;
 
 /* Hover effect for project thumbnails */
 .project-thumbnail:hover {
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 
 /* Image style within project thumbnails */
@@ -288,14 +288,38 @@ margin: auto;
     text-align: center; /* Center the text */
 }
 
-/* Remove absolute positioning from the description */
 .project-thumbnail p {
-    position: relative; /* Changed from absolute to relative */
-    bottom: auto; /* Remove bottom positioning */
-    overflow: visible; /* Ensure text is not clipped */
-		font-size: 16px;
-
+    font-family: 'Open Sans', sans-serif; /* Change to your preferred font */
+    position: relative;
+    bottom: auto;
+    overflow: visible;
+    text-align: center;
+    width: 100%;
+    display: block;
+    font-weight: normal; /* Ensure the font weight is normal */
+	        font-size: 18px; /* Adjust as needed for h1 */
 }
+
+
+@media only screen and (max-width: 1080px) {
+    .project-thumbnail h1 {
+        font-size: 24px; /* Adjust as needed for h1 */
+    }
+
+    .project-thumbnail h2 {
+        font-size: 22px; /* Adjust as needed for h2 */
+    }
+
+    .project-thumbnail h3 {
+        font-size: 20px; /* Adjust as needed for h3 */
+    }
+
+    .project-thumbnail p {
+        font-size: 18px; /* Adjust as needed for paragraph text */
+    }
+}
+
+
 
 
 
@@ -467,7 +491,7 @@ margin: auto;
         }
 
         .info-box:hover {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
 	.user-info {
     color: white; /* Set the text color to match other links */

@@ -10,11 +10,11 @@
                                 {{ comment.project_name }}
                             </a>
                         </p>
-                        <p>Verfasser des Kommtenars: {{ comment.author_name }} (ID: {{ comment.author_id }})</p>
+                        <p>Autor: {{ comment.author_name }} (ID: {{ comment.author_id }})</p>
                         <p>Datum: {{ comment.timestamp.strftime('%d.%m.%Y, %H:%M:%S') }}</p> <!-- Formatted date -->
                     </div>
                     <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
-                        <button type="submit" class="register-button">Kommentar löschen</button>
+                        <button type="submit" class="register-button">Löschen</button>
                     </form>
                 </div>
             {% endfor %}
@@ -26,7 +26,7 @@
                 <ul class="pagination">
                     {% if paginated_comments.has_prev %}
                         <li class="page-item">
-                            <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.prev_num) }}">zurück</a>
+						<a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.prev_num, comment_sort=comment_sort) }}">Zurück</a>
                         </li>
                     {% endif %}
                     {% for page in paginated_comments.iter_pages() %}
@@ -36,7 +36,7 @@
                     {% endfor %}
                     {% if paginated_comments.has_next %}
                         <li class="page-item">
-                            <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.next_num) }}">weiter</a>
+                            <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', comment_page=paginated_comments.next_num) }}">Weiter</a>
                         </li>
                     {% endif %}
                 </ul>

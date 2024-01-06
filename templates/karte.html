@@ -130,7 +130,7 @@ display:none !important;
 }
 
 .button-hover-effect:hover {
-    transform: scale(1.02);
+    transform: scale(1.01);
     background-color: #111111; /* Light blue color */
 }
 
@@ -1186,7 +1186,7 @@ display: none !important;
 }
 
 .tool-btn:hover img {
-    transform: scale(1.02);
+    transform: scale(1.01);
     outline: var(--tool-btn-hover-outline);
 }
 
@@ -1610,12 +1610,12 @@ margin-bottom: 50px;
 }
 
 .register-button-m:hover {
-    transform: scale(1.02); /* Scale up on hover */
+    transform: scale(1.01); /* Scale up on hover */
     filter: brightness(110%); /* Increase brightness by 10% */
 }
 
 .publish-button:hover {
-    transform: scale(1.02); /* Scale up on hover */
+    transform: scale(1.01); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 
@@ -1659,7 +1659,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.01); /* Scale up slightly on hover */
 }
 
 
@@ -1724,7 +1724,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.01); /* Scale up slightly on hover */
 }
 
 /* Underline effect for links that do not contain buttons */
@@ -1808,7 +1808,7 @@ margin: auto;
         }
 
         .info-box:hover {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -2088,21 +2088,21 @@ margin-bottom: 0px !important;
  <style>
     /* Scale logo image on hover */
     img.logo:hover {
-        transform: scale(1.02);
+        transform: scale(1.01);
         transition: transform 0.3s ease;
     }
 
 /* Hover effect for category buttons (dynamically generated) */
 #category-toggle-buttons button:hover {
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
     /* Scale register buttons on hover */
     .register-button:hover {
-        transform: scale(1.02);
+        transform: scale(1.01);
         transition: transform 0.3s ease;
     }
 	.register-button-f:hover {
-        transform: scale(1.02);
+        transform: scale(1.01);
         transition: transform 0.3s ease;
     }
 </style>
@@ -3452,13 +3452,14 @@ $.ajax({
         var marker = L.marker(latlng, { icon: markerIcon }).addTo(map);
         marker.bindPopup(`<strong>${category}</strong><br>${description}`);
         console.log(`Marker with text "${description}" of category "${category}" just created, creating an icon for it.`);
+        // Check marker limit after adding a marker
+        checkMarkerLimit();
     },
     error: function(xhr, textStatus, errorThrown) {
         if(xhr.status === 429) {
-            // Display alert when status code is 429 (Too Many Requests)
-            alert("Sie haben kürzlich ein Projekt gepostet Versuchen Sie es in Kürze noch einmal!");
+            alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
+            console.log('Rate limit reached for adding markers.');
         } else {
-            // Log other types of errors
             console.error('Error saving marker:', errorThrown);
         }
     }
@@ -3466,8 +3467,114 @@ $.ajax({
 
 }
 
+// Function to check marker limit
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded and parsed. Initiating limit check...");
+
+    fetch('/check_limit')
+        .then(response => {
+            console.log("Received response from /check_limit");
+            return response.json();
+        })
+        .then(data => {
+            console.log("Data received from /check_limit:", data);
+            if (data.limit_reached) {
+                console.log(`LIMIT CHECK: 3/3 markers posted, limit has been reached. Turning buttons into timers. Limit expires in: ${data.reset_time}`);
+                document.getElementById('add-marker-button').disabled = true;
+                document.getElementById('open-overlay').disabled = true;
+                startTimer(data.reset_time);
+            } else {
+                console.log(`LIMIT CHECK: ${data.current_count}/3 markers posted.`);
+            }
+        })
+        .catch(error => console.error('Error checking limit:', error));
+});
+
+
+
+function checkMarkerLimit() {
+    fetch('/check_marker_limit')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Marker Limit Check: ", data);
+            if (data.limit_reached) {
+                console.log(`LIMIT CHECK: 3/3 markers posted, limit has been reached. Turning buttons into timers. Limit expires in: ${data.reset_time}`);
+                document.getElementById('add-marker-button').disabled = true;
+                document.getElementById('open-overlay').disabled = true;
+                startTimer(data.reset_time);
+            } else {
+                console.log(`LIMIT CHECK: ${data.current_count}/3 markers posted.`);
+            }
+        })
+        .catch(error => console.error('Error checking marker limit:', error));
+}
+
+// Call checkMarkerLimit on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded and parsed. Initiating marker limit check...");
+    checkMarkerLimit();
+});
+
+
+// Timer function
+function startTimer(expiryTime) {
+    if (!expiryTime) return; // Add this check
+
+    var countDownDate = new Date(expiryTime).getTime();
+    var addButton = document.getElementById('add-marker-button');
+    var overlayButton = document.getElementById('open-overlay');
+
+    var interval = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        var timerText = `Limit erreicht. Läuft in ${hours}h ${minutes}m ${seconds}s ab`;
+        addButton.innerText = timerText;
+        overlayButton.innerText = timerText;
+
+        if (distance < 0) {
+            clearInterval(interval);
+            addButton.innerText = "Hinzufügen";
+            addButton.disabled = false;
+            overlayButton.innerText = "Hinzufügen";
+            overlayButton.disabled = false;
+        }
+    }, 1000);
+}
+
+// Function for updating character count on textarea
+function updateTextareaCharCountFeedback(textareaElement, feedbackElement, minLimit, maxLimit) {
+    var charCount = textareaElement.value.length;
+    var charRemaining = maxLimit - charCount;
+
+    if (charCount < minLimit) {
+        feedbackElement.textContent = `Sie müssen noch ${minLimit - charCount} Zeichen eingeben.`;
+    } else if (charCount <= maxLimit) {
+        feedbackElement.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
+    } else {
+        feedbackElement.textContent = "Zeichenlimit erreicht.";
+        textareaElement.value = textareaElement.value.substring(0, maxLimit);
+    }
+    feedbackElement.style.color = '#003056';
+}
+
+// Create a feedback element for the marker description textarea
+var markerDescriptionTextarea = document.getElementById('marker-description');
+var markerDescriptionFeedback = document.createElement('div');
+markerDescriptionFeedback.id = 'markerDescriptionFeedback';
+markerDescriptionTextarea.parentNode.insertBefore(markerDescriptionFeedback, markerDescriptionTextarea.nextSibling);
+
+// Event listener for the marker description textarea
+markerDescriptionTextarea.addEventListener('input', function() {
+    updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300);
+});
+updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300); // Initial update
 
 </script>
+
    
    
 <script>
@@ -3518,94 +3625,6 @@ $.ajax({
 <script type="text/javascript">
     var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
 </script>
-<script type="text/javascript">
-    // Check marker posting limit on page load
-    window.onload = function() {
-        fetch('/check_limit')
-            .then(response => response.json())
-            .then(data => {
-                var addButton = document.getElementById('add-marker-button');
-                var overlayButton = document.getElementById('open-overlay');
-
-                if (data.limit_reached) {
-                    console.log("This IP already reached posting limits for today. Limits expire at:", data.reset_time);
-                    
-                    // Disable buttons immediately
-                    addButton.disabled = true;
-                    overlayButton.disabled = true;
-
-                    // Immediately update the timer text for both buttons
-                    updateTimerText(data.reset_time, addButton, overlayButton);
-
-                    console.log("Buttons now show a timer and are unclickable.");
-                    startTimer(data.reset_time, addButton, overlayButton);
-                }
-            })
-            .catch(error => console.error('Error checking limit:', error));
-    };
-
-    function updateTimerText(expiryTime, addButton, overlayButton) {
-        var now = new Date().getTime();
-        var countDownDate = new Date(expiryTime).getTime();
-        var distance = countDownDate - now;
-        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        var timerText = `Limit erreicht. Läuft in ${hours}h ${minutes}m ab`;
-        addButton.innerText = timerText;
-        overlayButton.innerText = timerText;
-    }
-
-    // Function to start a countdown timer
-    function startTimer(expiryTime, addButton, overlayButton) {
-        var countDownDate = new Date(expiryTime).getTime();
-
-        var x = setInterval(function() {
-            updateTimerText(expiryTime, addButton, overlayButton);
-
-            if (new Date().getTime() > countDownDate) {
-                clearInterval(x);
-                addButton.innerText = "Hinzufügen";
-                overlayButton.innerText = "Hinzufügen";
-                addButton.disabled = false; // Enable the buttons
-                overlayButton.disabled = false; // Enable the buttons
-                console.log("Buttons are now clickable and ready for new submissions.");
-            }
-        }, 1000);
-    }
-	
-	// Function for updating character count on textarea
-function updateTextareaCharCountFeedback(textareaElement, feedbackElement, minLimit, maxLimit) {
-    var charCount = textareaElement.value.length;
-    var charRemaining = maxLimit - charCount;
-
-    if (charCount < minLimit) {
-        feedbackElement.textContent = `Sie müssen noch ${minLimit - charCount} Zeichen eingeben.`;
-    } else if (charCount <= maxLimit) {
-        feedbackElement.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
-    } else {
-        feedbackElement.textContent = "Zeichenlimit erreicht.";
-        textareaElement.value = textareaElement.value.substring(0, maxLimit); // Truncate to maxLimit
-    }
-    feedbackElement.style.color = '#003056';
-}
-
-// Create a feedback element for the marker description textarea
-var markerDescriptionTextarea = document.getElementById('marker-description');
-var markerDescriptionFeedback = document.createElement('div');
-markerDescriptionFeedback.id = 'markerDescriptionFeedback';
-markerDescriptionTextarea.parentNode.insertBefore(markerDescriptionFeedback, markerDescriptionTextarea.nextSibling);
-
-// Event listener for the marker description textarea
-markerDescriptionTextarea.addEventListener('input', function() {
-    updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300);
-});
-updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300); // Initial update
-
-
-</script>
-
 
 
 </body>

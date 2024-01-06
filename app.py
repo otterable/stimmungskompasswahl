@@ -376,6 +376,30 @@ def cleanup_ip_addresses():
 cleanup_thread = threading.Thread(target=cleanup_ip_addresses, daemon=True)
 cleanup_thread.start()
 
+@app.route('/check_marker_limit', methods=['GET'])
+def check_marker_limit():
+    ip_address = request.remote_addr
+    now = datetime.now()
+    additions = ip_marker_additions.get(ip_address, [])
+    additions = [time for time in additions if now - time < timedelta(days=1)]
+    current_count = len(additions)
+    max_limit = 3  # Set your max limit here
+    limit_reached = current_count >= max_limit
+
+    if limit_reached and additions:
+        reset_time = max(additions) + timedelta(days=1)
+    else:
+        reset_time = None
+
+    return jsonify({
+        'ip_address': ip_address,
+        'current_count': current_count,
+        'max_limit': max_limit,
+        'limit_reached': limit_reached,
+        'reset_time': reset_time.isoformat() if reset_time else None
+    })
+
+    
 
 @app.route('/add_marker', methods=['POST'])
 def add_marker():
@@ -383,19 +407,19 @@ def add_marker():
     ip_address = request.remote_addr
 
     # Check and update the rate limit for marker additions
+    now = datetime.now()
     additions = ip_marker_additions.get(ip_address, [])
-    # Remove timestamps older than 24 hours
-    additions = [time for time in additions if datetime.now() - time < timedelta(days=1)]
-    if len(additions) >= 2:
+    # Filter additions within the last 24 hours
+    additions = [time for time in additions if now - time < timedelta(days=1)]
+    
+    if len(additions) >= 3:  # Assuming a limit of 2 markers per day
         app.logger.warning(f"IP {ip_address} blocked from adding new markers due to rate limit")
-        return jsonify({'error': 'Rate limit exceeded. You can only add 20 markers every 24 hours'}), 429
+        return jsonify({'error': 'Rate limit exceeded. You can only add 2 markers every 24 hours'}), 429
 
     try:
-        author_id = current_user.id if current_user.is_authenticated and hasattr(current_user, 'id') else 0
-
-        # Providing default values for public_benefit and image_file
+        author_id = current_user.id if current_user.is_authenticated else 0
         public_benefit = data.get('public_benefit', 'Default public benefit description')
-        image_file = data.get('image_file', 'default_image.jpg')  # Assuming 'default_image.jpg' is a valid placeholder
+        image_file = data.get('image_file', 'default_image.jpg')
 
         new_project = Project(
             name="User Generated Marker",
@@ -407,11 +431,12 @@ def add_marker():
             author=author_id,
             is_mapobject=True
         )
+
         db.session.add(new_project)
         db.session.commit()
 
         # Update IP tracking dictionary
-        additions.append(datetime.now())
+        additions.append(now)
         ip_marker_additions[ip_address] = additions
 
         app.logger.info(f"IP {ip_address} recorded for posting a marker")
@@ -420,7 +445,7 @@ def add_marker():
     except Exception as e:
         app.logger.error(f'Error saving marker: {e}')
         return jsonify({'error': str(e)}), 500
-        
+
 @app.route('/get_projects')
 def get_projects():
     try:
@@ -449,13 +474,22 @@ def get_projects():
 def check_limit():
     ip_address = request.remote_addr
     additions = ip_marker_additions.get(ip_address, [])
+    
+    # Filter additions within the last 24 hours
     additions = [time for time in additions if datetime.now() - time < timedelta(days=1)]
+    ip_marker_additions[ip_address] = additions  # Update the dictionary
 
-    if len(additions) >= 10:
-        reset_time = max(additions) + timedelta(days=1)
-        return jsonify({'limit_reached': True, 'reset_time': reset_time.strftime('%Y-%m-%d %H:%M:%S')})
+    # Debugging log
+    app.logger.debug(f"IP {ip_address} - Marker Additions: {additions}")
 
-    return jsonify({'limit_reached': False})
+    limit_reached = len(additions) >= 10  # Assuming a limit of 10
+    reset_time = max(additions) + timedelta(days=1) if limit_reached else None
+
+    app.logger.debug(f"IP {ip_address} - Limit Reached: {limit_reached}, Reset Time: {reset_time}")
+
+    return jsonify({'limit_reached': limit_reached, 'reset_time': reset_time.isoformat() if reset_time else None})
+
+
 
 @app.route('/check_project_limit')
 def check_project_limit():
@@ -834,9 +868,22 @@ def admintools():
     if search_map_object_query:
         map_object_query = map_object_query.filter(Project.descriptionwhy.ilike(f'%{search_map_object_query}%'))
 
+    search_comment_by_user_id = request.args.get('searchCommentByUserId')
+    search_comment_query = request.args.get('searchComment')
     comment_query = Comment.query
+
+    if search_comment_by_user_id:
+        comment_query = comment_query.filter(Comment.user_id == int(search_comment_by_user_id))
     if search_comment_query:
         comment_query = comment_query.filter(Comment.text.ilike(f'%{search_comment_query}%'))
+
+    comment_sort = request.args.get('comment_sort', 'newest')  # Default sorting is by newest
+
+    # Sorting logic
+    if comment_sort == 'oldest':
+        comment_query = comment_query.order_by(Comment.timestamp)
+    elif comment_sort == 'newest':
+        comment_query = comment_query.order_by(Comment.timestamp.desc())
 
 
     query = Project.query.filter(Project.is_mapobject == False)  # Filtern for non-mapobject projects

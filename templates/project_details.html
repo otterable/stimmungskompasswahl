@@ -25,7 +25,19 @@ body {
     padding: 0 !important;
     border-radius: 0 !important; /* Removes rounded corners */
 }
+/* Target <h3> within the .text-content class */
+.text-content h3 {
+    margin-block-start: 0.5em; /* Adjust the top margin */
+    margin-block-end: 0.5em;   /* Adjust the bottom margin */
+    font-weight: normal;       /* Adjust the font weight */
+}
 
+/* Target <h3> immediately following .centered-title.section-title */
+.centered-title.section-title + h3 {
+    margin-block-start: 0.5em; /* Adjust the top margin */
+    margin-block-end: 0.5em;   /* Adjust the bottom margin */
+    font-weight: normal;       /* Adjust the font weight */
+}
 
         img {
             border-radius: 30px;
@@ -38,7 +50,7 @@ body {
         }
 
         img:hover {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
 		
 		 #project-map {
@@ -114,7 +126,7 @@ body {
 
     .upvote-button:hover {
         background-color: #66c46a; /* Lighter shade of green */
-        transform: scale(1.02);
+        transform: scale(1.01);
     }
 
     .downvote-button {
@@ -126,7 +138,7 @@ body {
 
     .downvote-button:hover {
         background-color: #cc5045; /* Lighter shade of red */
-        transform: scale(1.02);
+        transform: scale(1.01);
     }
 
 
@@ -157,13 +169,13 @@ body {
 	
 	    .share-button:hover {
         background-color: #306db8; /* Lighter shade of red */
-        transform: scale(1.02);
+        transform: scale(1.01);
     }
 
 
     .comment-button:hover {
         background-color: #00427a; /* Lighter shade of blue */
-        transform: scale(1.02);
+        transform: scale(1.01);
     }
 	
 .publish-button {
@@ -179,7 +191,7 @@ body {
 }
 
 .publish-button:hover {
-    transform: scale(1.02); /* Scale up on hover */
+    transform: scale(1.01); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 .left-column img {
@@ -228,7 +240,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.01); /* Scale up slightly on hover */
 }
 
 .voting-login-prompt {
@@ -378,7 +390,7 @@ margin: auto;
 
 /* Hover effect for buttons inside links in the top bar */
 .top-bar a button:hover {
-    transform: scale(1.02); /* Scale up slightly on hover */
+    transform: scale(1.01); /* Scale up slightly on hover */
 }
 
 .voting-bar {
@@ -498,7 +510,7 @@ margin: auto;
         }
 
         .info-box:hover {
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -802,12 +814,13 @@ display: block;
 </div>
 
 
-    <script>
+ <script>
 document.addEventListener('DOMContentLoaded', function() {
     var commentTextarea = document.querySelector('textarea[name="comment"]');
     var charCountFeedback = document.getElementById('charCountFeedback');
     var minCharLimit = 20;
     var maxCharLimit = 500;
+    var commentButton = document.querySelector('.comment-button');
 
     function updateCharCountFeedback() {
         var charCount = commentTextarea.value.length;
@@ -826,21 +839,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     commentTextarea.addEventListener('input', updateCharCountFeedback);
     updateCharCountFeedback(); // Initial update when the page loads
-});
 
-
-
-       // When the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        checkCommentLimitAndUpdateButton();
-    });
+    // Check comment limit and update button
+    checkCommentLimitAndUpdateButton();
 
     function checkCommentLimitAndUpdateButton() {
         fetch('/check_comment_limit?_=' + new Date().getTime())
             .then(response => response.json())
             .then(data => {
                 console.log("Received data from /check_comment_limit:", data);
-                var commentButton = document.querySelector('.comment-button');
 
                 if (data.limit_reached) {
                     console.log("Comment submission limit reached. Limit expires at:", data.reset_time);
@@ -861,9 +868,9 @@ document.addEventListener('DOMContentLoaded', function() {
         button.innerText = text;
         button.disabled = disabled;
         if (disabled) {
-            button.classList.add('disabled-button'); // Style the disabled button
+            button.classList.add('disabled-button');
         } else {
-            button.classList.remove('disabled-button'); // Remove the style if enabled
+            button.classList.remove('disabled-button');
         }
     }
 
@@ -885,7 +892,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 1000);
     }
-    </script>
+});
+</script>
 </body>
 
 

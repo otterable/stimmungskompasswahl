@@ -12,7 +12,7 @@
                     Projektvorschläge erstellt: {{ user.project_count }} <br>
                     Notizen erstellt: {{ user.map_object_count }} <br>
                     Kommentare gepostet: {{ user.comment_count }} <br>
-                    Konto erstellt am: {{ user.account_creation.strftime('%Y-%m-%d %H:%M:%S') }}
+					Konto erstellt am: {{ user.account_creation.strftime('%d.%m.%Y, %H:%M:%S') }}
                 </div>
                 <form method="POST" action="{{ url_for('delete_user') }}" onsubmit="return confirmUserDeletion()">
                     <input type="hidden" name="user_id" value="{{ user.id }}">
@@ -27,7 +27,7 @@
             <ul class="pagination">
                 {% if paginated_users.has_prev %}
                     <li class="page-item">
-                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', user_page=paginated_users.prev_num) }}">zurück</a>
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', user_page=paginated_users.prev_num) }}">Zurück</a>
                     </li>
                 {% endif %}
                 {% for page in paginated_users.iter_pages() %}
@@ -37,7 +37,7 @@
                 {% endfor %}
                 {% if paginated_users.has_next %}
                     <li class="page-item">
-                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', user_page=paginated_users.next_num) }}">weiter</a>
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', user_page=paginated_users.next_num) }}">Weiter</a>
                     </li>
                 {% endif %}
             </ul>

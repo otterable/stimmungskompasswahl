@@ -26,7 +26,7 @@
             <ul class="pagination">
                 {% if paginated_map_objects.has_prev %}
                     <li class="page-item">
-                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.prev_num) }}">zurück</a>
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.prev_num) }}">Zurück</a>
                     </li>
                 {% endif %}
                 {% for page in paginated_map_objects.iter_pages() %}
@@ -36,7 +36,7 @@
                 {% endfor %}
                 {% if paginated_map_objects.has_next %}
                     <li class="page-item">
-                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.next_num) }}">weiter</a>
+                        <a class="page-link ajax-pagination-link" href="{{ url_for('admintools', map_object_page=paginated_map_objects.next_num) }}">Weiter</a>
                     </li>
                 {% endif %}
             </ul>
