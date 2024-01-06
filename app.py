@@ -829,7 +829,7 @@ def admintools():
             else:
                 flash('Project not found for marking as featured', 'error')
 
-        elif 'unmark_featured' in request.form:
+        elif 'unmark_featured' in requgt.form:
             project = Project.query.get(project_id)
             if project:
                 project.is_featured = False
@@ -1481,22 +1481,21 @@ def download_data():
     }
 
     # Create a zip file of user submissions
-    zip_path = zip_user_submissions()
+    zip_path = zip_user_submissions()  # Ensure this function is defined
 
     if zip_path and zip_path.is_file():
         data['image_zip_file'] = url_for('static', filename='usersubmissions.zip')
     else:
         data['image_zip_file'] = "No images available to download"
 
-    # Create JSON response
+    # Create a formatted JSON response
     response = Response(
-        json.dumps(data, default=str),
+        json.dumps(data, default=str, indent=4),  # Adding indentation
         mimetype='application/json',
         headers={'Content-Disposition': 'attachment;filename=data.json'}
     )
 
     return response
-
 
 @login_manager.user_loader
 def load_user(user_id):

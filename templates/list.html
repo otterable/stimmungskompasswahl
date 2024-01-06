@@ -651,6 +651,13 @@ nav[aria-label="Page navigation"] {
         max-width: 100vw; /* Prevent horizontal overflow */
         overflow-x: hidden; /* Hide horizontal scrollbar */
     }
+	
+	#nav-links .user-info {
+        display: block; /* Make it a block element */
+        width: 100%; /* Full width */
+        text-align: center; /* Center text horizontally */
+        margin: 10px 0; /* Optional: adjust top and bottom margin as needed */
+    }
 
     body {
         font-size: 14px; /* Smaller font size */
@@ -1142,79 +1149,79 @@ nav[aria-label="Page navigation"] {
 </script>
 
 <script>
-
-   // JavaScript for handling the hamburger menu and navigation overlay
     document.getElementById('hamburger-button').addEventListener('click', function() {
         var navOverlay = document.getElementById('nav-overlay');
-        // Toggle the display of the navigation overlay
         navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
+        console.log('Hamburger button clicked. nav-overlay display status:', navOverlay.style.display);
     });
-	
-// JavaScript for handling the filter form overlay
-document.getElementById('hamburger-button-filter').addEventListener('click', function() {
-    var filterOverlay = document.getElementById('filter-overlay');
-    // Toggle the display of the filter overlay
-    filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
-});
 
-// Close the filter overlay when clicking outside of its content
-document.getElementById('filter-overlay').addEventListener('click', function(event) {
-    // Check if the clicked element is outside of the filter form
-    var filterForm = document.getElementById('filter-form-mobile');
-    if (!filterForm.contains(event.target)) {
-        this.style.display = 'none';
-    }
-});
+    document.getElementById('hamburger-button-filter').addEventListener('click', function() {
+        var filterOverlay = document.getElementById('filter-overlay');
+        filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
+    });
 
-// Prevent closing when clicking on filter form (stop the event from bubbling up)
-document.getElementById('filter-form-mobile').addEventListener('click', function(event) {
-    event.stopPropagation();
-});
-
-
-
-
-document.addEventListener("DOMContentLoaded", function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectID = urlParams.get('projectID');
-    
-    if (projectID) {
-        showOverlayForProjectID(projectID);
-    }
-
-   
-
-    document.getElementById('overlay').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeOverlay();
-            history.pushState(null, '', '/list');
+    document.getElementById('filter-overlay').addEventListener('click', function(event) {
+        var filterForm = document.getElementById('filter-form-mobile');
+        if (!filterForm.contains(event.target)) {
+            this.style.display = 'none';
         }
     });
-document.getElementById('filter-form-mobile').addEventListener('keypress', function(event) {
-        if (event.keyCode === 13) { // 13 is the Enter key
-            event.preventDefault();  // Prevent form submission
+
+    document.getElementById('filter-form-mobile').addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+
+    document.addEventListener('click', function(event) {
+        var navOverlay = document.getElementById('nav-overlay');
+        var navLinks = document.getElementById('nav-links');
+        var hamburgerButton = document.getElementById('hamburger-button');
+
+        if (window.innerWidth <= 1080) {
+            if (navOverlay.style.display === 'block' && !navOverlay.contains(event.target) && !hamburgerButton.contains(event.target)) {
+                navOverlay.style.display = 'none';
+                console.log('nav-overlay area outside the buttons clicked, overlay closing');
+            } else if (navLinks.contains(event.target)) {
+                navOverlay.style.display = 'none';
+                console.log('nav-links area clicked, overlay closing');
+            }
         }
     });
-});
 
-function showOverlayForProjectID(projectID) {
-    fetch('/api/project/' + projectID) // Assuming you have an API endpoint to get project details
-        .then(response => response.json())
-        .then(data => {
-            // Update overlay content with project details
-            document.getElementById('overlay-title').textContent = data.title;
-            document.getElementById('overlay-description').textContent = data.description;
-            // ... set other details
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectID = urlParams.get('projectID');
+        if (projectID) {
+            showOverlayForProjectID(projectID);
+        }
 
-            document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('overlay').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeOverlay();
+                history.pushState(null, '', '/list');
+            }
         });
-}
 
-function closeOverlay() {
-    document.getElementById('overlay').style.display = 'none';
-}
+        document.getElementById('filter-form-mobile').addEventListener('keypress', function(event) {
+            if (event.keyCode === 13) { // Enter key
+                event.preventDefault();
+            }
+        });
+    });
+
+    function showOverlayForProjectID(projectID) {
+        fetch('/api/project/' + projectID)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('overlay-title').textContent = data.title;
+                document.getElementById('overlay-description').textContent = data.description;
+                document.getElementById('overlay').style.display = 'flex';
+            });
+    }
+
+    function closeOverlay() {
+        document.getElementById('overlay').style.display = 'none';
+    }
 </script>
-
 <script>
 function openProjectDetails(projectId) {
     window.location.href = '/project_details/' + projectId;
