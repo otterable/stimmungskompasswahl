@@ -131,11 +131,18 @@ def create_tables():
 def can_user_post_comment(user_id):
     time_limit = datetime.now() - timedelta(minutes=15)
     max_comments = 5
-    recent_comments_count = Comment.query.filter(
+    recent_comments = Comment.query.filter(
         Comment.user_id == user_id,
         Comment.timestamp > time_limit
-    ).count()
-    return recent_comments_count < max_comments
+    ).order_by(Comment.timestamp.asc()).all()
+
+    if len(recent_comments) >= max_comments:
+        # Calculate the reset time as 15 minutes from the oldest comment in the last 15 minutes
+        oldest_comment_time = recent_comments[0].timestamp
+        reset_time = oldest_comment_time + timedelta(minutes=15)
+        return False, reset_time
+    else:
+        return True, None
     
 def get_reset_time(user_id):
     earliest_comment = Comment.query.filter(
@@ -170,27 +177,7 @@ def zip_user_submissions():
         return None
 
 
-@app.route('/check_comment_limit')
-def check_comment_limit():
-    if not current_user.is_authenticated:
-        return jsonify({'limit_reached': False})
 
-    user_id = current_user.id
-    time_limit = datetime.utcnow() - timedelta(minutes=15)
-    recent_comments = Comment.query.filter(
-        Comment.user_id == user_id,
-        Comment.timestamp > time_limit
-    ).order_by(Comment.timestamp.asc()).all()
-
-    if len(recent_comments) >= 5:
-        oldest_comment_time = recent_comments[0].timestamp
-        reset_time = oldest_comment_time + timedelta(minutes=15)
-        formatted_expiry_time = reset_time.isoformat() + "Z"  # Format the expiry time in ISO 8601 format
-        app.logger.debug(f"Comment limit reached for user {user_id}. Reset time: {formatted_expiry_time}")
-        return jsonify({'limit_reached': True, 'reset_time': formatted_expiry_time})
-    else:
-        app.logger.debug(f"Comment limit not reached for user {user_id}.")
-        return jsonify({'limit_reached': False})
 
 
 @app.route('/delete_all_projects', methods=['POST'])
@@ -752,6 +739,25 @@ def project_details(project_id):
     except Exception as e:
         app.logger.error("Error in project_details route: %s", str(e))
         return str(e)  # Or redirect to a generic error page
+
+@app.route('/check_comment_limit')
+def check_comment_limit():
+    if not current_user.is_authenticated:
+        return jsonify(limit_reached=False, current_count=0)
+
+    time_limit = datetime.now() - timedelta(minutes=15)
+    recent_comments = Comment.query.filter(
+        Comment.user_id == current_user.id,
+        Comment.timestamp > time_limit
+    ).order_by(Comment.timestamp.asc()).all()
+    recent_comments_count = len(recent_comments)
+
+    if recent_comments_count >= 5:
+        oldest_comment_time = recent_comments[0].timestamp
+        reset_time = oldest_comment_time + timedelta(minutes=15)
+        return jsonify(limit_reached=True, reset_time=reset_time.isoformat(), current_count=recent_comments_count)
+    else:
+        return jsonify(limit_reached=False, reset_time=None, current_count=recent_comments_count)
 
 
 

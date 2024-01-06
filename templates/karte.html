@@ -3467,28 +3467,6 @@ $.ajax({
 
 }
 
-// Function to check marker limit
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM fully loaded and parsed. Initiating limit check...");
-
-    fetch('/check_limit')
-        .then(response => {
-            console.log("Received response from /check_limit");
-            return response.json();
-        })
-        .then(data => {
-            console.log("Data received from /check_limit:", data);
-            if (data.limit_reached) {
-                console.log(`LIMIT CHECK: 3/3 markers posted, limit has been reached. Turning buttons into timers. Limit expires in: ${data.reset_time}`);
-                document.getElementById('add-marker-button').disabled = true;
-                document.getElementById('open-overlay').disabled = true;
-                startTimer(data.reset_time);
-            } else {
-                console.log(`LIMIT CHECK: ${data.current_count}/3 markers posted.`);
-            }
-        })
-        .catch(error => console.error('Error checking limit:', error));
-});
 
 
 

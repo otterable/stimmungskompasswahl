@@ -799,7 +799,7 @@ display: block;
                         <form id="comment-form" action="{{ url_for('comment', project_id=project.id) }}" method="POST">
 <textarea name="comment" class="full-width-textarea" required></textarea>
 <div id="charCountFeedback" style="text-align: center; color: #003056;"></div>
-                            <button type="submit" class="button comment-button">Speichern 💬</button>
+<button type="submit" id="comment-button" class="button comment-button">Speichern 💬</button>
                         </form>
                     </div>
                 {% endif %}
@@ -814,87 +814,113 @@ display: block;
 </div>
 
 
- <script>
+
+</body>
+
+<script>
+// Function to check comment limit and potentially start a timer
+function checkCommentLimit() {
+    console.log("Checking comment limit...");
+
+    fetch('/check_comment_limit')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Comment Limit Check: ", data);
+            var commentButton = document.querySelector('.comment-button');
+            if (commentButton) {
+                if (data.limit_reached) {
+                    console.log(`LIMIT CHECK: 5/5 comments posted, limit has been reached. Turning button into a timer. Limit expires in: ${data.reset_time}`);
+                    commentButton.disabled = true;
+                    startTimer(data.reset_time, 'comment-button');
+                } else {
+                    // Ensure the property name here matches what is sent from the server
+                    console.log(`LIMIT CHECK: ${data.current_count}/5 comments posted.`);
+                }
+            } else {
+                console.error("Comment button element not found");
+            }
+        })
+        .catch(error => console.error('Error checking comment limit:', error));
+}
+
+// Timer function
+function startTimer(expiryTime, elementId) {
+    if (!expiryTime) {
+        console.log("No expiry time provided for the timer.");
+        return;
+    }
+
+    var countDownDate = new Date(expiryTime).getTime();
+    var element = document.getElementById(elementId);
+    if (element) {
+        console.log("Timer element found:", elementId);
+    } else {
+        console.error("Timer element not found for ID:", elementId);
+        return;
+    }
+
+    var interval = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        var timerText = `Limit erreicht. Nächstes Kommentar möglich um: ${minutes}m ${seconds}s`;
+        element.innerText = timerText;
+
+        if (distance < 0) {
+            clearInterval(interval);
+            element.innerText = "Kommentar absenden";
+            element.disabled = false;
+        }
+    }, 1000);
+}
+
+// Function to update character count feedback
+function updateCharCountFeedback(textareaElement, feedbackElement, minLimit, maxLimit) {
+    var charCount = textareaElement.value.length;
+    var charRemaining = maxLimit - charCount;
+
+    if (charCount < minLimit) {
+        feedbackElement.textContent = `Sie müssen noch ${minLimit - charCount} Zeichen eingeben.`;
+    } else if (charCount <= maxLimit) {
+        feedbackElement.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
+    } else {
+        feedbackElement.textContent = "Zeichenlimit erreicht.";
+        textareaElement.value = textareaElement.value.substring(0, maxLimit);
+    }
+    feedbackElement.style.color = '#003056';
+}
+
+// Event listener for DOMContentLoaded to initialize functionalities
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded and parsed. Initializing functionalities...");
+
     var commentTextarea = document.querySelector('textarea[name="comment"]');
     var charCountFeedback = document.getElementById('charCountFeedback');
-    var minCharLimit = 20;
-    var maxCharLimit = 500;
-    var commentButton = document.querySelector('.comment-button');
+    var commentButton = document.querySelector('.comment-button'); // Modified line
 
-    function updateCharCountFeedback() {
-        var charCount = commentTextarea.value.length;
-        var charNeeded = minCharLimit - charCount;
-        var charRemaining = maxCharLimit - charCount;
+    console.log("Checking for textarea:", commentTextarea);
+    console.log("Checking for charCountFeedback:", charCountFeedback);
+    console.log("Checking for commentButton:", commentButton);
 
-        if (charCount >= maxCharLimit) {
-            commentTextarea.value = commentTextarea.value.substring(0, maxCharLimit);
-            charCountFeedback.textContent = "Zeichenlimit erreicht.";
-        } else if (charNeeded > 0) {
-            charCountFeedback.textContent = `Sie müssen noch ${charNeeded} Zeichen eingeben.`;
-        } else {
-            charCountFeedback.textContent = `Sie können noch ${charRemaining} Zeichen eingeben.`;
-        }
-    }
+    if (commentTextarea && charCountFeedback && commentButton) {
+        console.log("All required elements found. Adding event listeners...");
+        commentTextarea.addEventListener('input', function() {
+            updateCharCountFeedback(commentTextarea, charCountFeedback, 20, 500);
+        });
 
-    commentTextarea.addEventListener('input', updateCharCountFeedback);
-    updateCharCountFeedback(); // Initial update when the page loads
-
-    // Check comment limit and update button
-    checkCommentLimitAndUpdateButton();
-
-    function checkCommentLimitAndUpdateButton() {
-        fetch('/check_comment_limit?_=' + new Date().getTime())
-            .then(response => response.json())
-            .then(data => {
-                console.log("Received data from /check_comment_limit:", data);
-
-                if (data.limit_reached) {
-                    console.log("Comment submission limit reached. Limit expires at:", data.reset_time);
-                    updateButtonState(commentButton, `Limit reached, expires at ${data.reset_time}`, true);
-                    startTimer(data.reset_time, commentButton);
-                } else {
-                    console.log("Comment submission limit not reached.");
-                    updateButtonState(commentButton, "Speichern", false);
-                }
-            })
-            .catch(error => {
-                console.error('Error checking comment submission limit:', error);
-                updateButtonState(commentButton, "Speichern", false); // Default state if error occurs
-            });
-    }
-
-    function updateButtonState(button, text, disabled) {
-        button.innerText = text;
-        button.disabled = disabled;
-        if (disabled) {
-            button.classList.add('disabled-button');
-        } else {
-            button.classList.remove('disabled-button');
-        }
-    }
-
-    function startTimer(expiryTime, button) {
-        var countDownDate = new Date(expiryTime).getTime();
-
-        var x = setInterval(function() {
-            var now = new Date().getTime();
-            var distance = countDownDate - now;
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            button.innerText = `Limit reached, expires in ${hours}h ${minutes}m ${seconds}s`;
-
-            if (distance < 0) {
-                clearInterval(x);
-                updateButtonState(button, "Speichern", false);
-            }
-        }, 1000);
+        updateCharCountFeedback(commentTextarea, charCountFeedback, 20, 500); // Initial update
+        checkCommentLimit(); // Check comment limit on page load
+    } else {
+        console.error("Required elements not found for initializing comment functionalities.");
     }
 });
 </script>
-</body>
+
+
+
 
 
    <script>
@@ -1050,7 +1076,7 @@ function submitCommentForm(form, commentText) {
 
     xhr.onload = function() {
         if (this.status >= 200 && this.status < 400) {
-            // Success! Parse response, update comments, and clear textarea
+            // Parse response, update comments, and clear textarea
             var response = JSON.parse(this.response);
             var commentsContainer = document.getElementById('comments-container');
             var newCommentHtml = `
@@ -1060,9 +1086,12 @@ function submitCommentForm(form, commentText) {
                 </div>
             `;
             commentsContainer.insertAdjacentHTML('beforeend', newCommentHtml);
-            
+
             // Clear the textarea after successful submission
             form.querySelector('textarea[name="comment"]').value = '';
+
+            // Check comment limit after adding a comment
+            checkCommentLimit();
         } else {
             // Error handling
             console.error('Error occurred in comment submission');
