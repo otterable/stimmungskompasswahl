@@ -83,6 +83,122 @@
     font-style: italic; /* Optional: make it italic */
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+.info-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    object-fit: cover;
+}
+
+.info-image:hover {
+    transform: scale(1) !important;
+}
+
+#replay-image {
+    cursor: pointer;
+    /* Resize to 30% of the original size */
+    width: 30%;
+    height: auto; /* Maintain aspect ratio */
+	    margin-top: 20px; /* Space between the video and replay button */
+
+}
+
+#replay-container {
+    display: none; /* Initially hidden */
+    align-items: center; /* Center the content horizontally */
+    justify-content: center; /* Center the content vertically */
+    flex-direction: row; /* Align children horizontally */
+}
+
+
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 10000;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+
+
+
+
+/* Styling for the close button */
+.video-overlay button {
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    background-color: #003056;
+    color: white;
+    border-radius: 30px;
+    transition: background-color 0.2s ease;
+		    margin-top: 40px; /* Space between the video and replay button */
+
+}
+
+/* Hover effect for the close button */
+.video-overlay button:hover {
+    transform: scale(1.02);
+}
+
+/* Base style for the iframe */
+#youtube-iframe {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 30px; /* Rounded corners with a radius of 30px */
+
+    /* Media queries to adjust width and height based on screen size */
+    @media only screen and (min-width: 1025px) {
+        width: 70vw;
+        height: calc(70vw * 9 / 16); /* Maintain a 16:9 aspect ratio */
+    }
+
+    @media only screen and (min-width: 768px) and (max-width: 1024px) {
+        width: 80vw;
+        height: calc(80vw * 9 / 16); /* Maintain a 16:9 aspect ratio */
+    }
+
+    @media only screen and (max-width: 767px) {
+        width: 90vw;
+        height: calc(90vw * 9 / 16); /* Maintain a 16:9 aspect ratio */
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 		
 /* Style for filter-button on desktop */
 .filter-bar .filter-button {
@@ -920,6 +1036,15 @@ nav[aria-label="Page navigation"] {
 
     </style>
 
+
+<!-- Video Overlay -->
+<div id="video-overlay" class="video-overlay" style="display:none;">
+    <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/aV6s-reibEc" frameborder="0" allowfullscreen></iframe>
+    <div id="replay-container" style="display: none;"></div> <!-- Container for replay image -->
+    <button onclick="closeVideoOverlay()" class="register-button">Schließen</button>
+</div>
+
+
 <div class="top-bar">
     <a href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
@@ -985,7 +1110,12 @@ nav[aria-label="Page navigation"] {
     </select>
 </div>
 
-		        <button type="submit" class="filter-button">Filtern</button>
+			
+   
+        <button type="submit" class="filter-button">Filtern</button>
+		     <a href="#" id="info-link" style="height: 100%;"> <!-- Set the height to 100% -->
+            <img src="{{ url_for('static', filename='infobutton2.png') }}" alt="Info" class="info-image" style="margin-left: 20px">
+        </a>
     </form>
 </div>
 
@@ -1268,5 +1398,101 @@ document.addEventListener("DOMContentLoaded", function() {
         {% endif %}
     {% endwith %}
 });
+
+</script>
+
+
+<script>
+document.getElementById('info-link').addEventListener('click', function(e) {
+    e.preventDefault(); // Prevent default link behavior
+    openVideoOverlay();
+});
+
+function openVideoOverlay() {
+    var iframe = document.getElementById('youtube-iframe');
+var videoSrc = 'https://www.youtube.com/embed/aV6s-reibEc?autoplay=1&mute=1&enablejsapi=1';
+    iframe.src = videoSrc;
+    document.getElementById('video-overlay').style.display = 'flex';
+    console.log('Video overlay opened');
+}
+
+function closeVideoOverlay() {
+    if (player && player.pauseVideo) {
+        player.pauseVideo();
+    }
+    document.getElementById('video-overlay').style.display = 'none';
+    console.log('Video overlay closed');
+}
+
+
+
+// Add an event listener to the video-overlay
+document.getElementById('video-overlay').addEventListener('click', function(event) {
+    // Check if the clicked element is not the video itself
+    if (!event.target.closest('#youtube-iframe, #replay-image')) {
+        closeVideoOverlay();
+        console.log('Clicked outside the video, overlay closed');
+    }
+});
+
+// Prevent closing when clicking on the video (event propagation)
+document.getElementById('youtube-iframe').addEventListener('click', function(event) {
+    event.stopPropagation();
+    console.log('Clicked on the video, overlay remains open');
+});
+
+// Initialize YouTube API
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var player;
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('youtube-iframe', {
+        videoId: 'aV6s-reibEc', // Ensure the video ID is set
+        events: {
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log('Video ended');
+        showReplayImage();
+    }
+}
+
+function showReplayImage() {
+    // Hide the YouTube iframe
+    var iframe = document.getElementById('youtube-iframe');
+    iframe.style.display = 'none';
+
+    // Display the replay container
+    var replayContainer = document.getElementById('replay-container');
+    replayContainer.style.display = 'flex'; 
+
+    var replayImg = document.createElement('img');
+    replayImg.id = 'replay-image';
+    replayImg.src = '{{ url_for("static", filename="replay.png") }}';
+    replayImg.addEventListener('click', replayVideo);
+
+    replayContainer.innerHTML = ''; // Clear any existing content
+    replayContainer.appendChild(replayImg); // Add the replay image to the container
+}
+
+
+function replayVideo() {
+    console.log('Replay clicked');
+    var replayContainer = document.getElementById('replay-container');
+    replayContainer.style.display = 'none'; // Hide the replay container
+
+    var iframe = document.getElementById('youtube-iframe');
+    iframe.style.display = 'block';
+    player.seekTo(0); // Seek to the beginning of the video
+    player.playVideo(); // Play the video
+}
+
 
 </script>

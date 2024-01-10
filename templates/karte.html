@@ -269,7 +269,7 @@ display:none !important;
     background: white;
     border-radius: 30px !important;
     overflow-y: auto;
-    z-index: 1001;
+    z-index: 10030 !important;
     padding: 20px;
     border-right: 1px solid #ccc;
     display: none; /* Initially hidden */
@@ -1308,7 +1308,7 @@ margin-bottom: 50px;
 
     #map {
         position: absolute;
-        top: calc(9vh + 15px); /* Estimate based on viewport height and gap */
+        top: calc(9vh + 9px); /* Estimate based on viewport height and gap */
         bottom: 165px; /* Adjust for the fixed height of the sidebar (150px + 15px gap) */
         left: 15px;
         right: 15px;
@@ -1371,6 +1371,173 @@ margin-bottom: 50px;
         display: block !important;
     }
 }
+
+
+
+
+
+
+.title-button-container {
+    display: flex;
+    justify-content: center; /* Centering content horizontally */
+    align-items: center; /* Centering content vertically */
+	    width: 100%; /* Ensure the container takes full width */
+
+}
+
+.title-imagebutton {
+    margin-right: 10px; /* Adds a 10px margin to the right of the title */
+}
+
+.info-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50px;
+    object-fit: cover;
+	z-index: 1002;
+}
+
+
+ #info-link2 {
+        position: absolute; /* Absolute positioning within the map */
+        top: calc(100% - 50px); /* Positioned below the Leaflet control layers */
+        left: 10px; /* Adjust left position as needed */
+        z-index: 1002; /* Ensure it's above other map elements */
+    }
+
+    .info-image {
+        display: block; /* Ensures the image is properly displayed */
+     
+    }
+	
+.info-image:hover {
+    transform: scale(1) !important;
+}
+
+.info-link:hover {
+    transform: scale(1) !important;
+}
+
+
+#replay-image {
+    cursor: pointer;
+    /* Resize to 30% of the original size */
+    width: 30%;
+    height: auto; /* Maintain aspect ratio */
+	    margin-top: 20px; /* Space between the video and replay button */
+
+}
+
+
+#replay-image-2 {
+    cursor: pointer;
+    /* Resize to 30% of the original size */
+    width: 30%;
+    height: auto; /* Maintain aspect ratio */
+	    margin-top: 20px; /* Space between the video and replay button */
+
+}
+
+#replay-container {
+    display: none; /* Initially hidden */
+    align-items: center; /* Center the content horizontally */
+    justify-content: center; /* Center the content vertically */
+    flex-direction: row; /* Align children horizontally */
+}
+
+#replay-container-2 {
+    display: none; /* Initially hidden */
+    align-items: center; /* Center the content horizontally */
+    justify-content: center; /* Center the content vertically */
+    flex-direction: row; /* Align children horizontally */
+}
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 100000;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+
+#video-overlay-2 {
+    position: fixed; /* or 'absolute' depending on layout */
+    top: 50%;  /* Adjust these values as needed */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100000;  /* Ensure it appears above the map content */
+    /* Other styling as needed */
+}
+
+
+
+/* Styling for the close button */
+.video-overlay button {
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    background-color: #003056;
+    color: white;
+    border-radius: 30px;
+    transition: background-color 0.2s ease;
+		    margin-top: 40px; /* Space between the video and replay button */
+
+}
+
+/* Hover effect for the close button */
+.video-overlay button:hover {
+    transform: scale(1.02);
+}
+
+/* Base style for both iframes */
+#youtube-iframe, #youtube-iframe-2 {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 30px; /* Rounded corners with a radius of 30px */
+}
+
+/* Media queries to adjust width and height based on screen size for both iframes */
+@media only screen and (min-width: 1025px) {
+    #youtube-iframe, #youtube-iframe-2 {
+        width: 70vw;
+        height: calc(70vw * 9 / 16); /* Maintain a 16:9 aspect ratio */
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    #youtube-iframe, #youtube-iframe-2 {
+        width: 80vw;
+        height: calc(80vw * 9 / 16); /* Maintain a 16:9 aspect ratio */
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    #youtube-iframe, #youtube-iframe-2 {
+        width: 90vw;
+        height: calc(90vw * 9 / 16); /* Maintain a 16:9 aspect ratio */
+    }
+}
+
+#video-overlay-2 iframe {
+    border-radius: 30px; /* Apply a border-radius of 30px */
+}
+
+
+
+
+
+
 
 @media (max-width: 768px) {
     #counter-pill {
@@ -1489,7 +1656,6 @@ margin-bottom: 50px;
 
         img {
             border-radius: 30px;
-            transition: transform 0.3s ease;
         }
 
         .logo {
@@ -2140,8 +2306,21 @@ margin-bottom: 0px !important;
 
 <body>
 
-<!-- Top Bar -->
 
+
+<!-- Video Overlay -->
+<div id="video-overlay" class="video-overlay" style="display:none;">
+    <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/aV6s-reibEc" frameborder="0" allowfullscreen></iframe>
+    <div id="replay-container" style="display: none;"></div> <!-- Container for replay image -->
+    <button onclick="closeVideoOverlay()">Schließen</button>
+</div>
+
+<!-- Video Overlay 2 -->
+<div id="video-overlay-2" class="video-overlay" style="display:none;">
+    <iframe id="youtube-iframe-2" width="560" height="315" src="https://www.youtube.com/embed/WPjnhKnrMeo" frameborder="0" allowfullscreen></iframe>
+    <div id="replay-container-2" style="display: none;"></div> <!-- Container for replay image -->
+    <button onclick="closeVideoOverlay2()">Schließen</button>
+</div>
 
 
 <div class="top-bar">
@@ -2201,7 +2380,15 @@ margin-bottom: 0px !important;
 <!-- Marker Placing Overlay -->
 <div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:10000;">
     <div id="overlay-content" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px; width: 80%; max-width: 500px; text-align: center;">
-        <h2>Notiz hinzufügen</h2>
+      <div class="title-button-container">
+    <h2 class="title-imagebutton">Notiz hinzufügen</h2>
+    <a href="#" id="info-link">
+        <img src="{{ url_for('static', filename='infobutton.png') }}" alt="Info" class="info-image">
+    </a>
+	
+
+</div>
+
         <p style="font-size: 14px;">
             <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Hier klicken, um Projektvorschläge zu posten.</a>
         </p>        
@@ -2246,6 +2433,10 @@ margin-bottom: 0px !important;
    </h3>
 </div>
 <div id="map">
+
+	<a href="#" id="info-link2" style="z-index:10000 !important;">
+    <img src="{{ url_for('static', filename='infobutton2.png') }}" alt="Info" class="info-image" style="z-index: 1002 !important;">
+</a>
 <!-- Inside the map div -->
 
 
@@ -2895,7 +3086,7 @@ function renderPage(page) {
 
     if (paginatedMarkers.length === 0) {
         const noMarkersMessage = document.createElement('p');
-        noMarkersMessage.textContent = "No markers found!";
+        noMarkersMessage.textContent = "Keine Beiträge gefunden!";
         noMarkersMessage.style.textAlign = 'center';
         list.appendChild(noMarkersMessage);
     } else {
@@ -2928,7 +3119,7 @@ function renderPage(page) {
 
 document.getElementById('show-markers-btn').addEventListener('click', function() {
     var markersListOverlay = document.getElementById('markers-list-overlay');
-    var showMarkersBtn = document.getElementById('show-markers-btn');
+    var showMarkersBtn = this;  // Reference the clicked button
     
     if (markersListOverlay.style.display === 'block') {
         // Hide the overlay and change button text to "Liste anzeigen"
@@ -2944,6 +3135,18 @@ document.getElementById('show-markers-btn').addEventListener('click', function()
         console.log("Markers list overlay shown");
     }
 });
+
+// Event listener for the 'Schließen' button
+document.getElementById('close-overlay-button').addEventListener('click', function() {
+    var markersListOverlay = document.getElementById('markers-list-overlay');
+    var showMarkersBtn = document.getElementById('show-markers-btn');
+    
+    // Hide the overlay and change button text to "Liste anzeigen"
+    markersListOverlay.style.display = 'none';
+    showMarkersBtn.innerText = 'Liste anzeigen';
+    console.log("Markers list overlay closed via Schließen button");
+});
+
 
 // Global variable to track the filter state
 
@@ -3055,6 +3258,8 @@ document.addEventListener('click', function(event) {
     var markerOverlay = document.getElementById('marker-overlay');
     var overlayContent = document.getElementById('overlay-content');
     var navOverlay = document.getElementById('nav-overlay');
+    var videoOverlay = document.getElementById('video-overlay'); // First video overlay
+    var videoOverlay2 = document.getElementById('video-overlay-2'); // Second video overlay
 
     console.log("Document clicked, checking target element...");
 
@@ -3062,6 +3267,18 @@ document.addEventListener('click', function(event) {
     if (navOverlay && navOverlay.contains(event.target)) {
         console.log("Click inside nav-overlay, no action on marker overlay.");
         return; // Exit the function if clicked inside nav-overlay
+    }
+
+    // Check if the clicked element is part of the video-overlay
+    if (videoOverlay && videoOverlay.contains(event.target)) {
+        console.log("Click inside video-overlay, no action on marker overlay.");
+        return; // Exit the function if clicked inside video-overlay
+    }
+
+    // Check if the clicked element is part of the video-overlay-2
+    if (videoOverlay2 && videoOverlay2.contains(event.target)) {
+        console.log("Click inside video-overlay-2, no action on marker overlay.");
+        return; // Exit the function if clicked inside video-overlay-2
     }
 
     // Close the marker overlay if it is open and the click is outside its content
@@ -3072,6 +3289,8 @@ document.addEventListener('click', function(event) {
         console.log("Click inside overlayContent or marker overlay not displayed, no action taken.");
     }
 });
+
+
 
 
 
@@ -3286,14 +3505,18 @@ function centerMapOnMarker(markerId) {
 
         console.log("Marker with ID", markerId, "centered on map");
 
-        // Close the markers list overlay on mobile and tablet
+        // Close the markers list overlay on mobile and tablet, and update button text
         if (window.innerWidth <= 1080) { // Adjust 1024 to include tablets
             sidebar.style.display = 'none';
+            var showMarkersBtn = document.getElementById('show-markers-btn');
+            showMarkersBtn.innerText = 'Liste anzeigen';
+            console.log("Markers list overlay closed and button text updated");
         }
     } else {
         console.error("Marker with ID", markerId, "not found");
     }
 }
+
 
 
 
@@ -3639,6 +3862,116 @@ updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeed
             navOverlay.style.display = 'none';
         }
     };
+</script>
+
+<script>
+document.getElementById('info-link').addEventListener('click', function(e) {
+    e.preventDefault(); 
+    openVideoOverlay('youtube-iframe', 'video-overlay', 'aV6s-reibEc');
+});
+
+document.getElementById('info-link2').addEventListener('click', function(e) {
+    e.preventDefault();
+    openVideoOverlay('youtube-iframe-2', 'video-overlay-2', 'WPjnhKnrMeo');
+});
+
+function openVideoOverlay(iframeId, overlayId, videoId) {
+    var iframe = document.getElementById(iframeId);
+    iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&enablejsapi=1';
+    document.getElementById(overlayId).style.display = 'flex';
+    console.log('Video overlay opened for ' + iframeId);
+}
+
+function closeVideoOverlay(iframeId, overlayId) {
+    var iframe = document.getElementById(iframeId);
+    if (iframe.src) {
+        iframe.src = '';
+    }
+    document.getElementById(overlayId).style.display = 'none';
+    console.log('Video overlay closed for ' + iframeId);
+}
+
+// Initialize YouTube API
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+var player, player2;
+
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('youtube-iframe', {
+        videoId: 'aV6s-reibEc',
+        events: {
+            'onStateChange': onPlayerStateChange
+        }
+    });
+    player2 = new YT.Player('youtube-iframe-2', {
+        videoId: 'WPjnhKnrMeo',
+        events: {
+            'onStateChange': onPlayerStateChange2
+        }
+    });
+}
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log('Video 1 ended');
+        showReplayImage('youtube-iframe', 'replay-container');
+    }
+}
+
+function onPlayerStateChange2(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        console.log('Video 2 ended');
+        showReplayImage('youtube-iframe-2', 'replay-container-2');
+    }
+}
+
+function showReplayImage(iframeId, containerId) {
+    var iframe = document.getElementById(iframeId);
+    iframe.style.display = 'none';
+
+    var replayContainer = document.getElementById(containerId);
+    replayContainer.style.display = 'flex';
+
+    var replayImg = document.createElement('img');
+    replayImg.id = 'replay-image';
+    replayImg.src = '{{ url_for("static", filename="replay.png") }}';
+    replayImg.addEventListener('click', function() {
+        replayVideo(iframeId, containerId);
+    });
+
+    replayContainer.innerHTML = '';
+    replayContainer.appendChild(replayImg);
+}
+
+function replayVideo(iframeId, containerId) {
+    console.log('Replay clicked for ' + iframeId);
+    var replayContainer = document.getElementById(containerId);
+    replayContainer.style.display = 'none';
+
+    var iframe = document.getElementById(iframeId);
+    iframe.style.display = 'block';
+
+    var playerToUse = iframeId === 'youtube-iframe' ? player : player2;
+    playerToUse.seekTo(0);
+    playerToUse.playVideo();
+}
+
+// Event listeners for closing overlays
+document.getElementById('video-overlay').addEventListener('click', function(event) {
+    if (!event.target.closest('#youtube-iframe, #replay-image')) {
+        closeVideoOverlay('youtube-iframe', 'video-overlay');
+    }
+});
+
+document.getElementById('video-overlay-2').addEventListener('click', function(event) {
+    if (!event.target.closest('#youtube-iframe-2, #replay-image')) {
+        closeVideoOverlay('youtube-iframe-2', 'video-overlay-2');
+    }
+});
+
 </script>
 
 <script type="text/javascript">
