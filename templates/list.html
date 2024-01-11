@@ -187,6 +187,16 @@
     }
 }
 
+.info-link-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0; /* Adjust as needed for spacing */
+}
+
+.info-link img {
+    margin-left: 0; /* Remove left margin if not needed */
+}
 
 
 
@@ -1121,7 +1131,14 @@ nav[aria-label="Page navigation"] {
 
 
 <div id="filter-overlay" class="nav-overlay">
+
     <form id="filter-form-mobile" action="{{ url_for('list_view') }}" method="get">
+		 <div class="info-link-container">
+    <a href="#" id="info-link-mobile" class="info-link">
+        <img src="{{ url_for('static', filename='infobutton2.png') }}" alt="Info" class="info-image">
+    </a>
+</div>
+
         <div class="filter-item">
             <label for="search">Suchen:</label>
             <input type="text" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Suche nach Projektvorschläge...">
@@ -1168,7 +1185,7 @@ nav[aria-label="Page navigation"] {
 </div>
 
 <div class="projects-header">
-    <h1>Eingebrachte Projektvorschläge</h1>
+    <h1>Eingebrachte Projektvorschläge</h1> 
     {% if projects %}
         <p>Klicken Sie auf einen Vorschlag, nähere Informationen zu sehen.</p>
     {% endif %}
@@ -1407,6 +1424,12 @@ document.getElementById('info-link').addEventListener('click', function(e) {
     e.preventDefault(); // Prevent default link behavior
     openVideoOverlay();
 });
+
+document.querySelector('.info-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    openVideoOverlay();
+});
+
 
 function openVideoOverlay() {
     var iframe = document.getElementById('youtube-iframe');

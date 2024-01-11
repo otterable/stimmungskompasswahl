@@ -1396,7 +1396,13 @@ margin-bottom: 50px;
     object-fit: cover;
 	z-index: 1002;
 }
-
+.info-image2 {
+    width: 40px;
+    height: 40px;
+    border-radius: 50px;
+    object-fit: cover;
+	z-index: 1002;
+}
 
  #info-link2 {
         position: absolute; /* Absolute positioning within the map */
@@ -2435,7 +2441,7 @@ margin-bottom: 0px !important;
 <div id="map">
 
 	<a href="#" id="info-link2" style="z-index:10000 !important;">
-    <img src="{{ url_for('static', filename='infobutton2.png') }}" alt="Info" class="info-image" style="z-index: 1002 !important;">
+    <img src="{{ url_for('static', filename='infobutton2.png') }}" alt="Info" class="info-image2" style="z-index: 1002 !important;">
 </a>
 <!-- Inside the map div -->
 

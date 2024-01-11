@@ -397,7 +397,7 @@ margin: auto;
     width: 100%;
     height: 20px;
     background-color: #ddd;
-	    border-radius: 30px !important;
+	    border-radius: 30px;
 	margin-top: 30px;
     display: flex;
 }
@@ -405,7 +405,6 @@ margin: auto;
 .upvotes {
     height: 100%;
     background-color: #4caf50;
-       border-radius: 30px !important;
 
     transition: width 0.3s ease;
 }
@@ -413,7 +412,6 @@ margin: auto;
 .downvotes {
     height: 100%;
     background-color: #b71c1c;
-       border-radius: 30px !important;
 
     transition: width 0.3s ease;
 }
@@ -923,6 +921,25 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error("Required elements not found for initializing comment functionalities.");
     }
+function setInitialVoteBarStyles() {
+        const upvoteElement = document.querySelector('.upvotes');
+        const downvoteElement = document.querySelector('.downvotes');
+        const upvotePercentage = parseFloat(upvoteElement.style.width);
+        const downvotePercentage = parseFloat(downvoteElement.style.width);
+
+        if (upvotePercentage > 0 && downvotePercentage > 0) {
+            upvoteElement.style.borderRadius = '30px 0 0 30px';
+            downvoteElement.style.borderRadius = '0 30px 30px 0';
+        } else if (upvotePercentage > 0) {
+            upvoteElement.style.borderRadius = '30px';
+        } else if (downvotePercentage > 0) {
+            downvoteElement.style.borderRadius = '30px';
+        }
+
+        console.log(`Site loaded with ${upvotePercentage}% upvotes and ${downvotePercentage}% downvotes, adjusting border-radius accordingly.`);
+    }
+
+    setInitialVoteBarStyles(); // Call the function on page load
 });
 </script>
 
@@ -1126,16 +1143,37 @@ function vote(projectId, voteType) {
             console.log('Vote recorded:', data);
 
             // Update UI elements with formatted text
-            document.getElementById('upvote-count').innerText = `Gefällt: ${data.upvote_count} (${data.upvote_percentage.toFixed(1)}%)`;
-            document.getElementById('downvote-count').innerText = `Gefällt nicht: ${data.downvote_count} (${data.downvote_percentage.toFixed(1)}%)`;
-            document.querySelector('.upvotes').style.width = data.upvote_percentage + '%';
-            document.querySelector('.downvotes').style.width = data.downvote_percentage + '%';
+            const upvoteElement = document.querySelector('.upvotes');
+            const downvoteElement = document.querySelector('.downvotes');
+            const upvoteCount = data.upvote_count;
+            const downvoteCount = data.downvote_count;
+            const upvotePercentage = data.upvote_percentage.toFixed(1);
+            const downvotePercentage = data.downvote_percentage.toFixed(1);
+
+            document.getElementById('upvote-count').innerText = `Gefällt: ${upvoteCount} (${upvotePercentage}%)`;
+            document.getElementById('downvote-count').innerText = `Gefällt nicht: ${downvoteCount} (${downvotePercentage}%)`;
+            upvoteElement.style.width = `${upvotePercentage}%`;
+            downvoteElement.style.width = `${downvotePercentage}%`;
+
+            // Adjust border-radius based on vote counts
+            if (upvoteCount > 0 && downvoteCount > 0) {
+                upvoteElement.style.borderRadius = '30px 0 0 30px';
+                downvoteElement.style.borderRadius = '0 30px 30px 0';
+                console.log(`Vote casted. Now there are ${upvoteCount} upvotes and ${downvoteCount} downvotes. The border-radius will not change.`);
+            } else if (upvoteCount > 0 && downvoteCount === 0) {
+                upvoteElement.style.borderRadius = '30px';
+                console.log(`Vote casted. Now there are 0 downvotes and ${upvoteCount} upvotes. The border-radius for both ends of upvotes will be 30px.`);
+            } else if (upvoteCount === 0 && downvoteCount > 0) {
+                downvoteElement.style.borderRadius = '30px';
+                console.log(`Vote casted. Now there are 0 upvotes and ${downvoteCount} downvotes. The border-radius for both ends of downvotes will be 30px.`);
+            }
         } else {
             console.error('Error:', data.message);
         }
     })
     .catch(error => console.error('Error:', error));
 }
+
 
 </script>
 

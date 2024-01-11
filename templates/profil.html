@@ -586,16 +586,29 @@ nav[aria-label="Page navigation"] {
 		
 		
 			.info-text-field2 {
-            background-color: #F4F4F8; /* Light grey background */
             width: 100%; /* Full width */
-            height: 620px; /* Specified height */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             padding: 20px;
-			margin-top: 20px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+		
+		
+					.info-text-field2-c {
+            background-color: #e0d3ae; /* Light grey background */
+          
+            padding: 20px;
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+		
+		
+							.info-text-field3-c {
+            background-color: #f5f1e4; /* Light grey background */
+          
+            padding: 20px;
             box-sizing: border-box; /* Include padding in width calculation */
         }
 		
@@ -843,7 +856,8 @@ display: block;
 
    {% if current_user.is_authenticated %}
    
-   
+       <div class="info-text-field3-c">
+
     <h1>Meine Projektvorschläge:</h1>
     <div class="my-statistics centered-text">
         <p>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span></p>
@@ -853,22 +867,30 @@ display: block;
             <p>Ihre Projekte wurden noch nicht bewertet.</p>
         {% endif %}
     </div>
-	</div>
 
+	
+	
    <!-- My Projects Section -->
 <div id="projects-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
         {% include 'partials/projects_section.html' %}
     {% endwith %}
 </div>
+	</div>
 
 
+
+    <div class="info-text-field2-c">
 <!-- My Map Objects Section -->
 <div id="map-objects-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
         {% include 'partials/map_objects_section.html' %}
     {% endwith %}
 </div>
+</div>
+
+
+    <div class="info-text-field3-c">
 
 <!-- My Comments Section -->
 <div id="comments-container">
@@ -877,7 +899,9 @@ display: block;
     {% endwith %}
 </div>
 </div>
+</div>
 
+    <div class="info-text-field2-c">
 <div class="my-account centered-text">
     <h1>Mein Konto:</h1>
     {% if current_user.is_authenticated %}
@@ -892,6 +916,7 @@ display: block;
 
         <p>Das Konto wurde erstellt am: <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
     {% endif %}
+</div>
 </div>
 
 
@@ -915,7 +940,7 @@ display: block;
 
 {% if is_authenticated %}
     <div class="info-text-field2">
-        <div class="centered-text" style="margin-top:30px">
+        <div class="centered-text">
             <h1>Daten:</h1>
 
             <!-- Download My Data Section -->
