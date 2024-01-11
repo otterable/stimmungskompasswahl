@@ -376,14 +376,14 @@ nav[aria-label="Page navigation"] {
 .upvotes {
     height: 100%;
     background-color: #4caf50;
-    border-radius: 30px !important;
+    border-radius: 30px;
     transition: width 0.3s ease;
 }
 
 .downvotes {
     height: 100%;
     background-color: #b71c1c;
-    border-radius: 30px !important;
+    border-radius: 30px;
     transition: width 0.3s ease;
 }
 
@@ -1518,4 +1518,40 @@ function replayVideo() {
 }
 
 
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.project-thumbnail').forEach(projectThumbnail => {
+        const upvotesElement = projectThumbnail.querySelector('.upvotes');
+        const downvotesElement = projectThumbnail.querySelector('.downvotes');
+
+        let upvotes = 0, downvotes = 0;
+
+        if (upvotesElement) {
+            upvotes = parseInt(upvotesElement.textContent.match(/\d+/) ? upvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        if (downvotesElement) {
+            downvotes = parseInt(downvotesElement.textContent.match(/\d+/) ? downvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        // Log the project details and adjust border-radius
+        if (upvotes > 0 && downvotes > 0) {
+            console.log(`Project loaded with ${upvotes} upvotes and ${downvotes} downvotes. Adjusting border-radius.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px 0 0 30px';
+            if (downvotesElement) downvotesElement.style.borderRadius = '0 30px 30px 0';
+        } else if (upvotes > 0 && downvotes === 0) {
+            console.log(`Project loaded with ${upvotes} upvotes and 0 downvotes. Adjusting border-radius for upvotes.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px';
+        } else if (downvotes > 0 && upvotes === 0) {
+            console.log(`Project loaded with ${downvotes} downvotes and 0 upvotes. Adjusting border-radius for downvotes.`);
+            if (downvotesElement) downvotesElement.style.borderRadius = '30px';
+        } else {
+            console.log(`Project loaded with 0 upvotes and 0 downvotes. Setting border-radius to 30px on both sides.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px';
+            if (downvotesElement) downvotesElement.style.borderRadius = '30px';
+        }
+    });
+});
 </script>
