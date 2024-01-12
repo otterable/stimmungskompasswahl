@@ -504,7 +504,7 @@ def generate_otp_and_send(phone_number):
     client = Client(account_sid, auth_token)
     try:
         message = client.messages.create(
-            body=f"Your OTP is: {otp}",
+            body=f"Stimmungskompass: Ihr OTP ist: {otp}",
             from_=twilio_number,
             to=phone_number
         )
@@ -715,6 +715,20 @@ def project_details(project_id):
         upvote_percentage = (upvote_count / total_votes * 100) if total_votes > 0 else 0
         downvote_percentage = (downvote_count / total_votes * 100) if total_votes > 0 else 0
 
+        prev_project = Project.query.filter(Project.id < project_id, Project.is_mapobject == False).order_by(Project.id.desc()).first()
+        next_project = Project.query.filter(Project.id > project_id, Project.is_mapobject == False).order_by(Project.id.asc()).first()
+
+        if prev_project:
+            print(f"Previous project_details page with is_mapobject=false found, it is page number {prev_project.id}")
+        else:
+            print("Previous project_details page with is_mapobject=false does not exist, hiding the arrowleft.")
+
+        if next_project:
+            print(f"Next project_details page with is_mapobject=false found, it is page number {next_project.id}")
+        else:
+            print("Next project_details page with is_mapobject=false does not exist, hiding the arrowright.")
+
+
         project_author = User.query.get(project.author)
         author_name = project_author.name if project_author else "Unknown"
         comments_with_authors = [
@@ -728,7 +742,9 @@ def project_details(project_id):
 
         is_mapobject = getattr(project, 'is_mapobject', False)
 
-        return render_template('project_details.html', project=project, 
+        return render_template('project_details.html', project=project,
+                               prev_project_id=prev_project.id if prev_project else None,
+                               next_project_id=next_project.id if next_project else None,
                                upvote_percentage=upvote_percentage, 
                                downvote_percentage=downvote_percentage, 
                                upvote_count=upvote_count, 
@@ -1454,7 +1470,7 @@ def password_recovery():
             otp = randint(100000, 999999)
             client = Client(account_sid, auth_token)
             client.messages.create(
-                body=f"Your OTP is: {otp}",
+                body=f"Stimmungskompass: Ihr OTP ist: {otp}",
                 from_=twilio_number,
                 to=phone_number
             )

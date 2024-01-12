@@ -4,6 +4,7 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
 <body>
@@ -39,7 +40,19 @@ body {
     font-weight: normal;       /* Adjust the font weight */
 }
 
+@media only screen and (max-width: 1445px) {
+.top-bar a button {
+    transition: transform 0.3s ease; /* Transition for the transform property */
+    border-radius: 30px; /* If you want to keep the border-radius */
+	padding: 7px;
+    /* Add any other button-specific styles here */
+}
+}
+
         img {
+		    max-width: 100%; /* Ensure images are not larger than their container */
+    height: auto; /* Maintain aspect ratio */
+
             border-radius: 30px;
             transition: transform 0.3s ease;
         }
@@ -53,10 +66,12 @@ body {
             transform: scale(1.01);
         }
 		
-		 #project-map {
-            height: 400px;
-			border-radius: 30px;
-        }
+	#project-map {
+    width: 100%; /* Full width of the parent container */
+    height: 400px; /* Set a fixed height or use vh for a responsive height */
+    border-radius: 30px; /* As per your existing style */
+}
+
 
    .form-container {
             margin: 40px auto;
@@ -115,6 +130,204 @@ body {
     cursor: pointer;
     transition: background-color 0.3s ease; /* Smooth transition for background color */
 }
+
+.centered-title a {
+    color: #003056; /* The desired color */
+}
+
+
+  @media screen and (max-width: 1080px) {
+        .arrowleft, .arrowright {
+            display: none !important;
+        }
+    }
+	
+/* LEAFLET MAP PILL CSS */
+.leaflet-bar, .leaflet-draw-section, .leaflet-draw-section {
+  border-radius: 30px !important;
+  border: none;
+  background-color: var(--leaflet-control-bg-dark) !important; /* Use variable */
+}
+
+/* LEAFLET MAP ICONS CSS */
+.leaflet-control-zoom-in, .leaflet-control-zoom-out, .leaflet-draw-draw-polyline, .leaflet-draw-draw-polygon, .leaflet-draw-draw-rectangle, .leaflet-draw-draw-circle, .leaflet-draw-draw-marker, .leaflet-draw-draw-circlemarker, .leaflet-draw-edit-edit, .leaflet-draw-edit-remove {
+  background-color: #f5f1e4 !important; /* Use variable */
+  color: #000000 !important; /* Use variable */
+  border: none !important;
+  font-size: 18px !important;
+  line-height: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.leaflet-draw-draw-rectangle {
+  background-image: url('rectangle_darkmode_svg.svg'); /* Replace with the path to your new icon */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/* LEAFLET MAP ICONS CSS END */
+
+/* Arrow styling */
+  @media screen and (min-width: 1080px) {
+
+.arrow-left, .arrow-right {
+    position: fixed; /* Fixed positioning relative to the viewport */
+    top: 50%; /* Center vertically */
+    width: 100px; /* Width of the arrow */
+    height: 100px; /* Height of the arrow */
+    z-index: 10; /* Ensure it's above other elements */
+}
+}
+
+/* Position the left arrow */
+.arrow-left {
+    left: 10px; /* Distance from the left side */
+}
+
+/* Position the right arrow */
+.arrow-right {
+    right: 10px; /* Distance from the right side */
+}
+
+
+.leaflet-draw-draw-marker {
+display: none !important;
+}
+
+.leaflet-draw-draw-polyline {
+display: none !important;
+}
+
+.leaflet-draw-draw-circlemarker {
+display: none !important;
+}
+
+/* LEAFLET MAP ICON COLOR CHANGE WHEN DISABLED CSS START */
+.leaflet-disabled {
+  background-color:#3a3a3a !important;
+  color: #ffffff !important;
+}
+
+/* LEAFLET MAP ICON COLOR CHANGE WHEN DISABLED CSS END */
+
+
+
+/* LEAFLET MAP ICON BORDER REMOVAL CSS START */
+.leaflet-control-zoom-in, .leaflet-control-zoom-out {
+  border-top: none !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+}
+/* LEAFLET MAP ICON BORDER REMOVAL CSS END */
+
+
+
+/* LEAFLET MAP ICON MISC CSS START */
+.leaflet-bar > a:first-child {
+  border-top-left-radius: 30px !important;
+  border-top-right-radius: 30px !important;
+}
+
+.leaflet-bar > a:last-child {
+  border-bottom-left-radius: 30px !important;
+  border-bottom-right-radius: 30px !important;
+}
+
+
+
+
+
+
+.leaflet-control-layers {
+    border-radius: 30px;
+    opacity: 1;
+}
+
+.leaflet-control-layers::before {
+    content: "";
+    background-image: var(--leaflet-control-layers-before-bg);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 30px;
+    background-size: cover;
+    opacity: 1;
+}
+
+
+
+
+/* Hide the background image when the control layers menu is expanded */
+.leaflet-control-layers-expanded::before {
+    content: none !important;
+}
+
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+   margin-top: 0px !important; /* Reduces the top margin of each label */
+    margin-bottom: 0px !important; /* Adjusts the space between each item */
+
+    font-size: 7px !important;
+    font-weight: bold;
+    padding: 10px;  /* Added padding here */
+}
+
+
+.leaflet-control-layers-separator {
+    margin-top: 5px; /* Adjusts the space above the separator line */
+    margin-bottom: 5px; /* Adjusts the space below the separator line */
+}
+
+.leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
+    font-size: 18px !important;
+}
+
+
+/* Your existing rules for .leaflet-control-layers and .leaflet-top leaflet-right had typos, corrected below */
+.leaflet-control-layers.leaflet-control {
+		background-color: #f5f1e4 !important;
+
+    border-radius: 30px;
+}
+
+.leaflet-top.leaflet-right {
+    border-radius: 50px;
+}
+
+    .leaflet-popup .shape-image {
+        max-width: 512px;
+        max-height: 512px;
+        display: block;
+        margin: 0 auto;
+    }
+	
+	
+
+    .leaflet-popup-content-wrapper {
+    background-color: #f5f1e4 !important;
+    color: #000000 !important;
+    border-radius: 30px !important;
+	width: auto !important;
+}
+
+   .leaflet-popup-content {
+    color: #000000 !important;
+}
+
+.leaflet-popup-tip {
+    display: block; /* Optional: hides the tip arrow for a cleaner look */
+    background-color: #f5f1e4 !important;
+}
+	
+	  .leaflet-popup-close-button {
+        display: none; /* Optional: hides the tip arrow for a cleaner look */
+
+    }
+.leaflet-popup.image-popup .leaflet-popup-tip {
+    display: none;
+}	
 
   .upvote-button {
         background-color: #4caf50;
@@ -640,7 +853,7 @@ margin: auto;
     background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black */
     overflow-x: hidden; /* Hide horizontal overflow */
     transition: 0.5s; /* Smooth transition for opening/closing */
-    z-index: 1000; /* High z-index to ensure it's on top */
+    z-index: 1002; /* High z-index to ensure it's on top */
 }
 
 .nav-overlay-active {
@@ -742,12 +955,27 @@ display: block;
         </div>
     </div>
 </div>
+
+<!-- Previous Project Arrow -->
+{% if prev_project_id %}
+    <a href="{{ url_for('project_details', project_id=prev_project_id) }}">
+        <img src="{{ url_for('static', filename='arrowleft.png') }}" alt="Previous" class="arrow-left">
+    </a>
+{% endif %}
+
+<!-- Next Project Arrow -->
+{% if next_project_id %}
+    <a href="{{ url_for('project_details', project_id=next_project_id) }}">
+        <img src="{{ url_for('static', filename='arrowright.png') }}" alt="Next" class="arrow-right">
+    </a>
+{% endif %}
+
 <div class="form-container">
     <h2 class="centered-title">{{ project.name }}</h2>
     <p class="centered-title">Gepostet am: {{ project.date.strftime('%d.%m.%Y, %H:%M') }}</p>
     <p class="centered-title">
         <strong>Kategorie:</strong>
-        <a href="{{ url_for('list_view', search='', category=project.category) }}">{{ project.category }}</a>
+<a href="{{ url_for('list_view', search='', category=project.category) }}" class="category-link">{{ project.category }}</a>
     </p>
     <p class="centered-title" style="color: #003056; font-style: italic; margin-bottom: 30px;"><strong>Autor/in:</strong> {{ author_name }}</p>
 
