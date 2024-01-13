@@ -825,8 +825,13 @@ display: block;
         <input type="hidden" id="geoloc" name="geoloc" required>
     </div>
 	
-        <!-- Publish Button -->
-<button type="submit" class="button publish-button" onclick="console.log('Publish button clicked');">Veröffentlichen</button>
+<!-- Inside the form element -->
+<!-- Existing 'Veröffentlichen' button -->
+<button type="submit" id="publish-button" class="button publish-button" onclick="console.log('Publish button clicked');">Veröffentlichen</button>
+
+<!-- New 'Update contents' button, hidden initially -->
+<button type="submit" id="update-button" class="button update-button" style="display: none;" onclick="console.log('Update contents button clicked');">Inhalte aktualisieren</button>
+
 
     </form>
 </div>
@@ -1536,7 +1541,6 @@ function replayVideo() {
 
 
 </script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Check for a project ID in the query string
@@ -1545,6 +1549,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (projectID) {
         console.log(`Editing project with ID: ${projectID}`);
+        setupEditingMode(projectID);
 
         // Fetch the project data from the server
         fetch(`/get_project_data/${projectID}`)
@@ -1566,34 +1571,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log(`Project_details.html - contents of "public_benefit" loaded, filling the text (${projectData.public_benefit}) into the quill editor.`);
 
                 // Fetch and display the project's image
-if (projectData.image_file) {
-    var img = new Image();
-    img.onload = function() {
-        var imagePreviewContainer = document.getElementById('image-preview-container');
-        imagePreviewContainer.innerHTML = ''; // Clear existing content
-        imagePreviewContainer.appendChild(img);
-        
-        // Initialize or update Cropper.js
-        if (typeof cropper !== 'undefined' && cropper) {
-            cropper.replace(img.src);
-        } else {
-            cropper = new Cropper(img, {
-                aspectRatio: 4 / 3,
-                viewMode: 1,
-                zoomable: false,
-                responsive: true, // Make cropper responsive
-                autoCropArea: 1, // Automatically crop the area to the maximum size
-                scalable: false, // Disable scaling
-                movable: false // Disable moving
-            });
-        }
-        console.log(`Project_details.html: Image ${projectData.image_file} loaded into the "image_file" field, opening it inside cropper js`);
-    };
-    img.src = `/static/usersubmissions/${projectData.image_file}`;
-    img.id = 'image-preview';
-    img.style.display = 'block';
-}
-
+                if (projectData.image_file) {
+                    var img = new Image();
+                    img.onload = function() {
+                        var imagePreviewContainer = document.getElementById('image-preview-container');
+                        imagePreviewContainer.innerHTML = ''; // Clear existing content
+                        imagePreviewContainer.appendChild(img);
+                        
+                        // Initialize or update Cropper.js
+                        if (typeof cropper !== 'undefined' && cropper) {
+                            cropper.replace(img.src);
+                        } else {
+                            cropper = new Cropper(img, {
+                                aspectRatio: 4 / 3,
+                                viewMode: 1,
+                                zoomable: false
+                            });
+                        }
+                        console.log(`Project_details.html: Image ${projectData.image_file} loaded into the "image_file" field, opening it inside cropper js`);
+                    };
+                    img.src = `/static/usersubmissions/${projectData.image_file}`;
+                    img.id = 'image-preview';
+                    img.style.display = 'block';
+                }
 
                 // Load and set marker position on the map
                 if (projectData.geoloc) {
@@ -1614,7 +1614,55 @@ if (projectData.image_file) {
     }
 });
 
+function setupEditingMode(projectID) {
+    // Hide the 'Veröffentlichen' button and show 'Update contents' button
+    const publishButton = document.querySelector('.publish-button');
+    publishButton.style.display = 'none';
+
+    // Create a new 'Update contents' button
+    const updateButton = document.createElement('button');
+    updateButton.type = 'submit';
+    updateButton.classList.add('button', 'publish-button');
+    updateButton.textContent = 'Update contents';
+    publishButton.parentNode.appendChild(updateButton);
+
+    // Add click event listener to the 'Update contents' button
+    updateButton.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default form submission
+        console.log(`Project_details.html: Update contents button clicked, overwriting the contents of the existing Project entry ${projectID} inside the database`);
+        handleUpdateProject(projectID);
+    });
+
+    console.log('Project_details.html: Editing mode entered, hiding "Veröffentlichen" button and showing "Update contents" button instead.');
+}
+
+function handleUpdateProject(projectID) {
+      const formData = new FormData(document.querySelector('form'));
+
+    console.log(`Project_details.html: Update contents button clicked, overwriting the "title" of project ${projectID} with new contents: ${formData.get('name')}`);
+    console.log(`Project_details.html: Update contents button clicked, overwriting the "category" of project ${projectID} with new category: ${formData.get('category')}`);
+    console.log(`Project_details.html: Update contents button clicked, overwriting the "descriptionwhy" of project ${projectID} with new contents: ${formData.get('descriptionwhy')}`);
+    console.log(`Project_details.html: Update contents button clicked, overwriting the "public_benefit" of project ${projectID} with new contents: ${formData.get('public_benefit')}`);
+    console.log(`Project_details.html: Update contents button clicked, overwriting the "geoloc" of project ${projectID} with new geoloc: ${formData.get('geoloc')}`);
+    console.log(`Project_details.html: Update contents button clicked, overwriting the "image_file" of project ${projectID} with new image_file: ${formData.get('image_file')}`);
+
+    // Send the updated data to the server
+    fetch(`/update_project_data/${projectID}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(`Project ${projectID} updated successfully.`);
+        // Handle successful update (e.g., redirect or show a message)
+    })
+    .catch(error => {
+        console.error(`Error updating project ${projectID}:`, error);
+        // Handle error (e.g., show an error message)
+    });
+}
 </script>
+
 
 
 {% if not current_user.is_authenticated %}
