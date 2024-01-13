@@ -1562,6 +1562,35 @@ def get_project_image(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
+@app.route('/update_project_data/<int:project_id>', methods=['POST'])
+@login_required
+def update_project_data(project_id):
+    project = Project.query.get_or_404(project_id)
 
+    # Check if current user is authorized to edit the project
+    if str(project.author) != str(current_user.id):
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    try:
+        # Update project data
+        project.name = request.form.get('name', project.name)
+        project.category = request.form.get('category', project.category)
+        project.descriptionwhy = request.form.get('descriptionwhy', project.descriptionwhy)
+        project.public_benefit = request.form.get('public_benefit', project.public_benefit)
+        project.geoloc = request.form.get('geoloc', project.geoloc)
+
+        # Handle image update if provided
+        image_file = request.files.get('image_file')
+        if image_file:
+            filename = secure_filename(image_file.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_file.save(image_path)
+            project.image_file = filename
+
+        db.session.commit()
+        return jsonify({'success': 'Project updated successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
 if __name__ == "__main__":
     app.run(debug=True)
