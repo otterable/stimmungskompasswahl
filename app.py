@@ -1566,17 +1566,14 @@ def get_project_image(filename):
 @login_required
 def update_project_data(project_id):
     project = Project.query.get_or_404(project_id)
-
-    # Check if current user is authorized to edit the project
     if str(project.author) != str(current_user.id):
         return jsonify({'error': 'Unauthorized'}), 403
 
     try:
-        # Update project data
         project.name = request.form.get('name', project.name)
         project.category = request.form.get('category', project.category)
-        project.descriptionwhy = request.form.get('descriptionwhy', project.descriptionwhy)
-        project.public_benefit = request.form.get('public_benefit', project.public_benefit)
+        project.descriptionwhy = request.form['descriptionwhy']
+        project.public_benefit = request.form['public_benefit']
         project.geoloc = request.form.get('geoloc', project.geoloc)
 
         # Handle image update if provided

@@ -1330,9 +1330,16 @@ updateInputCharCountFeedback(titleInput, titleFeedback, 20, 100); // Initial upd
 
 // Function to copy Quill content to textarea on form submission
 document.querySelector('form').addEventListener('submit', function(event) {
-    document.getElementById('descriptionwhy').value = descriptionEditor.root.innerHTML;
-    document.getElementById('public_benefit').value = benefitEditor.root.innerHTML;
+    // Get HTML content from Quill editors
+    var descriptionContent = descriptionEditor.root.innerHTML;
+    var benefitContent = benefitEditor.root.innerHTML;
+
+    // Set content to hidden textareas
+    document.getElementById('descriptionwhy').value = descriptionContent;
+    document.getElementById('public_benefit').value = benefitContent;
 });
+
+
 
 	
 	
@@ -1557,29 +1564,20 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(projectData => {
                 // Fill in the form fields
                 document.getElementById('title').value = projectData.name;
-                console.log(`Project_details.html - contents of "title" loaded, filling the text (${projectData.name}) into the input window`);
-
-                // Select the appropriate category
                 document.getElementById('category').value = projectData.category;
-                console.log(`Project_details.html - contents of "category" loaded, setting value (${projectData.category})`);
 
                 // Fill the Quill editors with the project data
                 descriptionEditor.clipboard.dangerouslyPasteHTML(projectData.descriptionwhy);
-                console.log(`Project_details.html - contents of "descriptionwhy" loaded, filling the text (${projectData.descriptionwhy}) into the quill editor.`);
-
                 benefitEditor.clipboard.dangerouslyPasteHTML(projectData.public_benefit);
-                console.log(`Project_details.html - contents of "public_benefit" loaded, filling the text (${projectData.public_benefit}) into the quill editor.`);
 
                 // Fetch and display the project's image
                 if (projectData.image_file) {
                     var img = new Image();
                     img.onload = function() {
                         var imagePreviewContainer = document.getElementById('image-preview-container');
-                        imagePreviewContainer.innerHTML = ''; // Clear existing content
+                        imagePreviewContainer.innerHTML = ''; 
                         imagePreviewContainer.appendChild(img);
-                        
-                        // Initialize or update Cropper.js
-                        if (typeof cropper !== 'undefined' && cropper) {
+                        if (cropper) {
                             cropper.replace(img.src);
                         } else {
                             cropper = new Cropper(img, {
@@ -1588,7 +1586,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 zoomable: false
                             });
                         }
-                        console.log(`Project_details.html: Image ${projectData.image_file} loaded into the "image_file" field, opening it inside cropper js`);
                     };
                     img.src = `/static/usersubmissions/${projectData.image_file}`;
                     img.id = 'image-preview';
@@ -1598,15 +1595,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Load and set marker position on the map
                 if (projectData.geoloc) {
                     const [lat, lng] = projectData.geoloc.split(",");
-                    if (lat && lng) {
-                        const position = L.latLng(lat, lng);
-                        map.setView(position, 15);
-                        if (marker) {
-                            marker.setLatLng(position);
-                        } else {
-                            marker = L.marker(position, { icon: icon }).addTo(map);
-                        }
-                        console.log(`Project_details.html: Marker of geoloc ${projectData.geoloc} inserted into the map.`);
+                    const position = L.latLng(lat, lng);
+                    map.setView(position, 15);
+                    if (marker) {
+                        marker.setLatLng(position);
+                    } else {
+                        marker = L.marker(position, { icon: icon }).addTo(map);
                     }
                 }
             })
@@ -1619,32 +1613,28 @@ function setupEditingMode(projectID) {
     const publishButton = document.querySelector('.publish-button');
     publishButton.style.display = 'none';
 
-    // Create a new 'Update contents' button
     const updateButton = document.createElement('button');
     updateButton.type = 'submit';
     updateButton.classList.add('button', 'publish-button');
     updateButton.textContent = 'Update contents';
     publishButton.parentNode.appendChild(updateButton);
 
-    // Add click event listener to the 'Update contents' button
     updateButton.addEventListener('click', function(event) {
         event.preventDefault(); // Prevent default form submission
-        console.log(`Project_details.html: Update contents button clicked, overwriting the contents of the existing Project entry ${projectID} inside the database`);
         handleUpdateProject(projectID);
     });
-
-    console.log('Project_details.html: Editing mode entered, hiding "Veröffentlichen" button and showing "Update contents" button instead.');
 }
 
 function handleUpdateProject(projectID) {
-      const formData = new FormData(document.querySelector('form'));
+    // Get HTML content from Quill editors
+    var descriptionContent = descriptionEditor.root.innerHTML;
+    var benefitContent = benefitEditor.root.innerHTML;
 
-    console.log(`Project_details.html: Update contents button clicked, overwriting the "title" of project ${projectID} with new contents: ${formData.get('name')}`);
-    console.log(`Project_details.html: Update contents button clicked, overwriting the "category" of project ${projectID} with new category: ${formData.get('category')}`);
-    console.log(`Project_details.html: Update contents button clicked, overwriting the "descriptionwhy" of project ${projectID} with new contents: ${formData.get('descriptionwhy')}`);
-    console.log(`Project_details.html: Update contents button clicked, overwriting the "public_benefit" of project ${projectID} with new contents: ${formData.get('public_benefit')}`);
-    console.log(`Project_details.html: Update contents button clicked, overwriting the "geoloc" of project ${projectID} with new geoloc: ${formData.get('geoloc')}`);
-    console.log(`Project_details.html: Update contents button clicked, overwriting the "image_file" of project ${projectID} with new image_file: ${formData.get('image_file')}`);
+    // Set content to hidden textareas
+    document.getElementById('descriptionwhy').value = descriptionContent;
+    document.getElementById('public_benefit').value = benefitContent;
+
+    const formData = new FormData(document.querySelector('form'));
 
     // Send the updated data to the server
     fetch(`/update_project_data/${projectID}`, {
@@ -1654,13 +1644,16 @@ function handleUpdateProject(projectID) {
     .then(response => response.json())
     .then(data => {
         console.log(`Project ${projectID} updated successfully.`);
-        // Handle successful update (e.g., redirect or show a message)
+        // Redirect or show a message upon successful update
     })
     .catch(error => {
         console.error(`Error updating project ${projectID}:`, error);
-        // Handle error (e.g., show an error message)
+        // Show an error message
     });
 }
+
+
+
 </script>
 
 
