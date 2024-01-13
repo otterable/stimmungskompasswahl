@@ -1552,6 +1552,15 @@ def single_vote(project_id):
         return redirect(url_for('index'))
     return render_template('vote.html', project=project)
 
+@app.route('/get_project_data/<int:project_id>')
+def get_project_data(project_id):
+    project = Project.query.get_or_404(project_id)
+    return jsonify(project.to_dict())
+
+@app.route('/get_project_image/<filename>')
+def get_project_image(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 
 if __name__ == "__main__":

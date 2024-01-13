@@ -32,6 +32,20 @@ body {
 }
 
 
+#image-preview-container {
+    width: 100%; /* Ensure the container takes the full width */
+    max-width: 600px; /* Max width can be adjusted as needed */
+    height: auto; /* Height will adjust based on content */
+    margin: auto; /* Center the container */
+    overflow: hidden; /* Hide overflow */
+}
+
+#image-preview {
+    max-width: 100%; /* Image will scale within container */
+    height: auto; /* Maintain aspect ratio */
+}
+
+
         img {
             transition: transform 0.3s ease;
         }
@@ -1522,6 +1536,87 @@ function replayVideo() {
 
 
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for a project ID in the query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectID = urlParams.get('project_id');
+
+    if (projectID) {
+        console.log(`Editing project with ID: ${projectID}`);
+
+        // Fetch the project data from the server
+        fetch(`/get_project_data/${projectID}`)
+            .then(response => response.json())
+            .then(projectData => {
+                // Fill in the form fields
+                document.getElementById('title').value = projectData.name;
+                console.log(`Project_details.html - contents of "title" loaded, filling the text (${projectData.name}) into the input window`);
+
+                // Select the appropriate category
+                document.getElementById('category').value = projectData.category;
+                console.log(`Project_details.html - contents of "category" loaded, setting value (${projectData.category})`);
+
+                // Fill the Quill editors with the project data
+                descriptionEditor.clipboard.dangerouslyPasteHTML(projectData.descriptionwhy);
+                console.log(`Project_details.html - contents of "descriptionwhy" loaded, filling the text (${projectData.descriptionwhy}) into the quill editor.`);
+
+                benefitEditor.clipboard.dangerouslyPasteHTML(projectData.public_benefit);
+                console.log(`Project_details.html - contents of "public_benefit" loaded, filling the text (${projectData.public_benefit}) into the quill editor.`);
+
+                // Fetch and display the project's image
+if (projectData.image_file) {
+    var img = new Image();
+    img.onload = function() {
+        var imagePreviewContainer = document.getElementById('image-preview-container');
+        imagePreviewContainer.innerHTML = ''; // Clear existing content
+        imagePreviewContainer.appendChild(img);
+        
+        // Initialize or update Cropper.js
+        if (typeof cropper !== 'undefined' && cropper) {
+            cropper.replace(img.src);
+        } else {
+            cropper = new Cropper(img, {
+                aspectRatio: 4 / 3,
+                viewMode: 1,
+                zoomable: false,
+                responsive: true, // Make cropper responsive
+                autoCropArea: 1, // Automatically crop the area to the maximum size
+                scalable: false, // Disable scaling
+                movable: false // Disable moving
+            });
+        }
+        console.log(`Project_details.html: Image ${projectData.image_file} loaded into the "image_file" field, opening it inside cropper js`);
+    };
+    img.src = `/static/usersubmissions/${projectData.image_file}`;
+    img.id = 'image-preview';
+    img.style.display = 'block';
+}
+
+
+                // Load and set marker position on the map
+                if (projectData.geoloc) {
+                    const [lat, lng] = projectData.geoloc.split(",");
+                    if (lat && lng) {
+                        const position = L.latLng(lat, lng);
+                        map.setView(position, 15);
+                        if (marker) {
+                            marker.setLatLng(position);
+                        } else {
+                            marker = L.marker(position, { icon: icon }).addTo(map);
+                        }
+                        console.log(`Project_details.html: Marker of geoloc ${projectData.geoloc} inserted into the map.`);
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching project data:', error));
+    }
+});
+
+</script>
+
+
 {% if not current_user.is_authenticated %}
     <script>
         window.location.href = "{{ url_for('login', next=url_for('neuerbeitrag')) }}";
