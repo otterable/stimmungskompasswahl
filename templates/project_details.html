@@ -5,6 +5,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
 	<link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.0.0-rc.7/html2canvas.min.js"></script>
 
 </head>
 <body>
@@ -979,14 +980,48 @@ display: block;
     </p>
     <p class="centered-title" style="color: #003056; font-style: italic; margin-bottom: 30px;"><strong>Autor/in:</strong> {{ author_name }}</p>
 
+
+
     {% if not is_mapobject %}
         <div class="project-details">
             <div class="left-column">
                 <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+<div style="text-align: center;">
+    {% if current_user.is_authenticated %}
+        {% set user_is_author = current_user.id|string == project.author|string %}
+        {% set user_is_admin = current_user.is_admin %}
+
+        {% if user_is_author or user_is_admin %}
+            <a href="{{ url_for('neuerbeitrag', project_id=project.id) }}" class="comment-button" style="border-radius: 30px; display: block; margin-bottom: -10px; margin-top: 12px; text-align: center; text-decoration: none;">Bearbeiten</a>
+        {% endif %}
+    {% endif %}
+</div>
+
+
+    <div class="share-section">
+        <h2 class="centered-title">Share the project!</h2>
+        <div class="share-buttons">
+            <a href="#" id="share-whatsapp">
+                <img src="{{ url_for('static', filename='icon_wh.png') }}" alt="WhatsApp">
+            </a>
+            <a href="#" id="share-facebook">
+                <img src="{{ url_for('static', filename='icon_fb.png') }}" alt="Facebook">
+            </a>
+            <a href="#" id="share-instagram">
+                <img src="{{ url_for('static', filename='icon_ig.png') }}" alt="Instagram">
+            </a>
+            <a href="#" id="share-share">
+                <img src="{{ url_for('static', filename='icon_sh.png') }}" alt="Share">
+            </a>
+        </div>
+    </div>
+
                 <div class="voting-bar">
                     <div class="upvotes" style="width: {{ upvote_percentage }}%;"></div>
                     <div class="downvotes" style="width: {{ downvote_percentage }}%;"></div>
                 </div>
+				
+				
                 <div class="vote-counts">
                     <div class="upvotes-info">
                         <p id="upvote-count">Gefällt: {{ upvote_count }} ({{ upvote_percentage }}%)</p>
@@ -1006,6 +1041,8 @@ display: block;
                     </div>
                 {% endif %}
             </div>
+
+
             <div class="right-column" style="text-align: left">
                 <div id="map" class="map-container"></div>
                 <div class="text-section">
@@ -1047,11 +1084,43 @@ display: block;
 </div>
 
 
-<!-- Add an Edit button -->
-<a href="{{ url_for('neuerbeitrag', project_id=project.id) }}" class="edit-button">Bearbeiten</a>
 
 
+
+	
+	
+	
 </body>
+
+<script>
+    console.log("Testing script execution");
+
+    // Debugging statements
+    console.log("User Authenticated:", {% if current_user.is_authenticated %} "Yes" {% else %} "No" {% endif %});
+    console.log("Project Author ID:", "{{ project.author }}", "Type:", typeof "{{ project.author }}");
+    console.log("Current User ID:", "{{ current_user.id }}", "Type:", typeof "{{ current_user.id }}");
+    console.log("Is Admin:", {% if current_user.is_admin %} "Yes" {% else %} "No" {% endif %});
+
+    // Refactored condition
+    {% if current_user.is_authenticated %}
+        var isAuthor = "{{ current_user.id }}" === "{{ project.author }}";
+        var isAdmin = {% if current_user.is_admin %} true {% else %} false {% endif %};
+
+        console.log("Is Author:", isAuthor);
+        console.log("Is Admin:", isAdmin);
+
+        if (isAuthor || isAdmin) {
+            console.log("Project_details.html: Project created by ID {{ project.author }}. User is logged in as ID {{ current_user.id }}. Showing the editing button - Condition Met (Author/Admin)");
+        } else {
+            console.log("Condition not met - User is neither the author nor an admin");
+        }
+    {% else %}
+        console.log("User not authenticated - Cannot show edit button");
+    {% endif %}
+</script>
+
+
+
 
 <script>
 // Function to check comment limit and potentially start a timer
@@ -1407,6 +1476,65 @@ function vote(projectId, voteType) {
 
 
 </script>
+
+
+  <script>
+        // Share on WhatsApp
+        document.getElementById('share-whatsapp').addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log("Sharing to WhatsApp");
+            var whatsappUrl = `https://wa.me/?text=Schau dir dieses Projekt an, das könnte unsere Stadt verbessern! ${window.location.href}`;
+            window.open(whatsappUrl, '_blank');
+        });
+
+        // Share on Facebook
+        document.getElementById('share-facebook').addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log("Sharing to Facebook");
+            var facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+            window.open(facebookUrl, '_blank');
+        });
+
+        // Share on Instagram
+   document.getElementById('share-instagram').addEventListener('click', function() {
+    html2canvas(document.body).then(canvas => {
+        canvas.toBlob(function(blob) {
+            var formData = new FormData();
+            formData.append('screenshot', blob, 'screenshot.png');
+
+            fetch('/upload_screenshot', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                  console.log("Screenshot uploaded. Shareable link:", data.link);
+                  // Direct the user to download the image and share it manually on Instagram
+                  window.open(data.link, '_blank');
+              });
+        });
+    });
+});
+
+
+        // General share
+        document.getElementById('share-share').addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log("Opening general share dialog");
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Project Sharing',
+                    url: window.location.href
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                })
+                .catch(console.error);
+            } else {
+                console.log('Web share not supported');
+                alert('Web share not supported. Copy the URL to share.');
+            }
+        });
+    </script>
+
 
 
 

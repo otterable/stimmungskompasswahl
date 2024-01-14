@@ -748,7 +748,8 @@ def project_details(project_id):
                                upvote_percentage=upvote_percentage, 
                                downvote_percentage=downvote_percentage, 
                                upvote_count=upvote_count, 
-                               downvote_count=downvote_count, 
+                               downvote_count=downvote_count,
+                               current_user=current_user,
                                author_name=author_name, 
                                comments=comments_with_authors, 
                                is_mapobject=is_mapobject)
@@ -1095,7 +1096,16 @@ def delete_my_data():
         logging.error(f"Error in delete_my_data: {e}")
         return jsonify({'success': False, 'message': 'An error occurred while deleting your data.'}), 500
 
-
+@app.route('/upload_screenshot', methods=['POST'])
+def upload_screenshot():
+    screenshot = request.files['screenshot']
+    filename = 'screenshot.png'
+    filepath = os.path.join('static/screenshots', filename)
+    screenshot.save(filepath)
+    
+    # Generate a shareable link
+    link = request.host_url + filepath
+    return jsonify({'link': link})
 
 
 @app.route('/delete_user', methods=['POST'])
@@ -1555,7 +1565,11 @@ def single_vote(project_id):
 @app.route('/get_project_data/<int:project_id>')
 def get_project_data(project_id):
     project = Project.query.get_or_404(project_id)
-    return jsonify(project.to_dict())
+    # Check if current user is the author of the project or the admin
+    if project.author == current_user.id or current_user.id == 1:  # Assuming admin ID is 1
+        return jsonify(project.to_dict())
+    else:
+        return jsonify({'error': 'Unauthorized'}), 403
 
 @app.route('/get_project_image/<filename>')
 def get_project_image(filename):

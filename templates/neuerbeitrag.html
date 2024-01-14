@@ -753,7 +753,7 @@ display: block;
 
 <div class="form-container">
 <div class="header-container">
-    <h1>Teilen Sie Ihre eigene Idee!</h1>
+    <h1 id="page-title">Teilen Sie Ihre eigene Idee!</h1>
     <a href="#" id="info-link">
         <img src="{{ url_for('static', filename='infobutton.png') }}" alt="Info" class="info-image">
     </a>
@@ -829,8 +829,8 @@ display: block;
 <!-- Existing 'Veröffentlichen' button -->
 <button type="submit" id="publish-button" class="button publish-button" onclick="console.log('Publish button clicked');">Veröffentlichen</button>
 
-<!-- New 'Update contents' button, hidden initially -->
-<button type="submit" id="update-button" class="button update-button" style="display: none;" onclick="console.log('Update contents button clicked');">Inhalte aktualisieren</button>
+<!-- New 'Projekt aktualisieren' button, hidden initially -->
+<button type="submit" id="update-button" class="button update-button" style="display: none;" onclick="console.log('Projekt aktualisieren button clicked');">Inhalte aktualisieren</button>
 
 
     </form>
@@ -1555,13 +1555,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const projectID = urlParams.get('project_id');
 
     if (projectID) {
-        console.log(`Editing project with ID: ${projectID}`);
+        console.log(`Project_details.html: Project ID ${projectID} loaded, when the object is updated, the user will be redirected to project_details/${projectID}.`);
         setupEditingMode(projectID);
 
         // Fetch the project data from the server
         fetch(`/get_project_data/${projectID}`)
-            .then(response => response.json())
-            .then(projectData => {
+    .then(response => {
+        if(response.ok) {
+            return response.json();
+        } else if(response.status === 403) {
+            alert("You do not have permission to edit this project.");
+            window.location.href = '/'; // Redirect to home page or any other page
+        } else {
+            throw new Error('Failed to fetch project data.');
+        }
+    })
+    .then(projectData => {
                 // Fill in the form fields
                 document.getElementById('title').value = projectData.name;
                 document.getElementById('category').value = projectData.category;
@@ -1609,14 +1618,14 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function setupEditingMode(projectID) {
-    // Hide the 'Veröffentlichen' button and show 'Update contents' button
+    // Hide the 'Veröffentlichen' button and show 'Projekt aktualisieren' button
     const publishButton = document.querySelector('.publish-button');
     publishButton.style.display = 'none';
 
     const updateButton = document.createElement('button');
     updateButton.type = 'submit';
     updateButton.classList.add('button', 'publish-button');
-    updateButton.textContent = 'Update contents';
+    updateButton.textContent = 'Projekt aktualisieren';
     publishButton.parentNode.appendChild(updateButton);
 
     updateButton.addEventListener('click', function(event) {
@@ -1626,6 +1635,8 @@ function setupEditingMode(projectID) {
 }
 
 function handleUpdateProject(projectID) {
+    console.log(`Project_details.html: Editing project ${projectID}`);
+
     // Get HTML content from Quill editors
     var descriptionContent = descriptionEditor.root.innerHTML;
     var benefitContent = benefitEditor.root.innerHTML;
@@ -1634,26 +1645,85 @@ function handleUpdateProject(projectID) {
     document.getElementById('descriptionwhy').value = descriptionContent;
     document.getElementById('public_benefit').value = benefitContent;
 
+    // Create new FormData object
     const formData = new FormData(document.querySelector('form'));
 
-    // Send the updated data to the server
+    // Add the current geolocation to the formData
+    if (marker) {
+        const currentGeoloc = `${marker.getLatLng().lat},${marker.getLatLng().lng}`;
+        formData.set('geoloc', currentGeoloc);
+        console.log(`Project_details.html: Geoloc ${currentGeoloc} loaded. If the geoloc is not updated, it will be saved when the contents are updated.`);
+    }
+
+    // Handle image cropping and update
+    if (cropper) {
+        cropper.getCroppedCanvas().toBlob(function(blob) {
+            // Fallback file name
+            var fallbackFileName = `cropped-${new Date().getTime()}.jpg`;
+
+            // Try to extract the original file name
+            var imgElement = document.getElementById('image-preview');
+            var originalFileName = fallbackFileName; // Use fallback as default
+
+            if (imgElement && imgElement.src) {
+                var imageSrc = imgElement.src;
+                var fileNameParts = imageSrc.split('/').pop().split('#')[0].split('?')[0];
+                if (fileNameParts) {
+                    originalFileName = fileNameParts;
+                }
+            }
+
+            console.log(`File ${originalFileName} loaded into the cropper.`);
+
+            formData.set('image_file', blob, originalFileName); 
+
+            var dimensions = `${cropper.getCroppedCanvas().width} x ${cropper.getCroppedCanvas().height}`;
+            var sizeMB = (blob.size / (1024*1024)).toFixed(2);
+            console.log(`File ${originalFileName} overwritten, new file size is ${dimensions} px, ${sizeMB} MB.`);
+
+            sendUpdateRequest(projectID, formData);
+        }, 'image/jpeg');
+    } else {
+        sendUpdateRequest(projectID, formData);
+    }
+}
+
+function sendUpdateRequest(projectID, formData) {
     fetch(`/update_project_data/${projectID}`, {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log(`Project ${projectID} updated successfully.`);
-        // Redirect or show a message upon successful update
+    .then(response => {
+        if (response.ok) {
+            console.log(`Project ${projectID} updated successfully.`);
+            console.log(`Project_details.html: Updating database of project ${projectID}, geoloc ${formData.get('geoloc')} has been kept`);
+            window.location.href = `/project_details/${projectID}`; // Redirect to the project details page
+        } else {
+            throw new Error('Failed to update project.');
+        }
     })
     .catch(error => {
         console.error(`Error updating project ${projectID}:`, error);
-        // Show an error message
     });
 }
 
+</script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectID = urlParams.get('project_id');
 
+        if (projectID) {
+            console.log("Project_details.html: Entered editing mode, replacing the page title.");
+            fetch(`/get_project_data/${projectID}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('page-title').textContent = 'Sie bearbeiten das Projekt: ' + data.name;
+                })
+                .catch(error => console.error('Error fetching project data:', error));
+        }
+    });
 </script>
 
 
