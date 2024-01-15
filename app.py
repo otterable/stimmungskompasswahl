@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, desc, asc  # Added desc and asc here
+from sqlalchemy import func, desc, asc
 from flask_migrate import Migrate
 from models import db, User, Project, Vote, Comment
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -9,15 +9,19 @@ from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta
 from werkzeug.middleware.proxy_fix import ProxyFix
-from forms import RegistrationForm, LoginForm, CommentForm  # Import CommentForm
+from forms import RegistrationForm, LoginForm, CommentForm
 from random import randint
 from urllib.parse import quote, unquote
 from markupsafe import Markup
 from twilio.rest import Client
+import matplotlib.pyplot as plt
 from openpyxl import Workbook
 import openpyxl
+from openpyxl.drawing.image import Image
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.chart import PieChart, Reference
+from collections import Counter
 from bs4 import BeautifulSoup
 import logging
 import shutil
@@ -29,9 +33,9 @@ import string
 import json
 import zipfile
 import pytz
+import io
 import time
 import threading
-
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -95,10 +99,47 @@ def google_login():
     redirect_uri = url_for('authorized', _external=True)
     return oauth.google.authorize_redirect(redirect_uri, nonce=nonce, prompt='select_account')
 
+
+def generate_pie_chart_categories(workbook, categories):
+    logging.debug("Generating pie chart for categories")
+    pie_sheet = workbook.create_sheet(title="Categories Pie Chart")
+    for row in categories.items():
+        pie_sheet.append(row)
+    chart = PieChart()
+    labels = Reference(pie_sheet, min_col=1, min_row=2, max_row=len(categories) + 1)
+    data = Reference(pie_sheet, min_col=2, min_row=1, max_row=len(categories) + 1)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(labels)
+    pie_sheet.add_chart(chart, "E2")
+
+# Function to generate pie chart for description lengths
+def generate_pie_chart_description_length(workbook, length_ranges):
+    logging.debug("Generating pie chart for description lengths")
+    pie_sheet = workbook.create_sheet(title="Description Lengths Pie Chart")
+    for row in length_ranges.items():
+        pie_sheet.append(row)
+    chart = PieChart()
+    labels = Reference(pie_sheet, min_col=1, min_row=2, max_row=len(length_ranges) + 1)
+    data = Reference(pie_sheet, min_col=2, min_row=1, max_row=len(length_ranges) + 1)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(labels)
+    pie_sheet.add_chart(chart, "E2")
+    
+def calculate_votes(project_id):
+    project = Project.query.get(project_id)
+    if project:
+        upvotes = sum(1 for vote in project.votes if vote.upvote)
+        downvotes = sum(1 for vote in project.votes if vote.downvote)
+        return upvotes, downvotes
+    else:
+        return 0, 0
+
+   
 @app.route('/export_projects', methods=['GET', 'POST'])
 @login_required
 def export_projects():
     try:
+        app.logger.debug("Starting export_projects function")
         app.logger.debug(f"Request method: {request.method}")
 
         # Retrieve filter parameters
@@ -112,12 +153,17 @@ def export_projects():
         include_comments = 'include_comments' in request.values
         include_votes = 'include_votes' in request.values
 
+        selected_category = request.values.get('category')
+        app.logger.debug(f"Selected category for export: {selected_category}")
+
         app.logger.debug(f"Filters: {category}, {older_than}, {younger_than}, {upvotes_greater}, {downvotes_lower}, {total_score_greater}, {comments_greater}, {include_comments}, {include_votes}")
+        app.logger.debug(f"Exporting projects for category: {category}")
 
         # Query database based on filters
         query = Project.query
-        if category:
-            query = query.filter_by(category=category)
+        if selected_category and selected_category != "":
+            query = query.filter_by(category=selected_category)
+            app.logger.debug("Filtering projects by category for export")
         if older_than:
             query = query.filter(Project.date < datetime.strptime(older_than, '%Y-%m-%d'))
         if younger_than:
@@ -134,6 +180,10 @@ def export_projects():
         # Fetch data
         projects = query.all()
 
+
+
+        projects = query.all()
+
         # Convert to DataFrame and strip HTML tags from specific fields
         def strip_html(content):
             if content:
@@ -146,6 +196,13 @@ def export_projects():
             # Update fields with HTML content
             project_dict['descriptionwhy'] = strip_html(project_dict['descriptionwhy'])
             project_dict['public_benefit'] = strip_html(project_dict['public_benefit'])  # Apply to 'public_benefit'
+            
+            # Calculate upvotes and downvotes
+            upvotes, downvotes = calculate_votes(project.id)
+            print(f"Project ID {project.id} exported with {upvotes} upvotes and {downvotes} downvotes into the Excel table")
+            project_dict['upvotes'] = upvotes
+            project_dict['downvotes'] = downvotes
+            
             projects_data.append(project_dict)
 
         df = pd.DataFrame(projects_data)
@@ -160,13 +217,18 @@ def export_projects():
             'author': 'Author',
             'image_file': 'Bild',
             'is_important': 'Privat markiert',
-            'is_featured': 'Ausgewählt'
+            'is_featured': 'Ausgewählt',
+            'upvotes': 'Upvotes',  # New columns for upvotes and downvotes
+            'downvotes': 'Downvotes'
         }
         df = df.rename(columns=rename_columns)[list(rename_columns.values())]  # Reorder columns
 
 
         # Remove the 'p_reports' column
         df.drop(columns=['p_reports'], inplace=True, errors='ignore')
+
+        
+        # Remove the 'p_reports' column
 
         def format_geoloc(geoloc):
             try:
@@ -186,45 +248,41 @@ def export_projects():
             app.logger.warning("'geoloc' column not found in DataFrame")
         
         # Include comments and votes if requested
+        df['Upvotes'] = 0  # Initialize with 0
+        df['Downvotes'] = 0  # Initialize with 0
+
+        # Include comments and votes if requested
         if include_comments or include_votes:
             for project in projects:
                 # Include comments and votes if requested
-                if include_comments or include_votes:
-                    for project in projects:
-                        if include_comments:
-                            # Add comment data
-                            project_comments = Comment.query.filter_by(project_id=project.id).all()
-                            comments_data = [{
-                                'project_id': project.id,
-                                'comment_id': comment.id,
-                                'comment_text': comment.text,
-                                'comment_author_id': comment.user_id,
-                                'comment_timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M:%S')  # Format timestamp
-                            } for comment in project_comments]
-                            comments_df = pd.DataFrame(comments_data)
-                            df = pd.merge(df, comments_df, how='left', left_on='id', right_on='project_id')
+                if include_comments:
+                    # Add comment data
+                    project_comments = Comment.query.filter_by(project_id=project.id).all()
+                    comments_data = [{
+                        'project_id': project.id,
+                        'comment_id': comment.id,
+                        'comment_text': comment.text,
+                        'comment_author_id': comment.user_id,
+                        'comment_timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M:%S')  # Format timestamp
+                    } for comment in project_comments]
+                    comments_df = pd.DataFrame(comments_data)
+                    df = pd.merge(df, comments_df, how='left', left_on='id', right_on='project_id')
 
-                        if include_votes:
-                            # Add vote data
-                            project_votes = Vote.query.filter_by(project_id=project.id).all()
-                            votes_data = [{
-                                'project_id': project.id,
-                                'upvotes': sum(vote.upvote for vote in project_votes),
-                                'downvotes': sum(vote.downvote for vote in project_votes)
-                            } for project in projects]
-                            votes_df = pd.DataFrame(votes_data)
-                            df = pd.merge(df, votes_df, how='left', left_on='id', right_on='project_id')
+                if include_votes:
+                    # Add vote data
+                    project_votes = Vote.query.filter_by(project_id=project.id).all()
+                    upvotes = sum(1 for vote in project_votes if vote.upvote)
+                    downvotes = sum(1 for vote in project_votes if vote.downvote)
+                    df.loc[df['ID'] == project.id, 'Upvotes'] = upvotes
+                    df.loc[df['ID'] == project.id, 'Downvotes'] = downvotes
+
 
         
         # Save DataFrame to an Excel file
         filename = 'exported_projects.xlsx'
         filepath = os.path.join('static/excel', filename)
-
-        # Create a Pandas Excel writer using openpyxl as the engine
         writer = pd.ExcelWriter(filepath, engine='openpyxl')
         df.to_excel(writer, index=False, sheet_name='Exported Projects')
-
-        # Get the openpyxl workbook and sheet objects
         workbook = writer.book
         worksheet = writer.sheets['Exported Projects']
 
@@ -280,16 +338,84 @@ def export_projects():
             column_letter = get_column_letter(column_cells[0].column)
             worksheet.column_dimensions[column_letter].width = col_width
 
-        writer.save()
 
-        app.logger.debug(f"Excel file created at {filepath}")
-        return send_file(filepath, as_attachment=True)
+              # Pie Chart for Project Categories
+        start_row_for_charts = df.shape[0] + 3  # 2 rows gap after the DataFrame
+
+        # Pie Chart for Project Categories
+        app.logger.debug("Generating pie chart for project categories")
+        category_counts = Counter(df['Kategorie'])
+        fig, ax = plt.subplots()
+        ax.pie(category_counts.values(), labels=category_counts.keys(), autopct='%1.1f%%')
+        plt.title("Project Categories Distribution")
+        img_data = io.BytesIO()
+        plt.savefig(img_data, format='png')
+        img_data.seek(0)
+        img = Image(img_data)
+        chart1_cell = f'A{start_row_for_charts}'  # Adjust as needed
+        worksheet.add_image(img, chart1_cell)
+        app.logger.debug("Pie chart for project categories created")
+
+        # Pie Chart for Average Description Length
+        app.logger.debug("Generating pie chart for average description length")
+        def get_length_category(row):
+            total_length = len(row['Beschreibung']) + len(row['Vorteile'])
+            if 50 <= total_length < 100:
+                return '50-100'
+            elif 100 <= total_length < 200:
+                return '100-200'
+            elif 200 <= total_length < 400:
+                return '200-400'
+            elif 400 <= total_length < 800:
+                return '400-800'
+            else:
+                return '800-5000'
+
+        df['Length Category'] = df.apply(get_length_category, axis=1)
+        length_category_counts = Counter(df['Length Category'])
+        fig, ax = plt.subplots()
+        ax.pie(length_category_counts.values(), labels=length_category_counts.keys(), autopct='%1.1f%%')
+        plt.title("Description Length Distribution")
+        img_data = io.BytesIO()
+        plt.savefig(img_data, format='png')
+        img_data.seek(0)
+        img = Image(img_data)
+        chart2_cell = f'H{start_row_for_charts}'  # Adjust as needed
+        worksheet.add_image(img, chart2_cell)
+        app.logger.debug("Pie chart for average description length created")
+
+       
+       
+        writer.save()
+        app.logger.debug(f"Excel file with pie charts saved at {filepath}")
+
+        # Return the file path in the JSON response
+        return jsonify({'filepath': filepath})
 
     except Exception as e:
         app.logger.error(f"Error in export_projects: {e}")
         return jsonify({"error": str(e)}), 500
         
-        
+@app.route('/get_categories')
+def get_categories():
+    try:
+        categories = [project.category for project in Project.query.distinct(Project.category).all()]
+        app.logger.debug("Fetched categories for dropdown")
+        return jsonify(success=True, categories=categories)
+    except Exception as e:
+        app.logger.error(f"Error in get_categories: {e}")
+        return jsonify(success=False, error=str(e)), 500
+       
+
+@app.route('/get_unique_categories')
+def get_unique_categories():
+    try:
+        categories = [category[0] for category in db.session.query(Project.category.distinct()).all()]
+        app.logger.debug("Fetched unique categories for dropdown")
+        return jsonify(success=True, categories=categories)
+    except Exception as e:
+        app.logger.error(f"Error in get_unique_categories: {e}")
+        return jsonify(success=False, error=str(e)), 500
         
 @app.route('/login/google/authorized')
 def authorized():
@@ -893,7 +1019,15 @@ def project_details(project_id):
     try:
         project = Project.query.get(project_id)
         comments = Comment.query.filter_by(project_id=project_id).all()
+        ip_address = request.remote_addr
+        last_view = ProjectView.query.filter_by(project_id=project_id, ip_address=ip_address).order_by(ProjectView.timestamp.desc()).first()
 
+        if last_view is None or last_view.timestamp < datetime.utcnow() - timedelta(days=1):
+        new_view = ProjectView(project_id=project_id, ip_address=ip_address)
+        project.views += 1
+        db.session.add(new_view)
+        db.session.commit()
+        
         if request.method == 'POST' and current_user.is_authenticated:
             comment_text = request.form.get('comment', '').strip()
             if not (20 <= len(comment_text) <= 500):
@@ -1087,6 +1221,12 @@ def admintools():
     search_comment_query = request.args.get('searchComment', '')
     search_map_object_query = request.args.get('searchMapObject', '')
 
+
+    categories = db.session.query(Project.category).distinct().all()
+    categories = [category[0] for category in categories if category[0]]  # Extract category names
+
+    app.logger.debug(f"Found categories: {categories}")
+    
     # Query map objects with the search filter
     map_object_query = Project.query.filter_by(is_mapobject=True)
     if search_map_object_query:
@@ -1215,7 +1355,8 @@ def admintools():
                            paginated_map_objects=paginated_map_objects,
                            paginated_comments=paginated_comments,
                            paginated_users=paginated_users,
-                           sort=sort, 
+                           sort=sort,
+                           categories=categories,
                            search_query=search_query, 
                            users=users, 
                            important_projects=important_projects, 

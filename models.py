@@ -22,7 +22,12 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-
+class ProjectView(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    ip_address = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -37,7 +42,9 @@ class Project(db.Model):
     p_reports = db.Column(db.Integer, default=0)
     is_featured = db.Column(db.Boolean, default=False)  # New field
     is_mapobject = db.Column(db.Boolean, default=False)
-
+    views = db.Column(db.Integer, default=0)
+    viewed_by = db.relationship('ProjectView', backref='project', lazy=True, cascade="all, delete-orphan")
+    
     # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
     comments = db.relationship('Comment', backref='project', lazy=True, cascade="all, delete-orphan")
