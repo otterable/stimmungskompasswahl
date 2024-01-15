@@ -14,10 +14,16 @@ from random import randint
 from urllib.parse import quote, unquote
 from markupsafe import Markup
 from twilio.rest import Client
+from openpyxl import Workbook
+import openpyxl
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from bs4 import BeautifulSoup
 import logging
 import shutil
 from pathlib import Path
 import os
+import pandas as pd
 import random
 import string
 import json
@@ -89,7 +95,202 @@ def google_login():
     redirect_uri = url_for('authorized', _external=True)
     return oauth.google.authorize_redirect(redirect_uri, nonce=nonce, prompt='select_account')
 
+@app.route('/export_projects', methods=['GET', 'POST'])
+@login_required
+def export_projects():
+    try:
+        app.logger.debug(f"Request method: {request.method}")
 
+        # Retrieve filter parameters
+        category = request.values.get('category')
+        older_than = request.values.get('older_than')
+        younger_than = request.values.get('younger_than')
+        upvotes_greater = request.values.get('upvotes_greater', type=int)
+        downvotes_lower = request.values.get('downvotes_lower', type=int)
+        total_score_greater = request.values.get('total_score_greater', type=int)
+        comments_greater = request.values.get('comments_greater', type=int)
+        include_comments = 'include_comments' in request.values
+        include_votes = 'include_votes' in request.values
+
+        app.logger.debug(f"Filters: {category}, {older_than}, {younger_than}, {upvotes_greater}, {downvotes_lower}, {total_score_greater}, {comments_greater}, {include_comments}, {include_votes}")
+
+        # Query database based on filters
+        query = Project.query
+        if category:
+            query = query.filter_by(category=category)
+        if older_than:
+            query = query.filter(Project.date < datetime.strptime(older_than, '%Y-%m-%d'))
+        if younger_than:
+            query = query.filter(Project.date > datetime.strptime(younger_than, '%Y-%m-%d'))
+        if upvotes_greater is not None:
+            query = query.filter(Project.upvotes > upvotes_greater)
+        if downvotes_lower is not None:
+            query = query.filter(Project.downvotes < downvotes_lower)
+        if total_score_greater is not None:
+            query = query.filter((Project.upvotes - Project.downvotes) > total_score_greater)
+        if comments_greater is not None:
+            query = query.filter(Project.comments_count > comments_greater)
+
+        # Fetch data
+        projects = query.all()
+
+        # Convert to DataFrame and strip HTML tags from specific fields
+        def strip_html(content):
+            if content:
+                return BeautifulSoup(content, "html.parser").get_text()
+            return content
+
+        projects_data = []
+        for project in projects:
+            project_dict = project.to_dict()
+            # Update fields with HTML content
+            project_dict['descriptionwhy'] = strip_html(project_dict['descriptionwhy'])
+            project_dict['public_benefit'] = strip_html(project_dict['public_benefit'])  # Apply to 'public_benefit'
+            projects_data.append(project_dict)
+
+        df = pd.DataFrame(projects_data)
+        rename_columns = {
+            'id': 'ID',
+            'category': 'Kategorie',
+            'name': 'Titel',
+            'descriptionwhy': 'Beschreibung',
+            'public_benefit': 'Vorteile',
+            'date': 'Datum',
+            'geoloc': 'Markierter Standort',
+            'author': 'Author',
+            'image_file': 'Bild',
+            'is_important': 'Privat markiert',
+            'is_featured': 'Ausgewählt'
+        }
+        df = df.rename(columns=rename_columns)[list(rename_columns.values())]  # Reorder columns
+
+
+        # Remove the 'p_reports' column
+        df.drop(columns=['p_reports'], inplace=True, errors='ignore')
+
+        def format_geoloc(geoloc):
+            try:
+                if geoloc and ',' in geoloc:
+                    lat, lon = geoloc.split(',')
+                    return f"https://www.google.com/maps/search/?api=1&query={lat.strip()},{lon.strip()}"
+                else:
+                    return ""
+            except Exception as e:
+                app.logger.error(f"Error in format_geoloc: {e}")
+                return ""
+
+        # Check if 'geoloc' column exists in DataFrame
+        if 'geoloc' in df.columns:
+            df['geoloc'] = df['geoloc'].apply(format_geoloc)
+        else:
+            app.logger.warning("'geoloc' column not found in DataFrame")
+        
+        # Include comments and votes if requested
+        if include_comments or include_votes:
+            for project in projects:
+                # Include comments and votes if requested
+                if include_comments or include_votes:
+                    for project in projects:
+                        if include_comments:
+                            # Add comment data
+                            project_comments = Comment.query.filter_by(project_id=project.id).all()
+                            comments_data = [{
+                                'project_id': project.id,
+                                'comment_id': comment.id,
+                                'comment_text': comment.text,
+                                'comment_author_id': comment.user_id,
+                                'comment_timestamp': comment.timestamp.strftime('%Y-%m-%d %H:%M:%S')  # Format timestamp
+                            } for comment in project_comments]
+                            comments_df = pd.DataFrame(comments_data)
+                            df = pd.merge(df, comments_df, how='left', left_on='id', right_on='project_id')
+
+                        if include_votes:
+                            # Add vote data
+                            project_votes = Vote.query.filter_by(project_id=project.id).all()
+                            votes_data = [{
+                                'project_id': project.id,
+                                'upvotes': sum(vote.upvote for vote in project_votes),
+                                'downvotes': sum(vote.downvote for vote in project_votes)
+                            } for project in projects]
+                            votes_df = pd.DataFrame(votes_data)
+                            df = pd.merge(df, votes_df, how='left', left_on='id', right_on='project_id')
+
+        
+        # Save DataFrame to an Excel file
+        filename = 'exported_projects.xlsx'
+        filepath = os.path.join('static/excel', filename)
+
+        # Create a Pandas Excel writer using openpyxl as the engine
+        writer = pd.ExcelWriter(filepath, engine='openpyxl')
+        df.to_excel(writer, index=False, sheet_name='Exported Projects')
+
+        # Get the openpyxl workbook and sheet objects
+        workbook = writer.book
+        worksheet = writer.sheets['Exported Projects']
+
+        # Medium border style
+        medium_border_side = Side(border_style="medium", color="000000")
+        medium_border = Border(top=medium_border_side, bottom=medium_border_side)
+
+        # Font for all cells
+        font_size = 12  # Set your desired font size
+        bahnschrift_font = Font(name='Bahnschrift', size=font_size)
+
+        # Formatting for the first row
+        header_font = Font(name='Bahnschrift', bold=True, color="F5F1E4", size=font_size+2)  # Slightly larger for headers
+        header_fill = PatternFill(start_color="003056", end_color="003056", fill_type="solid")
+        kategorie_font = Font(name='Bahnschrift', size=12, bold=True)
+
+        # Apply font settings to Kategorie column
+        kategorie_col_idx = df.columns.get_loc("Kategorie") + 1  # 1-based indexing
+        for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row, min_col=kategorie_col_idx, max_col=kategorie_col_idx):
+            for cell in row:
+                cell.font = kategorie_font
+        
+        for row in worksheet.iter_rows(min_row=2, min_col=2, max_col=2):  # Kategorie is the 2nd column
+                    for cell in row:
+                        cell.font = Font(name='Bahnschrift', size=12, bold=True)
+
+        
+        # Apply styles to all cells
+        for row in worksheet.iter_rows():
+            for cell in row:
+                cell.font = bahnschrift_font  # Set font for all cells
+                cell.border = medium_border  # Set medium border for all cells
+                if cell.row == 1:
+                    cell.font = header_font  # Override font for the first row
+                    cell.fill = header_fill  # Apply fill for the first row
+                    cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        # Alternate background colors and wrap text
+        colors = ["F5F1E4", "D9D4C7"]
+        for i, column_cells in enumerate(worksheet.columns):
+            color_index = (i % len(colors))  # Alternate between 0 and 1
+            fill = PatternFill(start_color=colors[color_index], end_color=colors[color_index], fill_type="solid")
+            for cell in column_cells[1:]:  # Skip the first row
+                cell.fill = fill
+                cell.alignment = Alignment(wrap_text=True)
+
+        # Adjust column widths based on the longest content
+        max_char_length = 100
+        for column_cells in worksheet.columns:
+            length = max(len(str(cell.value)) for cell in column_cells)
+            length = min(length, max_char_length)  # Limit to max_char_length characters
+            col_width = length * 1.2  # Approximate column width
+            column_letter = get_column_letter(column_cells[0].column)
+            worksheet.column_dimensions[column_letter].width = col_width
+
+        writer.save()
+
+        app.logger.debug(f"Excel file created at {filepath}")
+        return send_file(filepath, as_attachment=True)
+
+    except Exception as e:
+        app.logger.error(f"Error in export_projects: {e}")
+        return jsonify({"error": str(e)}), 500
+        
+        
+        
 @app.route('/login/google/authorized')
 def authorized():
     token = oauth.google.authorize_access_token()

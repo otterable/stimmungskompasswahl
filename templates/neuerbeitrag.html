@@ -1093,7 +1093,7 @@ function handleImageAndSubmitForm(event) {
             console.log('Veröffentlichungs-Button geklickt, das zugeschnittene Bild wird verarbeitet und gespeichert.');
 
             // Generate a random 20 digit string
-            var randomFileName = 'cropped-' + generateRandomString(20) + '.jpg';
+            var randomFileName = 's' + generateRandomString(10) + '.jpg';
 
             var dataTransfer = new DataTransfer();
             dataTransfer.items.add(new File([blob], randomFileName, { type: 'image/jpeg' }));

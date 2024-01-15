@@ -317,7 +317,22 @@ nav[aria-label="Page navigation"] {
 }
 
 
+.export-section {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
 
+.export-section h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.export-section .filter-options > div {
+    margin-bottom: 10px;
+}
 
 /* Underline effect for links that do not contain buttons */
 .top-bar a:not(:has(> button))::after {
@@ -1094,7 +1109,7 @@ nav[aria-label="Page navigation"] {
 
 {% if current_user.is_authenticated %}
     <div class="logged-in-info">
-        Angemeldet als Admin: {{ current_user.name }}, ID: {{ current_user.id }}
+        Verwaltung
     </div>
 {% endif %}
 <div class="top-bar">
@@ -1120,6 +1135,65 @@ nav[aria-label="Page navigation"] {
             {% endif %}
         </div>
     </div>
+</div>
+
+<div class="export-section">
+    <h2>Export Projects</h2>
+    <form id="exportForm" method="POST" action="{{ url_for('export_projects') }}">
+        <div class="filter-options">
+            <!-- Category Selection -->
+            <div>
+                <label for="category">Export a selected category:</label>
+                <select id="category" name="category">
+                    <option value="">All Categories</option>
+                    <!-- Populate with actual categories -->
+                </select>
+            </div>
+
+            <!-- Date Filters -->
+            <div>
+                <label for="dateOlderThan">Export projects older than:</label>
+                <input type="date" id="dateOlderThan" name="dateOlderThan">
+            </div>
+            <div>
+                <label for="dateYoungerThan">Export projects younger than:</label>
+                <input type="date" id="dateYoungerThan" name="dateYoungerThan">
+            </div>
+
+            <!-- Vote Thresholds -->
+            <div>
+                <label for="upvotesHigherThan">Export projects with upvotes higher than:</label>
+                <input type="number" id="upvotesHigherThan" name="upvotesHigherThan">
+            </div>
+            <div>
+                <label for="downvotesLowerThan">Export projects with downvotes lower than:</label>
+                <input type="number" id="downvotesLowerThan" name="downvotesLowerThan">
+            </div>
+
+            <!-- Score and Comment Count -->
+            <div>
+                <label for="scoreHigherThan">Export projects with total score higher than:</label>
+                <input type="number" id="scoreHigherThan" name="scoreHigherThan">
+            </div>
+            <div>
+                <label for="commentsMoreThan">Export projects with more comments than:</label>
+                <input type="number" id="commentsMoreThan" name="commentsMoreThan">
+            </div>
+
+            <!-- Include Options -->
+            <div>
+                <input type="checkbox" id="includeComments" name="includeComments">
+                <label for="includeComments">Include comments</label>
+            </div>
+            <div>
+                <input type="checkbox" id="includeVotes" name="includeVotes">
+                <label for="includeVotes">Include votes</label>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" onclick="submitExportForm()">Export</button>
+    </form>
 </div>
 
 
@@ -1672,5 +1746,39 @@ function deleteComment(commentId) {
 }
 </script>
 
+<script>
+function submitExportForm() {
+    console.debug("Export form submitted.");
+
+    var formData = new FormData(document.getElementById("exportForm"));
+    formData.forEach(function(value, key){
+        console.debug("Form Data - Key:", key, "Value:", value);
+    });
+
+    console.debug("Sending POST request to /export_projects");
+
+    fetch('{{ url_for("export_projects") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.debug("Server Response:", response);
+        if (!response.ok) {
+            console.error('Server responded with status:', response.status);
+            throw new Error('Server responded with status ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.debug("Export response:", data);
+    })
+    .catch(error => {
+        console.error('Export error:', error);
+    });
+
+    return false; // Prevent traditional form submission
+}
+
+</script>
 
 </html>
