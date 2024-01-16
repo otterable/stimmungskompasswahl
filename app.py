@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, desc, asc, and_
 from flask_migrate import Migrate
-from models import db, User, Project, Vote, Comment, ProjectView
+from models import db, User, Project, Vote, Comment, ProjectView, Bookmark, Report
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth
@@ -1013,13 +1013,33 @@ def get_project_by_id(project_id):
 
     return Project.query.get_or_404(project_id)
     
+
+
+@app.route('/remove_bookmark/<int:project_id>', methods=['POST'])
+def remove_bookmark(project_id):
+    if not current_user.is_authenticated:
+        print("User not authenticated")
+        return redirect(url_for('login'))
+
+    bookmark = Bookmark.query.filter_by(user_id=current_user.id, project_id=project_id).first()
+    if bookmark:
+        db.session.delete(bookmark)
+        db.session.commit()
+        print(f"Bookmark removed for project ID {project_id} by user ID {current_user.id}")
+    else:
+        print(f"No bookmark found for project ID {project_id} and user ID {current_user.id}")
+
+    return redirect(url_for('bookmarked'))
+
     
 @app.route('/project_details/<int:project_id>', methods=['GET', 'POST'])
 def project_details(project_id):
     try:
         project = Project.query.get(project_id)
         comments = Comment.query.filter_by(project_id=project_id).all()
-        
+        is_bookmarked = Bookmark.query.filter_by(user_id=current_user.id, project_id=project_id).first() is not None if current_user.is_authenticated else False
+        is_reported = Report.query.filter_by(user_id=current_user.id, project_id=project_id).first() is not None if current_user.is_authenticated else False
+
         user_ip = request.remote_addr
         current_time = datetime.utcnow()
         last_view = ProjectView.query.filter(and_(ProjectView.project_id == project_id, 
@@ -1104,10 +1124,55 @@ def project_details(project_id):
                                current_user=current_user,
                                author_name=author_name, 
                                comments=comments_with_authors, 
-                               is_mapobject=is_mapobject)
+                               is_mapobject=is_mapobject,
+                               currentUserId=current_user.id if current_user.is_authenticated else None,
+                               is_bookmarked=is_bookmarked,
+                               is_reported=is_reported)
     except Exception as e:
         app.logger.error("Error in project_details route: %s", str(e))
         return str(e)  # Or redirect to a generic error page
+
+@app.route('/report/<int:project_id>', methods=['POST'])
+def toggle_report(project_id):
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': 'User not authenticated'}), 403
+
+    try:
+        report = Report.query.filter_by(user_id=current_user.id, project_id=project_id).first()
+        if report:
+            db.session.delete(report)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Report removed', 'reported': False}), 200
+        else:
+            new_report = Report(user_id=current_user.id, project_id=project_id)
+            db.session.add(new_report)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Project reported', 'reported': True}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred'}), 500
+        
+@app.route('/bookmark/<int:project_id>', methods=['POST'])
+def toggle_bookmark(project_id):
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'message': 'User not authenticated'}), 403
+
+    try:
+        bookmark = Bookmark.query.filter_by(user_id=current_user.id, project_id=project_id).first()
+        if bookmark:
+            db.session.delete(bookmark)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Bookmark removed', 'bookmarked': False}), 200
+        else:
+            new_bookmark = Bookmark(user_id=current_user.id, project_id=project_id)
+            db.session.add(new_bookmark)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Project bookmarked', 'bookmarked': True}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'success': False, 'message': 'An error occurred'}), 500
+
+
 
 @app.route('/check_comment_limit')
 def check_comment_limit():
@@ -1642,6 +1707,16 @@ def comment(project_id):
         'timestamp': new_comment.timestamp.strftime('%d.%m.%Y %H:%M')
     })
 
+@app.route('/bookmarked')
+def bookmarked():
+    if current_user.is_authenticated:
+        user_bookmarked_projects = Project.query.join(
+            Bookmark, Bookmark.project_id == Project.id
+        ).filter(Bookmark.user_id == current_user.id).all()
+        return render_template('bookmarked.html', user_bookmarked_projects=user_bookmarked_projects)
+    else:
+        return redirect(url_for('login'))
+
     
 @app.route('/profil')
 @app.route('/profil/projects/<int:project_page>/map_objects/<int:map_object_page>/comments/<int:comment_page>')
@@ -1651,6 +1726,7 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
     paginated_projects = []
     paginated_map_objects = []
     paginated_comments = []
+    bookmarks = Bookmark.query.filter_by(user_id=current_user.id).all()
 
     if current_user.is_authenticated:
         paginated_projects = Project.query.filter_by(
@@ -1683,6 +1759,7 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
         num_projects = Project.query.filter_by(author=current_user.id, is_mapobject=False).count()
         num_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
         num_comments = Comment.query.filter_by(user_id=current_user.id).count()
+        bookmarked_projects = Project.query.join(Bookmark, Bookmark.project_id == Project.id).filter(Bookmark.user_id == current_user.id).all()
 
         # Find the most successful project
         most_successful_project = None
@@ -1731,11 +1808,12 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
     return render_template(
         'profil.html', 
         project_pagination=paginated_projects, 
-        map_object_pagination=paginated_map_objects, 
+        map_object_pagination=paginated_map_objects,
+        user_bookmarked_projects=bookmarked_projects,
         comment_pagination=paginated_comments, 
         user_statistics=user_statistics, 
-        is_authenticated=current_user.is_authenticated
-    )
+        is_authenticated=current_user.is_authenticated,
+        bookmarks=bookmarks)
 
 @app.route('/erfolge')
 def erfolge():

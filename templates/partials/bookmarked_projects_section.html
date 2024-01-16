@@ -1,0 +1,22 @@
+<!-- bookmarked_projects_section.html -->
+<div class="bookmarked-projects centered-text">
+    <div class="project-list">
+        {% if bookmarked_projects %}
+            {% for project in bookmarked_projects %}
+                <div class="project-thumbnail" id="project-thumbnail-{{ project.id }}">
+                    <h3>{{ project.name }}</h3>
+                    <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
+            
+                    <a href="{{ url_for('project_details', project_id=project.id) }}">
+                        <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+                    </a>
+                    <button onclick="removeBookmark({{ project.id }})" class="register-button" style="font-weight: bold;">Bookmark entfernen</button>
+                    <script>console.log("Bookmarked project loaded: {{ project.name }}");</script>
+</div>
+{% endfor %}
+{% else %}
+<p>Keine Lesezeichen vorhanden.</p>
+{% endif %}
+</div>
+
+</div>

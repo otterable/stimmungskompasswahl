@@ -374,12 +374,38 @@ display: none !important;
     display: none;
 }	
 
-  .upvote-button {
+
+ .report-button {
+      background-color: #111111;
+        color: white;
+        padding: 10px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+	
+	 .report-button:hover {
+
+	        background-color: #222222; /* Lighter shade of green */
+        transform: scale(1.01);
+    }
+
+ .bookmark-button {
+      background-color: #003056;
+        color: white;
+        padding: 10px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+	
+	 .bookmark-button:hover {
+
+	        background-color: #234770; /* Lighter shade of green */
+        transform: scale(1.01);
+    }
+	
+ .upvote-button {
         background-color: #4caf50;
         color: white;
         padding: 10px;
         transition: background-color 0.3s ease, transform 0.3s ease;
-        /* other styles */
     }
 
     .upvote-button:hover {
@@ -986,7 +1012,6 @@ display: block;
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
-			<a href="/roulette">Roulette</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
@@ -1063,6 +1088,9 @@ display: block;
                     <div class="voting-buttons-container">
                         <button onclick="vote({{ project.id }}, 'upvote')" class="button upvote-button">Gefällt mir! 👍</button>
                         <button onclick="vote({{ project.id }}, 'downvote')" class="button downvote-button">Gefällt mir nicht. 👎</button>
+						{% set bookmarked = current_user.is_authenticated and bookmarks|selectattr('project_id', 'equalto', project.id)|list|length > 0 %}
+<button id="bookmark-button" onclick="toggleBookmark({{ project.id }})" class="button bookmark-button">{{ 'Bookmarked ✨' if is_bookmarked else 'Bookmark ⭐' }}</button>
+
                     </div>
                 {% else %}
                     <div class="voting-login-prompt">
@@ -1071,8 +1099,7 @@ display: block;
                 {% endif %}
             </div>
    <div class="share-section">
-        <h2 class="centered-title" style="margin-top:10px;">Teilen:</h2>
-        <div class="share-buttons">
+        <div class="share-buttons" style="margin-top:10px;">
             <a href="#" id="share-whatsapp">
                 <img src="{{ url_for('static', filename='icon_wh.png') }}" alt="WhatsApp">
             </a>
@@ -1101,6 +1128,20 @@ display: block;
 {% else %}
 <script>console.log("Map hidden because project is marked as global.");</script>
 {% endif %}
+
+
+
+                {% if current_user.is_authenticated %}
+                    <div class="voting-buttons-container">
+
+{% set reported = current_user.is_authenticated and reports|selectattr('project_id', 'equalto', project.id)|list|length > 0 %}
+<button id="report-button" onclick="toggleReport({{ project.id }})" class="button report-button">{{ 'Spam gemeldet 🛑' if is_reported else 'Spam melden ⚠️' }}</button>
+</div>
+                {% endif %}
+
+
+
+
                 <div id="comments-container" class="comments" style="margin-top:30px">
                     <h2 class="centered-title" style="margin-bottom: 10px">Kommentare</h2>
                     {% for comment in comments %}
@@ -1138,6 +1179,89 @@ display: block;
 	
 </body>
 
+
+<script>
+    function toggleReport(projectId) {
+        console.log(`Project_details.html: ${document.getElementById('report-button').innerText === 'Spam gemeldet 🛑' ? 'Removing report for' : 'Reporting'} project ID ${projectId} for user ${currentUserId}.`);
+
+        fetch(`/report/${projectId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            let button = document.getElementById('report-button');
+            if (data.reported) {
+                console.log(`Project_details.html: Logged in as user ID ${currentUserId}. You have reported this project. Transforming the Report button to "Spam gemeldet 🛑".`);
+                button.innerText = 'Spam gemeldet 🛑';
+            } else {
+                console.log(`Project_details.html: Report button clicked, removing the report of project ID ${projectId} for user ${currentUserId}.`);
+                button.innerText = 'Spam melden ⚠️';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+
+<script>
+    console.log("Project_details.html: Logged in as user ID {{ current_user.id if current_user.is_authenticated else 'Anonymous' }}. {% if is_bookmarked %}You have already bookmarked this project. Transforming the Bookmark button to 'Bookmarked'.{% else %}This project is not bookmarked by you.{% endif %}");
+
+    var currentUserId = {{ currentUserId | tojson }};
+
+
+    function bookmarkProject(projectId) {
+        console.log("Attempting to bookmark project with ID:", projectId);
+        fetch(`/bookmark/${projectId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Project bookmarked:', data);
+                // Update the button to reflect bookmark status
+                document.getElementById('bookmark-button').innerText = 'Bookmarked ✨';
+            } else {
+     console.error('Error:', data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function toggleBookmark(projectId) {
+    console.log(`Project_details.html: ${document.getElementById('bookmark-button').innerText === 'Bookmarked' ? 'Removing' : 'Adding'} bookmark for project ID ${projectId} for user ${currentUserId}.`);
+
+fetch(`/bookmark/${projectId}`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        let button = document.getElementById('bookmark-button');
+        if (data.bookmarked) {
+            console.log(`Project_details.html: Logged in as user ID ${currentUserId}. You have bookmarked this project. Transforming the Bookmark button to "Bookmarked".`);
+            button.innerText = 'Bookmarked ✨';
+        } else {
+            console.log(`Project_details.html: Bookmarked button clicked, removing the bookmark of project ID ${projectId} for user ${currentUserId}.`);
+            button.innerText = 'Bookmark ⭐';
+        }
+    } else {
+        console.error('Error:', data.message);
+    }
+})
+.catch(error => console.error('Error:', error));
+}
+</script>
 
 
 <script>

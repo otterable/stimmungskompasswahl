@@ -935,11 +935,10 @@ display: block;
     </a>  
     <button id="hamburger-button">&#9776;</button>
 
-    <div id="nav-overlay" class="nav-overlay">
+        <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
-			<a href="/roulette">Roulette</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
@@ -958,6 +957,7 @@ display: block;
   <button id="toggleExportSection" class="c-button" data-section-id="exportSection" style="display:none;">Datenexport</button>
 		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
     <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
+	<button id="toggleBookmarks" class="c-button" data-section-id="bookmarksSection">Bookmarks</button>
     <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
     <button id="toggleComments" class="c-button" data-section-id="commentsSection">Kommentare</button>
     <button id="toggleImportantProjects" class="c-button" data-section-id="importantProjectsSection" style="display:none;">Markierte Projektvorschläge</button>
@@ -984,6 +984,9 @@ display: block;
     {% endwith %}
 </div>
 	</div>
+	
+
+	
 </div>
 
 <div id="notesSection" style="display: none;">
@@ -995,7 +998,21 @@ display: block;
 </div>
 </div>
 </div>
+
 </div>
+
+
+<div id="bookmarksSection" style="display: none;">
+    <div class="info-text-field3-c">
+        <h1>Meine Bookmarks:</h1>
+        <div id="bookmarked-projects-container">
+            {% with bookmarked_projects=user_bookmarked_projects %}
+                {% include 'partials/bookmarked_projects_section.html' %}
+            {% endwith %}
+        </div>
+    </div>
+</div>
+
 
 
 <div id="commentsSection" style="display: none;">
@@ -1038,6 +1055,16 @@ display: block;
     {% endif %}
 
 
+<div class="bookmarked-projects">
+    <h2>Your Bookmarked Projects</h2>
+    {% for bookmark in bookmarks %}
+        <div class="bookmark">
+            <a href="{{ url_for('project_details', project_id=bookmark.project_id) }}">
+                Project ID: {{ bookmark.project_id }} | Bookmarked on: {{ bookmark.timestamp }}
+            </a>
+        </div>
+    {% endfor %}
+</div>
 
 
 <!-- My Account Section -->
@@ -1277,34 +1304,39 @@ function toggleNotes() {
 
 let currentOpenSection = null;
 
-function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    const allButtons = document.querySelectorAll('.control-bar .c-button');
 
-    // Close the currently open section and deactivate its button
-    if (currentOpenSection && currentOpenSection !== sectionId) {
-        const currentSection = document.getElementById(currentOpenSection);
-        if (currentSection) {
-            currentSection.style.display = 'none';
-            document.querySelector(`[data-section-id="${currentOpenSection}"]`).classList.remove('active');
-            console.debug(currentOpenSection + ' section closed');
+
+
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        const allButtons = document.querySelectorAll('.control-bar .c-button');
+
+        if (currentOpenSection && currentOpenSection !== sectionId) {
+            const currentSection = document.getElementById(currentOpenSection);
+            if (currentSection) {
+                currentSection.style.display = 'none';
+                document.querySelector(`[data-section-id="${currentOpenSection}"]`).classList.remove('active');
+                console.debug(currentOpenSection + ' section closed');
+            }
+        }
+
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
+            console.debug(sectionId + ' section opened, closing ' + currentOpenSection);
+            currentOpenSection = sectionId;
+        } else {
+            section.style.display = 'none';
+            document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
+            console.debug(sectionId + ' section closed');
+            currentOpenSection = null;
         }
     }
 
-    // Toggle the clicked section and update the button's active state
-    if (section.style.display === 'none') {
-        section.style.display = 'block';
-        document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
-        console.debug(sectionId + ' section opened, closing ' + currentOpenSection);
-        currentOpenSection = sectionId;
-    } else {
-        section.style.display = 'none';
-        document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
-        console.debug(sectionId + ' section closed');
-currentOpenSection = null;
-}
-}
-
+    document.getElementById('toggleBookmarks').addEventListener('click', function() {
+        toggleSection('bookmarksSection');
+    });
+	
 // Attach the toggleSection function to the new button
 document.getElementById('toggleDeleteAllProjects').addEventListener('click', function() {
 toggleSection('deleteAllProjectsSection');
@@ -1321,6 +1353,7 @@ document.querySelectorAll('.control-bar .c-button').forEach(button => {
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
 
 // Update event listeners
 document.getElementById('toggleExportSection').addEventListener('click', function() { toggleSection('exportSection'); });
@@ -1370,4 +1403,32 @@ function submitExportForm() {
 }
 
 
+</script>
+
+<script>
+function removeBookmark(projectId) {
+    console.log("Removing bookmark for project ID:", projectId);
+    fetch(`/bookmark/${projectId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Bookmark removed:', data);
+            // Remove the project thumbnail from the DOM
+            var thumbnailToRemove = document.getElementById('project-thumbnail-' + projectId);
+            if (thumbnailToRemove) {
+                thumbnailToRemove.remove();
+                console.log('Project thumbnail removed for project ID:', projectId);
+            }
+        } else {
+            console.error('Error:', data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
 </script>
