@@ -735,12 +735,13 @@ display: block;
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
+			<a href="/roulette">Roulette</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
             <span class="user-info" style="margin-top: 10px;">
-                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+                 Benutzer: {{ current_user.name }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
@@ -749,7 +750,6 @@ display: block;
         </div>
     </div>
 </div>
-
 
 <div class="form-container">
 <div class="header-container">
@@ -1033,18 +1033,36 @@ function handleImageChange(event) {
 document.getElementById('image').addEventListener('change', handleImageChange);
 
     // Toggle map container visibility
-    document.getElementById('no-location-btn').addEventListener('click', function() {
-        var mapContainer = document.getElementById('map');
-        var geolocInput = document.getElementById('geoloc');
-        if (mapContainer.style.display === 'none') {
-            mapContainer.style.display = 'block';
-            geolocInput.required = true;
-        } else {
-            mapContainer.style.display = 'none';
-            geolocInput.required = false;
-        }
-        console.log('Toggle map container visibility');
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectID = urlParams.get('project_id');
+
+    if (projectID) {
+        console.log("Project_details.html: Entered editing mode, replacing the page title.");
+        fetch(`/get_project_data/${projectID}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('page-title').textContent = 'Sie bearbeiten das Projekt: ' + data.name;
+
+                // Handle "no-location-btn" button click
+                document.getElementById('no-location-btn').addEventListener('click', function() {
+                    var mapContainer = document.getElementById('map');
+                    var geolocInput = document.getElementById('geoloc');
+
+                    if (mapContainer.style.display === 'none') {
+                        mapContainer.style.display = 'block';
+                        geolocInput.required = true;
+                    } else {
+                        mapContainer.style.display = 'none';
+                        geolocInput.required = false;
+                        console.log(`Project_details.html: is_global for project ${projectID} set to false after 'no-location-btn' clicked.`);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching project data:', error));
+    }
+});
+
 
     // Modify existing form submission logic
     document.querySelector('form').addEventListener('submit', function(event) {
@@ -1562,6 +1580,10 @@ function replayVideo() {
 
 </script>
 <script>
+
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // Check for a project ID in the query string
     const urlParams = new URLSearchParams(window.location.search);
@@ -1570,20 +1592,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (projectID) {
         console.log(`Project_details.html: Project ID ${projectID} loaded, when the object is updated, the user will be redirected to project_details/${projectID}.`);
         setupEditingMode(projectID);
+		
 
         // Fetch the project data from the server
         fetch(`/get_project_data/${projectID}`)
-    .then(response => {
-        if(response.ok) {
-            return response.json();
-        } else if(response.status === 403) {
-            alert("You do not have permission to edit this project.");
-            window.location.href = '/'; // Redirect to home page or any other page
-        } else {
-            throw new Error('Failed to fetch project data.');
-        }
-    })
-    .then(projectData => {
+            .then(response => {
+                if(response.ok) {
+                    return response.json();
+                } else if(response.status === 403) {
+                    alert("You do not have permission to edit this project.");
+                    window.location.href = '/';
+                } else {
+                    throw new Error('Failed to fetch project data.');
+                }
+            })
+            .then(projectData => {
+			 if (projectData.is_global) {
+                    console.log(`Project_details.html: Project ${projectID} has is_global=true. If you select a point on the map, it will be overwritten to is_global=false when submitted.`);
+                }
                 // Fill in the form fields
                 document.getElementById('title').value = projectData.name;
                 document.getElementById('category').value = projectData.category;
@@ -1649,7 +1675,6 @@ function setupEditingMode(projectID) {
 
 function handleUpdateProject(projectID) {
     console.log(`Project_details.html: Editing project ${projectID}`);
-
     // Get HTML content from Quill editors
     var descriptionContent = descriptionEditor.root.innerHTML;
     var benefitContent = benefitEditor.root.innerHTML;
@@ -1661,12 +1686,15 @@ function handleUpdateProject(projectID) {
     // Create new FormData object
     const formData = new FormData(document.querySelector('form'));
 
-    // Add the current geolocation to the formData
+    // Check and add the current geolocation to the formData
     if (marker) {
         const currentGeoloc = `${marker.getLatLng().lat},${marker.getLatLng().lng}`;
         formData.set('geoloc', currentGeoloc);
         console.log(`Project_details.html: Geoloc ${currentGeoloc} loaded. If the geoloc is not updated, it will be saved when the contents are updated.`);
+    } else {
+        console.log(`Project_details.html: Project ${projectID} loaded with is_global=true. Geoloc has not been selected. is_global=true will be maintained.`);
     }
+
 
     // Handle image cropping and update
     if (cropper) {
@@ -1688,17 +1716,17 @@ function handleUpdateProject(projectID) {
 
             console.log(`File ${originalFileName} loaded into the cropper.`);
 
-            formData.set('image_file', blob, originalFileName); 
+        formData.set('image_file', blob, originalFileName);
 
-            var dimensions = `${cropper.getCroppedCanvas().width} x ${cropper.getCroppedCanvas().height}`;
-            var sizeMB = (blob.size / (1024*1024)).toFixed(2);
-            console.log(`File ${originalFileName} overwritten, new file size is ${dimensions} px, ${sizeMB} MB.`);
+        var dimensions = `${cropper.getCroppedCanvas().width} x ${cropper.getCroppedCanvas().height}`;
+        var sizeMB = (blob.size / (1024*1024)).toFixed(2);
+        console.log(`File ${originalFileName} overwritten, new file size is ${dimensions} px, ${sizeMB} MB.`);
 
-            sendUpdateRequest(projectID, formData);
-        }, 'image/jpeg');
-    } else {
         sendUpdateRequest(projectID, formData);
-    }
+    }, 'image/jpeg');
+} else {
+    sendUpdateRequest(projectID, formData);
+}
 }
 
 function sendUpdateRequest(projectID, formData) {
@@ -1723,20 +1751,37 @@ function sendUpdateRequest(projectID, formData) {
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const projectID = urlParams.get('project_id');
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectID = urlParams.get('project_id');
 
-        if (projectID) {
-            console.log("Project_details.html: Entered editing mode, replacing the page title.");
-            fetch(`/get_project_data/${projectID}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('page-title').textContent = 'Sie bearbeiten das Projekt: ' + data.name;
-                })
-                .catch(error => console.error('Error fetching project data:', error));
-        }
-    });
+    if (projectID) {
+        console.log("Project_details.html: Entered editing mode, replacing the page title.");
+        fetch(`/get_project_data/${projectID}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('page-title').textContent = 'Sie bearbeiten das Projekt: ' + data.name;
+
+                // Initialize isGlobal variable based on fetched data
+                let isGlobal = data.is_global === true || data.is_global === 'true';
+
+                if (isGlobal) {
+                    console.log(`Project_details.html: Project ${projectID} has is_global=true.`);
+                }
+
+                // Handle "no-location-btn" button click
+                const noLocationBtn = document.getElementById('no-location-btn');
+                noLocationBtn.addEventListener('click', function() {
+                    if (isGlobal) {
+                        isGlobal = true; // Change is_global to false
+                        console.log(`Project_details.html: is_global for project ${projectID} set to true after 'no-location-btn' clicked.`);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching project data:', error));
+    }
+});
+
 </script>
 
 

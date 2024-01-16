@@ -16,7 +16,7 @@
                 </div>
                 <form method="POST" action="{{ url_for('delete_user') }}" onsubmit="return confirmUserDeletion()">
                     <input type="hidden" name="user_id" value="{{ user.id }}">
-                    <button type="submit"  class="register-button">Benutzer löschen</button>
+                    <button type="submit"  class="register-button">Löschen</button>
                 </form>
             </div>
         {% endfor %}

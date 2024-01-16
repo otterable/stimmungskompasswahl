@@ -986,12 +986,13 @@ display: block;
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
+			<a href="/roulette">Roulette</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
             <span class="user-info" style="margin-top: 10px;">
-                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+                 Benutzer: {{ current_user.name }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
@@ -1000,7 +1001,6 @@ display: block;
         </div>
     </div>
 </div>
-
 <!-- Previous Project Arrow -->
 {% if prev_project_id %}
     <a href="{{ url_for('project_details', project_id=prev_project_id) }}">
@@ -1095,8 +1095,12 @@ display: block;
                     <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wie wird die Öffentlichkeit davon profitieren?</h2>
                     <p class="text-content">{{ project.public_benefit | safe }}</p>
                 </div>
-                <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wo ist dieses Projekt?</h2>
-                <div id="project-map"></div>
+              {% if not project.is_global %}
+    <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px;">Wo ist dieses Projekt?</h2>
+    <div id="project-map"></div>
+{% else %}
+<script>console.log("Map hidden because project is marked as global.");</script>
+{% endif %}
                 <div id="comments-container" class="comments" style="margin-top:30px">
                     <h2 class="centered-title" style="margin-bottom: 10px">Kommentare</h2>
                     {% for comment in comments %}
@@ -1405,6 +1409,7 @@ function setInitialVoteBarStyles() {
 	
 <script>
     // Initialize the map
+	    {% if not project.is_global %}
     var projectMap = L.map('project-map').setView([51.505, -0.09], 13); // Default location
 
     // Load and display tile layer on the map
@@ -1435,6 +1440,9 @@ function setInitialVoteBarStyles() {
         projectMap.setView([lat, lng], 15);
         L.marker([lat, lng], {icon: customIcon}).addTo(projectMap);
     }
+	    {% else %}
+        console.log("Project is global, map initialization skipped.");
+    {% endif %}
 </script>
 <script>
 document.getElementById('comment-form').addEventListener('submit', function(e) {

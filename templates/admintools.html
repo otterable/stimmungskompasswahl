@@ -1196,6 +1196,7 @@ nav[aria-label="Page navigation"] {
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
+			<a href="/roulette">Roulette</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
@@ -1209,6 +1210,7 @@ nav[aria-label="Page navigation"] {
             {% endif %}
         </div>
     </div>
+</div>
 </div>
 
 <!-- Update the buttons in the filter-bar div -->
@@ -1284,47 +1286,10 @@ nav[aria-label="Page navigation"] {
                     <!-- Populate with actual categories -->
                 </select>
             </div>
+            </div>
 
             <!-- Date Filters -->
-            <div>
-                <label for="dateOlderThan">Export projects older than:</label>
-                <input type="date" id="dateOlderThan" name="dateOlderThan">
-            </div>
-            <div>
-                <label for="dateYoungerThan">Export projects younger than:</label>
-                <input type="date" id="dateYoungerThan" name="dateYoungerThan">
-            </div>
-
-            <!-- Vote Thresholds -->
-            <div>
-                <label for="upvotesHigherThan">Export projects with upvotes higher than:</label>
-                <input type="number" id="upvotesHigherThan" name="upvotesHigherThan">
-            </div>
-            <div>
-                <label for="downvotesLowerThan">Export projects with downvotes lower than:</label>
-                <input type="number" id="downvotesLowerThan" name="downvotesLowerThan">
-            </div>
-
-            <!-- Score and Comment Count -->
-            <div>
-                <label for="scoreHigherThan">Export projects with total score higher than:</label>
-                <input type="number" id="scoreHigherThan" name="scoreHigherThan">
-            </div>
-            <div>
-                <label for="commentsMoreThan">Export projects with more comments than:</label>
-                <input type="number" id="commentsMoreThan" name="commentsMoreThan">
-            </div>
-
-            <!-- Include Options -->
-            <div>
-                <input type="checkbox" id="includeComments" name="includeComments">
-                <label for="includeComments">Include comments</label>
-            </div>
-            <div>
-                <input type="checkbox" id="includeVotes" name="includeVotes">
-                <label for="includeVotes">Include votes</label>
-            </div>
-        </div>
+     
 
         <!-- Submit Button -->
         <button type="submit" onclick="submitExportForm()">Export</button>
@@ -1475,7 +1440,51 @@ nav[aria-label="Page navigation"] {
 </body>
 
 
+   
+<script>
+     // Toggle the navigation overlay
+    function toggleNavOverlay() {
+        var navOverlay = document.getElementById('nav-overlay');
+        if (navOverlay.style.display === 'block') {
+            navOverlay.style.display = 'none';
+        } else {
+            navOverlay.style.display = 'block';
+        }
+    }
 
+    // Close the navigation overlay when clicking on the overlay background or on a non-button element
+    document.getElementById('nav-overlay').addEventListener('click', function(event) {
+        // Close only if on mobile
+        if (window.innerWidth <= 1080 && !event.target.closest('button, a')) {
+            toggleNavOverlay();
+        }
+    });
+
+    // Event listener for hamburger button
+    document.getElementById('hamburger-button').addEventListener('click', toggleNavOverlay);
+
+    // Resize event listener
+    window.addEventListener('resize', function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        // Show on desktop, hide on mobile
+        if (window.innerWidth > 1080) {
+            navOverlay.style.display = 'block';
+        } else {
+            navOverlay.style.display = 'none';
+        }
+    });
+    
+    // Set initial state of the nav-overlay based on device width
+    window.onload = function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        // Show on desktop, hide on mobile
+        if (window.innerWidth > 1080) {
+            navOverlay.style.display = 'block';
+        } else {
+            navOverlay.style.display = 'none';
+        }
+    };
+</script>
 <script>
 
 

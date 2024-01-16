@@ -651,7 +651,7 @@ def register():
             from_=twilio_number,
             to=phone_number
         )
-        logging.debug(f"Twilio message SID: {message.sid}")
+        logging.debug(f"Twilio message S{message.sid}")
 
         # Save the user data in session temporarily
         session['user_data'] = {

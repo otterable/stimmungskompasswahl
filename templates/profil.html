@@ -656,7 +656,7 @@ nav[aria-label="Page navigation"] {
 		
 		
 					.info-text-field2-c {
-            background-color: #e0d3ae; /* Light grey background */
+            background-color: #f5f1e4; /* Light grey background */
           
             padding: 20px;
             box-sizing: border-box; /* Include padding in width calculation */
@@ -939,12 +939,13 @@ display: block;
         <div id="nav-links">
             <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
+			<a href="/roulette">Roulette</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
  {% if current_user.is_authenticated %}
             <span class="user-info" style="margin-top: 10px;">
-                Angemeldet als: {{ current_user.name }}, ID: {{ current_user.id }}
+                 Benutzer: {{ current_user.name }}
             </span>
             <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
@@ -953,7 +954,6 @@ display: block;
         </div>
     </div>
 </div>
-
 <div class="filter-bar">
   <button id="toggleExportSection" class="c-button" data-section-id="exportSection" style="display:none;">Datenexport</button>
 		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
@@ -1014,7 +1014,7 @@ display: block;
 <div class="my-account centered-text">
     <h1>Mein Konto:</h1>
     {% if current_user.is_authenticated %}
-        <p>Ihr Benutzername ist: <span style="color: #003056;">{{ current_user.name }}</span></p>
+        <p>Ihr Benutzername ist: <span style="color: #003056;">Benutzer: {{ current_user.name }}</span></p>
 
         {% if not current_user.is_googleaccount %}
             <p>Die verknüpfte Handynummer lautet: <span style="color: #003056;">{{ current_user.phone_number }}</span>.</p>
