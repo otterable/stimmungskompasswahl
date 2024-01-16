@@ -1023,10 +1023,10 @@ def project_details(project_id):
         last_view = ProjectView.query.filter_by(project_id=project_id, ip_address=ip_address).order_by(ProjectView.timestamp.desc()).first()
 
         if last_view is None or last_view.timestamp < datetime.utcnow() - timedelta(days=1):
-        new_view = ProjectView(project_id=project_id, ip_address=ip_address)
-        project.views += 1
-        db.session.add(new_view)
-        db.session.commit()
+            new_view = ProjectView(project_id=project_id, ip_address=ip_address)
+            project.views += 1
+            db.session.add(new_view)
+            db.session.commit()
         
         if request.method == 'POST' and current_user.is_authenticated:
             comment_text = request.form.get('comment', '').strip()
