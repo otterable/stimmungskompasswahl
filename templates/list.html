@@ -1109,16 +1109,17 @@ nav[aria-label="Page navigation"] {
         </div>
 
 
-        <div class="filter-item">
+<div class="filter-item">
     <label for="sort">Sortieren:</label>
     <select name="sort" id="sort">
-		<option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
-        <option value="lowest" {% if request.args.get('sort', '') == 'lowest' %}selected{% endif %}>Niedrigste Bewertung zuerst </option>
-        <option value="newest" {% if request.args.get('sort', '') == 'newest' %}selected{% endif %}>Neuester Beitrag zuerst </option>
+        <option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
+        <option value="lowest" {% if request.args.get('sort', '') == 'lowest' %}selected{% endif %}>Niedrigste Bewertung zuerst</option>
+		<option value="highest_views" {% if request.args.get('sort', '') == 'highest_views' %}selected{% endif %}>Meistgesehene zuerst</option>
+        <option value="newest" {% if request.args.get('sort', '') == 'newest' %}selected{% endif %}>Neuester Beitrag zuerst</option>
         <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Ältester Beitrag zuerst</option>
-        
     </select>
 </div>
+
 
 			
    

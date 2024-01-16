@@ -729,7 +729,10 @@ nav[aria-label="Page navigation"] {
     box-sizing: border-box;
     padding: 10px;
 }
-
+  ul {
+        list-style-type: none; /* Removes bullet points */
+        padding-left: 0; /* Removes default padding */
+    }
 
 .comment-thumbnail {
     flex-basis: calc(33.333% - 20px); /* Three items per row, adjust margin as needed */
@@ -889,6 +892,14 @@ nav[aria-label="Page navigation"] {
 
 }
 
+    a {
+            color: #003056; /* Set the color of links */
+            text-decoration: none; /* Optional: removes underline from links */
+        }
+
+        a:hover {
+            text-decoration: underline; /* Optional: underline on hover */
+        }
 
 
 	
@@ -1212,6 +1223,54 @@ nav[aria-label="Page navigation"] {
     <button id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</button>
 </div>
 
+
+
+<div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
+
+<h2>Top 5 Meistgesehene Projekte</h2>
+<ul>
+  {% for project in top_viewed_projects %}
+      {% if project.view_count > 0 %}
+    <li><a href="{{ url_for('project_details', project_id=project.id) }}">{{ project.name }}</a> mit {{ project.view_count }} Aufrufen</li>
+      {% endif %}
+  {% endfor %}
+</ul>
+
+<h2>Top 5 Bewertete Projekte</h2>
+<ul>
+  {% for project in top_rated_projects %}
+    <li><a href="{{ url_for('project_details',project_id=project.id) }}">{{ project.name }}</a> mit {{ project.upvote_count }} Stimmen</li>
+{% endfor %}
+
+</ul>
+<h2>Top 5 Kommentierte Projekte</h2>
+<ul>
+  {% for project in top_commented_projects %}
+    <li><a href="{{ url_for('project_details', project_id=project.id) }}">{{ project.name }}</a> mit {{ project.comments_count }} Kommentaren</li>
+  {% endfor %}
+</ul>
+<h2>Top 5 Häufigste Kategorien</h2>
+<ul>
+  {% for category, count in category_counts %}
+    <li>{{ category }} mit {{ count }} Projekten</li>
+  {% endfor %}
+</ul>
+<h2>Top 5 Aktivste Benutzerkonten</h2>
+<ul>
+  {% for user in active_users %}
+    <li>{{ user.name }} mit {{ user.project_count }} Projekten, {{ user.map_object_count }} Kartenobjekten und {{ user.comment_count }} Kommentaren</li>
+  {% endfor %}
+</ul>
+
+    <h2>Alle Beiträge löschen</h2>
+    <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
+    <form method="POST" action="{{ url_for('delete_all_projects') }}">
+        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to Alle Projektvorschläge löschen? This action cannot be undone.');">Alle Beiträge löschen</button>
+    </form>
+</div>
+
+
+
 	
 <div id="exportSection" style="display: none;">
     <h2>Export Projects</h2>
@@ -1270,7 +1329,13 @@ nav[aria-label="Page navigation"] {
         <!-- Submit Button -->
         <button type="submit" onclick="submitExportForm()">Export</button>
     </form>
+	            <h2>Gesamte Website herunterladen</h2>
+
+	            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Website herunterladen</a>
+
 </div>
+
+
 
 
     <div id="projectProposalsSection" style="display: none;">
@@ -1403,14 +1468,6 @@ nav[aria-label="Page navigation"] {
 
 
 <!-- Section for Deleting All Projects -->
-
-<div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
-    <h2>Alle Beiträge löschen</h2>
-    <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
-    <form method="POST" action="{{ url_for('delete_all_projects') }}">
-        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to Alle Projektvorschläge löschen? This action cannot be undone.');">Alle Beiträge löschen</button>
-    </form>
-</div>
 
 
 	

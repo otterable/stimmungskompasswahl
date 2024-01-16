@@ -422,6 +422,64 @@ nav[aria-label="Page navigation"] {
     transition: color 0.3s ease, text-shadow 0.3s ease; /* Transition for color and text shadow */
 }
 
+	
+.filter-bar {
+    background-color: #111111; /* Existing background color */
+    height: 80px; /* Existing height */
+    width: 100%; /* Full width */
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    padding: 0 20px; /* Existing padding */
+    box-sizing: border-box;
+    flex-wrap: nowrap; /* Existing no-wrap */
+}
+
+#filter-form {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center form contents */
+    width: 100%; /* Use the full width of the parent */
+    max-width: 800px; /* Set a max-width if needed */
+}
+
+.filter-item {
+    margin: 0 10px; /* Add some horizontal spacing between items */
+}
+
+/* You might need to adjust the width of inputs/selects inside filter-items */
+.filter-item input, 
+.filter-item select {
+    width: auto; /* Adjust width as needed */
+}
+
+.filter-bar .filter-item label {
+    font-size: 18px; /* Adjust the font size for labels */
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Spacing between filter items */
+}
+
+.filter-item label {
+    color: white;
+    margin-right: 10px; /* Spacing between label and input/select */
+}
+
+/* Apply styles to fields within .filter-bar */
+.filter-bar input,
+.filter-bar select {
+    border-radius: 30px;
+    padding: 15px;
+    background-color: white;
+    font-weight: bold;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+
 
 /* Exclude the logo link from having the underline effect */
 .top-bar a[href="/"]:hover::after {
@@ -634,6 +692,34 @@ nav[aria-label="Page navigation"] {
             color: black;
             margin-top: 10px;
         }
+		
+		.c-button {
+    /* Your existing button styles */
+    margin: 5px;
+    transition: background-color 0.3s;
+}
+
+.c-button.active {
+    background-color: green; /* Green color for active button */
+    color: white;
+}
+
+.c-button {
+        border-radius: 30px;
+        padding: 12px;
+        background-color: white;
+        font-weight: bold;
+        color: black;
+        border: none;
+        cursor: pointer;
+        margin: 10px;
+        transition: background-color 0.3s;
+    }
+
+    .c-button.active {
+        background-color: #4CAF50; /* Green background for active button */
+        color: white;
+    }
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
@@ -642,6 +728,19 @@ nav[aria-label="Page navigation"] {
 	padding: 7px;
     /* Add any other button-specific styles here */
 }
+
+.c-button {
+        border-radius: 30px;
+        padding: 6px;
+        background-color: white;
+        font-weight: bold;
+        color: black;
+        border: none;
+        cursor: pointer;
+        margin: 10px;
+        transition: background-color 0.3s;
+    }
+	
 }
 #hamburger-button {
     display: none; /* Hidden by default */
@@ -769,7 +868,9 @@ display: block;
         .register-button {
             padding: 10px 20px;
         }
-
+	.filter-bar {
+	display: none;
+	}
 
     .top-bar {
         width: 100%; /* Full width of the screen */
@@ -852,12 +953,22 @@ display: block;
         </div>
     </div>
 </div>
+
+<div class="filter-bar">
+  <button id="toggleExportSection" class="c-button" data-section-id="exportSection" style="display:none;">Datenexport</button>
+		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
+    <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
+    <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
+    <button id="toggleComments" class="c-button" data-section-id="commentsSection">Kommentare</button>
+    <button id="toggleImportantProjects" class="c-button" data-section-id="importantProjectsSection" style="display:none;">Markierte Projektvorschläge</button>
+    <button id="toggleFeaturedProjects" class="c-button" data-section-id="featuredProjectsSection" style="display:none;">Open Ausgewählte Projektvorschläge</button>
+    <button id="toggleUsers" class="c-button" data-section-id="usersSection">Meine Konto</button></div> 
 <div class="my-projects centered-text">
 
    {% if current_user.is_authenticated %}
    
+       <div id="projectProposalsSection" style="display: none;">
        <div class="info-text-field3-c">
-
     <h1>Meine Projektvorschläge:</h1>
     <div class="my-statistics centered-text">
         <p>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span></p>
@@ -867,32 +978,28 @@ display: block;
             <p>Ihre Projekte wurden noch nicht bewertet.</p>
         {% endif %}
     </div>
-
-	
-	
-   <!-- My Projects Section -->
 <div id="projects-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
         {% include 'partials/projects_section.html' %}
     {% endwith %}
 </div>
 	</div>
+</div>
 
-
-
-    <div class="info-text-field2-c">
-<!-- My Map Objects Section -->
+<div id="notesSection" style="display: none;">
+<div class="info-text-field2-c">
 <div id="map-objects-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
         {% include 'partials/map_objects_section.html' %}
     {% endwith %}
 </div>
 </div>
+</div>
+</div>
 
 
-    <div class="info-text-field3-c">
-
-<!-- My Comments Section -->
+<div id="commentsSection" style="display: none;">
+<div class="info-text-field3-c">
 <div id="comments-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
         {% include 'partials/comments_section_profil.html' %}
@@ -901,7 +1008,9 @@ display: block;
 </div>
 </div>
 
-    <div class="info-text-field2-c">
+
+<div id="usersSection" style="display: none;">
+<div class="info-text-field2-c">
 <div class="my-account centered-text">
     <h1>Mein Konto:</h1>
     {% if current_user.is_authenticated %}
@@ -921,7 +1030,6 @@ display: block;
 
 
 
-
 		
   {% else %}
         <div class="login-prompt centered-text">
@@ -932,10 +1040,7 @@ display: block;
 
 
 
-		
-</div>
 <!-- My Account Section -->
-
 
 
 {% if is_authenticated %}
@@ -963,6 +1068,7 @@ display: block;
 {% endif %}
 
 <a id="download-link" href="#" style="display: none;"></a>
+</div>
 </body>
 </html>
 
@@ -1126,6 +1232,142 @@ document.getElementById('delete-data-btn').addEventListener('click', function() 
         .catch(error => console.error('Error:', error));
     }
 });
+
+
+</script>
+
+<script>
+
+function toggleExportSection() {
+            var exportSection = document.querySelector('.export-section');
+            if (exportSection.style.display === 'none') {
+                exportSection.style.display = 'block';
+                console.debug('Export section opened');
+            } else {
+                exportSection.style.display = 'none';
+                console.debug('Export section closed');
+            }
+        }
+
+        // Add click event listener to the toggle button
+
+function toggleProjectProposals() {
+            var projectProposalsSection = document.getElementById('projectProposalsSection');
+            if (projectProposalsSection.style.display === 'none') {
+                projectProposalsSection.style.display = 'block';
+                console.debug('Projektvorschläge section opened');
+			} else {
+            projectProposalsSection.style.display = 'none';
+            console.debug('Projektvorschläge section closed');
+        }
+    }
+
+
+function toggleNotes() {
+            var notesSection = document.getElementById('notesSection');
+            if (notesSection.style.display === 'none') {
+                notesSection.style.display = 'block';
+                console.debug('Notizen section opened');
+            } else {
+                notesSection.style.display = 'none';
+                console.debug('Notizen section closed');
+            }
+        }
+
+
+let currentOpenSection = null;
+
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const allButtons = document.querySelectorAll('.control-bar .c-button');
+
+    // Close the currently open section and deactivate its button
+    if (currentOpenSection && currentOpenSection !== sectionId) {
+        const currentSection = document.getElementById(currentOpenSection);
+        if (currentSection) {
+            currentSection.style.display = 'none';
+            document.querySelector(`[data-section-id="${currentOpenSection}"]`).classList.remove('active');
+            console.debug(currentOpenSection + ' section closed');
+        }
+    }
+
+    // Toggle the clicked section and update the button's active state
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
+        console.debug(sectionId + ' section opened, closing ' + currentOpenSection);
+        currentOpenSection = sectionId;
+    } else {
+        section.style.display = 'none';
+        document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
+        console.debug(sectionId + ' section closed');
+currentOpenSection = null;
+}
+}
+
+// Attach the toggleSection function to the new button
+document.getElementById('toggleDeleteAllProjects').addEventListener('click', function() {
+toggleSection('deleteAllProjectsSection');
+});
+
+// Attach the toggleSection function to each button
+document.querySelectorAll('.control-bar .c-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const sectionId = this.getAttribute('data-section-id');
+        toggleSection(sectionId);
+    });
+});
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Update event listeners
+document.getElementById('toggleExportSection').addEventListener('click', function() { toggleSection('exportSection'); });
+document.getElementById('toggleProjectProposals').addEventListener('click', function() { toggleSection('projectProposalsSection'); });
+document.getElementById('toggleNotes').addEventListener('click', function() { toggleSection('notesSection'); });
+document.getElementById('toggleComments').addEventListener('click', function() { toggleSection('commentsSection'); });
+document.getElementById('toggleImportantProjects').addEventListener('click', function() { toggleSection('importantProjectsSection'); });
+document.getElementById('toggleFeaturedProjects').addEventListener('click', function() { toggleSection('featuredProjectsSection'); });
+document.getElementById('toggleUsers').addEventListener('click', function() { toggleSection('usersSection'); });
+
+
+function submitExportForm() {
+    console.debug("Export form submitted.");
+
+    var formData = new FormData(document.getElementById("exportForm"));
+    formData.forEach(function(value, key){
+        console.debug("Form Data - Key:", key, "Value:", value);
+    });
+
+    console.debug("Sending POST request to /export_projects");
+
+    fetch('{{ url_for("export_projects") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.debug("Server Response:", response);
+        if (!response.ok) {
+            console.error('Server responded with status:', response.status);
+            throw new Error('Server responded with status ' + response.status);
+        }
+        return response.json(); // Expecting a JSON response now
+    })
+    .then(data => {
+        if (data.filepath) {
+            // Trigger download using the filepath received
+            window.location.href = data.filepath; // This will start the download
+        } else {
+            console.error('File path not received from server');
+        }
+    })
+    .catch(error => {
+        console.error('Export error:', error);
+    });
+
+    return false; // Prevent traditional form submission
+}
 
 
 </script>

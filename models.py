@@ -25,8 +25,8 @@ class User(db.Model, UserMixin):
 class ProjectView(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
-    ip_address = db.Column(db.String(100), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(100))
+    last_viewed = db.Column(db.DateTime)
     
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,9 +42,9 @@ class Project(db.Model):
     p_reports = db.Column(db.Integer, default=0)
     is_featured = db.Column(db.Boolean, default=False)  # New field
     is_mapobject = db.Column(db.Boolean, default=False)
-    views = db.Column(db.Integer, default=0)
-    viewed_by = db.relationship('ProjectView', backref='project', lazy=True, cascade="all, delete-orphan")
-    
+    is_global = db.Column(db.Boolean, default=False)
+    view_count = db.Column(db.Integer, default=0)  # New field for view count
+
     # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
     comments = db.relationship('Comment', backref='project', lazy=True, cascade="all, delete-orphan")

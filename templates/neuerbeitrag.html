@@ -817,7 +817,7 @@ display: block;
         </div>
 
 
-
+	<button id="no-location-btn" class="button">Dieses Projekt benötigt keinen Ort</button>
     <!-- Map Container -->
     <div class="input-field">
         <label for="map">6. Wählen Sie den betreffenden Ort auf der Stadtkarte aus.</label>
@@ -1032,15 +1032,28 @@ function handleImageChange(event) {
 
 document.getElementById('image').addEventListener('change', handleImageChange);
 
-document.querySelector('form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent default form submission
+    // Toggle map container visibility
+    document.getElementById('no-location-btn').addEventListener('click', function() {
+        var mapContainer = document.getElementById('map');
+        var geolocInput = document.getElementById('geoloc');
+        if (mapContainer.style.display === 'none') {
+            mapContainer.style.display = 'block';
+            geolocInput.required = true;
+        } else {
+            mapContainer.style.display = 'none';
+            geolocInput.required = false;
+        }
+        console.log('Toggle map container visibility');
+    });
 
-    // Check if a marker has been placed
-    var geolocInput = document.getElementById('geoloc');
-    if (!geolocInput.value) {
-        alert('Bitte platzieren Sie zuerst einen Marker auf der Karte.');
-        return; // Do not proceed with form submission
-    }
+    // Modify existing form submission logic
+    document.querySelector('form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var geolocInput = document.getElementById('geoloc');
+        if (geolocInput.required && !geolocInput.value) {
+            alert('Bitte platzieren Sie zuerst einen Marker auf der Karte.');
+            return;
+        }
 
     // Fetch the swear words list
     fetch('/static/filter.json')

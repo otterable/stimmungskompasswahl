@@ -1018,6 +1018,8 @@ display: block;
 <div class="form-container">
     <h2 class="centered-title">{{ project.name }}</h2>
     <p class="centered-title">Gepostet am: {{ project.date.strftime('%d.%m.%Y, %H:%M') }}</p>
+	    <p class="centered-title">Projektansichten: {{ project.view_count }}</p>
+
     <p class="centered-title">
         <strong>Kategorie:</strong>
 <a href="{{ url_for('list_view', search='', category=project.category) }}" class="category-link">{{ project.category }}</a>
@@ -1041,9 +1043,6 @@ display: block;
     {% endif %}
 </div>
 
-
-
-    <h3>Project Views: {{ project.views }}</h3>
 
 
                 <div class="voting-bar">
@@ -1134,6 +1133,8 @@ display: block;
 	
 	
 </body>
+
+
 
 <script>
     function initClickableEdges() {

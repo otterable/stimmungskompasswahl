@@ -1,8 +1,8 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, desc, asc
+from sqlalchemy import func, desc, asc, and_
 from flask_migrate import Migrate
-from models import db, User, Project, Vote, Comment
+from models import db, User, Project, Vote, Comment, ProjectView
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth
@@ -913,6 +913,7 @@ def submit_project():
         public_benefit = request.form.get('public_benefit')
         image = request.files.get('image_file')
         geoloc = request.form.get('geoloc')
+        is_global = False if geoloc else True
 
         if image:
             image_filename = secure_filename(image.filename)
@@ -928,6 +929,7 @@ def submit_project():
                 public_benefit=public_benefit,
                 image_file=image_filename,
                 geoloc=geoloc,
+                is_global=is_global,
                 author=current_user.id,
                 date=current_time
             )
@@ -952,7 +954,7 @@ def submit_project():
 @app.route('/list/pages/<int:page>')
 def list_view(page=1):
     per_page = 9  # Number of projects per page
-    query = Project.query.filter(Project.is_mapobject != True)  # Exclude projects with is_mapobject = True
+    query = Project.query.filter(Project.is_mapobject != True)
 
     category = request.args.get('category')
     sort = request.args.get('sort')
@@ -964,23 +966,22 @@ def list_view(page=1):
     if search:
         query = query.filter(Project.name.contains(search))
 
-    # Apply combined sort filter
+    # Apply sort filters
     if sort == 'oldest':
         query = query.order_by(Project.date.asc())
-        logging.debug("Sorting by oldest posts")
-    elif sort == 'lowest':
-        query = query.outerjoin(Vote, Project.id == Vote.project_id) \
-                    .group_by(Project.id) \
-                    .order_by(func.sum(Vote.upvote - Vote.downvote))
-        logging.debug("Sorting by lowest score")
     elif sort == 'newest':
         query = query.order_by(Project.date.desc())
-        logging.debug("Sorting by newest posts")
-    else:  # Default to highest score if no valid sort option is provided
+    elif sort == 'highest_views':
+        query = query.order_by(Project.view_count.desc())
+    elif sort == 'lowest':
+        # Sorting by lowest score (more downvotes)
         query = query.outerjoin(Vote, Project.id == Vote.project_id) \
                     .group_by(Project.id) \
-                    .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
-        logging.debug("Sorting by highest score")
+                    .order_by(func.coalesce(func.sum(Vote.upvote - Vote.downvote), 0))
+    else:  # Default to highest score (more upvotes)
+        query = query.outerjoin(Vote, Project.id == Vote.project_id) \
+                    .group_by(Project.id) \
+                    .order_by(func.coalesce(func.sum(Vote.upvote - Vote.downvote), 0).desc())
 
     # Paginate the query
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
@@ -991,11 +992,9 @@ def list_view(page=1):
         downvotes = sum(vote.downvote for vote in project.votes)
         total_votes = upvotes + downvotes
 
-        # Add upvote and downvote counts to each project
         project.upvotes = upvotes
         project.downvotes = downvotes
 
-        # Calculate and add percentages
         if total_votes > 0:
             project.upvote_percentage = upvotes / total_votes * 100
             project.downvote_percentage = downvotes / total_votes * 100
@@ -1004,6 +1003,7 @@ def list_view(page=1):
             project.downvote_percentage = 0
 
     return render_template('list.html', projects=paginated_projects.items, pagination=paginated_projects)
+
 
 
 
@@ -1019,14 +1019,31 @@ def project_details(project_id):
     try:
         project = Project.query.get(project_id)
         comments = Comment.query.filter_by(project_id=project_id).all()
-        ip_address = request.remote_addr
-        last_view = ProjectView.query.filter_by(project_id=project_id, ip_address=ip_address).order_by(ProjectView.timestamp.desc()).first()
+        
+        user_ip = request.remote_addr
+        current_time = datetime.utcnow()
+        last_view = ProjectView.query.filter(and_(ProjectView.project_id == project_id, 
+                                                  ProjectView.ip_address == user_ip)).first()
 
-        if last_view is None or last_view.timestamp < datetime.utcnow() - timedelta(days=1):
-            new_view = ProjectView(project_id=project_id, ip_address=ip_address)
-            project.views += 1
+        ip_address = request.remote_addr  # Example to get IP address
+        last_view = ProjectView.query.filter_by(
+            project_id=project_id, ip_address=ip_address
+        ).order_by(ProjectView.last_viewed.desc()).first()
+
+        if last_view is None or (datetime.utcnow() - last_view.last_viewed > timedelta(hours=24)):
+            new_view = ProjectView(project_id=project_id, ip_address=ip_address, last_viewed=datetime.utcnow())
             db.session.add(new_view)
+            
+            # Ensure view_count is not None
+            if project.view_count is None:
+                project.view_count = 0
+            project.view_count += 1
+
             db.session.commit()
+            print(f"Project viewed by user {current_user.id if current_user.is_authenticated else 'Anonymous'} from IP {ip_address}, adding one more view. Current number of views: {project.view_count}.")
+        else:
+            print(f"Project viewed by user {current_user.id if current_user.is_authenticated else 'Anonymous'} from IP {ip_address}, user has however already viewed this project during the last 24 hours. Not adding a view. Current number of views: {project.view_count}.")
+
         
         if request.method == 'POST' and current_user.is_authenticated:
             comment_text = request.form.get('comment', '').strip()
@@ -1149,6 +1166,47 @@ def admintools():
         comment.author_name = user.name if user else "Unknown Author"
         comment.author_id = user.id if user else "Unknown ID"
 
+    top_viewed_projects = Project.query.order_by(Project.view_count.desc()).limit(5).all()
+    top_rated_projects = db.session.query(
+        Project.id,
+        Project.name,
+        func.count(Vote.id).label('upvote_count')
+    ).join(Vote, Project.id == Vote.project_id).filter(
+        Vote.upvote == True
+    ).group_by(
+        Project.id
+    ).order_by(
+        desc('upvote_count')
+    ).limit(5).all()
+
+    top_commented_projects_query = db.session.query(
+        Project.id,
+        Project.name,
+        func.count(Comment.id).label('comments_count')
+    ).join(Comment, Project.id == Comment.project_id)\
+     .group_by(Project.id)\
+     .order_by(func.count(Comment.id).desc())\
+     .limit(5).all()
+
+    top_commented_projects = [
+        {'id': project_id, 'name': project_name, 'comments_count': comments_count}
+        for project_id, project_name, comments_count in top_commented_projects_query
+    ]
+
+
+
+
+    # Top categories
+    category_counts = Counter([project.category for project in Project.query.all()]).most_common(5)
+    
+    # Top active accounts
+    active_users = User.query.outerjoin(Project, User.id == Project.author)\
+        .group_by(User.id)\
+        .order_by(func.count(Project.id).desc()).limit(5).all()
+
+    app.logger.debug("Top statistics calculated for admin tools")
+
+        
     # POST request handling
     if request.method == 'POST':
         project_id = request.form.get('project_id')
@@ -1360,7 +1418,12 @@ def admintools():
                            search_query=search_query, 
                            users=users, 
                            important_projects=important_projects, 
-                           featured_projects=featured_projects)
+                           featured_projects=featured_projects,
+                           top_viewed_projects=top_viewed_projects,
+                           top_rated_projects=top_rated_projects,
+                           top_commented_projects=top_commented_projects,
+                           category_counts=category_counts,
+                           active_users=active_users)
                            
 @app.route('/verify_admin_otp', methods=['GET', 'POST'])
 @login_required
