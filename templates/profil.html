@@ -33,7 +33,7 @@
         color: white;
         border: none;
         border-radius: 30px;
-        padding: 10px 10px;
+        padding: 5px 10px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
@@ -62,7 +62,7 @@
             background-color: #fff;
             padding: 40px;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-            border-radius: 10px;
+            border-radius: 30px;
             box-sizing: border-box;
         }
 
@@ -113,7 +113,7 @@
     border-radius: 30px; /* Border radius */
     border: none; /* No border by default */
     cursor: pointer; /* Pointer cursor on hover */
-    transition: transform 0.3s ease, border 0.3s ease; /* Smooth transition for transform and border */
+    transition: width transform 0.3s ease; /* Smooth transition for transform and border */
 }
 
 .publish-button:hover {
@@ -1064,15 +1064,14 @@ display: block;
             <!-- Download My Data Section -->
             <p>Meine Daten herunterladen:</p>
  
-            <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold;">Daten herunterladen</a>
+<a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold; display: inline-block; width: auto; padding: 5px 10px;">Daten herunterladen</a>
          
-            <p>Alle Daten zu Projhektvorschlägen, Notizen, Kommentaren und mehr herunterladen:</p>
-            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Website herunterladen</a>
+<a href="{{ url_for('download_data') }}" class="register-button" style="display:none">Website herunterladen</a>
             <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Bilder herunterladen</a>
 
             <p>Möchten Sie Ihr Konto und Ihre gesamten Aktivitäten inklusive Ihrer Notizen und Projektvorschläge von der Website löschen? </p>
       
-            <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold;" id="delete-data-btn">Meine gesamten Daten löschen</a>
+<a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold; display: inline-block; width: auto; padding: 5px 10px;" id="delete-data-btn">Meine gesamten Daten löschen</a>
         </div>
     </div>
 {% endif %}
