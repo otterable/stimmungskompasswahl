@@ -697,7 +697,7 @@ def check_marker_limit():
     additions = ip_marker_additions.get(ip_address, [])
     additions = [time for time in additions if now - time < timedelta(days=1)]
     current_count = len(additions)
-    max_limit = 3  # Set your max limit here
+    max_limit = 300  # Set your max limit here
     limit_reached = current_count >= max_limit
 
     if limit_reached and additions:
@@ -726,7 +726,7 @@ def add_marker():
     # Filter additions within the last 24 hours
     additions = [time for time in additions if now - time < timedelta(days=1)]
     
-    if len(additions) >= 3:  # Assuming a limit of 2 markers per day
+    if len(additions) >= 300:  # Assuming a limit of 2 markers per day
         app.logger.warning(f"IP {ip_address} blocked from adding new markers due to rate limit")
         return jsonify({'error': 'Rate limit exceeded. You can only add 2 markers every 24 hours'}), 429
 
