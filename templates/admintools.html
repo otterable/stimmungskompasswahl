@@ -20,7 +20,8 @@
    
    
 body {
-    font-family: 'Roboto', sans-serif;
+                   font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+
     background-color: #f5f1e4;
     color: black;
     margin: 0;
@@ -50,7 +51,7 @@ body {
 }
         img {
             border-radius: 30px;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
         }
 
         .logo {
@@ -188,7 +189,7 @@ margin: auto;
 
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
     /* Add any other button-specific styles here */
 }
@@ -250,10 +251,12 @@ nav[aria-label="Page navigation"] {
 
 /* Pagination Links */
 .pagination .page-link {
-    color: white; /* Text color */
-    background-color: transparent; /* Remove default background */
-    border: none; /* Remove default borders */
-    margin: 0 5px; /* Add horizontal spacing between items */
+    color: white;
+    background-color: transparent;
+    border: none;
+    margin: 0 5px;
+    text-decoration: none; /* Remove underline */
+    font-weight: bold; /* Make it bold */
 }
 
 /* Pagination Items */
@@ -500,7 +503,7 @@ nav[aria-label="Page navigation"] {
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             width: 30%; /* Set a fixed width for each box */
         }
 
@@ -597,7 +600,7 @@ nav[aria-label="Page navigation"] {
         flex-direction: column; /* Stack items vertically */
         align-items: center; /* Center items horizontally */
         box-sizing: border-box; /* Include padding and border in width/height */
-        transition: transform 0.3s ease; /* Smooth scaling on hover */
+        transition: width 0.3s ease; /* Smooth scaling on hover */
         position: relative; /* Position relative for any positioned children */
         overflow: hidden; /* Hide overflow */
         width: calc(33.333% - 20px); /* Three items per row */
@@ -645,7 +648,7 @@ nav[aria-label="Page navigation"] {
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     box-sizing: border-box;
-    transition: transform 0.3s ease;
+    transition: width 0.3s ease;
     position: relative;
     overflow: visible; /* Ensure the content is not clipped */
 }
@@ -745,7 +748,7 @@ nav[aria-label="Page navigation"] {
     box-sizing: border-box;
   background-color: rgba(40, 116, 166, 0.3); /* Similar to project-thumbnail */
     border-radius: 30px; /* Similar to project-thumbnail */
-	    transition: transform 0.3s ease; /* Smooth scaling on hover */
+	    transition: width 0.3s ease; /* Smooth scaling on hover */
 
 	}
 
@@ -869,7 +872,7 @@ nav[aria-label="Page navigation"] {
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
     /* Add any other button-specific styles here */

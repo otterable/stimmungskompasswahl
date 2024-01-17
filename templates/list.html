@@ -13,7 +13,8 @@
    
    
       body {
-        font-family: 'Roboto', sans-serif;
+                       font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+
         background-color: #f5f1e4;
         color: black;
         margin: 0; /* Remove default margin */
@@ -24,7 +25,7 @@
 }
         img {
             border-radius: 30px;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
         }
 
         .logo {
@@ -32,9 +33,7 @@
             margin-bottom: 30px;
         }
 
-        img:hover {
-            transform: scale(1.01);
-        }
+
 
         .button {
             border-radius: 30px;
@@ -248,15 +247,13 @@ margin: auto;
 
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
     /* Add any other button-specific styles here */
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 
 /* Hover effect for links in the top bar */
@@ -310,10 +307,12 @@ nav[aria-label="Page navigation"] {
 
 /* Pagination Links */
 .pagination .page-link {
-    color: white; /* Text color */
-    background-color: transparent; /* Remove default background */
-    border: none; /* Remove default borders */
-    margin: 0 5px; /* Add horizontal spacing between items */
+    color: white;
+    background-color: transparent;
+    border: none;
+    margin: 0 5px;
+    text-decoration: none; /* Remove underline */
+    font-weight: bold; /* Make it bold */
 }
 
 /* Pagination Items */
@@ -360,9 +359,7 @@ nav[aria-label="Page navigation"] {
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 .voting-bar {
     width: 90%;
@@ -535,12 +532,12 @@ nav[aria-label="Page navigation"] {
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             width: 30%; /* Set a fixed width for each box */
         }
 
         .info-box:hover {
-            transform: scale(1.01);
+            transform: scale(1.005);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -612,7 +609,7 @@ nav[aria-label="Page navigation"] {
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     box-sizing: border-box;
-    transition: transform 0.3s ease;
+    transition: width 0.3s ease;
     position: relative;
     overflow: visible; /* Ensure the content is not clipped */
 }
@@ -628,7 +625,8 @@ nav[aria-label="Page navigation"] {
 
 /* Hover effect for project thumbnails */
 .project-thumbnail:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
+	    transition: width 0.3s ease;
 }
 
 /* Image style within project thumbnails */
@@ -758,7 +756,7 @@ nav[aria-label="Page navigation"] {
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
     /* Add any other button-specific styles here */

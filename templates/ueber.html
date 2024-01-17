@@ -9,7 +9,8 @@
 
    <style>
       body {
-        font-family: 'Roboto', sans-serif;
+                       font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+
         background-color: #f5f1e4;
         color: black;
    background-image: url('static/background2.png');
@@ -23,7 +24,7 @@
 
         img {
             border-radius: 30px;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
         }
 
         .logo {
@@ -31,9 +32,7 @@
             margin-bottom: 30px;
         }
 
-        img:hover {
-            transform: scale(1.01);
-        }
+        
 
    .form-container {
             margin: 40px auto;
@@ -96,7 +95,7 @@
 }
 
 .publish-button:hover {
-    transform: scale(1.01); /* Scale up on hover */
+    transform: scale(1.005); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 
@@ -136,15 +135,13 @@ margin: auto;
 
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
     /* Add any other button-specific styles here */
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 
 /* Hover effect for links in the top bar */
@@ -207,9 +204,7 @@ margin: auto;
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 /* Underline effect for links that do not contain buttons */
 .top-bar a:not(:has(> button))::after {
@@ -282,12 +277,12 @@ margin: auto;
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             width: 30%; /* Set a fixed width for each box */
         }
 
         .info-box:hover {
-            transform: scale(1.01);
+            transform: scale(1.005);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -352,7 +347,7 @@ margin: auto;
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
     /* Add any other button-specific styles here */

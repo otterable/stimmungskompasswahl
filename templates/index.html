@@ -18,7 +18,8 @@ img { max-width: 100%; height: auto;
 </style></head>
 <style>
       body {
-        font-family: 'Roboto', sans-serif;
+                       font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+
         background-color: #f5f1e4;
         color: black;
         margin: 0; /* Remove default margin */
@@ -58,15 +59,13 @@ margin: auto;
 
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
     /* Add any Andere button-specific styles here */
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 
 /* Hover effect for links in the top bar */
@@ -129,9 +128,7 @@ margin: auto;
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 /* Underline effect for links that do not contain buttons */
 .top-bar a:not(:has(> button))::after {
@@ -164,7 +161,7 @@ margin: auto;
 
         img { max-width: 100%; height: auto;
             border-radius: 30px;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
         }
 
         .logo {
@@ -172,9 +169,7 @@ margin: auto;
             margin-bottom: 30px;
         }
 
-        img:hover {
-            transform: scale(1.01);
-        }
+        
 
    .form-container {
             margin: 40px auto;
@@ -237,7 +232,7 @@ margin: auto;
 }
 
 .publish-button:hover {
-    transform: scale(1.01); /* Scale up on hover */
+    transform: scale(1.005); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 
@@ -261,14 +256,15 @@ margin: auto;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     box-sizing: border-box;
-    transition: transform 0.3s ease;
+    transition: width 0.3s ease;
     position: relative;
     overflow: visible; /* Ensure the content is not clipped */
 }
 
 /* Hover effect for project thumbnails */
 .project-thumbnail:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
+	    transition: width 0.3s ease;
 }
 
 /* Image style within project thumbnails */
@@ -437,9 +433,7 @@ margin: auto;
 	border-radius: 0px;
 }
 
-.index-image:hover {
- transform: scale(1.00); !important:
-}
+
 
     .cover-text-container {
         position: absolute;
@@ -486,12 +480,12 @@ margin: auto;
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             width: 30%; /* Set a fixed width for each box */
         }
 
         .info-box:hover {
-            transform: scale(1.01);
+            transform: scale(1.005);
         }
 	.user-info {
     color: white; /* Set the text color to match other links */
@@ -563,7 +557,7 @@ margin: auto;
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
     /* Add any Andere button-specific styles here */

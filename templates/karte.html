@@ -155,7 +155,7 @@ display:none !important;
 }
 
 .button-hover-effect:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
     background-color: #111111; /* Light blue color */
 }
 
@@ -643,7 +643,8 @@ display: none !important;
 		max-width: 100%;
         margin-bottom: -25px; /* Adjust this value as needed to reduce gap */
 		font-size: 15px; /* Set font size to 15px */
-        font-family: 'Roboto', sans-serif; /* Set font family to Roboto */
+                       font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+ /* Set font family to Roboto */
     }
 
 
@@ -1209,7 +1210,7 @@ display: none !important;
 }
 
 .tool-btn:hover img {
-    transform: scale(1.01);
+    transform: scale(1.005);
     outline: var(--tool-btn-hover-outline);
 }
 
@@ -1805,12 +1806,12 @@ margin-bottom: 50px;
 }
 
 .register-button-m:hover {
-    transform: scale(1.01); /* Scale up on hover */
+    transform: scale(1.005); /* Scale up on hover */
     filter: brightness(110%); /* Increase brightness by 10% */
 }
 
 .publish-button:hover {
-    transform: scale(1.01); /* Scale up on hover */
+    transform: scale(1.005); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 
@@ -1847,15 +1848,13 @@ margin: auto;
 
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
     /* Add any Andere button-specific styles here */
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 
 /* Hover effect for links in the top bar */
@@ -1918,9 +1917,7 @@ margin: auto;
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 /* Underline effect for links that do not contain buttons */
 .top-bar a:not(:has(> button))::after {
@@ -1998,12 +1995,12 @@ margin: auto;
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             width: 30%; /* Set a fixed width for each box */
         }
 
         .info-box:hover {
-            transform: scale(1.01);
+            transform: scale(1.005);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -2075,7 +2072,7 @@ margin-bottom: 0px !important;
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
     /* Add any Andere button-specific styles here */
@@ -2291,22 +2288,22 @@ margin-bottom: 0px !important;
  <style>
     /* Scale logo image on hover */
     img.logo:hover {
-        transform: scale(1.01);
-        transition: transform 0.3s ease;
+        transform: scale(1.005);
+        transition: width 0.3s ease;
     }
 
 /* Hover effect for category buttons (dynamically generated) */
 #category-toggle-buttons button:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
 }
     /* Scale register buttons on hover */
     .register-button:hover {
-        transform: scale(1.01);
-        transition: transform 0.3s ease;
+        transform: scale(1.005);
+        transition: width 0.3s ease;
     }
 	.register-button-f:hover {
-        transform: scale(1.01);
-        transition: transform 0.3s ease;
+        transform: scale(1.005);
+        transition: width 0.3s ease;
     }
 </style>
 

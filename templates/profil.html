@@ -9,7 +9,8 @@
 
    <style>
       body {
-        font-family: 'Roboto', sans-serif;
+                       font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+
         background-color: #f5f1e4;
         color: black;
         margin: 0; /* Remove default margin */
@@ -17,7 +18,7 @@
     }
 		.register-button:hover {
 
-    transform: scale(1.01); /* Scale up on hover */
+    transform: scale(1.005); /* Scale up on hover */
 }
 .project-description {
     text-align: center !important; /* Center text horizontally */
@@ -45,7 +46,7 @@
 	
         img {
             border-radius: 30px;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
         }
 
         .logo {
@@ -53,9 +54,7 @@
             margin-bottom: 30px;
         }
 
-        img:hover {
-            transform: scale(1.01);
-        }
+        
 
    .form-container {
             margin: 40px auto;
@@ -118,7 +117,7 @@
 }
 
 .publish-button:hover {
-    transform: scale(1.01); /* Scale up on hover */
+    transform: scale(1.005); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 
@@ -151,14 +150,15 @@
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     box-sizing: border-box;
-    transition: transform 0.3s ease;
+    transition: width 0.3s ease;
     position: relative;
     overflow: visible; /* Ensure the content is not clipped */
 }
 
 /* Hover effect for project thumbnails */
 .project-thumbnail:hover {
-    transform: scale(1.01);
+    transform: scale(1.005);
+	    transition: width 0.3s ease;
 }
 
 /* Image style within project thumbnails */
@@ -354,15 +354,13 @@ margin: auto;
 
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
     /* Add any other button-specific styles here */
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 
 /* Centering Pagination Wrapper */
@@ -382,10 +380,12 @@ nav[aria-label="Page navigation"] {
 
 /* Pagination Links */
 .pagination .page-link {
-    color: white; /* Text color */
-    background-color: transparent; /* Remove default background */
-    border: none; /* Remove default borders */
-    margin: 0 5px; /* Add horizontal spacing between items */
+    color: white;
+    background-color: transparent;
+    border: none;
+    margin: 0 5px;
+    text-decoration: none; /* Remove underline */
+    font-weight: bold; /* Make it bold */
 }
 
 /* Pagination Items */
@@ -524,9 +524,7 @@ nav[aria-label="Page navigation"] {
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 /* Underline effect for links that do not contain buttons */
 .top-bar a:not(:has(> button))::after {
@@ -591,12 +589,12 @@ nav[aria-label="Page navigation"] {
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             width: 30%; /* Set a fixed width for each box */
         }
 
         .info-box:hover {
-            transform: scale(1.01);
+            transform: scale(1.005);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -723,7 +721,7 @@ nav[aria-label="Page navigation"] {
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
     /* Add any other button-specific styles here */
@@ -955,7 +953,7 @@ display: block;
 </div>
 <div class="filter-bar">
   <button id="toggleExportSection" class="c-button" data-section-id="exportSection" style="display:none;">Datenexport</button>
-		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
+		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection" style="display:none;">Statistik</button>
     <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
 	<button id="toggleBookmarks" class="c-button" data-section-id="bookmarksSection">Bookmarks</button>
     <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
@@ -1004,7 +1002,7 @@ display: block;
 
 <div id="bookmarksSection" style="display: none;">
     <div class="info-text-field3-c">
-        <h1>Meine Bookmarks:</h1>
+        <h1>Meine Lesezeichen:</h1>
         <div id="bookmarked-projects-container">
             {% with bookmarked_projects=user_bookmarked_projects %}
                 {% include 'partials/bookmarked_projects_section.html' %}
@@ -1055,17 +1053,6 @@ display: block;
     {% endif %}
 
 
-<div class="bookmarked-projects">
-    <h2>Your Bookmarked Projects</h2>
-    {% for bookmark in bookmarks %}
-        <div class="bookmark">
-            <a href="{{ url_for('project_details', project_id=bookmark.project_id) }}">
-                Project ID: {{ bookmark.project_id }} | Bookmarked on: {{ bookmark.timestamp }}
-            </a>
-        </div>
-    {% endfor %}
-</div>
-
 
 <!-- My Account Section -->
 
@@ -1108,6 +1095,10 @@ document.addEventListener('DOMContentLoaded', function() {
     attachPaginationEvent('comments-container');
     attachPaginationEvent('map-objects-container');
     attachPaginationEvent('projects-container'); // Add this line
+	
+	if (!isAnySectionOpen()) {
+        document.getElementById('toggleProjectProposals').click();
+    }
 });
 
 function attachPaginationEvent(containerId) {
@@ -1265,77 +1256,95 @@ document.getElementById('delete-data-btn').addEventListener('click', function() 
 
 <script>
 
-function toggleExportSection() {
-            var exportSection = document.querySelector('.export-section');
-            if (exportSection.style.display === 'none') {
-                exportSection.style.display = 'block';
-                console.debug('Export section opened');
-            } else {
-                exportSection.style.display = 'none';
-                console.debug('Export section closed');
-            }
-        }
 
-        // Add click event listener to the toggle button
 
-function toggleProjectProposals() {
-            var projectProposalsSection = document.getElementById('projectProposalsSection');
-            if (projectProposalsSection.style.display === 'none') {
-                projectProposalsSection.style.display = 'block';
-                console.debug('Projektvorschläge section opened');
-			} else {
-            projectProposalsSection.style.display = 'none';
-            console.debug('Projektvorschläge section closed');
+
+
+
+
+
+
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const projectProposalsSection = document.getElementById('projectProposalsSection');
+    const projectProposalsButton = document.getElementById('toggleProjectProposals');
+
+    // Close the current open section if it's not the one being toggled
+    if (currentOpenSection && currentOpenSection !== sectionId) {
+        const currentSection = document.getElementById(currentOpenSection);
+        if (currentSection) {
+            currentSection.style.display = 'none';
+            document.querySelector(`[data-section-id="${currentOpenSection}"]`).classList.remove('active');
+            console.debug(currentOpenSection + ' section closed');
         }
     }
 
+    // Toggle the clicked section
+    if (section.style.display === 'none') {
+        section.style.display = 'block';
+        document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
+        console.debug(sectionId + ' section opened');
+        currentOpenSection = sectionId;
 
-function toggleNotes() {
-            var notesSection = document.getElementById('notesSection');
-            if (notesSection.style.display === 'none') {
-                notesSection.style.display = 'block';
-                console.debug('Notizen section opened');
-            } else {
-                notesSection.style.display = 'none';
-                console.debug('Notizen section closed');
-            }
+        // Close project proposals if it's open and not the current section
+        if (projectProposalsSection.style.display === 'block' && sectionId !== 'projectProposalsSection') {
+            projectProposalsSection.style.display = 'none';
+            projectProposalsButton.classList.remove('active');
+            console.debug('projectProposalsSection section closed');
         }
+    } else {
+        section.style.display = 'none';
+        document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
+        console.debug(sectionId + ' section closed, opening projectProposalsSection');
 
-
-let currentOpenSection = null;
-
-
-
-
-    function toggleSection(sectionId) {
-        const section = document.getElementById(sectionId);
-        const allButtons = document.querySelectorAll('.control-bar .c-button');
-
-        if (currentOpenSection && currentOpenSection !== sectionId) {
-            const currentSection = document.getElementById(currentOpenSection);
-            if (currentSection) {
-                currentSection.style.display = 'none';
-                document.querySelector(`[data-section-id="${currentOpenSection}"]`).classList.remove('active');
-                console.debug(currentOpenSection + ' section closed');
-            }
-        }
-
-        if (section.style.display === 'none') {
-            section.style.display = 'block';
-            document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
-            console.debug(sectionId + ' section opened, closing ' + currentOpenSection);
-            currentOpenSection = sectionId;
+        // Open project proposals section if it's not already open
+        if (projectProposalsSection.style.display === 'none') {
+            projectProposalsSection.style.display = 'block';
+            projectProposalsButton.classList.add('active');
+            console.debug('projectProposalsSection section opened');
+            currentOpenSection = 'projectProposalsSection';
         } else {
-            section.style.display = 'none';
-            document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
-            console.debug(sectionId + ' section closed');
             currentOpenSection = null;
         }
     }
+}
 
-    document.getElementById('toggleBookmarks').addEventListener('click', function() {
-        toggleSection('bookmarksSection');
+let currentOpenSection = null;
+
+// Attach event listeners
+document.querySelectorAll('.control-bar .c-button').forEach(button => {
+    button.addEventListener('click', function() {
+        const sectionId = this.getAttribute('data-section-id');
+        toggleSection(sectionId);
     });
+});
+
+// Initialize with project proposals section open
+document.addEventListener('DOMContentLoaded', function() {
+    if (!isAnySectionOpen()) {
+        toggleSection('projectProposalsSection');
+    }
+});
+
+
+
+// Function to check if any section is open
+function isAnySectionOpen() {
+    let sections = document.querySelectorAll('.section');
+    return Array.from(sections).some(section => section.style.display === 'block');
+}
+
+// Function to open the project proposals section
+function openProjectProposalsSection() {
+    const projectProposalsButton = document.getElementById('toggleProjectProposals');
+    projectProposalsButton.click();
+    console.debug('No sections open, opening projectProposalsSection');
+}
+
+// Attach event listeners
+document.getElementById('toggleBookmarks').addEventListener('click', function() {
+    toggleSection('bookmarksSection');
+});
 	
 // Attach the toggleSection function to the new button
 document.getElementById('toggleDeleteAllProjects').addEventListener('click', function() {
@@ -1402,10 +1411,16 @@ function submitExportForm() {
     return false; // Prevent traditional form submission
 }
 
+function isAnySectionOpen() {
+    let sections = document.querySelectorAll('.section');
+    return Array.from(sections).some(section => section.style.display === 'block');
+}
 
 </script>
 
 <script>
+
+
 function removeBookmark(projectId) {
     console.log("Removing bookmark for project ID:", projectId);
     fetch(`/bookmark/${projectId}`, {

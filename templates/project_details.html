@@ -12,7 +12,8 @@
 
    <style>
 body {
-    font-family: 'Roboto', sans-serif;
+               font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
+
     background-color: #f5f1e4;
     color: black;
     background-image: url('/static/background2.png'); /* Updated path */
@@ -43,7 +44,7 @@ body {
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
 	padding: 7px;
     /* Add any other button-specific styles here */
@@ -55,7 +56,7 @@ body {
     height: auto; /* Maintain aspect ratio */
 
             border-radius: 30px;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
         }
 
         .logo {
@@ -63,9 +64,7 @@ body {
             margin-bottom: 30px;
         }
 
-        img:hover {
-            transform: scale(1.01);
-        }
+        
 		
 	#project-map {
     width: 100%; /* Full width of the parent container */
@@ -385,7 +384,7 @@ display: none !important;
 	 .report-button:hover {
 
 	        background-color: #222222; /* Lighter shade of green */
-        transform: scale(1.01);
+        transform: scale(1.005);
     }
 
  .bookmark-button {
@@ -398,7 +397,7 @@ display: none !important;
 	 .bookmark-button:hover {
 
 	        background-color: #234770; /* Lighter shade of green */
-        transform: scale(1.01);
+        transform: scale(1.005);
     }
 	
  .upvote-button {
@@ -410,7 +409,7 @@ display: none !important;
 
     .upvote-button:hover {
         background-color: #66c46a; /* Lighter shade of green */
-        transform: scale(1.01);
+        transform: scale(1.005);
     }
 
     .downvote-button {
@@ -422,7 +421,7 @@ display: none !important;
 
     .downvote-button:hover {
         background-color: #cc5045; /* Lighter shade of red */
-        transform: scale(1.01);
+        transform: scale(1.005);
     }
 
 
@@ -453,13 +452,13 @@ display: none !important;
 	
 	    .share-button:hover {
         background-color: #306db8; /* Lighter shade of red */
-        transform: scale(1.01);
+        transform: scale(1.005);
     }
 
 
     .comment-button:hover {
         background-color: #00427a; /* Lighter shade of blue */
-        transform: scale(1.01);
+        transform: scale(1.005);
     }
 	
 .publish-button {
@@ -475,7 +474,7 @@ display: none !important;
 }
 
 .publish-button:hover {
-    transform: scale(1.01); /* Scale up on hover */
+    transform: scale(1.005); /* Scale up on hover */
     border: 2px solid black; /* Thin black border on hover */
 }
 .left-column img {
@@ -517,15 +516,13 @@ margin: auto;
 
 /* Styles for buttons inside links in the top bar */
 .top-bar a button {
-    transition: transform 0.3s ease; /* Transition for the transform property */
+    transition: width 0.3s ease; /* Transition for the transform property */
     border-radius: 30px; /* If you want to keep the border-radius */
     /* Add any other button-specific styles here */
 }
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 .voting-login-prompt {
     display: flex;
@@ -673,9 +670,7 @@ margin: auto;
 
 
 /* Hover effect for buttons inside links in the top bar */
-.top-bar a button:hover {
-    transform: scale(1.01); /* Scale up slightly on hover */
-}
+
 
 .voting-bar {
     width: 100%;
@@ -787,12 +782,12 @@ margin: auto;
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            transition: width 0.3s ease;
             width: 30%; /* Set a fixed width for each box */
         }
 
         .info-box:hover {
-            transform: scale(1.01);
+            transform: scale(1.005);
         }
         .info-box-icon {
             max-width: 70px; /* Icon size */
@@ -869,7 +864,7 @@ margin: auto;
 
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
-    transition: transform 0.3s ease;
+    transition: width 0.3s ease;
     border-radius: 30px;
     padding: 7px;
 }
