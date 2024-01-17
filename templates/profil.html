@@ -955,7 +955,7 @@ display: block;
   <button id="toggleExportSection" class="c-button" data-section-id="exportSection" style="display:none;">Datenexport</button>
 		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection" style="display:none;">Statistik</button>
     <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
-	<button id="toggleBookmarks" class="c-button" data-section-id="bookmarksSection">Bookmarks</button>
+	<button id="toggleLesezeichen" class="c-button" data-section-id="bookmarksSection">Lesezeichen</button>
     <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
     <button id="toggleComments" class="c-button" data-section-id="commentsSection">Kommentare</button>
     <button id="toggleImportantProjects" class="c-button" data-section-id="importantProjectsSection" style="display:none;">Markierte Projektvorschläge</button>
@@ -1060,20 +1060,16 @@ display: block;
 {% if is_authenticated %}
     <div class="info-text-field2">
         <div class="centered-text">
-            <h1>Daten:</h1>
 
             <!-- Download My Data Section -->
-            <h2>Meine Daten herunterladen</h2>
+            <p>Meine Daten herunterladen:</p>
  
             <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold;">Daten herunterladen</a>
-
-            <h2>Gesamte Website herunterladen</h2>
          
-            <p>Alle Daten zu Projhektvorschlägen, Notizen, Kommentaren und mehr herunterladen.</p>
+            <p>Alle Daten zu Projhektvorschlägen, Notizen, Kommentaren und mehr herunterladen:</p>
             <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Website herunterladen</a>
             <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Bilder herunterladen</a>
 
-            <h2>Konto löschen</h2>
             <p>Möchten Sie Ihr Konto und Ihre gesamten Aktivitäten inklusive Ihrer Notizen und Projektvorschläge von der Website löschen? </p>
       
             <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold;" id="delete-data-btn">Meine gesamten Daten löschen</a>
@@ -1342,7 +1338,7 @@ function openProjectProposalsSection() {
 }
 
 // Attach event listeners
-document.getElementById('toggleBookmarks').addEventListener('click', function() {
+document.getElementById('toggleLesezeichen').addEventListener('click', function() {
     toggleSection('bookmarksSection');
 });
 	

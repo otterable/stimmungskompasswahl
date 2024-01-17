@@ -1217,8 +1217,8 @@ nav[aria-label="Page navigation"] {
 
 <!-- Update the buttons in the filter-bar div -->
 <div class="filter-bar">
-    <button id="toggleExportSection" class="c-button" data-section-id="exportSection">Datenexport</button>
 		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
+    <button id="toggleExportSection" class="c-button" data-section-id="exportSection">Datenexport</button>
     <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
     <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
     <button id="toggleComments" class="c-button" data-section-id="commentsSection">Kommentare</button>
@@ -1294,7 +1294,7 @@ nav[aria-label="Page navigation"] {
      
 
         <!-- Submit Button -->
-        <button type="submit" onclick="submitExportForm()">Export</button>
+        <button type="submit" class="register-button" onclick="submitExportForm()">Export</button>
     </form>
 	            <h2>Gesamte Website herunterladen</h2>
 
@@ -1977,14 +1977,26 @@ function toggleNotes() {
         }
 
 
-let currentOpenSection = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    toggleSection('deleteAllProjectsSection'); // Open the 'Statistik' section by default
+
+    document.querySelectorAll('.control-bar .c-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const sectionId = this.getAttribute('data-section-id');
+            toggleSection(sectionId);
+        });
+    });
+});
+
+let currentOpenSection = 'deleteAllProjectsSection'; // Set 'Statistik' as the default section
 
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
-    const allButtons = document.querySelectorAll('.control-bar .c-button');
+    const defaultSection = document.getElementById('deleteAllProjectsSection');
+    const defaultButton = document.getElementById('toggleDeleteAllProjects');
 
-    // Close the currently open section and deactivate its button
-    if (currentOpenSection && currentOpenSection !== sectionId) {
+    if (currentOpenSection !== sectionId) {
         const currentSection = document.getElementById(currentOpenSection);
         if (currentSection) {
             currentSection.style.display = 'none';
@@ -1993,19 +2005,33 @@ function toggleSection(sectionId) {
         }
     }
 
-    // Toggle the clicked section and update the button's active state
     if (section.style.display === 'none') {
         section.style.display = 'block';
         document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
-        console.debug(sectionId + ' section opened, closing ' + currentOpenSection);
+        console.debug(sectionId + ' section opened');
         currentOpenSection = sectionId;
+
+        if (defaultSection && defaultSection !== section && defaultSection.style.display === 'block') {
+            defaultSection.style.display = 'none';
+            defaultButton.classList.remove('active');
+            console.debug('Default section closed');
+        }
     } else {
         section.style.display = 'none';
         document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
         console.debug(sectionId + ' section closed');
-currentOpenSection = null;
+
+        if (defaultSection.style.display === 'none') {
+            defaultSection.style.display = 'block';
+            defaultButton.classList.add('active');
+            console.debug('Default section opened');
+            currentOpenSection = 'deleteAllProjectsSection';
+        } else {
+            currentOpenSection = null;
+        }
+    }
 }
-}
+
 
 // Attach the toggleSection function to the new button
 document.getElementById('toggleDeleteAllProjects').addEventListener('click', function() {
