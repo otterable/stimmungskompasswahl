@@ -1,46 +1,17 @@
-Makes colors more differentiable (Kultur, Sport;    Umwelt/Bildung) !!!!
-Likes für Projekte auf der Karte !!!!
-Admin export: !!!!
+
+
+Top 5 boxes<????     better design / colors, spacing, 
+
+Statistik auf der Website, 
+schoenere Diagramme, grapghs
 
 
 
-
-More visible arrows, also for mobile
-On mobile, have two floating circle arrows in the middle of the screen left and right
-
-
-Admin export:
-Statistik ratio Vorschlag:Notiz
-
-
-
-
-
-
-Als Bürger:
-
-Bild links: Foto von etwas in der Stadt, das problematisch ist
-Bild rechts: Screenshot vom Post mit dem Foto, in der Ansicht auf der Karte
-Weiter oben: Bild von einer Notiz (Screenshot)
-
-
-
-
-
-
-
-A participatory planning webapp:
-
-Bild weiter oben: Screenshot von Karte mit vielen Punkten (Posts)
-Bilder unten:  Desktop, mobile version
-
-
-
-
+email template
 
 
 Als Gemeinde:
 
 
 
-Bilder von Admins tools (options) und Statistik overview, Übersicht (Top 5 boxes)
+Bilder von Admins tools (options) und Statistik overview (von der Website)

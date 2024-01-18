@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory
+from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, desc, asc, and_
 from flask_migrate import Migrate
@@ -36,6 +36,7 @@ import pytz
 import io
 import time
 import threading
+from io import StringIO
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -134,7 +135,74 @@ def calculate_votes(project_id):
     else:
         return 0, 0
 
-   
+@app.route('/export_gis', methods=['GET'])
+@login_required
+def export_gis():
+    category = request.args.get('category', '')
+    
+    if category and category != "Alle Kategorien":
+        projects = Project.query.filter_by(category=category).all()
+    else:
+        projects = Project.query.all()
+
+    features = []
+    for project in projects:
+        if project.geoloc and ',' in project.geoloc:
+            lat, lon = project.geoloc.split(',')
+            try:
+                lat, lon = float(lat.strip()), float(lon.strip())
+                features.append({
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [lon, lat]
+                    },
+                    "properties": project.to_dict()
+                })
+            except ValueError:
+                pass  # Handle invalid geolocation data
+
+    geojson_data = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+
+    formatted_geojson = json.dumps(geojson_data, indent=4)
+    response = Response(
+        formatted_geojson,
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment;filename=exported_data.geojson'}
+    )
+    return response
+
+    
+@app.route('/export_csv', methods=['GET', 'POST'])
+@login_required
+def export_csv():
+    category = request.args.get('category', '')
+
+    # Querying the database based on the category
+    if category and category != "Alle Kategorien":
+        projects_data = Project.query.filter_by(category=category).all()
+    else:
+        projects_data = Project.query.all()
+
+    projects_list = [project.to_dict() for project in projects_data]
+
+    # Convert to DataFrame
+    df = pd.DataFrame(projects_list)
+
+    # Converting DataFrame to CSV
+    csv_data = StringIO()
+    df.to_csv(csv_data, index=False)
+
+    # Flask response
+    response = make_response(csv_data.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=projects_data.csv'
+    response.headers['Content-type'] = 'text/csv'
+    return response
+
+    
 @app.route('/export_projects', methods=['GET', 'POST'])
 @login_required
 def export_projects():
@@ -384,7 +452,24 @@ def export_projects():
         worksheet.add_image(img, chart2_cell)
         app.logger.debug("Pie chart for average description length created")
 
-       
+        mapobject_counts = {
+            'Map Object': Project.query.filter_by(is_mapobject=True).count(),
+            'Non-Map Object': Project.query.filter_by(is_mapobject=False).count()
+        }
+
+        # Generate the pie chart for Map Object vs Non-Map Object
+        app.logger.debug("Generating pie chart for Map Object vs Non-Map Object")
+        fig, ax = plt.subplots()
+        ax.pie(mapobject_counts.values(), labels=mapobject_counts.keys(), autopct='%1.1f%%')
+        plt.title("Ratio Projekt vs Map_object")
+        img_data = io.BytesIO()
+        plt.savefig(img_data, format='png')
+        img_data.seek(0)
+        img = Image(img_data)
+        chart3_cell = f'O{start_row_for_charts}'  # Adjust the cell location as needed
+        worksheet.add_image(img, chart3_cell)
+        app.logger.debug("Pie chart for Map Object vs Non-Map Object created")
+
        
         writer.save()
         app.logger.debug(f"Excel file with pie charts saved at {filepath}")
@@ -732,11 +817,11 @@ def add_marker():
 
     try:
         author_id = current_user.id if current_user.is_authenticated else 0
-        public_benefit = data.get('public_benefit', 'Default public benefit description')
-        image_file = data.get('image_file', 'default_image.jpg')
+        public_benefit = data.get('public_benefit', '-')
+        image_file = data.get('image_file', 'keinbild.jpg')
 
         new_project = Project(
-            name="User Generated Marker",
+            name="Notiz",
             category=data['category'],
             descriptionwhy=data['description'],
             public_benefit=public_benefit,
@@ -1347,7 +1432,7 @@ def admintools():
 
 
     categories = db.session.query(Project.category).distinct().all()
-    categories = [category[0] for category in categories if category[0]]  # Extract category names
+    categories = [category[0] for category in db.session.query(Project.category.distinct()).all()]
 
     app.logger.debug(f"Found categories: {categories}")
     

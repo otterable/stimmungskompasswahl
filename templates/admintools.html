@@ -24,15 +24,29 @@
     justify-content: center;
 }
 
+   .stats-container2 {
+   margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .stat-box {
     background-color: #f5f5f5; /* Example background color */
     margin: 5px;
     padding: 0px;
-    border-radius: 30px;
+    border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     flex-basis: calc(33.333% - 20px); /* For desktop */
 }
 
+.stat-box2 {
+    background-color: #f5f5f5; /* Example background color */
+    margin: 5px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 
 
 @media (min-width: 1080px) and (max-width: 1445px) {
@@ -59,7 +73,7 @@ body {
 }
 
 .c-button {
-        border-radius: 30px;
+        border-radius: 10px;
         padding: 12px;
         background-color: white;
         font-weight: bold;
@@ -171,7 +185,7 @@ body {
         background-color: #003056; /* Example color */
         color: white;
         border: none;
-        border-radius: 30px;
+        border-radius: 10px;
 		font-weight: bold !important;
         padding: 5px 10px;
         text-align: center;
@@ -186,6 +200,21 @@ body {
 
     transform: scale(1.00); /* Scale up on hover */
 }
+
+		      .register-button2 {
+        background-color: #003056; /* Example color */
+        color: white;
+        border: none;
+        border-radius: 30px;
+		font-weight: bold !important;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        cursor: pointer;
+        box-sizing: border-box; /* Include padding in width */
+    }
 
 h3 {
     display: block;
@@ -622,8 +651,8 @@ nav[aria-label="Page navigation"] {
 	
 			    /* Base styles for user thumbnails */
     .user-thumbnail {
-        background-color: rgba(40, 116, 166, 0.3); /* Similar background color */
-        border-radius: 30px; /* Rounded corners */
+        background-color: #f9f8f5; /* Similar background color */
+        border-radius: 10px; /* Rounded corners */
         padding: 10px; /* Padding inside each thumbnail */
         display: flex; /* Use flexbox for layout */
         flex-direction: column; /* Stack items vertically */
@@ -634,7 +663,8 @@ nav[aria-label="Page navigation"] {
         overflow: hidden; /* Hide overflow */
         width: calc(33.333% - 20px); /* Three items per row */
         margin: 10px; /* Adjust margin as needed */
-        flex-basis: calc(33.333% - 20px); /* Adjust basis for three items per row */
+		    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
     }
 
 
@@ -669,7 +699,7 @@ nav[aria-label="Page navigation"] {
     }
 /* Base styles for project thumbnails */
 .project-thumbnail {
-    background-color: rgba(40, 116, 166, 0.3);
+    background-color: #f9f8f5;
     border-radius: 30px;
     margin: 10px;
     padding: 10px;
@@ -680,6 +710,8 @@ nav[aria-label="Page navigation"] {
     transition: width 0.3s ease;
     position: relative;
     overflow: visible; /* Ensure the content is not clipped */
+
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -689,6 +721,7 @@ nav[aria-label="Page navigation"] {
     font-size: 18px; /* Font size similar to other links */
     font-weight: bold; /* Bold text */
     align-self: center; /* Align vertically within the flex container */
+	
 }
 
 /* Hover effect for project thumbnails */
@@ -775,7 +808,7 @@ nav[aria-label="Page navigation"] {
     flex-direction: column;
     align-items: center;
     box-sizing: border-box;
-  background-color: rgba(40, 116, 166, 0.3); /* Similar to project-thumbnail */
+  background-color: #f9f8f5; /* Similar to project-thumbnail */
     border-radius: 30px; /* Similar to project-thumbnail */
 	    transition: width 0.3s ease; /* Smooth scaling on hover */
 
@@ -908,9 +941,8 @@ nav[aria-label="Page navigation"] {
 }
 
 
-
 .c-button {
-        border-radius: 30px;
+        border-radius: 10px;
         padding: 6px;
         background-color: white;
         font-weight: bold;
@@ -920,6 +952,7 @@ nav[aria-label="Page navigation"] {
         margin: 10px;
         transition: background-color 0.3s;
     }
+
 	
 
 }
@@ -1309,12 +1342,6 @@ nav[aria-label="Page navigation"] {
 </ul>
 </div>
 </div>
-
-    <h2>Alle Beiträge löschen</h2>
-    <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
-    <form method="POST" action="{{ url_for('delete_all_projects') }}">
-        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to Alle Projektvorschläge löschen? This action cannot be undone.');">Alle Beiträge löschen</button>
-    </form>
 </div>
 
 
@@ -1323,16 +1350,18 @@ nav[aria-label="Page navigation"] {
 <div id="exportSection" style="display: none;">
 <div class="stats-container">
 <div class="stat-box">
-    <h2>Export Projects</h2>
+    <h2>Projektdaten exportieren (.xlsx / .csv)</h2>
     <form id="exportForm" method="POST" action="{{ url_for('export_projects') }}">
         <div class="filter-options">
             <!-- Category Selection -->
             <div>
-                <label for="category">Export a selected category:</label>
+                <label for="category">Wählen Sie eine Kategorie:</label>
                 <select id="category" name="category">
-                    <option value="">All Categories</option>
+                    <option value="">Alle Kategorien</option>
                     <!-- Populate with actual categories -->
                 </select>
+				        <button type="submit" class="register-button" onclick="submitExportForm()">.xlsx exportieren</button>
+
             </div>
             </div>
 
@@ -1340,17 +1369,54 @@ nav[aria-label="Page navigation"] {
      
 
         <!-- Submit Button -->
-        <button type="submit" class="register-button" onclick="submitExportForm()">Export</button>
     </form>
+<form action="{{ url_for('export_csv') }}" method="get" style="margin-bottom:10px">
+    <label for="category">Wählen Sie eine Kategorie:</label>
+    <select id="category" name="category">
+        <option value="">Alle Kategorien</option>
+        {% for category in categories %}
+        <option value="{{ category }}">{{ category }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="register-button" >.csv exportieren</button>
+</form>
 	</div>
+
 
 <div class="stat-box">
 
-	<h2>Gesamte Website herunterladen</h2>
+	<h2>Alle Daten herunterladen (.json/.geojson)</h2>
+    <p>Die .json enthält alle Daten außer persönlichen Benutzerdaten.</p>
 
-	            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Website herunterladen</a>
+	            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">.json exportieren</a>
 
+
+
+<form action="{{ url_for('export_gis') }}" method="get" style="margin-bottom:10px">
+
+    <label for="category">GIS Daten:</label>
+    <select id="category" name="category">
+        <option value="">Alle Kategorien</option>
+        {% for category in categories %}
+        <option value="{{ category }}">{{ category }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="register-button">.geojson exportieren</button>
+</form>
 </div>
+
+
+
+
+
+
+<div class="stat-box">
+   <h2>Alle Beiträge löschen</h2>
+    <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
+    <form method="POST" action="{{ url_for('delete_all_projects') }}">
+        <button type="submit" class="register-button" onclick="return confirm('Are you sure you want to Alle Projektvorschläge löschen? This action cannot be undone.');">Alle Beiträge löschen</button>
+    </form>
+	</div>
 </div>
 </div>
 
@@ -1359,10 +1425,9 @@ nav[aria-label="Page navigation"] {
 
     <div id="projectProposalsSection" style="display: none;">
 
-        <h2>Projektvorschläge</h2>
  <div>
     <label for="search">Suchen nach Namen:</label>
-    <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()">
+    <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()" style="margin-top:20px; margin-bottom:10px;">
 
     <label for="sort">Sortieren nach:</label>
     <select id="sort" onchange="submitForm()">
@@ -1385,12 +1450,11 @@ nav[aria-label="Page navigation"] {
 
     <div id="notesSection" style="display: none;">
 
-        <h2>Notizen</h2>
 
 
 <!-- Map Objects Search Input -->
-<div class="map-object-search-container">
-    <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()">
+<div class="map-object-search-container" >
+    <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()"  style="margin-top:20px;">
 </div>
 
     {% with paginated_map_objects=paginated_map_objects %}
@@ -1402,10 +1466,9 @@ nav[aria-label="Page navigation"] {
 
 
    <div id="commentsSection" style="display: none;">
-        <h2>Kommentare</h2><!-- Comments Search Input -->
 <div class="comment-search-container">
-    <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()">
-    <input type="text" id="searchCommentByUserId" placeholder="Nach Benutzer-ID suchen" onkeyup="searchCommentsByUserId()">
+    <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()"  style="margin-top:20px;">
+    <input type="text" id="searchCommentByUserId" placeholder="Nach Benutzer-ID suchen" onkeyup="searchCommentsByUserId()"  style="margin-top:20px;">
 	
 </div>
 {% with paginated_comments=paginated_comments %}
@@ -1477,8 +1540,7 @@ nav[aria-label="Page navigation"] {
     <div id="usersSection" style="display: none;">
 
 
-<h2>Benutzer</h2>
-<div class="project-list">
+<div class="project-list" >
     {% with paginated_users=paginated_users %}
         {% include 'partials/user_list_section.html' %}
     {% endwith %}
@@ -1766,7 +1828,7 @@ function searchMapObjects() {
         // Handle 'No results found' scenario
         if (!newMapObjectContainer) {
             newMapObjectContainer = document.createElement('div');
-            newMapObjectContainer.innerHTML = "<p>No results found.</p>";
+            newMapObjectContainer.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
         }
 
         if (oldMapObjectContainer) {
@@ -1816,7 +1878,7 @@ function searchAndSortProjects() {
         // Handle 'No results found' scenario
         if (!newProjectContainer) {
             newProjectContainer = document.createElement('div');
-            newProjectContainer.innerHTML = "<p>No results found.</p>";
+            newProjectContainer.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
         }
 
         if (oldProjectContainer) {
@@ -1971,7 +2033,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     categorySelect.innerHTML = ''; // Clear existing options
                     const allCategoriesOption = document.createElement('option');
                     allCategoriesOption.value = '';
-                    allCategoriesOption.textContent = 'All Categories';
+                    allCategoriesOption.textContent = 'Alle Kategorien';
                     categorySelect.appendChild(allCategoriesOption);
                     data.categories.forEach(category => {
                         const option = document.createElement('option');

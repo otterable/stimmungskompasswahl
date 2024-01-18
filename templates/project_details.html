@@ -192,11 +192,54 @@ body {
 
 /* Hiding arrows on screens less than 1080px wide */
 @media only screen and (max-width: 1080px) {
-    .arrow-left, .arrow-right {
-        display: none !important;
+    .arrow-desktop {
+        display: none; /* Hide desktop arrows on mobile */
+    }
+    .arrow-mobile {
+        display: block; /* Show mobile arrows */
     }
 }
 
+
+.arrow-mobile-left, .arrow-mobile-right {
+    position: fixed; /* Fixed positioning relative to the viewport */
+    top: 50%; /* Center vertically */
+    width: 60px; /* Width of the arrow */
+    height: 60px; /* Height of the arrow */
+    z-index: 1000; /* Ensure it's above other elements */
+    transform: translateY(-50%); /* Align center with the middle of the image */
+	
+}
+
+.arrow-mobile-left {
+    left: 10px; /* Position from the left side */
+}
+
+.arrow-mobile-right {
+    right: 10px; /* Position from the right side */
+}
+
+@media only screen and (max-width: 1080px) {
+    .arrow-desktop {
+        display: none; /* Hide desktop arrows on mobile */
+    }
+    .arrow-mobile-left, .arrow-mobile-right {
+        display: block; /* Show mobile arrows */
+    }
+}
+
+@media only screen and (min-width: 1081px) {
+    .arrow-mobile-left, .arrow-mobile-right {
+        display: none; /* Hide mobile arrows on desktop */
+    }
+}
+
+
+@media only screen and (min-width: 1081px) {
+    .arrow-mobile {
+        display: none; /* Hide mobile arrows on desktop */
+    }
+}
 
 /* Arrow styling */
   @media screen and (min-width: 1080px) {
@@ -438,6 +481,7 @@ display: none !important;
         padding: 10px;
         display: block;
         margin: 20px auto;
+		font-weight:bold;
         transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
@@ -1021,19 +1065,34 @@ display: block;
         </div>
     </div>
 </div>
-<!-- Previous Project Arrow -->
+<!-- Previous Project Arrow for Desktop -->
 {% if prev_project_id %}
-    <a href="{{ url_for('project_details', project_id=prev_project_id) }}">
+    <a href="{{ url_for('project_details', project_id=prev_project_id) }}" class="arrow-desktop">
         <img src="{{ url_for('static', filename='arrowleft.png') }}" alt="Previous" class="arrow-left">
     </a>
 {% endif %}
 
-<!-- Next Project Arrow -->
+<!-- Next Project Arrow for Desktop -->
 {% if next_project_id %}
-    <a href="{{ url_for('project_details', project_id=next_project_id) }}">
+    <a href="{{ url_for('project_details', project_id=next_project_id) }}" class="arrow-desktop">
         <img src="{{ url_for('static', filename='arrowright.png') }}" alt="Next" class="arrow-right">
     </a>
 {% endif %}
+
+<!-- Previous Project Arrow for Mobile -->
+{% if prev_project_id %}
+    <a href="{{ url_for('project_details', project_id=prev_project_id) }}" class="arrow-mobile-left">
+        <img src="{{ url_for('static', filename='arrowcircle-left.png') }}" alt="Previous">
+    </a>
+{% endif %}
+
+<!-- Next Project Arrow for Mobile -->
+{% if next_project_id %}
+    <a href="{{ url_for('project_details', project_id=next_project_id) }}" class="arrow-mobile-right">
+        <img src="{{ url_for('static', filename='arrowcircle-right.png') }}" alt="Next">
+    </a>
+{% endif %}
+
 
 <div class="form-container">
     <h2 class="centered-title">{{ project.name }}</h2>

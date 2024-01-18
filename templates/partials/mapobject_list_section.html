@@ -1,15 +1,15 @@
 <div class="my-projects centered-text">
     {% if paginated_map_objects and paginated_map_objects.items %}
-        <div class="project-list" id="map-object-list-container"> 
+        <div class="stats-container2" id="map-object-list-container"> 
             {% for project in paginated_map_objects.items %}
                 {% if project.is_mapobject %}
-                    <div class="project-thumbnail">
+<div class="stat-box2">
                         <div class="project-description">{{ project.descriptionwhy|safe }}</div>
                         <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
                         <!-- Admin actions for each project -->
                         <form method="POST" action="{{ url_for('admintools') }}">
                             <input type="hidden" name="project_id" value="{{ project.id }}">
-                            <button type="submit" name="delete_project" class="register-button" style="font-weight: bold;">Löschen</button>
+                            <button type="submit" name="delete_project" class="register-button2" style="font-weight: bold;">Löschen</button>
                         </form>
                     </div>
                 {% endif %}

@@ -8,6 +8,52 @@
 <body>
 
    <style>
+   
+    .stats-container {
+   margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+   .stats-container2 {
+   margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.stat-box {
+    background-color: #f5f5f5; /* Example background color */
+    margin: 5px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex-basis: calc(33.333% - 20px); /* For desktop */
+}
+
+.stat-box2 {
+    background-color: #f5f5f5; /* Example background color */
+    margin: 5px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .stat-box {
+        flex-basis: calc(50% - 20px); /* For tablet */
+    }
+}
+
+@media (max-width: 1080px) {
+    .stat-box {
+        flex-basis: 100%; /* For mobile */
+    }
+}
+
+
       body {
                        font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
 
@@ -142,8 +188,8 @@
 
 /* Base styles for project thumbnails */
 .project-thumbnail {
-    background-color: rgba(40, 116, 166, 0.3);
-    border-radius: 30px;
+    background-color: #f9f8f5;
+    border-radius: 10px;
     margin: 10px;
     padding: 10px;
     display: flex; /* Changed to flex to better control the layout */
@@ -153,6 +199,8 @@
     transition: width 0.3s ease;
     position: relative;
     overflow: visible; /* Ensure the content is not clipped */
+			    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
 }
 
 /* Hover effect for project thumbnails */
@@ -703,7 +751,7 @@ nav[aria-label="Page navigation"] {
 }
 
 .c-button {
-        border-radius: 30px;
+        border-radius: 10px;
         padding: 12px;
         background-color: white;
         font-weight: bold;
@@ -728,7 +776,7 @@ nav[aria-label="Page navigation"] {
 }
 
 .c-button {
-        border-radius: 30px;
+        border-radius: 10px;
         padding: 6px;
         background-color: white;
         font-weight: bold;
@@ -967,11 +1015,10 @@ display: block;
    
        <div id="projectProposalsSection" style="display: none;">
        <div class="info-text-field3-c">
-    <h1>Meine Projektvorschläge:</h1>
     <div class="my-statistics centered-text">
-        <p>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span></p>
+        <h2>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span></h2>
         {% if user_statistics.most_successful_project %}
-            <p>Ihr erfolgreichstes Projekt ist: <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, mit <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} positiven Bewertungen</span>.</p>
+            <h2>Ihr erfolgreichstes Projekt ist: <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, mit <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} positiven Bewertungen</span>.</h2>
         {% else %}
             <p>Ihre Projekte wurden noch nicht bewertet.</p>
         {% endif %}
@@ -1002,7 +1049,7 @@ display: block;
 
 <div id="bookmarksSection" style="display: none;">
     <div class="info-text-field3-c">
-        <h1>Meine Lesezeichen:</h1>
+        
         <div id="bookmarked-projects-container">
             {% with bookmarked_projects=user_bookmarked_projects %}
                 {% include 'partials/bookmarked_projects_section.html' %}
@@ -1025,9 +1072,11 @@ display: block;
 
 
 <div id="usersSection" style="display: none;">
-<div class="info-text-field2-c">
-<div class="my-account centered-text">
-    <h1>Mein Konto:</h1>
+  <div class="info-text-field2">
+        <div class="centered-text">
+
+ <div class="stats-container">
+<div class="stat-box">
     {% if current_user.is_authenticated %}
         <p>Ihr Benutzername ist: <span style="color: #003056;">Benutzer: {{ current_user.name }}</span></p>
 
@@ -1040,7 +1089,6 @@ display: block;
 
         <p>Das Konto wurde erstellt am: <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>.</p>
     {% endif %}
-</div>
 </div>
 
 
@@ -1058,8 +1106,8 @@ display: block;
 
 
 {% if is_authenticated %}
-    <div class="info-text-field2">
-        <div class="centered-text">
+<div class="stat-box">
+
 
             <!-- Download My Data Section -->
             <p>Meine Daten herunterladen:</p>
@@ -1075,7 +1123,7 @@ display: block;
         </div>
     </div>
 {% endif %}
-
+</div></div>
 <a id="download-link" href="#" style="display: none;"></a>
 </div>
 </body>
