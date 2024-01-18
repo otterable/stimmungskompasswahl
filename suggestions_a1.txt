@@ -1,8 +1,11 @@
+Makes colors more differentiable (Kultur, Sport;    Umwelt/Bildung) !!!!
+Likes für Projekte auf der Karte !!!!
+Admin export: !!!!
 
-Likes für Projekte auf der Karte
-Makes colors more differentiable (Kultur, Sport;    Umwelt/Bildung)
+
+
+
 More visible arrows, also for mobile
-
 On mobile, have two floating circle arrows in the middle of the screen left and right
 
 

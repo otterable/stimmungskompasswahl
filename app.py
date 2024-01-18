@@ -849,8 +849,9 @@ def favicon():
     
 @app.route('/karte')
 def karte():
-    # Additional logic can be added here if needed
-    return render_template('karte.html')
+    # Fetch your projects data from the database or any source
+    projects = get_projects()  # This is a placeholder for your actual function to fetch projects
+    return render_template('karte.html', projects=projects)
 
 
 @app.route('/request_otp', methods=['POST'])
@@ -1200,7 +1201,7 @@ def check_comment_limit():
 def admintools():
     # Check if the user is the admin
     if current_user.id != 1:
-        flash('Access Denied: You are not authorized to view this page.', 'danger')
+        flash('', 'danger')
         return redirect(url_for('index'))
 
     # Check for OTP verification

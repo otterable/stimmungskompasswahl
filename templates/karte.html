@@ -163,7 +163,7 @@ display:none !important;
     width: 100%;
     height: 20px;
     background-color: #ddd;
-    border-radius: 30px !important;
+    border-radius: 30px;
     margin-top: 30px;
     display: flex;
 }
@@ -171,14 +171,14 @@ display:none !important;
 .upvotes {
     height: 100%;
     background-color: #4caf50;
-    border-radius: 30px !important;
+    border-radius: 30px;
     transition: width 0.3s ease;
 }
 
 .downvotes {
     height: 100%;
-    background-color: #B71C1C;
-    border-radius: 30px !important;
+    background-color: #9A031E;
+    border-radius: 30px;
     transition: width 0.3s ease;
 }
 
@@ -681,7 +681,7 @@ display: none !important;
     }
 
     #cancel-note {
-        background-color: #B71C1C;
+        background-color: #9A031E;
         margin-left: 50px; /* Adjust this value as needed */
     }
 
@@ -2520,6 +2520,7 @@ margin-bottom: 0px !important;
 <?php SIDEBAR BODY END ?>
 
 <script type="text/javascript">
+var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
 
 
 // Initialize the map
@@ -2969,14 +2970,14 @@ var displayedMarkersCount = 0;
 const markersPerPage = 20; // Number of markers per page
 
    const categoryColors = {
-        'Transport': '#1565C0',
-        'Öffentliche Plätze': '#FF7043',
+        'Transport': '#133873',
+        'Öffentliche Plätze': '#ff5c00',
         'Umwelt': '#4CAF50',
-        'Verwaltung': '#B38A58',
-        'Kultur': '#3B1C32',
-        'Bildung': '#264027',
-        'Gesundheit': '#B71C1C',
-        'Sport': '#4A001F',
+        'Verwaltung': '#653993',
+        'Kultur': '#431307',
+        'Bildung': '#eab003',
+        'Gesundheit': '#9A031E',
+        'Sport': '#3d4f53',
         'Andere': '#212121'
     };
 	
@@ -2990,14 +2991,14 @@ function addMarkersToOverlay(markers) {
     let showFullProjectsOnly = false;
 
     const categoryColors = {
-        'Transport': '#1565C0',
-        'Öffentliche Plätze': '#FF7043',
+        'Transport': '#133873',
+        'Öffentliche Plätze': '#ff5c00',
         'Umwelt': '#4CAF50',
-        'Verwaltung': '#B38A58',
-        'Kultur': '#3B1C32',
-        'Bildung': '#264027',
-        'Gesundheit': '#B71C1C',
-        'Sport': '#4A001F',
+        'Verwaltung': '#653993',
+        'Kultur': '#431307',
+        'Bildung': '#eab003',
+        'Gesundheit': '#9A031E',
+        'Sport': '#3d4f53',
         'Andere': '#212121'
     };
 
@@ -3258,6 +3259,11 @@ function updateMarkerIcons() {
 }
 
 document.addEventListener('click', function(event) {
+    // Check if the click is within the voting bar or its child elements
+    if (event.target.closest('.voting-bar, .upvotes, .downvotes')) {
+        console.log("Click inside voting bar, action allowed.");
+        return; // Exit the function early if click is on the voting bar
+    }
     var markerOverlay = document.getElementById('marker-overlay');
     var overlayContent = document.getElementById('overlay-content');
     var navOverlay = document.getElementById('nav-overlay');
@@ -3306,28 +3312,28 @@ function getCategoryColor(category) {
     var color;
     switch (category) {
         case 'Transport':
-            color = '#1565C0';
+            color = '#133873';
             break;
         case 'Öffentliche Plätze':
-            color = '#FF7043';
+            color = '#ff5c00';
             break;
         case 'Umwelt':
             color = '#4CAF50';
             break;
         case 'Verwaltung':
-            color = '#B38A58';
+            color = '#653993';
             break;
         case 'Kultur':
-            color = '#3B1C32';
+            color = '#431307';
             break;
         case 'Bildung':
-            color = '#264027';
+            color = '#eab003';
             break;
         case 'Gesundheit':
-            color = '#B71C1C';
+            color = '#9A031E';
             break;
         case 'Sport':
-            color = '#4A001F';
+            color = '#3d4f53';
             break;
         case 'Andere':
             color = '#212121';
@@ -3362,22 +3368,27 @@ function addMarkers(projects) {
             var isFeatured = project.is_featured; // Check if the project is featured
             var popupContent;
 
+            // Calculate vote percentages
+            var totalVotes = project.upvotes + project.downvotes;
+            var upvotePercentage = totalVotes > 0 ? ((project.upvotes / totalVotes) * 100).toFixed(1) : 0;
+            var downvotePercentage = totalVotes > 0 ? ((project.downvotes / totalVotes) * 100).toFixed(1) : 0;
+
             if (project.is_mapobject) {
                 // For map objects, show simple description
                 popupContent = `<div style="text-align: center;">${project.descriptionwhy}</div>`;
             } else {
-                // For non-map objects, show detailed popup
+                // For non-map objects, show detailed popup with voting details
                 var votingDetailsHtml = `
                     <div style="text-align: center; margin-bottom: 1px; font-size: 14px; font-weight: bold;">
-                        👍: ${project.upvotes} (${project.upvote_percentage}%),
-                        👎: ${project.downvotes} (${project.downvote_percentage}%)
+                        <span onclick="vote(${project.id}, 'upvote')" class="vote-button" style="cursor: pointer;">👍</span>: <span id="upvote-count-${project.id}">${project.upvotes}</span>,
+                        <span onclick="vote(${project.id}, 'downvote')" class="vote-button"  style="cursor: pointer;">👎</span>: <span id="downvote-count-${project.id}">${project.downvotes}</span>
                     </div>
                 `;
 
                 var votingBarHtml = `
                     <div class="voting-bar" style="margin-top: 1px;">
-                        <div class="upvotes" style="width: ${project.upvote_percentage}%;"></div>
-                        <div class="downvotes" style="width: ${project.downvote_percentage}%;"></div>
+                        <div class="upvotes" style="width: ${upvotePercentage}%;"></div>
+                        <div class="downvotes" style="width: ${downvotePercentage}%;"></div>
                     </div>
                 `;
 
@@ -3395,28 +3406,165 @@ function addMarkers(projects) {
             }
 
             var marker = L.marker(latLng, {
-            icon: createIcon(24, 2, fillColor, isFeatured), 
-            category: project.category,
-            isMapObject: project.is_mapobject,
-            isFeatured: isFeatured // Set isFeatured
+                icon: createIcon(24, 2, fillColor, isFeatured),
+                category: project.category,
+                isMapObject: project.is_mapobject,
+                isFeatured: isFeatured
             }).addTo(map);
 
-            marker.bindPopup(popupContent);
+        marker.bindPopup(popupContent);
+map.on('popupopen', function(e) {
+    var popupContent = e.popup.getContent();
+    var tempDiv = document.createElement('div');
+    tempDiv.innerHTML = popupContent;
+    var upvoteElement = tempDiv.querySelector('[id^="upvote-count-"]');
+
+    if (upvoteElement) {
+        var projectId = upvoteElement.id.replace('upvote-count-', '');
+        setInitialVoteBarStyles(projectId);
+    }
+});
+
             markersById[project.id] = marker;
 
-            // Log the type of button created
-            console.log(`Created a marker for the category: ${project.category}`);
-            
-            // Check if the layer for the category exists, if not create a new one
             if (!categoryLayers[project.category]) {
                 categoryLayers[project.category] = L.layerGroup().addTo(map);
             }
 
-            // Add the marker to the respective category layer
             marker.addTo(categoryLayers[project.category]);
+            console.log(`Created a marker for the category: ${project.category}`);
         }
     });
 }
+
+function setInitialVoteBarStyles(projectId) {
+    document.querySelectorAll('.voting-bar').forEach(votingBar => {
+        const upvoteElement = votingBar.querySelector('.upvotes');
+        const downvoteElement = votingBar.querySelector('.downvotes');
+
+        // Adjust border-radius
+        const upvotePercentage = parseFloat(upvoteElement.style.width);
+        const downvotePercentage = parseFloat(downvoteElement.style.width);
+
+        if (upvotePercentage > 0 && downvotePercentage > 0) {
+            upvoteElement.style.borderRadius = '30px 0 0 30px';
+            downvoteElement.style.borderRadius = '0 30px 30px 0';
+        } else if (upvotePercentage > 0) {
+            upvoteElement.style.borderRadius = '30px';
+            downvoteElement.style.borderRadius = '0';
+        } else if (downvotePercentage > 0) {
+            downvoteElement.style.borderRadius = '30px';
+            upvoteElement.style.borderRadius = '0';
+        }
+
+        // Attach event listeners for voting
+        upvoteElement.onclick = function() { vote(projectId, 'upvote'); };
+        downvoteElement.onclick = function() { vote(projectId, 'downvote'); };
+    });
+}
+
+
+
+
+// Call the function on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setInitialVoteBarStyles();
+});
+
+function vote(projectId, voteType) {
+    // Check if user is logged in
+    if (!userLoggedIn) {
+        alert("Melden Sie sich an, um über Projekte abzustimmen.");
+        return;
+    }
+
+    fetch(`/vote/${projectId}/${voteType}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 'project_id': projectId, 'vote_type': voteType })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Vote recorded:', data);
+
+            // Update UI elements
+            updateVotingUI(projectId, data);
+        } else {
+            console.error('Error:', data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateVotingUI(projectId, data) {
+    var openPopup = null;
+    map.eachLayer(function(layer) {
+        // Check if layer has a popup and if it is open
+        if (layer.getPopup && layer.getPopup() && layer.getPopup().isOpen()) {
+            openPopup = layer.getPopup();
+        }
+    });
+
+    // Proceed if an open popup is found
+    if (openPopup) {
+        // Extract and parse the popup content
+        const popupContent = openPopup.getContent();
+        const parser = new DOMParser();
+        const popupDoc = parser.parseFromString(popupContent, 'text/html');
+
+        // Update the voting counts and percentages
+        const upvoteCountElement = popupDoc.getElementById(`upvote-count-${projectId}`);
+        const downvoteCountElement = popupDoc.getElementById(`downvote-count-${projectId}`);
+        const upvotePercentage = data.upvote_percentage.toFixed(1);
+        const downvotePercentage = data.downvote_percentage.toFixed(1);
+
+        if (upvoteCountElement) upvoteCountElement.innerText = `${data.upvote_count}`;
+        if (downvoteCountElement) downvoteCountElement.innerText = `${data.downvote_count}`;
+
+        // Update voting bars widths and adjust border-radius
+        const upvotesBar = popupDoc.querySelector(`.upvotes`);
+        const downvotesBar = popupDoc.querySelector(`.downvotes`);
+        if (upvotesBar && downvotesBar) {
+            upvotesBar.style.width = `${upvotePercentage}%`;
+            downvotesBar.style.width = `${downvotePercentage}%`;
+
+            if (data.upvote_count > 0 && data.downvote_count > 0) {
+                upvotesBar.style.borderRadius = '30px 0 0 30px';
+                downvotesBar.style.borderRadius = '0 30px 30px 0';
+            } else if (data.upvote_count > 0 && data.downvote_count === 0) {
+                upvotesBar.style.borderRadius = '30px';
+                downvotesBar.style.borderRadius = '0';
+            } else if (data.upvote_count === 0 && data.downvote_count > 0) {
+                downvotesBar.style.borderRadius = '30px';
+                upvotesBar.style.borderRadius = '0';
+            }
+        }
+
+        // Update popup content with the modified HTML
+        openPopup.setContent(popupDoc.documentElement.innerHTML);
+    }
+    setInitialVoteBarStyles(projectId); // Call this at the end of the function
+
+}
+
+
+
+
+function adjustBorderRadius(upvoteElement, downvoteElement, upvoteCount, downvoteCount) {
+    if (upvoteCount > 0 && downvoteCount > 0) {
+        upvoteElement.style.borderRadius = '30px 0 0 30px';
+        downvoteElement.style.borderRadius = '0 30px 30px 0';
+    } else if (upvoteCount > 0 && downvoteCount === 0) {
+        upvoteElement.style.borderRadius = '30px';
+    } else if (upvoteCount === 0 && downvoteCount > 0) {
+        downvoteElement.style.borderRadius = '30px';
+    }
+}
+
 
 function loadMoreMarkers() {
     const list = document.getElementById('markers-list');
@@ -3455,7 +3603,12 @@ function loadMoreMarkers() {
 
 console.log("Map Initialization Started");
 fetch('/get_projects')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         console.log("Received data:", data);
         const sortedData = sortMarkersByNewest(data); // Sortieren data by newest
@@ -3621,14 +3774,14 @@ function toggleCategory(categoryName) {
 
 function updateCategoryButtonColors() {
     const categoryColors = {
-        'Transport': '#1565C0',
-        'Öffentliche Plätze': '#FF7043',
+        'Transport': '#133873',
+        'Öffentliche Plätze': '#ff5c00',
         'Umwelt': '#4CAF50',
-        'Verwaltung': '#B38A58',
-        'Kultur': '#3B1C32',
-        'Bildung': '#264027',
-        'Gesundheit': '#B71C1C',
-        'Sport': '#4A001F',
+        'Verwaltung': '#653993',
+        'Kultur': '#431307',
+        'Bildung': '#eab003',
+        'Gesundheit': '#9A031E',
+        'Sport': '#3d4f53',
         'Andere': '#212121'
     };
 
@@ -3818,6 +3971,8 @@ markerDescriptionTextarea.addEventListener('input', function() {
 });
 updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300); // Initial update
 
+
+
 </script>
 
    
@@ -3975,10 +4130,10 @@ document.getElementById('video-overlay-2').addEventListener('click', function(ev
     }
 });
 
+
 </script>
 
 <script type="text/javascript">
-    var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
 </script>
 
 

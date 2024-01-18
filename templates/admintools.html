@@ -17,7 +17,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
    <style>
-   
+   .stats-container {
+   margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.stat-box {
+    background-color: #f5f5f5; /* Example background color */
+    margin: 5px;
+    padding: 0px;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex-basis: calc(33.333% - 20px); /* For desktop */
+}
+
+
+
+@media (min-width: 1080px) and (max-width: 1445px) {
+    .stat-box {
+        flex-basis: calc(50% - 20px); /* For tablet */
+    }
+}
+
+@media (max-width: 1080px) {
+    .stat-box {
+        flex-basis: 100%; /* For mobile */
+    }
+}
+
    
 body {
                    font-family: MaisonNeue,Segoe UI,Helvetica Neue,-apple-system,system-ui,BlinkMacSystemFont,Roboto,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;
@@ -334,7 +363,7 @@ nav[aria-label="Page navigation"] {
 
 .downvotes {
     height: 100%;
-    background-color: #b71c1c;
+    background-color: #9A031E;
     border-radius: 30px !important;
     transition: width 0.3s ease;
 }
@@ -1231,6 +1260,8 @@ nav[aria-label="Page navigation"] {
 
 <div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
 
+<div class="stats-container">
+<div class="stat-box">
 <h2>Top 5 Meistgesehene Projekte</h2>
 <ul>
   {% for project in top_viewed_projects %}
@@ -1239,7 +1270,9 @@ nav[aria-label="Page navigation"] {
       {% endif %}
   {% endfor %}
 </ul>
+</div>
 
+<div class="stat-box">
 <h2>Top 5 Bewertete Projekte</h2>
 <ul>
   {% for project in top_rated_projects %}
@@ -1247,24 +1280,35 @@ nav[aria-label="Page navigation"] {
 {% endfor %}
 
 </ul>
+</div>
+
+<div class="stat-box">
 <h2>Top 5 Kommentierte Projekte</h2>
 <ul>
   {% for project in top_commented_projects %}
     <li><a href="{{ url_for('project_details', project_id=project.id) }}">{{ project.name }}</a> mit {{ project.comments_count }} Kommentaren</li>
   {% endfor %}
 </ul>
+</div>
+
+<div class="stat-box">
 <h2>Top 5 Häufigste Kategorien</h2>
 <ul>
   {% for category, count in category_counts %}
     <li>{{ category }} mit {{ count }} Projekten</li>
   {% endfor %}
 </ul>
+</div>
+
+<div class="stat-box">
 <h2>Top 5 Aktivste Benutzerkonten</h2>
 <ul>
   {% for user in active_users %}
     <li>{{ user.name }} mit {{ user.project_count }} Projekten, {{ user.map_object_count }} Kartenobjekten und {{ user.comment_count }} Kommentaren</li>
   {% endfor %}
 </ul>
+</div>
+</div>
 
     <h2>Alle Beiträge löschen</h2>
     <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
@@ -1277,6 +1321,8 @@ nav[aria-label="Page navigation"] {
 
 	
 <div id="exportSection" style="display: none;">
+<div class="stats-container">
+<div class="stat-box">
     <h2>Export Projects</h2>
     <form id="exportForm" method="POST" action="{{ url_for('export_projects') }}">
         <div class="filter-options">
@@ -1296,10 +1342,16 @@ nav[aria-label="Page navigation"] {
         <!-- Submit Button -->
         <button type="submit" class="register-button" onclick="submitExportForm()">Export</button>
     </form>
-	            <h2>Gesamte Website herunterladen</h2>
+	</div>
+
+<div class="stat-box">
+
+	<h2>Gesamte Website herunterladen</h2>
 
 	            <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">Website herunterladen</a>
 
+</div>
+</div>
 </div>
 
 
@@ -2098,6 +2150,23 @@ function submitExportForm() {
 }
 
 
+</script>
+
+<script>
+function logLayoutChange() {
+    const width = window.innerWidth;
+    if (width > 1445) {
+        console.debug("admintools.html: screen is wider than 1445px - displaying 3 boxes next to each other.");
+    } else if (width >= 1080 && width <= 1445) {
+        console.debug("admintools.html: screen is wide between 1080 and 1445px -- displaying 2 boxes next to each other.");
+    } else {
+        console.debug("admintools.html: screen is less than 1080px wide -- displaying 1 box per row.");
+    }
+}
+
+// Log layout change on page load and resize
+window.addEventListener('load', logLayoutChange);
+window.addEventListener('resize', logLayoutChange);
 </script>
 
 </html>
