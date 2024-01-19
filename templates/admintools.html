@@ -13,11 +13,18 @@
         }
     </script>
 </head>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
    <style>
+   .average-description-length {
+    font-size: 20px; /* Makes text larger */
+    margin-bottom: 10px; /* Adds a gap below the text */
+    display: block; /* Ensures margin-bottom is applied */
+}
+
    .stats-container {
    margin-top: 20px;
     display: flex;
@@ -1308,31 +1315,6 @@ nav[aria-label="Page navigation"] {
 
 
 
-<div class="chart-container">
-    <canvas id="projectCategoryChart"></canvas>
-</div>
-<div class="chart-container">
-    <canvas id="mapObjectChart"></canvas>
-</div>
-<div class="chart-container">
-    <canvas id="descriptionLengthChart"></canvas>
-</div>
-
-
-<!-- Date Range Selection -->
-<div>
-    <label for="startDate">Start Date:</label>
-    <input type="date" id="startDate">
-    <label for="endDate">End Date:</label>
-    <input type="date" id="endDate">
-    <label for="excludeMapObjects">Exclude Map Objects:</label>
-    <input type="checkbox" id="excludeMapObjects">
-    <label for="includeMapObjects">Include Only Map Objects:</label>
-    <input type="checkbox" id="includeMapObjects">
-    <button id="updateChart">Update Chart</button>
-</div>
-
-<canvas id="submissionChart"></canvas>
 
 
 
@@ -1379,6 +1361,92 @@ nav[aria-label="Page navigation"] {
       </li>  {% endfor %}
 </ul>
 </div>
+</div>
+
+<div class="stats-container">
+<div class="stat-box">
+<div class="chart-container">
+    <h2>Kategorieanteil</h2>
+	    <div style="margin-bottom: 10px;"><span id="mostUsedCategoryText"></span></div>
+
+    <div>
+        <button class="mapobject-toggle active" data-filter="all">Alles</button>
+        <button class="mapobject-toggle" data-filter="false">Nur Projektvorschläge</button>
+        <button class="mapobject-toggle" data-filter="true">Nur Notizen</button>
+        <button id="togglePercentage">Show Percentages</button> <!-- New Button -->
+    </div>
+    <canvas id="projectCategoryChart"></canvas>
+</div>
+
+
+</div>
+
+<div class="stat-box">
+<div class="chart-container">
+<h2>Projektvorschläge vs. Notizen</h2>
+    <canvas id="mapObjectChart"></canvas>
+</div>
+</div>
+
+<div class="stat-box">
+    <div class="chart-container">
+        <h2>Länge der Beiträge</h2>
+<span id="averageDescriptionLengthText" class="average-description-length">Durchschnittliche Länge: 999</span>
+
+        <div>
+            <button class="description-length-toggle active" data-filter="all">Alles</button>
+            <button class="description-length-toggle" data-filter="true">Nur Notizen</button>
+            <button class="description-length-toggle" data-filter="false">Nur Projektvorschläge</button>
+        </div>
+        <canvas id="descriptionLengthChart"></canvas>
+    </div>
+</div>
+
+
+<div class="stat-box">
+<h2>Neue Beiträge</h2>
+<div>
+    <label for="startDate">Startdatum:</label>
+    <input type="date" id="startDate">
+    <label for="endDate">Enddatum:</label>
+    <input type="date" id="endDate">
+	<div>
+    <label for="excludeMapObjects">Nur Projektvorschläge</label>
+    <input type="checkbox" id="excludeMapObjects">
+    <label for="includeMapObjects">Nur Notizen</label>
+    <input type="checkbox" id="includeMapObjects">
+    <button id="updateChart">Update</button>
+</div>
+</div>
+
+<canvas id="submissionChart"></canvas>
+</div>
+
+<div class="stat-box">
+    <h2>Projektinteraktion</h2>
+    <div>
+        <label for="activityStartDate">Startdatum:</label>
+        <input type="date" id="activityStartDate">
+        <label for="activityEndDate">Enddatum:</label>
+        <input type="date" id="activityEndDate">
+        <button id="updateActivityChart">Update</button>
+    </div>
+    <canvas id="activityChart"></canvas>
+</div>
+
+<div class="stat-box">
+    <h2>Projektansichten</h2>
+    <div>
+        <label for="viewsStartDate">Startdatum:</label>
+        <input type="date" id="viewsStartDate">
+        <label for="viewsEndDate">Enddatum:</label>
+        <input type="date" id="viewsEndDate">
+        <button id="updateViewsChart">Update</button>
+    </div>
+    <canvas id="viewsChart"></canvas>
+</div>
+
+
 </div>
 </div>
 
@@ -1490,7 +1558,7 @@ nav[aria-label="Page navigation"] {
 
 
 
-<!-- Map Objects Search Input -->
+<!-- Notizens Search Input -->
 <div class="map-object-search-container" >
     <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()"  style="margin-top:20px;">
 </div>
@@ -1872,7 +1940,7 @@ function searchMapObjects() {
         if (oldMapObjectContainer) {
             oldMapObjectContainer.innerHTML = newMapObjectContainer.innerHTML;
         } else {
-            console.error('Map object list container not found');
+            console.error('Notizen list container not found');
         }
 
         // Update pagination
@@ -2270,31 +2338,112 @@ window.addEventListener('resize', logLayoutChange);
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    fetchChartData();
+let currentMapObjectFilter = 'all'; // Initial filter state
+let chartInstances = {}; // Object to hold chart instances
+let currentDescriptionLengthFilter = 'all'; // Filter state for description length chart
+let showPercentage = false; // Global variable to keep track of the toggle state
 
-    function fetchChartData() {
-        console.log("Fetching chart data...");
-        fetch('/get_chart_data')
-            .then(response => response.json())
-            .then(data => {
-                if (document.getElementById('projectCategoryChart')) {
-                    renderPieChart('projectCategoryChart', 'Project Categories', data.categoryCounts);
-                }
-                if (document.getElementById('mapObjectChart')) {
-                    renderPieChart('mapObjectChart', 'Map Object Distribution', data.mapobjectCounts);
-                }
-                if (document.getElementById('descriptionLengthChart')) {
-                    renderPieChart('descriptionLengthChart', 'Description Lengths', data.descriptionLengthCounts);
-                }
-            })
-            .catch(error => console.error('Error fetching chart data:', error));
+document.addEventListener("DOMContentLoaded", function() {
+    fetchChartData(); // Load all charts initially
+    setupToggleButtons();
+    setupDescriptionLengthToggleButtons();
+    setupPercentageToggle();
+
+    function setupToggleButtons() {
+        const toggleButtons = document.querySelectorAll('.mapobject-toggle');
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentMapObjectFilter = button.getAttribute('data-filter');
+                console.log(`Toggled to: ${currentMapObjectFilter}`);
+                fetchChartData(true);
+                updateButtonStates(toggleButtons, currentMapObjectFilter);
+            });
+        });
     }
 
-    function renderPieChart(canvasId, title, data) {
-        const canvas = document.getElementById(canvasId);
-        console.log(canvas); // Check if this logs a valid element
+    function updateButtonStates(buttons, currentFilter) {
+        buttons.forEach(button => {
+            if (button.getAttribute('data-filter') === currentFilter) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
+    }
 
+    function setupDescriptionLengthToggleButtons() {
+        const descriptionLengthToggleButtons = document.querySelectorAll('.description-length-toggle');
+        descriptionLengthToggleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentDescriptionLengthFilter = button.getAttribute('data-filter');
+                console.log(`Description Length Chart: Toggled to: ${currentDescriptionLengthFilter}`);
+                fetchChartData(false, true);
+                updateButtonStates(descriptionLengthToggleButtons, currentDescriptionLengthFilter);
+            });
+        });
+    }
+
+    function setupPercentageToggle() {
+        const togglePercentageBtn = document.getElementById('togglePercentage');
+        togglePercentageBtn.addEventListener('click', () => {
+            showPercentage = !showPercentage;
+            console.log(`Toggle Percentage: Now showing ${showPercentage ? 'percentages' : 'numbers'}`);
+            togglePercentageBtn.textContent = showPercentage ? 'Show Numbers' : 'Show Percentages';
+            fetchChartData(true); // Update only project category chart
+        });
+    }
+
+function fetchChartData(updateOnlyCategoryChart = false, updateOnlyDescriptionLengthChart = false) {
+    console.log("Fetching chart data...");
+    const url = `/get_chart_data?filter=${currentMapObjectFilter}&description_length_filter=${currentDescriptionLengthFilter}`;
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        console.log('Chart data received:', data);
+
+        if (document.getElementById('averageDescriptionLengthText')) {
+            const averageLength = data.averageDescriptionLength ? data.averageDescriptionLength.toFixed(2) : 0;
+            document.getElementById('averageDescriptionLengthText').textContent = `Durchschnittliche Länge: ${averageLength}`;
+            console.log(`Updated average description length to: ${averageLength}`);
+        }
+
+        if (!updateOnlyCategoryChart && !updateOnlyDescriptionLengthChart) {
+                if (document.getElementById('mapObjectChart')) {
+                    renderPieChart('mapObjectChart', '', data.mapobjectCounts, true);
+                }
+                if (document.getElementById('descriptionLengthChart')) {
+                    renderPieChart('descriptionLengthChart', '', data.descriptionLengthCounts, false, true);
+                }
+                if (document.getElementById('projectCategoryChart')) {
+                    renderPieChart('projectCategoryChart', '', data.categoryCounts);
+                    updateMostUsedCategoryText(data.categoryCounts);
+                }
+            } else if (updateOnlyCategoryChart) {
+                if (document.getElementById('projectCategoryChart')) {
+                    renderPieChart('projectCategoryChart', '', data.categoryCounts);
+                    updateMostUsedCategoryText(data.categoryCounts);
+                }
+            } else if (updateOnlyDescriptionLengthChart) {
+                if (document.getElementById('descriptionLengthChart')) {
+                    renderPieChart('descriptionLengthChart', '', data.descriptionLengthCounts, false, true);
+                }
+            }
+        })
+        .catch(error => console.error('Error fetching chart data:', error));
+    }
+
+    function updateMostUsedCategoryText(categoryCounts) {
+        const mostUsedCategory = Object.keys(categoryCounts).reduce((a, b) => categoryCounts[a] > categoryCounts[b] ? a : b);
+        const totalProjects = Object.values(categoryCounts).reduce((a, b) => a + b, 0);
+        const mostUsedPercentage = ((categoryCounts[mostUsedCategory] / totalProjects) * 100).toFixed(2);
+
+        const mostUsedCategoryText = `Häufigste Kategorie: <strong>${mostUsedCategory}</strong> - <strong>${categoryCounts[mostUsedCategory]}</strong> Beiträge (<strong>${mostUsedPercentage}%</strong> aller Beiträge)`;
+        document.getElementById('mostUsedCategoryText').innerHTML = mostUsedCategoryText;
+        console.log('Updated most used category text:', mostUsedCategoryText);
+    }
+
+    function renderPieChart(canvasId, title, data, isMapObjectChart = false, isDescriptionLengthChart = false) {
+        const canvas = document.getElementById(canvasId);
         if (!canvas) {
             console.error(`Canvas element not found: ${canvasId}`);
             return;
@@ -2302,46 +2451,121 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const ctx = canvas.getContext('2d');
 
-        const categoryColors = {
-            'Öffentliche Plätze': '#ff5c00',
-            'Transport': '#133873',
-            'Gesundheit': '#9a031e',
-            'Umwelt': '#4caf50',
-            'Bildung': '#eab003',
-            'Andere': '#212121',
-            'Sport': '#3d4f53',
-            'Kultur': '#431307',
-            'Verwaltung': '#653993'
-        };
+        if (chartInstances[canvasId]) {
+            chartInstances[canvasId].destroy();
+        }
 
-        // Generate colors for each category in the data
-        const backgroundColors = Object.keys(data).map(category => {
-            return categoryColors[category] || '#999999'; // Default color if category not found
-        });
+        let backgroundColors = defineBackgroundColors(data, isMapObjectChart, isDescriptionLengthChart);
 
-        new Chart(ctx, {
+        chartInstances[canvasId] = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: Object.keys(data),
                 datasets: [{
                     data: Object.values(data),
-                    backgroundColor: backgroundColors
+                    backgroundColor: backgroundColors,
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            if (showPercentage) {
+                                const total = Object.values(data).reduce((a, b) => a + b, 0);
+                                const percentage = (value / total * 100).toFixed(2);
+                                return percentage + '%';
+                            } else {
+                                return value;
+                            }
+                        },
+                        color: '#FFFFFF',
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        },
+                        textStrokeColor: '#000000',
+                        textStrokeWidth: 4
+                    }
                 }]
             },
             options: {
                 responsive: true,
-                title: {
-                    display: true,
-                    text: title
-                }
+                plugins: {
+                    datalabels: {
+                        color: '#FFFFFF',
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        textStrokeColor: '#000000',
+                        textStrokeWidth: 4
+                    },
+                    legend: {
+                        labels: {
+                            font: {
+                                weight: 'bold',
+                                size: 14,
+                                color: 'black'
+                            }
+                        }
+                    }
+                },
+                title: createChartOptions(title).title
             }
         });
+
+        console.log(`Rendered ${canvasId} chart with data:`, data);
+    }
+
+    function defineBackgroundColors(data, isMapObjectChart, isDescriptionLengthChart) {
+        if (isMapObjectChart) {
+            return ['#021c4c', '#e82b10'];
+        } else if (isDescriptionLengthChart) {
+            return ['#021c4c', '#028d9e', '#f6e0bf', '#f57736', '#e82b10'];
+        } else {
+            const categoryColors = {
+                'Öffentliche Plätze': '#ff5c00',
+                'Transport': '#133873',
+                'Gesundheit': '#9a031e',
+                'Umwelt': '#4caf50',
+                'Bildung': '#eab003',
+                'Andere': '#212121',
+                'Sport': '#3d4f53',
+                'Kultur': '#431307',
+                'Verwaltung': '#653993'
+            };
+            return Object.keys(data).map(category => categoryColors[category] || '#999999');
+        }
+    }
+
+    function createChartOptions(title) {
+        return {
+            responsive: true,
+            title: {
+                display: title !== '',
+                text: title,
+                font: {
+                    weight: 'bold',
+                    size: 20,
+                    color: 'black'
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            weight: 'bold',
+                            size: 14,
+                            color: 'black'
+                        }
+                    }
+                }
+            }
+        };
     }
 });
 
 
+let submissionChart = null; // Reference to the 'Submissions over time' chart
+let activityChart = null; // Reference to the 'Activity over time' chart
+let viewsChart = null;
 
-let myChart = null; // Reference to the chart
 
 function generateDateLabels(startDate, endDate) {
     const start = new Date(startDate);
@@ -2409,31 +2633,43 @@ function generateDateLabels(startDate, endDate) {
                 };
             });
 
-            if (myChart) {
-                myChart.destroy();
-            }
+            if (submissionChart) {
+				submissionChart.destroy();
+			}
 
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: labels, datasets: datasets },
-                options: {
-                    scales: { y: { beginAtZero: true } },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                font: { weight: 'bold' },
-                                color: 'black'
-                            }
+    submissionChart = new Chart(ctx, {
+         type: 'line',
+    data: { labels: labels, datasets: datasets.map(dataset => ({ ...dataset, fill: false })) },
+        options: {
+            scales: { y: { beginAtZero: true } },
+            plugins: {
+                legend: {
+                    labels: {
+                        font: {
+                            weight: 'bold',
+                            size: 14,
+                            color: 'black'
                         }
                     }
                 }
-            });
+            },
+            title: {
+                display: false,
+                text: 'Your Chart Title Here', // Change as per requirement
+                font: {
+                    weight: 'bold',
+                    size: 16,
+                    color: 'black'
+                }
+            }
+        }
+    });
 
-            console.log("Chart configuration:", myChart.config);
+    console.log("Submission Chart configuration:", submissionChart.config); // Updated from myChart to submissionChart
         })
         .catch(error => {
             console.error('Error fetching data:', error);
-            console.log("Failed to update chart due to error in data fetching.");
+            console.log("Failed to Update due to error in data fetching.");
         });
 }
 
@@ -2442,17 +2678,199 @@ function generateDateLabels(startDate, endDate) {
         const endDate = document.getElementById('endDate').value;
         const includeMapObjects = document.getElementById('includeMapObjects').checked;
         const excludeMapObjects = document.getElementById('excludeMapObjects').checked;
-        console.log(`Updating chart with start date: ${startDate}, end date: ${endDate}, includeMapObjects: ${includeMapObjects}, excludeMapObjects: ${excludeMapObjects}`);
+        console.log(`Updating chart with Startdatum: ${startDate}, Enddatum: ${endDate}, includeMapObjects: ${includeMapObjects}, excludeMapObjects: ${excludeMapObjects}`);
         updateChart(startDate, endDate, includeMapObjects, excludeMapObjects);
     });
 
+
+document.getElementById('updateActivityChart').addEventListener('click', () => {
+    const startDate = document.getElementById('activityStartDate').value;
+    const endDate = document.getElementById('activityEndDate').value;
+    updateActivityChart(startDate, endDate);
+});
+
+function updateActivityChart(startDate, endDate) {
+    const url = `/get_activity_data?start=${startDate}&end=${endDate}`;
+    console.log(`Fetching activity data with URL: ${url}`);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Received activity data:", data);
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            const labels = generateDateLabels(startDate, endDate);
+
+            const datasets = [
+                {
+                    label: 'Upvotes 👍',
+                    data: labels.map(label => convertDateAndGetData(label, data.upvotes)),
+                    borderColor: '#4caf50',
+                    fill: false,
+                },
+                {
+                    label: 'Downvotes 👎',
+                    data: labels.map(label => convertDateAndGetData(label, data.downvotes)),
+                    borderColor: '#9a031e',
+                    fill: false,
+                },
+                {
+                    label: 'Kommentare',
+                    data: labels.map(label => convertDateAndGetData(label, data.comments)),
+                    borderColor: '#133873',
+                    fill: false,
+                },
+                {
+                    label: 'Meldungen',
+                    data: labels.map(label => convertDateAndGetData(label, data.reports)),
+                    borderColor: '#eab003',
+                    fill: false,
+                },
+                {
+                    label: 'Lesezeichen',
+                    data: labels.map(label => convertDateAndGetData(label, data.bookmarks)),
+                    borderColor: '#653993',
+                    fill: false,
+                }
+            ];
+
+            if (activityChart) {
+                activityChart.destroy();
+            }
+
+            activityChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: { weight: 'bold', color: 'black' }
+                            }
+                        }
+                    }
+                }
+            });
+    console.log("Activity Chart configuration:", activityChart.config); // Updated from myChart to activityChart
+        })
+        .catch(error => {
+            console.error('Error fetching activity data:', error);
+        });
+}
+
+function convertDateAndGetData(label, dataDict) {
+    let formattedDate = label.split('.').reverse().join('-'); // Convert to YYYY-MM-DD
+    return dataDict[formattedDate] || 0;
+}
+
+
+
+function generateDateLabels(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const labels = [];
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+        labels.push(`${('0' + date.getDate()).slice(-2)}.${('0' + (date.getMonth() + 1)).slice(-2)}.${date.getFullYear()}`);
+    }
+    return labels;
+}
+
+document.getElementById('updateViewsChart').addEventListener('click', () => {
+    const startDate = document.getElementById('viewsStartDate').value;
+    const endDate = document.getElementById('viewsEndDate').value;
+    updateViewsChart(startDate, endDate);
+});
+
+function updateViewsChart(startDate, endDate) {
+    const url = `/get_view_data?start=${startDate}&end=${endDate}`;
+    console.log(`Fetching views data with URL: ${url}`);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Received views data:", data);
+            const ctx = document.getElementById('viewsChart').getContext('2d');
+            const labels = generateDateLabels(startDate, endDate);
+
+            const dailyViewsData = labels.map(label => {
+                let formattedDate = label.split('.').reverse().join('-'); // Convert to YYYY-MM-DD
+                return data.daily_views[formattedDate] || 0;
+            });
+
+            // Calculate cumulative total views
+            const cumulativeTotalViewsData = dailyViewsData.reduce((acc, current, index) => {
+                if (index === 0) {
+                    acc.push(current);
+                } else {
+                    acc.push(acc[index - 1] + current);
+                }
+                return acc;
+            }, []);
+
+            const datasets = [
+                {
+                    label: 'Tägliche Ansichten',
+                    data: dailyViewsData,
+                    borderColor: '#e82b10',
+                    fill: false,
+                },
+                {
+                    label: 'Gesamtansichten',
+                    data: cumulativeTotalViewsData,
+                    borderColor: '#021c4c',
+                    fill: false,
+                }
+            ];
+
+            if (viewsChart) {
+                viewsChart.destroy();
+            }
+
+            viewsChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: { weight: 'bold', color: 'black' }
+                            }
+                        }
+                    }
+                }
+            });
+    console.log("Views Chart configuration:", viewsChart.config); // Updated from myChart to viewsChart
+        })
+        .catch(error => {
+            console.error('Error fetching views data:', error);
+        });
+}
+
+
 window.onload = function() {
-    const initialEndDate = new Date();
-    const initialStartDate = new Date(initialEndDate);
-    initialStartDate.setDate(initialEndDate.getDate() - 7);
-    document.getElementById('startDate').value = initialStartDate.toISOString().split('T')[0];
-    document.getElementById('endDate').value = initialEndDate.toISOString().split('T')[0];
-    updateChart(initialStartDate.toISOString().split('T')[0], initialEndDate.toISOString().split('T')[0], false, false);
+    // Initialize 'Submissions over time' chart
+    const initialEndDateSubmission = new Date();
+    const initialStartDateSubmission = new Date(initialEndDateSubmission);
+    initialStartDateSubmission.setDate(initialEndDateSubmission.getDate() - 7);
+    document.getElementById('startDate').value = initialStartDateSubmission.toISOString().split('T')[0];
+    document.getElementById('endDate').value = initialEndDateSubmission.toISOString().split('T')[0];
+    updateChart(initialStartDateSubmission.toISOString().split('T')[0], initialEndDateSubmission.toISOString().split('T')[0], false, false);
+
+    // Initialize 'Activity over time' chart
+    const initialEndDateActivity = new Date();
+    const initialStartDateActivity = new Date(initialEndDateActivity);
+    initialStartDateActivity.setDate(initialEndDateActivity.getDate() - 7);
+    document.getElementById('activityStartDate').value = initialStartDateActivity.toISOString().split('T')[0];
+    document.getElementById('activityEndDate').value = initialEndDateActivity.toISOString().split('T')[0];
+    updateActivityChart(initialStartDateActivity.toISOString().split('T')[0], initialEndDateActivity.toISOString().split('T')[0]);
+
+	const initialEndDateViews = new Date();
+    const initialStartDateViews = new Date(initialEndDateViews);
+    initialStartDateViews.setDate(initialEndDateViews.getDate() - 7);
+    document.getElementById('viewsStartDate').value = initialStartDateViews.toISOString().split('T')[0];
+    document.getElementById('viewsEndDate').value = initialEndDateViews.toISOString().split('T')[0];
+    updateViewsChart(initialStartDateViews.toISOString().split('T')[0], initialEndDateViews.toISOString().split('T')[0]);
 };
 
 </script>

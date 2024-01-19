@@ -97,7 +97,7 @@ def project_submission_stats():
         include_map_objects = request.args.get('includeMapObjects') == 'true'
         exclude_map_objects = request.args.get('excludeMapObjects') == 'true'
 
-        app.logger.debug(f"Fetching stats from {start_date} to {end_date}, include map objects: {include_map_objects}, exclude map objects: {exclude_map_objects}")
+        app.logger.debug(f"Fetching stats from {start_date} to {end_date}, include Notizens: {include_map_objects}, exclude Notizens: {exclude_map_objects}")
 
         query = db.session.query(
             func.strftime('%Y-%m-%d', Project.date).label('submission_date'),
@@ -127,31 +127,120 @@ def project_submission_stats():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/get_activity_data')
+def get_activity_data():
+    start_date = request.args.get('start', (date.today() - timedelta(days=7)).isoformat())
+    end_date = request.args.get('end', date.today().isoformat())
+
+    # Fetching upvotes, downvotes, and comments
+    upvotes = db.session.query(
+        func.date(Vote.timestamp).label('date'),
+        func.count().label('count')
+    ).filter(Vote.timestamp.between(start_date, end_date), Vote.upvote == True).group_by(func.date(Vote.timestamp)).all()
+
+    downvotes = db.session.query(
+        func.date(Vote.timestamp).label('date'),
+        func.count().label('count')
+    ).filter(Vote.timestamp.between(start_date, end_date), Vote.downvote == True).group_by(func.date(Vote.timestamp)).all()
+
+    comments = db.session.query(
+        func.date(Comment.timestamp).label('date'),
+        func.count().label('count')
+    ).filter(Comment.timestamp.between(start_date, end_date)).group_by(func.date(Comment.timestamp)).all()
+
+    # Fetching reports
+    reports = db.session.query(
+        func.date(Report.timestamp).label('date'),
+        func.count().label('count')
+    ).filter(Report.timestamp.between(start_date, end_date)).group_by(func.date(Report.timestamp)).all()
+
+    # Fetching bookmarks
+    bookmarks = db.session.query(
+        func.date(Bookmark.timestamp).label('date'),
+        func.count().label('count')
+    ).filter(Bookmark.timestamp.between(start_date, end_date)).group_by(func.date(Bookmark.timestamp)).all()
+
+    # Convert query results to dictionaries
+    upvotes_dict = {str(day.date): day.count for day in upvotes}
+    downvotes_dict = {str(day.date): day.count for day in downvotes}
+    comments_dict = {str(day.date): day.count for day in comments}
+    reports_dict = {str(day.date): day.count for day in reports}
+    bookmarks_dict = {str(day.date): day.count for day in bookmarks}
+
+    activity_data = {
+        'upvotes': upvotes_dict,
+        'downvotes': downvotes_dict,
+        'comments': comments_dict,
+        'reports': reports_dict,
+        'bookmarks': bookmarks_dict,
+    }
+
+    return jsonify(activity_data)
+
     
 
+@app.route('/get_view_data')
+def get_view_data():
+    start_date = request.args.get('start', (datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d'))
+    end_date = request.args.get('end', datetime.today().strftime('%Y-%m-%d'))
+
+    daily_views = db.session.query(
+        func.date(Project.date).label('date'),
+        func.sum(Project.view_count).label('daily_view_count')
+    ).filter(Project.date.between(start_date, end_date)).group_by(func.date(Project.date)).all()
+
+    total_views = db.session.query(
+        func.sum(Project.view_count)
+    ).filter(Project.date.between(start_date, end_date)).scalar()
+
+    daily_views_dict = {str(day.date): day.daily_view_count for day in daily_views}
+
+    view_data = {
+        'daily_views': daily_views_dict,
+        'total_views': total_views
+    }
+
+    return jsonify(view_data)
+    
 @app.route('/get_chart_data', methods=['GET'])
 @login_required
 def get_chart_data():
-    # Example logic - adapt based on your actual data structure
+    filter_param = request.args.get('filter', 'all')
+    description_length_filter = request.args.get('description_length_filter', 'all')
 
-    # Count projects per category
-    category_counts = db.session.query(
+    projects_query = Project.query
+    description_projects_query = Project.query
+
+    if filter_param == 'true':
+        projects_query = projects_query.filter_by(is_mapobject=True)
+    elif filter_param == 'false':
+        projects_query = projects_query.filter_by(is_mapobject=False)
+
+    if description_length_filter == 'true':
+        description_projects_query = description_projects_query.filter_by(is_mapobject=True)
+    elif description_length_filter == 'false':
+        description_projects_query = description_projects_query.filter_by(is_mapobject=False)
+
+    # Count projects per category with the filtered query
+    category_counts = projects_query.with_entities(
         Project.category, func.count(Project.id)
     ).group_by(Project.category).all()
     category_counts = {category: count for category, count in category_counts}
 
-    # Count map objects vs non-map objects
+    # Count Notizens vs Projektvorschläge
     mapobject_counts = {
-        'Map Object': Project.query.filter_by(is_mapobject=True).count(),
-        'Non-Map Object': Project.query.filter_by(is_mapobject=False).count()
+        'Notizen': Project.query.filter_by(is_mapobject=True).count(),
+        'Projektvorschläge': Project.query.filter_by(is_mapobject=False).count()
     }
 
     description_length_ranges = ["0-50", "51-100", "101-150", "151-200", ">200"]
     description_length_counts = {range: 0 for range in description_length_ranges}
+    total_description_length = 0
+    description_projects_count = description_projects_query.count()
 
-    for project in Project.query.all():
-        length = len(project.descriptionwhy)  # Assuming 'descriptionwhy' is the field name
-
+    for project in description_projects_query:
+        length = len(project.descriptionwhy)
+        total_description_length += length
         if length <= 50:
             description_length_counts["0-50"] += 1
         elif 51 <= length <= 100:
@@ -163,10 +252,13 @@ def get_chart_data():
         else:
             description_length_counts[">200"] += 1
 
+    average_description_length = (total_description_length / description_projects_count) if description_projects_count > 0 else 0
+
     return jsonify({
         'categoryCounts': category_counts,
         'mapobjectCounts': mapobject_counts,
-        'descriptionLengthCounts': description_length_counts
+        'descriptionLengthCounts': description_length_counts,
+        'averageDescriptionLength': average_description_length
     })
 
 def get_project_category_chart_data():
@@ -548,12 +640,12 @@ def export_projects():
         app.logger.debug("Pie chart for average description length created")
 
         mapobject_counts = {
-            'Map Object': Project.query.filter_by(is_mapobject=True).count(),
-            'Non-Map Object': Project.query.filter_by(is_mapobject=False).count()
+            'Notizen': Project.query.filter_by(is_mapobject=True).count(),
+            'Projektvorschläge': Project.query.filter_by(is_mapobject=False).count()
         }
 
-        # Generate the pie chart for Map Object vs Non-Map Object
-        app.logger.debug("Generating pie chart for Map Object vs Non-Map Object")
+        # Generate the pie chart for Notizen vs Projektvorschläge
+        app.logger.debug("Generating pie chart for Notizen vs Projektvorschläge")
         fig, ax = plt.subplots()
         ax.pie(mapobject_counts.values(), labels=mapobject_counts.keys(), autopct='%1.1f%%')
         plt.title("Ratio Projekt vs Map_object")
@@ -563,7 +655,7 @@ def export_projects():
         img = Image(img_data)
         chart3_cell = f'O{start_row_for_charts}'  # Adjust the cell location as needed
         worksheet.add_image(img, chart3_cell)
-        app.logger.debug("Pie chart for Map Object vs Non-Map Object created")
+        app.logger.debug("Pie chart for Notizen vs Projektvorschläge created")
 
        
         writer.save()
@@ -1512,7 +1604,7 @@ def admintools():
     per_page = 3
 
     map_object_page = request.args.get('map_object_page', 1, type=int)
-    map_object_per_page = 6  # Define the number of map objects per page
+    map_object_per_page = 6  # Define the number of Notizens per page
     
     comment_page = request.args.get('comment_page', 1, type=int)
     comment_per_page = 6  # Adjust the number of comments per page as needed
@@ -1531,7 +1623,7 @@ def admintools():
 
     app.logger.debug(f"Found categories: {categories}")
     
-    # Query map objects with the search filter
+    # Query Notizens with the search filter
     map_object_query = Project.query.filter_by(is_mapobject=True)
     if search_map_object_query:
         map_object_query = map_object_query.filter(Project.descriptionwhy.ilike(f'%{search_map_object_query}%'))
@@ -1924,7 +2016,7 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
             page=comment_page, per_page=per_page, error_out=False
         )
 
-        # Count map objects separately
+        # Count Notizens separately
         map_objects_count = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
 
         for project in paginated_projects.items:

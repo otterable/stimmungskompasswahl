@@ -2,7 +2,7 @@
     {% if paginated_projects and paginated_projects.items %}
         <div class="project-list" id="project-list-container"> 
             {% for project in paginated_projects.items %}
-                {% if not project.is_mapobject %}  <!-- Check if project is not a map object -->
+                {% if not project.is_mapobject %}  <!-- Check if project is not a Notizen -->
                     <div class="project-thumbnail">
                         <h3><strong>{{ project.name }}</strong></h3>
                         <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>

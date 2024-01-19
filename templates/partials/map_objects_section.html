@@ -1,7 +1,7 @@
 <!-- map_objects_section.html -->
 <div class="my-map-objects centered-text">
 
-    <!-- Map Objects Statistics Section -->
+    <!-- Notizens Statistics Section -->
     <div class="map-objects-statistics centered-text">
         <h2>Sie haben <span style="color: #003056;">{{ user_statistics.num_map_objects }} Notizen gepostet.</span></h2>
     </div>
@@ -24,9 +24,9 @@
             {% endfor %}
     </div>
 
-            <!-- Pagination for Map Objects -->
+            <!-- Pagination for Notizens -->
             {% if map_object_pagination.pages > 1 %}
-                <nav aria-label="Map Object Page navigation">
+                <nav aria-label="Notizen Page navigation">
                     <ul class="pagination">
                         {% if map_object_pagination.has_prev %}
                             <li class="page-item">

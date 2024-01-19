@@ -3,7 +3,7 @@
         <div class="comment-list" id="comment-list-container">
             {% for comment in paginated_comments.items %}
                 <div class="comment-thumbnail">
-                    <p>"{{ comment.text }}"</p>
+<h3 style="font-style: italic; font-weight: bold;">"{{ comment.text }}"</h3>
                     <div class="comment-details">
                         <p>Projekt: 
                             <a href="{{ url_for('project_details', project_id=comment.project_id) }}">

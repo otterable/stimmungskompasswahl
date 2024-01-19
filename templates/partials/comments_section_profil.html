@@ -6,7 +6,7 @@
             {% for comment, project_name in comment_pagination.items %}
                 <div class="project-thumbnail">
                     <!-- Comment Text -->
-                    <h3 style="font-style: italic;">"{{ comment.text }}"</h3>
+<h3 style="font-style: italic; font-weight: bold;">"{{ comment.text }}"</h3>
                     <!-- Project Name -->
                     <p>Commented on project: <a href="{{ url_for('project_details', project_id=comment.project_id) }}">{{ project_name }}</a></p>
                     <!-- Posted Date -->

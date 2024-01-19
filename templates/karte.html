@@ -3374,10 +3374,10 @@ function addMarkers(projects) {
             var downvotePercentage = totalVotes > 0 ? ((project.downvotes / totalVotes) * 100).toFixed(1) : 0;
 
             if (project.is_mapobject) {
-                // For map objects, show simple description
+                // For Notizens, show simple description
                 popupContent = `<div style="text-align: center;">${project.descriptionwhy}</div>`;
             } else {
-                // For non-map objects, show detailed popup with voting details
+                // For Projektvorschläges, show detailed popup with voting details
                 var votingDetailsHtml = `
                     <div style="text-align: center; margin-bottom: 1px; font-size: 14px; font-weight: bold;">
                         <span onclick="vote(${project.id}, 'upvote')" class="vote-button" style="cursor: pointer;">👍</span>: <span id="upvote-count-${project.id}">${project.upvotes}</span>,

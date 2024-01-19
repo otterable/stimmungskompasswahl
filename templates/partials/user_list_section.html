@@ -7,7 +7,7 @@
     {% if paginated_users.items %}
         {% for user in paginated_users.items %}
             <div class="user-thumbnail">
-                <h3>{{ user.name }} (ID: {{ user.id }})</h3>
+                <h3><strong>{{ user.name }} (ID: {{ user.id }})</strong></h3>
                 <div class="project-details">
                     Projektvorschläge erstellt: {{ user.project_count }} <br>
                     Notizen erstellt: {{ user.map_object_count }} <br>

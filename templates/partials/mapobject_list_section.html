@@ -4,7 +4,7 @@
             {% for project in paginated_map_objects.items %}
                 {% if project.is_mapobject %}
 <div class="stat-box2">
-                        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
+                        <div class="project-description" style="font-weight:bold;">{{ project.descriptionwhy|safe }}</div>
                         <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
                         <!-- Admin actions for each project -->
                         <form method="POST" action="{{ url_for('admintools') }}">
@@ -20,9 +20,9 @@
         {% endif %}
     {% endif %}
 
-    <!-- Pagination for Map Objects -->
+    <!-- Pagination for Notizens -->
     {% if paginated_map_objects.pages > 1 %}
-        <nav aria-label="Map Object Page navigation" class="pagination-container" data-pagination-type="map_object">
+        <nav aria-label="Notizen Page navigation" class="pagination-container" data-pagination-type="map_object">
             <ul class="pagination">
                 {% if paginated_map_objects.has_prev %}
                     <li class="page-item">
