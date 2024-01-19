@@ -13,6 +13,7 @@
         }
     </script>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
@@ -34,8 +35,8 @@
 .stat-box {
     background-color: #f5f5f5; /* Example background color */
     margin: 5px;
-    padding: 0px;
-    border-radius: 10px;
+    padding: 5px;
+    border-radius: 30px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     flex-basis: calc(33.333% - 20px); /* For desktop */
 }
@@ -223,7 +224,7 @@ h3 {
     margin-block-end: 0.3em;    /* Adjusted margin at the end */
     margin-inline-start: 0px;
     margin-inline-end: 0px;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 
@@ -1294,51 +1295,88 @@ nav[aria-label="Page navigation"] {
 <div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
 
 <div class="stats-container">
-<div class="stat-box">
+<div class="stat-box" style="background-color: #fff3c3 !important">
 <h2>Top 5 Meistgesehene Projekte</h2>
 <ul>
   {% for project in top_viewed_projects %}
       {% if project.view_count > 0 %}
-    <li><a href="{{ url_for('project_details', project_id=project.id) }}">{{ project.name }}</a> mit {{ project.view_count }} Aufrufen</li>
+        <li><h3><a href="{{ url_for('project_details', project_id=project.id) }}"><strong>{{ project.name }}</strong></a> mit <strong>{{ project.view_count }}</strong> Aufrufen</h3></li>
       {% endif %}
   {% endfor %}
 </ul>
 </div>
 
-<div class="stat-box">
+
+
+<div class="chart-container">
+    <canvas id="projectCategoryChart"></canvas>
+</div>
+<div class="chart-container">
+    <canvas id="mapObjectChart"></canvas>
+</div>
+<div class="chart-container">
+    <canvas id="descriptionLengthChart"></canvas>
+</div>
+
+
+<!-- Date Range Selection -->
+<div>
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate">
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate">
+    <label for="excludeMapObjects">Exclude Map Objects:</label>
+    <input type="checkbox" id="excludeMapObjects">
+    <label for="includeMapObjects">Include Only Map Objects:</label>
+    <input type="checkbox" id="includeMapObjects">
+    <button id="updateChart">Update Chart</button>
+</div>
+
+<canvas id="submissionChart"></canvas>
+
+
+
+
+<div class="stat-box" style="background-color: #ffd6a8 !important">
 <h2>Top 5 Bewertete Projekte</h2>
 <ul>
   {% for project in top_rated_projects %}
-    <li><a href="{{ url_for('project_details',project_id=project.id) }}">{{ project.name }}</a> mit {{ project.upvote_count }} Stimmen</li>
+      <li><h3><a href="{{ url_for('project_details',project_id=project.id) }}"><strong>{{ project.name }}</strong></a> mit <strong>{{ project.upvote_count }}</strong> Stimmen</h3></li>
 {% endfor %}
 
 </ul>
 </div>
 
-<div class="stat-box">
+<div class="stat-box" style="background-color: #e3ffff !important">
 <h2>Top 5 Kommentierte Projekte</h2>
 <ul>
   {% for project in top_commented_projects %}
-    <li><a href="{{ url_for('project_details', project_id=project.id) }}">{{ project.name }}</a> mit {{ project.comments_count }} Kommentaren</li>
+      <li><h3><a href="{{ url_for('project_details', project_id=project.id) }}"><strong>{{ project.name }}</strong></a> mit <strong>{{ project.comments_count }}</strong> Kommentaren</h3></li>
   {% endfor %}
 </ul>
 </div>
 
-<div class="stat-box">
+<div class="stat-box" style="background-color: #b8d5ff !important">
 <h2>Top 5 Häufigste Kategorien</h2>
 <ul>
   {% for category, count in category_counts %}
-    <li>{{ category }} mit {{ count }} Projekten</li>
+      <li><h3><strong>{{ category }}</strong> mit <strong>{{ count }}</strong> Projekten</h3></li>
   {% endfor %}
 </ul>
 </div>
 
-<div class="stat-box">
+<div class="stat-box"  style="background-color: #b9ea9b !important">
 <h2>Top 5 Aktivste Benutzerkonten</h2>
 <ul>
   {% for user in active_users %}
-    <li>{{ user.name }} mit {{ user.project_count }} Projekten, {{ user.map_object_count }} Kartenobjekten und {{ user.comment_count }} Kommentaren</li>
-  {% endfor %}
+     <li>
+        <h3>
+			<strong> {{ user.name }}</strong> mit 
+          <strong>{{ user.project_count }}</strong> Projekten, 
+          <strong>{{ user.map_object_count }}</strong> Kartenobjekten und 
+          <strong>{{ user.comment_count }}</strong> Kommentaren
+        </h3>
+      </li>  {% endfor %}
 </ul>
 </div>
 </div>
@@ -2229,6 +2267,194 @@ function logLayoutChange() {
 // Log layout change on page load and resize
 window.addEventListener('load', logLayoutChange);
 window.addEventListener('resize', logLayoutChange);
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    fetchChartData();
+
+    function fetchChartData() {
+        console.log("Fetching chart data...");
+        fetch('/get_chart_data')
+            .then(response => response.json())
+            .then(data => {
+                if (document.getElementById('projectCategoryChart')) {
+                    renderPieChart('projectCategoryChart', 'Project Categories', data.categoryCounts);
+                }
+                if (document.getElementById('mapObjectChart')) {
+                    renderPieChart('mapObjectChart', 'Map Object Distribution', data.mapobjectCounts);
+                }
+                if (document.getElementById('descriptionLengthChart')) {
+                    renderPieChart('descriptionLengthChart', 'Description Lengths', data.descriptionLengthCounts);
+                }
+            })
+            .catch(error => console.error('Error fetching chart data:', error));
+    }
+
+    function renderPieChart(canvasId, title, data) {
+        const canvas = document.getElementById(canvasId);
+        console.log(canvas); // Check if this logs a valid element
+
+        if (!canvas) {
+            console.error(`Canvas element not found: ${canvasId}`);
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+
+        const categoryColors = {
+            'Öffentliche Plätze': '#ff5c00',
+            'Transport': '#133873',
+            'Gesundheit': '#9a031e',
+            'Umwelt': '#4caf50',
+            'Bildung': '#eab003',
+            'Andere': '#212121',
+            'Sport': '#3d4f53',
+            'Kultur': '#431307',
+            'Verwaltung': '#653993'
+        };
+
+        // Generate colors for each category in the data
+        const backgroundColors = Object.keys(data).map(category => {
+            return categoryColors[category] || '#999999'; // Default color if category not found
+        });
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    data: Object.values(data),
+                    backgroundColor: backgroundColors
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: title
+                }
+            }
+        });
+    }
+});
+
+
+
+let myChart = null; // Reference to the chart
+
+function generateDateLabels(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const labels = [];
+    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+        labels.push(`${('0' + date.getDate()).slice(-2)}.${('0' + (date.getMonth() + 1)).slice(-2)}.${date.getFullYear()}`);
+    }
+    return labels;
+}
+
+    function updateChart(startDate, endDate, includeMapObjects, excludeMapObjects) {
+        let urlParams = `start=${startDate}&end=${endDate}`;
+        if (includeMapObjects) {
+            urlParams += '&includeMapObjects=true';
+        } else if (excludeMapObjects) {
+            urlParams += '&excludeMapObjects=true';
+        }
+        const url = `/project_submission_stats?${urlParams}`;
+        console.log(`Fetching data with URL: ${url}`);
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Received data:", data);
+
+            const ctx = document.getElementById('submissionChart').getContext('2d');
+            const categories = Object.keys(data);
+
+            if (categories.length === 0) {
+                console.log("No data available for the selected date range");
+                return;
+            }
+
+            categories.forEach(category => console.log(category, data[category]));
+
+            const labels = generateDateLabels(startDate, endDate);
+            console.log("Labels for chart:", labels);
+
+            const categoryColors = {
+                'Öffentliche Plätze': '#ff5c00',
+                'Transport': '#133873',
+                'Gesundheit': '#9a031e',
+                'Umwelt': '#4caf50',
+                'Bildung': '#eab003',
+                'Andere': '#212121',
+                'Sport': '#3d4f53',
+                'Kultur': '#431307',
+                'Verwaltung': '#653993'
+            };
+
+            const datasets = categories.map(category => {
+                const categoryData = labels.map(label => {
+                    const [day, month, year] = label.split('.');
+                    const formattedDate = `${year}-${month}-${day}`;
+                    return data[category][formattedDate] || 0;
+                });
+                console.log(`Data for category ${category}:`, categoryData);
+                return {
+                    label: category,
+                    data: categoryData,
+                    backgroundColor: categoryColors[category] + '66',
+                    borderColor: categoryColors[category],
+                    borderWidth: 3
+                };
+            });
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    scales: { y: { beginAtZero: true } },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: { weight: 'bold' },
+                                color: 'black'
+                            }
+                        }
+                    }
+                }
+            });
+
+            console.log("Chart configuration:", myChart.config);
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            console.log("Failed to update chart due to error in data fetching.");
+        });
+}
+
+   document.getElementById('updateChart').addEventListener('click', () => {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const includeMapObjects = document.getElementById('includeMapObjects').checked;
+        const excludeMapObjects = document.getElementById('excludeMapObjects').checked;
+        console.log(`Updating chart with start date: ${startDate}, end date: ${endDate}, includeMapObjects: ${includeMapObjects}, excludeMapObjects: ${excludeMapObjects}`);
+        updateChart(startDate, endDate, includeMapObjects, excludeMapObjects);
+    });
+
+window.onload = function() {
+    const initialEndDate = new Date();
+    const initialStartDate = new Date(initialEndDate);
+    initialStartDate.setDate(initialEndDate.getDate() - 7);
+    document.getElementById('startDate').value = initialStartDate.toISOString().split('T')[0];
+    document.getElementById('endDate').value = initialEndDate.toISOString().split('T')[0];
+    updateChart(initialStartDate.toISOString().split('T')[0], initialEndDate.toISOString().split('T')[0], false, false);
+};
+
 </script>
 
 </html>

@@ -4,7 +4,7 @@
             {% for project in paginated_projects.items %}
                 {% if not project.is_mapobject %}  <!-- Check if project is not a map object -->
                     <div class="project-thumbnail">
-                        <h3>{{ project.name }}</h3>
+                        <h3><strong>{{ project.name }}</strong></h3>
                         <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
                               <div class="voting-bar">
                             {% if project.upvotes > 0 %}

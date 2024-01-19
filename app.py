@@ -1,13 +1,13 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, Response, json, send_file, send_from_directory, make_response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func, desc, asc, and_
+from sqlalchemy import func, desc, asc, and_, cast, Date
 from flask_migrate import Migrate
 from models import db, User, Project, Vote, Comment, ProjectView, Bookmark, Report
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from werkzeug.middleware.proxy_fix import ProxyFix
 from forms import RegistrationForm, LoginForm, CommentForm
 from random import randint
@@ -26,6 +26,7 @@ from bs4 import BeautifulSoup
 import logging
 import shutil
 from pathlib import Path
+from collections import Counter
 import os
 import pandas as pd
 import random
@@ -88,7 +89,101 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
+@app.route('/project_submission_stats')
+def project_submission_stats():
+    try:
+        start_date = request.args.get('start', (date.today() - timedelta(days=7)).isoformat())
+        end_date = request.args.get('end', date.today().isoformat())
+        include_map_objects = request.args.get('includeMapObjects') == 'true'
+        exclude_map_objects = request.args.get('excludeMapObjects') == 'true'
 
+        app.logger.debug(f"Fetching stats from {start_date} to {end_date}, include map objects: {include_map_objects}, exclude map objects: {exclude_map_objects}")
+
+        query = db.session.query(
+            func.strftime('%Y-%m-%d', Project.date).label('submission_date'),
+            Project.category,
+            func.count(Project.id).label('project_count')
+        ).filter(Project.date.between(start_date, end_date))
+
+        if include_map_objects:
+            query = query.filter(Project.is_mapobject == True)
+        elif exclude_map_objects:
+            query = query.filter(Project.is_mapobject == False)
+
+        submission_stats = query.group_by('submission_date', Project.category).all()
+
+        app.logger.debug(f"Raw data: {submission_stats}")
+
+        categories = set(category for _, category, _ in submission_stats)
+        stats = {category: {} for category in categories}
+
+        for submission_date, category, project_count in submission_stats:
+            stats[category][submission_date] = project_count
+
+        app.logger.debug(f"Processed stats: {stats}")
+        return jsonify(stats)
+    except Exception as e:
+        app.logger.error(f"Error in project_submission_stats: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+    
+
+@app.route('/get_chart_data', methods=['GET'])
+@login_required
+def get_chart_data():
+    # Example logic - adapt based on your actual data structure
+
+    # Count projects per category
+    category_counts = db.session.query(
+        Project.category, func.count(Project.id)
+    ).group_by(Project.category).all()
+    category_counts = {category: count for category, count in category_counts}
+
+    # Count map objects vs non-map objects
+    mapobject_counts = {
+        'Map Object': Project.query.filter_by(is_mapobject=True).count(),
+        'Non-Map Object': Project.query.filter_by(is_mapobject=False).count()
+    }
+
+    description_length_ranges = ["0-50", "51-100", "101-150", "151-200", ">200"]
+    description_length_counts = {range: 0 for range in description_length_ranges}
+
+    for project in Project.query.all():
+        length = len(project.descriptionwhy)  # Assuming 'descriptionwhy' is the field name
+
+        if length <= 50:
+            description_length_counts["0-50"] += 1
+        elif 51 <= length <= 100:
+            description_length_counts["51-100"] += 1
+        elif 101 <= length <= 150:
+            description_length_counts["101-150"] += 1
+        elif 151 <= length <= 200:
+            description_length_counts["151-200"] += 1
+        else:
+            description_length_counts[">200"] += 1
+
+    return jsonify({
+        'categoryCounts': category_counts,
+        'mapobjectCounts': mapobject_counts,
+        'descriptionLengthCounts': description_length_counts
+    })
+
+def get_project_category_chart_data():
+    # Count projects per category
+    projects = Project.query.all()
+    category_counts = Counter([project.category for project in projects])
+
+    # Prepare data for the pie chart
+    pie_chart_data = {
+        'labels': list(category_counts.keys()),
+        'datasets': [{
+            'label': 'Project Categories',
+            'data': list(category_counts.values()),
+            'backgroundColor': ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0', '#f77825']  # Customize colors
+        }]
+    }
+    return pie_chart_data
 
 
 @app.route('/login/google')
