@@ -25,6 +25,40 @@
     display: block; /* Ensures margin-bottom is applied */
 }
 
+.overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+.overlay-content {
+    position: relative;
+    top: 25%;
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+}
+
+.closebtn {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 35px;
+    cursor: pointer;
+}
+
+#projectsList {
+    list-style-type: none;
+}
+
+
    .stats-container {
    margin-top: 20px;
     display: flex;
@@ -1404,17 +1438,17 @@ nav[aria-label="Page navigation"] {
 
 
 <div class="stat-box">
-    <h2>Engaged Projects</h2>
+    <h2>Engagierte Projektvorschläge</h2>
    <select id="engagedProjectsThreshold">
-    <option value="1">Above 1 view</option>
-    <option value="2">Above 2 views</option>
-    <option value="3">Above 3 views</option>
-    <option value="4">Above 4 views</option>
-    <option value="500">Above 500 views</option>
-    <option value="1000">Above 1000 views</option>
+    <option value="1">Über 1 Ansicht</option>
+    <option value="2">Über 2 Ansichten</option>
+    <option value="3">Über 3 Ansichten</option>
+    <option value="4">Über 4 Ansichten</option>
+    <option value="500">Über 500 Ansichten</option>
+    <option value="1000">Über 1000 Ansichten</option>
 </select>
 
-    <button id="showEngagedProjectsList">Show Project List</button>
+    <button id="showEngagedProjectsList">Liste anzeigen</button>
     <canvas id="engagedProjectsChart"></canvas>
 </div>
 
@@ -1468,7 +1502,13 @@ nav[aria-label="Page navigation"] {
 </div>
 </div>
 
-
+<div id="projectsOverlay" class="overlay">
+    <div class="overlay-content">
+        <span class="closebtn" onclick="closeOverlay()">&times;</span>
+        <h2>Engaged Projects List</h2>
+        <ul id="projectsList"></ul>
+    </div>
+</div>
 
 	
 <div id="exportSection" style="display: none;">
@@ -2368,9 +2408,62 @@ let engagedProjectsChart = null;
     });
 
 document.getElementById('showEngagedProjectsList').addEventListener('click', function() {
-    const threshold = document.getElementById('engagedProjectsThreshold').value;
-    // Implement the logic to fetch the project list and show in an overlay
+    document.getElementById('projectsOverlay').style.display = 'block';
+    loadEngagedProjects();
 });
+
+function closeOverlay() {
+    document.getElementById('projectsOverlay').style.display = 'none';
+}
+
+function loadEngagedProjects() {
+    const threshold = document.getElementById('engagedProjectsThreshold').value || 1;
+    fetch(`/get_engaged_projects?threshold=${threshold}`)
+        .then(response => response.json())
+        .then(projects => {
+            const listElement = document.getElementById('projectsList');
+            listElement.innerHTML = '';
+
+            if (projects.length === 0) {
+                listElement.innerHTML = '<li>No projects found</li>';
+                return;
+            }
+
+            projects.forEach(project => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>${project.name}</strong> with ${project.views} views, ${project.upvotes} upvotes, ${project.downvotes} downvotes, ${project.comments} comments, ${project.bookmarks} bookmarks, and ${project.reports} reports.`;
+                listElement.appendChild(listItem);
+            });
+
+            console.log(`Loaded projects for threshold ${threshold}:`, projects);
+        })
+        .catch(error => {
+            console.error('Error loading projects:', error);
+            listElement.innerHTML = '<li>Error loading projects</li>';
+        });
+}
+
+
+
+// Updated function for fetching engaged projects
+function getEngagedProjects() {
+    const threshold = document.getElementById('engagedProjectsThreshold').value;
+    return fetch(`/get_engaged_projects_data?threshold=${threshold}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Engaged projects fetched:', data);
+            return Object.entries(data).map(([category, count]) => {
+                return { name: category, count: count };
+            });
+        });
+}
+
+
 
 document.addEventListener("DOMContentLoaded", function() {
     fetchChartData(); // Load all charts initially
@@ -2815,13 +2908,19 @@ document.getElementById('updateViewsChart').addEventListener('click', () => {
 });
 
 function fetchAndRenderEngagedProjectsChart(threshold) {
-    fetch(`/get_engaged_projects_data?threshold=${threshold}`)
+    fetch(`/get_engaged_projects?threshold=${threshold}`)
         .then(response => response.json())
         .then(data => {
-            if (Object.keys(data).length === 0) {
+            if (!data || data.length === 0) {
                 console.log("No data available for the threshold:", threshold);
                 return;
             }
+
+            // Process the data to create category counts
+            let categoryCounts = data.reduce((counts, project) => {
+                counts[project.category] = (counts[project.category] || 0) + 1;
+                return counts;
+            }, {});
 
             const ctx = document.getElementById('engagedProjectsChart').getContext('2d');
             if (engagedProjectsChart) engagedProjectsChart.destroy();
@@ -2831,49 +2930,34 @@ function fetchAndRenderEngagedProjectsChart(threshold) {
             engagedProjectsChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: Object.keys(data),
+                    labels: Object.keys(categoryCounts),
                     datasets: [{
-                        data: Object.values(data),
+                        data: Object.values(categoryCounts),
                         backgroundColor: backgroundColors,
                     }]
                 },
                 options: {
                     title: {
-                        display: true,
-                        text: 'Engaged Projects'
+                        display: false,
+                        text: 'Engagierte Projektvorschläge'
                     }
                 }
             });
 
-            console.log("engagedProjectsChart loaded with data:", data);
+            console.log("Engaged Projects Chart loaded with data:", categoryCounts);
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            if (engagedProjectsChart) engagedProjectsChart.destroy();
+        });
 }
 
-// Initialize with a default threshold
+
 document.addEventListener("DOMContentLoaded", function() {
     fetchAndRenderEngagedProjectsChart(1); // default threshold
 });
 
-// Update chart on threshold change
-document.getElementById('engagedProjectsThreshold').addEventListener('change', function() {
-    const threshold = this.value;
-    fetchAndRenderEngagedProjectsChart(threshold);
-});
 
-
-// Initial call
-document.addEventListener("DOMContentLoaded", function() {
-    fetchAndRenderEngagedProjectsChart(10); // Assuming an initial threshold value of 10
-});
-
-
-// Call this function with an initial threshold value when the page loads
-document.addEventListener("DOMContentLoaded", function() {
-    // Assuming an initial threshold value, e.g., 10
-    let initialThreshold = 10;
-    fetchAndRenderEngagedProjectsChart(initialThreshold);
-});
 
 
 function updateViewsChart(startDate, endDate) {

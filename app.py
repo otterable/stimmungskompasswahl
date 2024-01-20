@@ -202,21 +202,29 @@ def get_view_data():
 
     return jsonify(view_data)
 
-
-@app.route('/get_engaged_projects_data')
+@app.route('/get_engaged_projects')
 @login_required
-def get_engaged_projects_data():
+def get_engaged_projects():
     threshold = request.args.get('threshold', default=1, type=int)
 
     # Query projects with view_count greater than or equal to threshold
     projects = Project.query.filter(Project.view_count >= threshold).all()
 
-    # Create a dictionary of category counts
-    category_counts = {}
+    project_list = []
     for project in projects:
-        category_counts[project.category] = category_counts.get(project.category, 0) + 1
+        project_details = {
+            "id": project.id,
+            "name": project.name,
+            "views": project.view_count,
+            "upvotes": len([vote for vote in project.votes if vote.upvote]),
+            "downvotes": len([vote for vote in project.votes if vote.downvote]),
+            "comments": len(project.comments),
+            "bookmarks": len(Bookmark.query.filter_by(project_id=project.id).all()),
+            "reports": project.p_reports
+        }
+        project_list.append(project_details)
 
-    return jsonify(category_counts)
+    return jsonify(project_list)
 
 
 
