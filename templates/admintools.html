@@ -1404,6 +1404,21 @@ nav[aria-label="Page navigation"] {
 
 
 <div class="stat-box">
+    <h2>Engaged Projects</h2>
+   <select id="engagedProjectsThreshold">
+    <option value="1">Above 1 view</option>
+    <option value="2">Above 2 views</option>
+    <option value="3">Above 3 views</option>
+    <option value="4">Above 4 views</option>
+    <option value="500">Above 500 views</option>
+    <option value="1000">Above 1000 views</option>
+</select>
+
+    <button id="showEngagedProjectsList">Show Project List</button>
+    <canvas id="engagedProjectsChart"></canvas>
+</div>
+
+<div class="stat-box">
 <h2>Neue Beiträge</h2>
 <div>
     <label for="startDate">Startdatum:</label>
@@ -1421,6 +1436,8 @@ nav[aria-label="Page navigation"] {
 
 <canvas id="submissionChart"></canvas>
 </div>
+
+
 
 <div class="stat-box">
     <h2>Projektinteraktion</h2>
@@ -1445,6 +1462,7 @@ nav[aria-label="Page navigation"] {
     </div>
     <canvas id="viewsChart"></canvas>
 </div>
+
 
 
 </div>
@@ -2342,12 +2360,27 @@ let currentMapObjectFilter = 'all'; // Initial filter state
 let chartInstances = {}; // Object to hold chart instances
 let currentDescriptionLengthFilter = 'all'; // Filter state for description length chart
 let showPercentage = false; // Global variable to keep track of the toggle state
+let engagedProjectsChart = null;
+
+    document.getElementById('engagedProjectsThreshold').addEventListener('change', function() {
+        const threshold = this.value;
+        fetchAndRenderEngagedProjectsChart(threshold);
+    });
+
+document.getElementById('showEngagedProjectsList').addEventListener('click', function() {
+    const threshold = document.getElementById('engagedProjectsThreshold').value;
+    // Implement the logic to fetch the project list and show in an overlay
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     fetchChartData(); // Load all charts initially
     setupToggleButtons();
     setupDescriptionLengthToggleButtons();
     setupPercentageToggle();
+});
+
+
+
 
     function setupToggleButtons() {
         const toggleButtons = document.querySelectorAll('.mapobject-toggle');
@@ -2559,7 +2592,7 @@ function fetchChartData(updateOnlyCategoryChart = false, updateOnlyDescriptionLe
             }
         };
     }
-});
+
 
 
 let submissionChart = null; // Reference to the 'Submissions over time' chart
@@ -2780,6 +2813,68 @@ document.getElementById('updateViewsChart').addEventListener('click', () => {
     const endDate = document.getElementById('viewsEndDate').value;
     updateViewsChart(startDate, endDate);
 });
+
+function fetchAndRenderEngagedProjectsChart(threshold) {
+    fetch(`/get_engaged_projects_data?threshold=${threshold}`)
+        .then(response => response.json())
+        .then(data => {
+            if (Object.keys(data).length === 0) {
+                console.log("No data available for the threshold:", threshold);
+                return;
+            }
+
+            const ctx = document.getElementById('engagedProjectsChart').getContext('2d');
+            if (engagedProjectsChart) engagedProjectsChart.destroy();
+
+            const backgroundColors = ['#003056', '#36A2EB', '#e82b10', '#f57736', '#f6e0bf', '#028d9e', '#036a90'];
+
+            engagedProjectsChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        data: Object.values(data),
+                        backgroundColor: backgroundColors,
+                    }]
+                },
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Engaged Projects'
+                    }
+                }
+            });
+
+            console.log("engagedProjectsChart loaded with data:", data);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Initialize with a default threshold
+document.addEventListener("DOMContentLoaded", function() {
+    fetchAndRenderEngagedProjectsChart(1); // default threshold
+});
+
+// Update chart on threshold change
+document.getElementById('engagedProjectsThreshold').addEventListener('change', function() {
+    const threshold = this.value;
+    fetchAndRenderEngagedProjectsChart(threshold);
+});
+
+
+// Initial call
+document.addEventListener("DOMContentLoaded", function() {
+    fetchAndRenderEngagedProjectsChart(10); // Assuming an initial threshold value of 10
+});
+
+
+// Call this function with an initial threshold value when the page loads
+document.addEventListener("DOMContentLoaded", function() {
+    // Assuming an initial threshold value, e.g., 10
+    let initialThreshold = 10;
+    fetchAndRenderEngagedProjectsChart(initialThreshold);
+});
+
 
 function updateViewsChart(startDate, endDate) {
     const url = `/get_view_data?start=${startDate}&end=${endDate}`;

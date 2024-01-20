@@ -201,7 +201,25 @@ def get_view_data():
     }
 
     return jsonify(view_data)
-    
+
+
+@app.route('/get_engaged_projects_data')
+@login_required
+def get_engaged_projects_data():
+    threshold = request.args.get('threshold', default=1, type=int)
+
+    # Query projects with view_count greater than or equal to threshold
+    projects = Project.query.filter(Project.view_count >= threshold).all()
+
+    # Create a dictionary of category counts
+    category_counts = {}
+    for project in projects:
+        category_counts[project.category] = category_counts.get(project.category, 0) + 1
+
+    return jsonify(category_counts)
+
+
+
 @app.route('/get_chart_data', methods=['GET'])
 @login_required
 def get_chart_data():
