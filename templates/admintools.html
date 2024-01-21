@@ -21,6 +21,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
    <style>
+   
+   
    .average-description-length {
     font-size: 20px; /* Makes text larger */
     margin-bottom: 10px; /* Adds a gap below the text */
@@ -1147,6 +1149,25 @@ nav[aria-label="Page navigation"] {
     }
 	
 	    /* Specific styles for filter form in overlay */
+('overlay').style.display = 'none';
+    }
+</script>
+
+#filter-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    overflow-x: hidden; /* Hide horizontal overflow */
+    transition: 0.5s;
+    z-index: 1000;
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+}
+
 #filter-form-mobile {
     display: flex;
     flex-direction: column;
@@ -1341,7 +1362,8 @@ nav[aria-label="Page navigation"] {
 
 <!-- Update the buttons in the filter-bar div -->
 <div class="filter-bar">
-		<button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
+
+    <button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
     <button id="toggleExportSection" class="c-button" data-section-id="exportSection">Datenexport</button>
     <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
     <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
@@ -1351,6 +1373,20 @@ nav[aria-label="Page navigation"] {
     <button id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</button>
 </div>
 
+<div id="filter-overlay" class="nav-overlay">
+    <div id="nav-links">
+        <a href="#" id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</a>
+        <a href="#" id="toggleExportSection" class="c-button" data-section-id="exportSection">Datenexport</a>
+        <a href="#" id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</a>
+        <a href="#" id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</a>
+        <a href="#" id="toggleComments" class="c-button" data-section-id="commentsSection">Kommentare</a>
+        <a href="#" id="toggleImportantProjects" class="c-button" data-section-id="importantProjectsSection">Markierte Projektvorschläge</a>
+        <a href="#" id="toggleFeaturedProjects" class="c-button" data-section-id="featuredProjectsSection" style="display:none;">Open Ausgewählte Projektvorschläge</a>
+        <a href="#" id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</a>
+    </div>
+</div>
+
+			<button id="hamburger-button-filter">&#9776; Filtern</button>
 
 
 <div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
@@ -1757,51 +1793,6 @@ nav[aria-label="Page navigation"] {
 </body>
 
 
-   
-<script>
-     // Toggle the navigation overlay
-    function toggleNavOverlay() {
-        var navOverlay = document.getElementById('nav-overlay');
-        if (navOverlay.style.display === 'block') {
-            navOverlay.style.display = 'none';
-        } else {
-            navOverlay.style.display = 'block';
-        }
-    }
-
-    // Close the navigation overlay when clicking on the overlay background or on a non-button element
-    document.getElementById('nav-overlay').addEventListener('click', function(event) {
-        // Close only if on mobile
-        if (window.innerWidth <= 1080 && !event.target.closest('button, a')) {
-            toggleNavOverlay();
-        }
-    });
-
-    // Event listener for hamburger button
-    document.getElementById('hamburger-button').addEventListener('click', toggleNavOverlay);
-
-    // Resize event listener
-    window.addEventListener('resize', function() {
-        var navOverlay = document.getElementById('nav-overlay');
-        // Show on desktop, hide on mobile
-        if (window.innerWidth > 1080) {
-            navOverlay.style.display = 'block';
-        } else {
-            navOverlay.style.display = 'none';
-        }
-    });
-    
-    // Set initial state of the nav-overlay based on device width
-    window.onload = function() {
-        var navOverlay = document.getElementById('nav-overlay');
-        // Show on desktop, hide on mobile
-        if (window.innerWidth > 1080) {
-            navOverlay.style.display = 'block';
-        } else {
-            navOverlay.style.display = 'none';
-        }
-    };
-</script>
 <script>
 
 
@@ -2305,57 +2296,64 @@ function toggleNotes() {
 document.addEventListener('DOMContentLoaded', function() {
     toggleSection('deleteAllProjectsSection'); // Open the 'Statistik' section by default
 
-    document.querySelectorAll('.control-bar .c-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const sectionId = this.getAttribute('data-section-id');
-            toggleSection(sectionId);
+ 
+
+ const filterButtons = document.querySelectorAll('#filter-overlay .c-button');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                // Close the overlay
+                document.getElementById('filter-overlay').style.display = 'none';
+
+                // Toggle the respective section
+                const sectionId = this.getAttribute('data-section-id');
+                toggleSection(sectionId);
+            });
         });
     });
-});
 
-let currentOpenSection = 'deleteAllProjectsSection'; // Set 'Statistik' as the default section
+    // Your existing toggleSection function
+    let currentOpenSection = 'deleteAllProjectsSection';
 
-function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    const defaultSection = document.getElementById('deleteAllProjectsSection');
-    const defaultButton = document.getElementById('toggleDeleteAllProjects');
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        const defaultSection = document.getElementById('deleteAllProjectsSection');
+        const defaultButton = document.getElementById('toggleDeleteAllProjects');
 
-    if (currentOpenSection !== sectionId) {
-        const currentSection = document.getElementById(currentOpenSection);
-        if (currentSection) {
-            currentSection.style.display = 'none';
-            document.querySelector(`[data-section-id="${currentOpenSection}"]`).classList.remove('active');
-            console.debug(currentOpenSection + ' section closed');
+        if (currentOpenSection !== sectionId) {
+            const currentSection = document.getElementById(currentOpenSection);
+            if (currentSection) {
+                currentSection.style.display = 'none';
+                document.querySelector(`[data-section-id="${currentOpenSection}"]`).classList.remove('active');
+                console.debug(currentOpenSection + ' section closed');
+            }
         }
-    }
 
-    if (section.style.display === 'none') {
-        section.style.display = 'block';
-        document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
-        console.debug(sectionId + ' section opened');
-        currentOpenSection = sectionId;
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
+            console.debug(sectionId + ' section opened');
+            currentOpenSection = sectionId;
 
-        if (defaultSection && defaultSection !== section && defaultSection.style.display === 'block') {
-            defaultSection.style.display = 'none';
-            defaultButton.classList.remove('active');
-            console.debug('Default section closed');
-        }
-    } else {
-        section.style.display = 'none';
-        document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
-        console.debug(sectionId + ' section closed');
-
-        if (defaultSection.style.display === 'none') {
-            defaultSection.style.display = 'block';
-            defaultButton.classList.add('active');
-            console.debug('Default section opened');
-            currentOpenSection = 'deleteAllProjectsSection';
+            if (defaultSection && defaultSection !== section && defaultSection.style.display === 'block') {
+                defaultSection.style.display = 'none';
+                defaultButton.classList.remove('active');
+                console.debug('Default section closed');
+            }
         } else {
-            currentOpenSection = null;
+            section.style.display = 'none';
+            document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
+            console.debug(sectionId + ' section closed');
+
+            if (defaultSection.style.display === 'none') {
+                defaultSection.style.display = 'block';
+                defaultButton.classList.add('active');
+                console.debug('Default section opened');
+                currentOpenSection = 'deleteAllProjectsSection';
+            } else {
+                currentOpenSection = null;
+            }
         }
     }
-}
-
 
 // Attach the toggleSection function to the new button
 document.getElementById('toggleDeleteAllProjects').addEventListener('click', function() {
@@ -3328,11 +3326,92 @@ function displayViewerStats(data) {
 
 	
 </script>
+
+only one of the expanded sections shall be open at a time. when a button inside of the overlay is pressed, the overlay shall close, and all other expanded sections except the one that has just been opened by the button shall close.
+
+update my existing code;
+
+
+<script>
+   document.getElementById('hamburger-button').addEventListener('click', function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
+        console.log('Hamburger button clicked. nav-overlay display status:', navOverlay.style.display);
+    });
+
+    document.getElementById('hamburger-button-filter').addEventListener('click', function() {
+        var filterOverlay = document.getElementById('filter-overlay');
+        filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    document.getElementById('filter-overlay').addEventListener('click', function(event) {
+        var filterForm = document.getElementById('filter-form-mobile');
+        if (!filterForm.contains(event.target)) {
+            this.style.display = 'none';
+        }
+    });
+
+    document.getElementById('filter-form-mobile').addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+
+    document.addEventListener('click', function(event) {
+        var navOverlay = document.getElementById('nav-overlay');
+        var navLinks = document.getElementById('nav-links');
+        var hamburgerButton = document.getElementById('hamburger-button');
+
+        if (window.innerWidth <= 1080) {
+            if (navOverlay.style.display === 'block' && !navOverlay.contains(event.target) && !hamburgerButton.contains(event.target)) {
+                navOverlay.style.display = 'none';
+                console.log('nav-overlay area outside the buttons clicked, overlay closing');
+            } else if (navLinks.contains(event.target)) {
+                navOverlay.style.display = 'none';
+                console.log('nav-links area clicked, overlay closing');
+            }
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectID = urlParams.get('projectID');
+        if (projectID) {
+            showOverlayForProjectID(projectID);
+        }
+
+        document.getElementById('overlay').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeOverlay();
+                history.pushState(null, '', '/list');
+            }
+        });
+
+        document.getElementById('filter-form-mobile').addEventListener('keypress', function(event) {
+            if (event.keyCode === 13) { // Enter key
+                event.preventDefault();
+            }
+        });
+    });
+
+    function showOverlayForProjectID(projectID) {
+        fetch('/api/project/' + projectID)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('overlay-title').textContent = data.title;
+                document.getElementById('overlay-description').textContent = data.description;
+                document.getElementById('overlay').style.display = 'flex';
+            });
+    }
+
+    function closeOverlay() {
+        document.getElementById('overlay').style.display = 'none';
+    }
+	</script>
 <script>
 fetch('/log_view')
     .then(response => response.json())
     .then(data => console.debug(data.message))
     .catch(console.error);
 </script>
+
 
 </html>

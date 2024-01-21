@@ -32,6 +32,74 @@
             margin-bottom: 30px;
         }
 
+.content-container {
+    max-width: 800px; /* Optimal reading width */
+    margin: 0 auto; /* Center align */
+    padding: 20px;
+    font-size: 16px; /* Comfortable reading size */
+    line-height: 1.6; /* Optimal line spacing */
+}
+
+.about-section h1, .about-section h2 {
+    color: #003056; /* Dark color for headings */
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.about-section p {
+    text-align: justify; /* Justify text for a clean look */
+    margin-bottom: 15px;
+}
+
+/* Responsive Design for Tablets */
+@media screen and (max-width: 768px) {
+    .content-container {
+        padding: 15px;
+        font-size: 15px;
+    }
+}
+
+/* Responsive Design for Mobile Devices */
+@media screen and (max-width: 480px) {
+    .content-container {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+.features-section h2, .features-section h3 {
+    color: #003056; /* A consistent color for subheadings */
+    margin: 20px 0;
+}
+
+.features-list {
+    list-style-type: none; /* Remove default list styling */
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.features-list li {
+    margin-bottom: 10px;
+    padding-left: 20px;
+    position: relative;
+    text-align: left; /* Align text to the left for clarity */
+    line-height: 1.4; /* Optimal line height for readability */
+}
+
+.features-list li::before {
+    content: '•'; /* Unicode character for bullet */
+    color: #2874A6; /* A distinctive color for bullets */
+    position: absolute;
+    left: 0;
+}
+
+/* Responsive Design for Tablets and Mobile Devices */
+@media screen and (max-width: 768px) {
+    .features-list li {
+        padding-left: 15px;
+    }
+}
+
         
 
    .form-container {
@@ -460,6 +528,8 @@ display: block;
         margin-left: auto; /* Adjust logo position */
 		margin-right: auto;
     }
+	
+	
 
     #nav-links {
         display: flex;
@@ -562,24 +632,37 @@ display: block;
     </div>
 </div><div class="form-container">
 
-<h1> Über den Stimmungskompass: </h2>
-<p>Der Stimmungskompass" ist eine Web-App, die die Verbundenheit der Bürgerinnen und Bürger mit ihrer Stadt messen und verbessern soll. Die Hauptfunktion besteht darin, Meinungen und Eindrücke der Einwohner über ihr städtisches Umfeld zu sammeln.
+  <div class="content-container">
+        <section class="about-section">
+		    <img src="static/stimmungskompass_ueber_title_1.png" alt="Stimmungskompass Überblick" style="width: 100%;">
 
 
-<p>Nachdem Nutzer ein Konto erstellt haben, können sie Einblicke in ihre bevorzugten Plätze, Freizeitorte und Erholungsgebiete in der Stadt geben. Außerdem können sie über Alltagsprobleme wie Verkehrstaus oder Gegenden, in denen sie sich unsicher fühlen, berichten.</p>
-
-<p>Im Mittelpunkt des Stimmungskompasses steht die partizipative Planung. Die Nutzer haben die Möglichkeit, Projekte vorzuschlagen, die die Lebensqualität in der Stadt verbessern sollen. Diese können von infrastrukturellen Veränderungen wie neuen Radwegen bis hin zu gemeinschaftsorientierten Initiativen reichen.
- </p>
-
-<p>Andere Mitglieder können sich dann durch Abstimmen und Kommentieren mit diesen Vorschlägen auseinandersetzen, wodurch ein kollaboratives Umfeld gefördert wird. Diese Funktion dient nicht nur dazu, Ideen zu sammeln, sondern auch der Stadtverwaltung dabei zu helfen, die Projekte neu zu bewerten und priorisieren in Abstimmung mit den Bürgern.
-
-<p>Durch die Verbindung von Stadtverwaltung und ihren Einwohnern soll der Stimmungskompass eine Gemeinschaft schaffen, in der das gemeinsame Ziel darin besteht, die Lebensqualität in der Stadt kontinuierlich zu verbessern. Der Stimmungskompass ist eine Plattform, auf der die Stimmen der Bürgerinnen und Bürger gehört, ihre Ideen geschätzt und möglicherweise verwirklicht werden. </p>
-</p>
+<h1>Let a video explain it to you:</h1>
 
 
-<h1> Anleitung: </h2>
+<h2>Nutzerbeiträge und lokale Einblicke</h2>
+<p>Der Stimmungskompass ist eine Web-App, die die Verbundenheit der Bürgerinnen und Bürger mit ihrer Stadt messen und verbessern soll. Die Hauptfunktion besteht darin, Meinungen und Eindrücke der Einwohner über ihr städtisches Umfeld zu sammeln.</p>
+Nachdem Nutzer ein Konto erstellt haben, können sie Einblicke in ihre bevorzugten Plätze, Freizeitorte und Erholungsgebiete in der Stadt geben. Außerdem können sie über Alltagsprobleme wie Verkehrstaus oder Gegenden, in denen sie sich unsicher fühlen, berichten.
 
-..Video
+
+<h2>Partizipative Planung und Projektvorschläge</h2>
+<p>Im Mittelpunkt des Stimmungskompasses steht die partizipative Planung. Die Nutzer haben die Möglichkeit, Projekte vorzuschlagen, die die Lebensqualität in der Stadt verbessern sollen. Diese können von infrastrukturellen Veränderungen wie neuen Radwegen bis hin zu gemeinschaftsorientierten Initiativen reichen.</p>
+
+<h2>Stimmen Sie über vorgeschlagene Projekte ab</h2>
+<p>Andere Mitglieder können sich dann durch Abstimmen und Kommentieren mit diesen Vorschlägen auseinandersetzen, wodurch ein kollaboratives Umfeld gefördert wird. Diese Funktion dient nicht nur dazu, Ideen zu sammeln, sondern auch der Stadtverwaltung dabei zu helfen, die Projekte neu zu bewerten und priorisieren in Abstimmung mit den Bürgern.</p>
+
+<h2>Ziel: Verbesserung der Lebensqualität in der Stadt</h2>
+<p>Durch die Verbindung von Stadtverwaltung und ihren Einwohnern soll der Stimmungskompass eine Gemeinschaft schaffen, in der das gemeinsame Ziel darin besteht, die Lebensqualität in der Stadt kontinuierlich zu verbessern. Der Stimmungskompass ist eine Plattform, auf der die Stimmen der Bürgerinnen und Bürger gehört, ihre Ideen geschätzt und möglicherweise verwirklicht werden.</p></p>
+
+
+
+
+    </div>
+    </div>
+
+    </div>
+
+
 
 </body>
 </html>
