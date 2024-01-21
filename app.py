@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, flash, ses
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, desc, asc, and_, cast, Date
 from flask_migrate import Migrate
-from models import db, User, Project, Vote, Comment, ProjectView, Bookmark, Report
+from models import db, User, Project, Vote, Comment, ProjectView, Bookmark, Report, WebsiteViews
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth
@@ -38,6 +38,7 @@ import io
 import time
 import threading
 from io import StringIO
+import random
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -88,6 +89,90 @@ google = oauth.register(
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
+
+@app.route('/log_view')
+def log_view():
+    ip_address = request.remote_addr  # Get the IP address of the visitor
+
+    # Check if this IP address has already been logged today
+    existing_view = WebsiteViews.query.filter_by(
+        view_date=datetime.utcnow().date(),
+        ip_address=ip_address
+    ).first()
+
+    unique_views_count = WebsiteViews.query.filter_by(
+        view_date=datetime.utcnow().date()
+    ).count()
+
+    if existing_view:
+        # IP address has already been logged today
+        return jsonify({"message": f"IP {ip_address} not logged, it has already been logged today. There are {unique_views_count} unique viewers today."}), 200
+    else:
+        WebsiteViews.add_view(ip_address)
+        print(f"New view logged for IP {ip_address}")  # Debugging
+        return jsonify({"message": f"IP {ip_address} logged. It is today the {unique_views_count + 1}th viewer."}), 200
+
+@app.route('/get_unique_viewers_data')
+def get_unique_viewers_data():
+    try:
+        start_date = request.args.get('start_date', (datetime.utcnow() - timedelta(days=6)).strftime('%Y-%m-%d'))
+        end_date = request.args.get('end_date', datetime.utcnow().strftime('%Y-%m-%d'))
+
+        # Convert string dates to datetime.date objects
+        start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        unique_viewers_data = db.session.query(
+            WebsiteViews.view_date, 
+            func.count(WebsiteViews.ip_address).label('viewer_count')
+        ).filter(
+            WebsiteViews.view_date.between(start_date_obj, end_date_obj)
+        ).group_by(
+            WebsiteViews.view_date
+        ).all()
+
+        print("Queried Data:", unique_viewers_data)  # Debugging
+
+        viewer_count_dict = {view_date.strftime("%Y-%m-%d"): viewer_count for view_date, viewer_count in unique_viewers_data}
+        labels, values = zip(*[(date.strftime("%Y-%m-%d"), viewer_count_dict.get(date.strftime("%Y-%m-%d"), 0)) for date in (start_date_obj + timedelta(n) for n in range((end_date_obj - start_date_obj).days + 1))])
+
+        return jsonify({'labels': labels, 'values': values})
+    except Exception as e:
+        print("Error:", str(e))  # More detailed error logging
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/get_unique_viewers_data_range', methods=['POST'])
+def get_unique_viewers_data_range():
+    try:
+        # Extract start and end dates from the request
+        data = request.get_json()
+        start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+        end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+
+        print("Startdatum:", start_date, "Enddatum:", end_date)  # Debugging
+
+        # Query for viewer counts between the specified dates
+        unique_viewers_data = db.session.query(
+            WebsiteViews.view_date, 
+            func.count(WebsiteViews.ip_address).label('viewer_count')
+        ).filter(
+            WebsiteViews.view_date.between(start_date, end_date)
+        ).group_by(
+            WebsiteViews.view_date
+        ).all()
+
+        print("Queried Data:", unique_viewers_data)  # Debugging
+
+        viewer_count_dict = {view_date.strftime("%Y-%m-%d"): viewer_count for view_date, viewer_count in unique_viewers_data}
+        labels, values = zip(*[(date.strftime("%Y-%m-%d"), viewer_count_dict.get(date.strftime("%Y-%m-%d"), 0)) for date in (start_date + timedelta(n) for n in range((end_date - start_date).days + 1))])
+
+        return jsonify({'labels': labels, 'values': values})
+    except Exception as e:
+        print("Error:", str(e))  # More detailed error logging
+        return jsonify({'error': str(e)}), 500
+
+
 
 @app.route('/project_submission_stats')
 def project_submission_stats():
@@ -215,6 +300,7 @@ def get_engaged_projects():
         project_details = {
             "id": project.id,
             "name": project.name,
+            "category": project.category,  # Include the category here
             "views": project.view_count,
             "upvotes": len([vote for vote in project.votes if vote.upvote]),
             "downvotes": len([vote for vote in project.votes if vote.downvote]),
@@ -860,7 +946,9 @@ def download_images():
 def index():
     projects = Project.query.all()
     featured_projects = Project.query.filter_by(is_featured=True).all()
-
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    
     # Calculate upvotes and downvotes for each project
     for project in projects + featured_projects:
         upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
@@ -928,7 +1016,8 @@ def calculate_age(dob):
 def register():
     if request.method == 'POST':
         logging.debug("Registration attempt: %s", request.form)  # Debug: print form data
-
+        ip_address = request.remote_addr
+        WebsiteViews.add_view(ip_address)
         phone_number = request.form.get('phone_number')
         password = request.form.get('password')
         name = request.form.get('name')
@@ -1148,6 +1237,8 @@ def favicon():
 @app.route('/karte')
 def karte():
     # Fetch your projects data from the database or any source
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
     projects = get_projects()  # This is a placeholder for your actual function to fetch projects
     return render_template('karte.html', projects=projects)
 
@@ -1196,7 +1287,8 @@ def neuerbeitrag():
 def submit_project():
     if request.method == 'POST':
         ip_address = request.remote_addr
-
+        ip_address = request.remote_addr
+        WebsiteViews.add_view(ip_address)
         # Check and update the rate limit for project submissions
         submissions = ip_project_submissions.get(ip_address, [])
         # Remove timestamps older than 24 hours
@@ -1339,6 +1431,8 @@ def project_details(project_id):
         is_bookmarked = Bookmark.query.filter_by(user_id=current_user.id, project_id=project_id).first() is not None if current_user.is_authenticated else False
         is_reported = Report.query.filter_by(user_id=current_user.id, project_id=project_id).first() is not None if current_user.is_authenticated else False
 
+        ip_address = request.remote_addr
+        WebsiteViews.add_view(ip_address)
         user_ip = request.remote_addr
         current_time = datetime.utcnow()
         last_view = ProjectView.query.filter(and_(ProjectView.project_id == project_id, 
@@ -2027,6 +2121,9 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
     paginated_comments = []
     bookmarks = Bookmark.query.filter_by(user_id=current_user.id).all()
 
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    
     if current_user.is_authenticated:
         paginated_projects = Project.query.filter_by(
             author=current_user.id, is_mapobject=False
@@ -2121,6 +2218,8 @@ def erfolge():
 
 @app.route('/ueber')
 def ueber():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
     # Additional logic can be added here if needed
     return render_template('ueber.html')
 

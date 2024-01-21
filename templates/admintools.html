@@ -15,7 +15,9 @@
 </head>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
-
+   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
    <style>
@@ -79,6 +81,18 @@
     padding: 5px;
     border-radius: 30px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    flex-basis: calc(30% - 10px); /* For desktop */
+	max-width: calc(30% - 10px) ; 
+}
+
+
+
+.stat-box3 {
+    background-color: #f5f5f5; /* Example background color */
+    margin: 5px;
+    padding: 5px;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     flex-basis: calc(33.333% - 20px); /* For desktop */
 }
 
@@ -93,12 +107,18 @@
 
 @media (min-width: 1080px) and (max-width: 1445px) {
     .stat-box {
-        flex-basis: calc(50% - 20px); /* For tablet */
+        flex-basis: calc(50% - 10px) !important; /* For tablet */
+			max-width: calc(50% - 20px) !important;
+
     }
 }
 
 @media (max-width: 1080px) {
     .stat-box {
+        flex-basis: 100% !important; /* For mobile */
+					max-width:  100% !important; /* For mobile */
+    }
+	 .stat-box3 {
         flex-basis: 100%; /* For mobile */
     }
 }
@@ -1415,11 +1435,21 @@ nav[aria-label="Page navigation"] {
 
 </div>
 
+
 <div class="stat-box">
-<div class="chart-container">
-<h2>Projektvorschläge vs. Notizen</h2>
-    <canvas id="mapObjectChart"></canvas>
-</div>
+    <h2>Engagierte Projektvorschläge</h2>
+			        <p>..und ihre Kategorien.</p>
+   <select id="engagedProjectsThreshold">
+    <option value="1">Über 1 Ansicht</option>
+    <option value="2">Über 2 Ansichten</option>
+    <option value="3">Über 3 Ansichten</option>
+    <option value="4">Über 4 Ansichten</option>
+    <option value="500">Über 500 Ansichten</option>
+    <option value="1000">Über 1000 Ansichten</option>
+</select>
+
+    <button id="showEngagedProjectsList">Projektliste anzeigen</button>
+    <canvas id="engagedProjectsChart"></canvas>
 </div>
 
 <div class="stat-box">
@@ -1438,19 +1468,12 @@ nav[aria-label="Page navigation"] {
 
 
 <div class="stat-box">
-    <h2>Engagierte Projektvorschläge</h2>
-   <select id="engagedProjectsThreshold">
-    <option value="1">Über 1 Ansicht</option>
-    <option value="2">Über 2 Ansichten</option>
-    <option value="3">Über 3 Ansichten</option>
-    <option value="4">Über 4 Ansichten</option>
-    <option value="500">Über 500 Ansichten</option>
-    <option value="1000">Über 1000 Ansichten</option>
-</select>
-
-    <button id="showEngagedProjectsList">Liste anzeigen</button>
-    <canvas id="engagedProjectsChart"></canvas>
+<div class="chart-container">
+<h2>Projektvorschläge vs. Notizen</h2>
+    <canvas id="mapObjectChart"></canvas>
 </div>
+</div>
+
 
 <div class="stat-box">
 <h2>Neue Beiträge</h2>
@@ -1487,7 +1510,7 @@ nav[aria-label="Page navigation"] {
 
 <div class="stat-box">
     <h2>Projektansichten</h2>
-    <div>
+    <div style="margin-top:57px">
         <label for="viewsStartDate">Startdatum:</label>
         <input type="date" id="viewsStartDate">
         <label for="viewsEndDate">Enddatum:</label>
@@ -1497,6 +1520,20 @@ nav[aria-label="Page navigation"] {
     <canvas id="viewsChart"></canvas>
 </div>
 
+<div class="stat-box">
+    <h2>Unique Viewers Over Time</h2>
+		<div id="viewerStats"></div>
+
+	<div>
+    <label for="start-date">Startdatum:</label>
+    <input type="date" id="start-date" name="start-date">
+    <label for="end-date">Enddatum:</label>
+    <input type="date" id="end-date" name="end-date">
+    <button onclick="fetchDataForRange()">Update</button>
+</div>
+
+    <canvas id="uniqueViewersChart"></canvas>
+</div>
 
 
 </div>
@@ -1505,7 +1542,7 @@ nav[aria-label="Page navigation"] {
 <div id="projectsOverlay" class="overlay">
     <div class="overlay-content">
         <span class="closebtn" onclick="closeOverlay()">&times;</span>
-        <h2>Engaged Projects List</h2>
+        <h2>Engagierte Projektvorschläge</h2>
         <ul id="projectsList"></ul>
     </div>
 </div>
@@ -2186,6 +2223,15 @@ function deleteComment(commentId) {
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+var deleteAllProjectsSection = document.getElementById('deleteAllProjectsSection');
+
+    // Find all buttons within the div
+    var buttons = deleteAllProjectsSection.getElementsByTagName('button');
+
+    // Add the 'register-button' class to each button
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].classList.add('register-button');
+    }
     // Function to fetch unique categories and populate the select dropdown
     function fetchUniqueCategories() {
         console.debug("Fetching unique categories for dropdown");
@@ -2379,7 +2425,7 @@ function submitExportForm() {
 </script>
 
 <script>
-function logLayoutChange() {
+function handleLayoutChange() {
     const width = window.innerWidth;
     if (width > 1445) {
         console.debug("admintools.html: screen is wider than 1445px - displaying 3 boxes next to each other.");
@@ -2388,12 +2434,25 @@ function logLayoutChange() {
     } else {
         console.debug("admintools.html: screen is less than 1080px wide -- displaying 1 box per row.");
     }
+    resizeCharts(); // Resize the charts
 }
 
-// Log layout change on page load and resize
-window.addEventListener('load', logLayoutChange);
-window.addEventListener('resize', logLayoutChange);
+// Function to resize all chart instances
+function resizeCharts() {
+    for (let chartId in chartInstances) {
+        if (chartInstances.hasOwnProperty(chartId)) {
+            chartInstances[chartId].resize(); // Resize each chart
+            console.debug("Resized chart:", chartId);
+        }
+    }
+    console.debug("All charts resized.");
+}
+
+// Add event listeners for load and resize events
+window.addEventListener('load', handleLayoutChange);
+window.addEventListener('resize', handleLayoutChange);
 </script>
+
 
 <script>
 let currentMapObjectFilter = 'all'; // Initial filter state
@@ -2412,36 +2471,76 @@ document.getElementById('showEngagedProjectsList').addEventListener('click', fun
     loadEngagedProjects();
 });
 
+document.getElementById('projectsOverlay').addEventListener('click', function(event) {
+    // Check if the click was outside the overlay content
+    if (event.target == this) {
+        closeOverlay();
+        console.log('Overlay closed by clicking outside');
+    }
+});
+
 function closeOverlay() {
     document.getElementById('projectsOverlay').style.display = 'none';
 }
-
 function loadEngagedProjects() {
     const threshold = document.getElementById('engagedProjectsThreshold').value || 1;
     fetch(`/get_engaged_projects?threshold=${threshold}`)
         .then(response => response.json())
         .then(projects => {
-            const listElement = document.getElementById('projectsList');
-            listElement.innerHTML = '';
+            const container = document.getElementById('projectsList');
+            container.innerHTML = '';
 
             if (projects.length === 0) {
-                listElement.innerHTML = '<li>No projects found</li>';
+                container.innerHTML = '<p>No projects found</p>';
                 return;
             }
 
-            projects.forEach(project => {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `<strong>${project.name}</strong> with ${project.views} views, ${project.upvotes} upvotes, ${project.downvotes} downvotes, ${project.comments} comments, ${project.bookmarks} bookmarks, and ${project.reports} reports.`;
-                listElement.appendChild(listItem);
-            });
+            // Create a table
+            const table = document.createElement('table');
+table.style.margin = 'auto';
+table.style.width = '90%'; // Adjust as needed
 
-            console.log(`Loaded projects for threshold ${threshold}:`, projects);
+// Create table header
+const thead = document.createElement('thead');
+thead.innerHTML = `
+    <tr>
+        <th>Titel</th>
+        <th>Ansichten</th>
+        <th>Upvotes </th>
+        <th>Downvotes</th>
+        <th>Kommentare</th>
+        <th>Bookmarks</th>
+        <th>Meldungen</th>
+    </tr>`;
+table.appendChild(thead);
+
+// Create table body
+const tbody = document.createElement('tbody');
+projects.forEach(project => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td><a href="/project_details/${project.id}">${project.name}</a></td>
+        <td><strong>${project.upvotes}</strong></td>
+        <td><strong>${project.downvotes}</strong></td>
+        <td><strong>${project.comments}</strong></td>
+        <td><strong>${project.bookmarks}</strong></td>
+        <td><strong>${project.reports}</strong></td>
+        <td><strong>${project.views}</strong></td>`;
+    tbody.appendChild(row);
+});
+table.appendChild(tbody);
+
+// Append the table to the container
+container.appendChild(table);
+
+console.log(`Loaded projects for threshold ${threshold}:`, projects);
         })
         .catch(error => {
             console.error('Error loading projects:', error);
-            listElement.innerHTML = '<li>Error loading projects</li>';
+            container.innerHTML = '<p>Error loading projects</p>';
         });
 }
+
 
 
 
@@ -2568,76 +2667,87 @@ function fetchChartData(updateOnlyCategoryChart = false, updateOnlyDescriptionLe
         console.log('Updated most used category text:', mostUsedCategoryText);
     }
 
-    function renderPieChart(canvasId, title, data, isMapObjectChart = false, isDescriptionLengthChart = false) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) {
-            console.error(`Canvas element not found: ${canvasId}`);
-            return;
-        }
+function renderPieChart(canvasId, title, data, isMapObjectChart = false, isDescriptionLengthChart = false) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        console.error(`Canvas element not found: ${canvasId}`);
+        return;
+    }
 
-        const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
 
-        if (chartInstances[canvasId]) {
-            chartInstances[canvasId].destroy();
-        }
+    if (chartInstances[canvasId]) {
+        chartInstances[canvasId].destroy();
+    }
 
-        let backgroundColors = defineBackgroundColors(data, isMapObjectChart, isDescriptionLengthChart);
+    let backgroundColors = defineBackgroundColors(data, isMapObjectChart, isDescriptionLengthChart);
 
-        chartInstances[canvasId] = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: Object.keys(data),
-                datasets: [{
-                    data: Object.values(data),
-                    backgroundColor: backgroundColors,
-                    datalabels: {
-                        formatter: (value, ctx) => {
-                            if (showPercentage) {
-                                const total = Object.values(data).reduce((a, b) => a + b, 0);
-                                const percentage = (value / total * 100).toFixed(2);
-                                return percentage + '%';
-                            } else {
-                                return value;
-                            }
-                        },
-                        color: '#FFFFFF',
-                        font: {
-                            weight: 'bold',
-                            size: 16
-                        },
-                        textStrokeColor: '#000000',
-                        textStrokeWidth: 4
-                    }
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    datalabels: {
-                        color: '#FFFFFF',
-                        font: {
-                            weight: 'bold',
-                            size: 14
-                        },
-                        textStrokeColor: '#000000',
-                        textStrokeWidth: 4
+    chartInstances[canvasId] = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: backgroundColors,
+                datalabels: {
+                    formatter: (value, ctx) => {
+                        if (showPercentage) {
+                            const total = Object.values(data).reduce((a, b) => a + b, 0);
+                            const percentage = (value / total * 100).toFixed(2);
+                            return percentage + '%';
+                        } else {
+                            return value;
+                        }
                     },
-                    legend: {
-                        labels: {
-                            font: {
-                                weight: 'bold',
-                                size: 14,
-                                color: 'black'
-                            }
+                    color: '#FFFFFF',
+                    font: {
+                        size: 14, // Adjust the font size as needed
+                        weight: 'bold'
+                    },
+                    anchor: 'end',
+                    align: 'start',
+                    offset: 10,
+                    textStrokeColor: '#000000',
+                    textStrokeWidth: 4
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                datalabels: {
+                    color: '#FFFFFF',
+                    font: {
+                        size: 14, // Adjust the font size as needed
+                        weight: 'bold'
+                    },
+                    textStrokeColor: '#000000',
+                    textStrokeWidth: 4
+                },
+                legend: {
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: 'bold',
+                            color: 'black'
                         }
                     }
-                },
-                title: createChartOptions(title).title
+                }
+            },
+            title: {
+                display: title !== '',
+                text: title,
+                font: {
+                    size: 20,
+                    weight: 'bold',
+                    color: 'black'
+                }
             }
-        });
+        }
+    });
 
-        console.log(`Rendered ${canvasId} chart with data:`, data);
-    }
+    console.log(`Rendered ${canvasId} chart with data:`, data);
+}
 
     function defineBackgroundColors(data, isMapObjectChart, isDescriptionLengthChart) {
         if (isMapObjectChart) {
@@ -2916,7 +3026,6 @@ function fetchAndRenderEngagedProjectsChart(threshold) {
                 return;
             }
 
-            // Process the data to create category counts
             let categoryCounts = data.reduce((counts, project) => {
                 counts[project.category] = (counts[project.category] || 0) + 1;
                 return counts;
@@ -2925,18 +3034,52 @@ function fetchAndRenderEngagedProjectsChart(threshold) {
             const ctx = document.getElementById('engagedProjectsChart').getContext('2d');
             if (engagedProjectsChart) engagedProjectsChart.destroy();
 
-            const backgroundColors = ['#003056', '#36A2EB', '#e82b10', '#f57736', '#f6e0bf', '#028d9e', '#036a90'];
-
             engagedProjectsChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: Object.keys(categoryCounts),
                     datasets: [{
                         data: Object.values(categoryCounts),
-                        backgroundColor: backgroundColors,
+                        backgroundColor: ['#003056', '#36A2EB', '#e82b10', '#f57736', '#f6e0bf', '#028d9e', '#036a90'],
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                return value; // Display the raw value
+                            },
+                            color: '#FFFFFF',
+                            font: {
+                                size: 14, // Ensure this matches your desired size
+                                weight: 'bold'
+                            },
+                            anchor: 'end', // Set anchor to 'end' for positioning
+                            align: 'start', // Set align to 'start' for positioning
+                            offset: 10, // Adjust offset if needed
+                            textStrokeColor: '#000000',
+                            textStrokeWidth: 4
+                        }
                     }]
                 },
                 options: {
+                    responsive: true,
+                    plugins: {
+                        datalabels: {
+                            color: '#FFFFFF',
+                            font: {
+                                size: 14, // Ensure this matches your desired size
+                                weight: 'bold'
+                            },
+                            textStrokeColor: '#000000',
+                            textStrokeWidth: 4
+                        },
+                        legend: {
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold',
+                                    color: 'black'
+                                }
+                            }
+                        }
+                    },
                     title: {
                         display: false,
                         text: 'Engagierte Projektvorschläge'
@@ -2951,6 +3094,8 @@ function fetchAndRenderEngagedProjectsChart(threshold) {
             if (engagedProjectsChart) engagedProjectsChart.destroy();
         });
 }
+
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -3044,14 +3189,150 @@ window.onload = function() {
     document.getElementById('activityEndDate').value = initialEndDateActivity.toISOString().split('T')[0];
     updateActivityChart(initialStartDateActivity.toISOString().split('T')[0], initialEndDateActivity.toISOString().split('T')[0]);
 
-	const initialEndDateViews = new Date();
+    // Initialize 'Views over time' chart
+    const initialEndDateViews = new Date();
     const initialStartDateViews = new Date(initialEndDateViews);
     initialStartDateViews.setDate(initialEndDateViews.getDate() - 7);
     document.getElementById('viewsStartDate').value = initialStartDateViews.toISOString().split('T')[0];
     document.getElementById('viewsEndDate').value = initialEndDateViews.toISOString().split('T')[0];
     updateViewsChart(initialStartDateViews.toISOString().split('T')[0], initialEndDateViews.toISOString().split('T')[0]);
+
+    // Initialize 'Unique Viewers over time' chart
+    document.getElementById('start-date').value = initialStartDateSubmission.toISOString().split('T')[0];
+    document.getElementById('end-date').value = initialEndDateSubmission.toISOString().split('T')[0];
+    fetchDataForRange();
 };
 
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/get_unique_viewers_data')
+           .then(response => response.json())
+        .then(data => {
+            const formattedLabels = data.labels.map(label => {
+                const dateParts = label.split('-'); // Assuming label is in the format YYYY-MM-DD
+                return `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`; // Format as DD.MM.YYYY
+            });
+
+            const ctx = document.getElementById('uniqueViewersChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: formattedLabels, // Use the formatted labels
+                    datasets: [{
+                        label: 'Unique Viewers',
+                        data: data.values,
+                        backgroundColor: 'rgba(0, 48, 86, 0.5)', // Updated background color
+                        borderColor: 'rgba(2, 107, 147, 1)', // Updated border color
+                            borderWidth: 4
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+
+                // Get current date and time and log it to the console
+                const now = new Date();
+                const dateString = now.toLocaleString();
+                console.log("Unique Viewers Chart loaded with data as of " + dateString, data);
+            })
+            .catch(error => console.error('Error:', error));
+    });
+	
+	 document.addEventListener("DOMContentLoaded", function() {
+    fetchDataForRange(); // Fetch data for the initial range on page load
+});
+
+function fetchDataForRange() {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    console.log("Fetching data for range:", startDate, endDate);  // Debugging
+
+    fetch('/get_unique_viewers_data_range', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ start_date: startDate, end_date: endDate })
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateUniqueViewersChart(data);
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateUniqueViewersChart(data) {
+    const formattedLabels = data.labels.map(label => {
+        const dateParts = label.split('-'); // Assuming label is in the format YYYY-MM-DD
+        return `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`; // Format as DD.MM.YYYY
+    });
+
+    const ctx = document.getElementById('uniqueViewersChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: formattedLabels,
+            datasets: [{
+                label: 'Unique Viewers',
+                data: data.values,
+                backgroundColor: 'rgba(0, 48, 86, 0.5)',
+                borderColor: 'rgba(2, 107, 147, 1)',
+                borderWidth: 4
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    // Calculate and display additional stats
+    displayViewerStats(data);
+
+    console.log("Chart updated with new data:", data);
+}
+
+function displayViewerStats(data) {
+    const totalViewers = data.values.reduce((total, count) => total + count, 0);
+    const maxViewers = Math.max(...data.values);
+    const maxViewersDateIndex = data.values.indexOf(maxViewers);
+    let maxViewersDate = data.labels[maxViewersDateIndex];
+
+    // Convert date to DD.MM.YYYY format
+    if (maxViewersDate) {
+        const dateParts = maxViewersDate.split('-');
+        maxViewersDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
+    }
+
+    const statsElement = document.getElementById('viewerStats');
+    statsElement.innerHTML = `
+        <p>Most ever views on: <strong>${maxViewersDate}</strong> - <strong>${maxViewers} view(s);</strong> Total views: <strong>${totalViewers}</strong></p>
+
+    `;
+
+    console.log("Displayed viewer stats:", {maxViewersDate, maxViewers, totalViewers});
+}
+
+
+
+	
+</script>
+<script>
+fetch('/log_view')
+    .then(response => response.json())
+    .then(data => console.debug(data.message))
+    .catch(console.error);
 </script>
 
 </html>

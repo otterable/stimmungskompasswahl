@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, date
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
@@ -85,6 +85,21 @@ class Project(db.Model):
             "p_reports": self.p_reports,
             "is_featured": self.is_featured  # Include new field
         }
+
+class WebsiteViews(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    view_date = db.Column(db.Date, nullable=False)
+    ip_address = db.Column(db.String(100), nullable=False)
+
+    @classmethod
+    def add_view(cls, ip_address):
+        today = date.today()
+        existing_view = cls.query.filter_by(view_date=today, ip_address=ip_address).first()
+        if not existing_view:
+            new_view = cls(view_date=today, ip_address=ip_address)
+            db.session.add(new_view)
+            db.session.commit()
+
 
 class Vote(db.Model):
     id = db.Column(db.Integer, primary_key=True)
