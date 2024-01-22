@@ -21,7 +21,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
    <style>
-   
+   /* Style for buttons inside filter-overlay to match nav-overlay links */
+#filter-overlay .c-button {
+    background-color: transparent; /* Same as nav-overlay links */
+    color: white; /* Text color to match nav-overlay links */
+    border: none; /* Remove borders */
+    padding: 20px; /* Padding similar to nav-overlay links */
+    font-size: 24px; /* Font size similar to nav-overlay links */
+    text-decoration: none; /* Remove underline */
+    display: block; /* Display as block for full-width click area */
+    text-align: center; /* Center text */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for hover effect */
+    cursor: pointer; /* Cursor on hover */
+    margin-bottom: 10px; /* Space between buttons */
+}
+
+/* Hover effect for buttons inside filter-overlay */
+#filter-overlay .c-button:hover {
+    background-color: #02569d; /* Background color on hover */
+    color: #f5f1e4; /* Text color on hover */
+}
+
+/* Style for active button */
+.c-button.active {
+    background-color: #4CAF50; /* Green background for active button */
+    color: white; /* White text for better visibility */
+}
+
    
    .average-description-length {
     font-size: 20px; /* Makes text larger */
@@ -101,7 +127,7 @@
 .stat-box2 {
     background-color: #f5f5f5; /* Example background color */
     margin: 5px;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
@@ -269,7 +295,7 @@ body {
         background-color: #003056; /* Example color */
         color: white;
         border: none;
-        border-radius: 30px;
+        border-radius: 10px;
 		font-weight: bold !important;
         padding: 5px 10px;
         text-align: center;
@@ -715,22 +741,34 @@ nav[aria-label="Page navigation"] {
 	
 			    /* Base styles for user thumbnails */
     .user-thumbnail {
-        background-color: #f9f8f5; /* Similar background color */
-        border-radius: 10px; /* Rounded corners */
-        padding: 10px; /* Padding inside each thumbnail */
-        display: flex; /* Use flexbox for layout */
-        flex-direction: column; /* Stack items vertically */
-        align-items: center; /* Center items horizontally */
-        box-sizing: border-box; /* Include padding and border in width/height */
-        transition: width 0.3s ease; /* Smooth scaling on hover */
-        position: relative; /* Position relative for any positioned children */
-        overflow: hidden; /* Hide overflow */
-        width: calc(33.333% - 20px); /* Three items per row */
-        margin: 10px; /* Adjust margin as needed */
-		    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    background-color: #f5f5f5; /* Example background color */
+    margin: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 
-    }
 
+/* Styling the scrollbar */
+::-webkit-scrollbar {
+    width: 12px; /* Adjust the width of the scrollbar */
+}
+
+/* Styling the track of the scrollbar */
+::-webkit-scrollbar-track {
+    background: #f5f1e4; /* Light grey track */
+    border-radius: 10px; /* Round corners of the track */
+}
+
+/* Styling the thumb of the scrollbar */
+::-webkit-scrollbar-thumb {
+    background: #9b9b9b; /* Black thumb */
+}
+
+/* Hover effect on the thumb of the scrollbar */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker shade of grey on hover */
+}
 
     /* Hover effect for user thumbnails */
     .user-thumbnail:hover {
@@ -864,19 +902,21 @@ nav[aria-label="Page navigation"] {
     }
 
 .comment-thumbnail {
-    flex-basis: calc(33.333% - 20px); /* Three items per row, adjust margin as needed */
-    width: calc(33.333% - 20px); /* Explicitly set width */
-    margin: 10px; /* Margin around each thumbnail */
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-sizing: border-box;
-  background-color: #f9f8f5; /* Similar to project-thumbnail */
-    border-radius: 30px; /* Similar to project-thumbnail */
-	    transition: width 0.3s ease; /* Smooth scaling on hover */
+        background-color: #f9f8f5; /* Similar background color */
+        border-radius: 10px; /* Rounded corners */
+        padding: 10px; /* Padding inside each thumbnail */
+        display: flex; /* Use flexbox for layout */
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center items horizontally */
+        box-sizing: border-box; /* Include padding and border in width/height */
+        transition: width 0.3s ease; /* Smooth scaling on hover */
+        position: relative; /* Position relative for any positioned children */
+        overflow: hidden; /* Hide overflow */
+        width: calc(33.333% - 20px); /* Three items per row */
+        margin: 10px; /* Adjust margin as needed */
+		    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 
-	}
+    }
 
 
    
@@ -1151,7 +1191,6 @@ nav[aria-label="Page navigation"] {
 	    /* Specific styles for filter form in overlay */
 ('overlay').style.display = 'none';
     }
-</script>
 
 #filter-overlay {
     display: none; /* Hidden by default */
@@ -1373,7 +1412,7 @@ nav[aria-label="Page navigation"] {
     <button id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</button>
 </div>
 
-<div id="filter-overlay" class="nav-overlay">
+<div id="filter-overlay" class="nav-overlay" style="display:none">
     <div id="nav-links">
         <a href="#" id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</a>
         <a href="#" id="toggleExportSection" class="c-button" data-section-id="exportSection">Datenexport</a>
@@ -1586,7 +1625,7 @@ nav[aria-label="Page navigation"] {
 	
 <div id="exportSection" style="display: none;">
 <div class="stats-container">
-<div class="stat-box">
+<div class="stat-box2">
     <h2>Projektdaten exportieren (.xlsx / .csv)</h2>
     <form id="exportForm" method="POST" action="{{ url_for('export_projects') }}">
         <div class="filter-options">
@@ -1620,7 +1659,7 @@ nav[aria-label="Page navigation"] {
 	</div>
 
 
-<div class="stat-box">
+<div class="stat-box2">
 
 	<h2>Alle Daten herunterladen (.json/.geojson)</h2>
     <p>Die .json enthält alle Daten außer persönlichen Benutzerdaten.</p>
@@ -1647,7 +1686,7 @@ nav[aria-label="Page navigation"] {
 
 
 
-<div class="stat-box">
+<div class="stat-box2">
    <h2>Alle Beiträge löschen</h2>
     <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
     <form method="POST" action="{{ url_for('delete_all_projects') }}">
@@ -2253,6 +2292,8 @@ var deleteAllProjectsSection = document.getElementById('deleteAllProjectsSection
     fetchUniqueCategories(); // Call the function to populate unique categories on page load
 });
 </script>
+
+
 <script>
 
 function toggleExportSection() {
@@ -2298,15 +2339,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
  
 
- const filterButtons = document.querySelectorAll('#filter-overlay .c-button');
+const filterButtons = document.querySelectorAll('#filter-overlay .c-button');
         filterButtons.forEach(button => {
             button.addEventListener('click', function(event) {
-                // Close the overlay
-                document.getElementById('filter-overlay').style.display = 'none';
-
-                // Toggle the respective section
+                // Get the section ID from the clicked button
                 const sectionId = this.getAttribute('data-section-id');
-                toggleSection(sectionId);
+                
+                // Check if the clicked section is already open
+                if (currentOpenSection === sectionId) {
+                    // Only close the overlay
+                    document.getElementById('filter-overlay').style.display = 'none';
+                } else {
+                    // Close the overlay and toggle the respective section
+                    document.getElementById('filter-overlay').style.display = 'none';
+                    toggleSection(sectionId);
+                }
             });
         });
     });
@@ -3327,9 +3374,7 @@ function displayViewerStats(data) {
 	
 </script>
 
-only one of the expanded sections shall be open at a time. when a button inside of the overlay is pressed, the overlay shall close, and all other expanded sections except the one that has just been opened by the button shall close.
 
-update my existing code;
 
 
 <script>

@@ -441,6 +441,27 @@ nav[aria-label="Page navigation"] {
     flex-wrap: nowrap; /* Existing no-wrap */
 }
 
+/* Styling the scrollbar */
+::-webkit-scrollbar {
+    width: 12px; /* Adjust the width of the scrollbar */
+}
+
+/* Styling the track of the scrollbar */
+::-webkit-scrollbar-track {
+    background: #f5f1e4; /* Light grey track */
+    border-radius: 10px; /* Round corners of the track */
+}
+
+/* Styling the thumb of the scrollbar */
+::-webkit-scrollbar-thumb {
+    background: #9b9b9b; /* Black thumb */
+}
+
+/* Hover effect on the thumb of the scrollbar */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker shade of grey on hover */
+}
+
 #filter-form {
     display: flex;
     align-items: center;
@@ -1050,7 +1071,7 @@ nav[aria-label="Page navigation"] {
 
 <!-- Video Overlay -->
 <div id="video-overlay" class="video-overlay" style="display:none;">
-    <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/aV6s-reibEc" frameborder="0" allowfullscreen></iframe>
+    <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/uolKHGe9c4Y?si=VoDtAheqxdbu37qG" frameborder="0" allowfullscreen></iframe>
     <div id="replay-container" style="display: none;"></div> <!-- Container for replay image -->
     <button onclick="closeVideoOverlay()" class="register-button">Schließen</button>
 </div>
@@ -1198,7 +1219,10 @@ nav[aria-label="Page navigation"] {
         {% for project in projects %}
             <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">
                 <h2>{{ project.name }}</h2>
-                <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
+<p class="project-date">
+    Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+    Ansichten: <strong>{{ project.view_count }}</strong>
+</p>
 
                 <!-- Voting Bar -->
                 <div class="voting-bar">
@@ -1435,7 +1459,7 @@ document.querySelector('.info-link').addEventListener('click', function(e) {
 
 function openVideoOverlay() {
     var iframe = document.getElementById('youtube-iframe');
-var videoSrc = 'https://www.youtube.com/embed/aV6s-reibEc?autoplay=1&mute=1&enablejsapi=1';
+var videoSrc = 'https://www.youtube.com/embed/uolKHGe9c4Y?autoplay=1&mute=1&enablejsapi=1';
     iframe.src = videoSrc;
     document.getElementById('video-overlay').style.display = 'flex';
     console.log('Video overlay opened');

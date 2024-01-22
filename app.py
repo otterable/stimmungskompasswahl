@@ -1697,7 +1697,7 @@ def admintools():
             else:
                 flash('Project not found for marking as featured', 'error')
 
-        elif 'unmark_featured' in requgt.form:
+        elif 'unmark_featured' in request.form:
             project = Project.query.get(project_id)
             if project:
                 project.is_featured = False
@@ -1721,16 +1721,16 @@ def admintools():
     sort = request.args.get('sort', 'score_desc')
     search_query = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
-    per_page = 3
+    per_page = 50
 
     map_object_page = request.args.get('map_object_page', 1, type=int)
-    map_object_per_page = 6  # Define the number of Notizens per page
+    map_object_per_page = 50  # Define the number of Notizens per page
     
     comment_page = request.args.get('comment_page', 1, type=int)
-    comment_per_page = 6  # Adjust the number of comments per page as needed
+    comment_per_page = 50  # Adjust the number of comments per page as needed
 
     user_page = request.args.get('user_page', 1, type=int)
-    user_per_page = 1  # Define the number of users per page
+    user_per_page = 50  # Define the number of users per page
 
     search_user_id = request.args.get('searchUserById', type=int)
     search_user_name = request.args.get('searchUserByName', '')

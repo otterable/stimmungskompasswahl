@@ -2320,7 +2320,7 @@ margin-bottom: 0px !important;
 
 <!-- Video Overlay 2 -->
 <div id="video-overlay-2" class="video-overlay" style="display:none;">
-    <iframe id="youtube-iframe-2" width="560" height="315" src="https://www.youtube.com/embed/WPjnhKnrMeo" frameborder="0" allowfullscreen></iframe>
+    <iframe id="youtube-iframe-2" width="560" height="315" src="https://www.youtube.com/embed/aoqu_9iibPo" frameborder="0" allowfullscreen></iframe>
     <div id="replay-container-2" style="display: none;"></div> <!-- Container for replay image -->
     <button onclick="closeVideoOverlay2()">Schließen</button>
 </div>
@@ -4030,7 +4030,7 @@ document.getElementById('info-link').addEventListener('click', function(e) {
 
 document.getElementById('info-link2').addEventListener('click', function(e) {
     e.preventDefault();
-    openVideoOverlay('youtube-iframe-2', 'video-overlay-2', 'WPjnhKnrMeo');
+    openVideoOverlay('youtube-iframe-2', 'video-overlay-2', 'aoqu_9iibPo');
 });
 
 function openVideoOverlay(iframeId, overlayId, videoId) {
@@ -4065,7 +4065,7 @@ function onYouTubeIframeAPIReady() {
         }
     });
     player2 = new YT.Player('youtube-iframe-2', {
-        videoId: 'WPjnhKnrMeo',
+        videoId: 'aoqu_9iibPo',
         events: {
             'onStateChange': onPlayerStateChange2
         }
