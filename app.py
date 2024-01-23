@@ -2119,26 +2119,37 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
     paginated_projects = []
     paginated_map_objects = []
     paginated_comments = []
-    bookmarks = Bookmark.query.filter_by(user_id=current_user.id).all()
+    bookmarks = []  # Default value for bookmarks
+    bookmarked_projects = []  # Default value for bookmarked projects
 
     ip_address = request.remote_addr
     WebsiteViews.add_view(ip_address)
     
     if current_user.is_authenticated:
+        bookmarks = Bookmark.query.filter_by(user_id=current_user.id).all()
         paginated_projects = Project.query.filter_by(
             author=current_user.id, is_mapobject=False
         ).order_by(Project.date.desc()).paginate(page=project_page, per_page=per_page, error_out=False)
+
+        total_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
+        max_page = (total_map_objects + per_page - 1) // per_page  # Calculate the max page number
+        map_object_page = min(map_object_page, max_page)  # Adjust the current page
 
         paginated_map_objects = Project.query.filter_by(
             author=current_user.id, is_mapobject=True
         ).order_by(Project.date.desc()).paginate(page=map_object_page, per_page=per_page, error_out=False)
 
+
         paginated_comments = db.session.query(Comment, Project.name).join(
             Project, Comment.project_id == Project.id
         ).filter(Comment.user_id == current_user.id).order_by(Comment.timestamp.desc()).paginate(
-            page=comment_page, per_page=per_page, error_out=False
-        )
-
+            page=comment_page, per_page=per_page, error_out=False)
+            
+        bookmarked_projects = Project.query.join(
+            Bookmark, Bookmark.project_id == Project.id
+        ).filter(Bookmark.user_id == current_user.id).all()
+        
+        
         # Count Notizens separately
         map_objects_count = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
 
@@ -2211,6 +2222,17 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
         is_authenticated=current_user.is_authenticated,
         bookmarks=bookmarks)
 
+@app.route('/get_user_statistics')
+@login_required
+def get_user_statistics():
+    try:
+        num_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
+        return jsonify({'num_map_objects': num_map_objects})
+    except Exception as e:
+        app.logger.error(f'Error fetching user statistics: {e}')
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/erfolge')
 def erfolge():
     # Additional logic can be added here if needed
@@ -2238,14 +2260,13 @@ def delete_project(project_id):
             db.session.delete(project)
             db.session.commit()
             app.logger.debug(f"Project {project_id} deleted successfully.")
-           # flash('Project successfully deleted.', 'success')
+            return jsonify({'success': True, 'message': 'Project deleted successfully.'})  # Return JSON response
         else:
-            flash('You do not have permission to delete this project.', 'danger')
             app.logger.debug(f"Permission denied to delete project {project_id}.")
+            return jsonify({'success': False, 'message': 'Permission denied.'}), 403  # Return JSON response for forbidden access
     except Exception as e:
-       # flash(f'Error deleting project: {e}', 'danger')
         app.logger.error(f'Error deleting project: {e}')
-    return redirect(url_for('profil'))
+        return jsonify({'success': False, 'message': str(e)}), 500  # Return JSON response for internal server error
 
 
 @app.route('/download_my_data')

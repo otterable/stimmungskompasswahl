@@ -2413,7 +2413,7 @@ margin-bottom: 0px !important;
             <p>Die ausgewählte Kategorie betrifft Themen wie:</p>
             <p id="marker-category-description" style="color:#003056;"></p> <!-- Description will appear here -->
             <p>2. Beschreiben Sie die Umstände:</p>
-            <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black;"></textarea>
+<textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Was beschäftigt Sie?"></textarea>
         </div>
         
         <br>
@@ -2755,6 +2755,7 @@ function handleMapClick(e) {
     }
 }
 
+
 // Register the map click event listener
 map.on('click', handleMapClick);
 
@@ -2764,12 +2765,68 @@ function showCustomConfirm(latlng, tempMarker) {
     confirmDiv.style.display = 'block';
 
     document.getElementById('confirm-yes').onclick = function() {
-        addMarker(latlng, futureMarker.category, futureMarker.description);
+        console.log("Confirm Yes clicked, attempting to save marker data");
+        saveMarkerData(latlng, futureMarker.category, futureMarker.description, function(savedMarkerData) {
+            console.log("Removing temporary marker before adding new marker");
+            map.removeLayer(tempMarker); // Remove the temporary marker
+            addNewMarker(latlng, futureMarker.category, futureMarker.description, savedMarkerData.id);
+        });
         confirmDiv.style.display = 'none';
-        console.log("Marker placed at:", latlng);
+        resetMapCursor();
+        isMarkerCreationActive = false;
+    };
+
+    document.getElementById('confirm-tryagain').onclick = function() {
+        console.log("TryAgain button clicked, temporary marker removed. Placement mode continues");
+        map.removeLayer(tempMarker); // Remove the temporary marker
+        confirmDiv.style.display = 'none';
+        isMarkerCreationActive = true; // Reactivate marker creation process
+        setMapCursor(); // Reset cursor to marker icon
+    };
+
+    document.getElementById('confirm-no').onclick = function() {
+        console.log("Marker placement cancelled, temporary marker removed");
+        map.removeLayer(tempMarker); // Remove the temporary marker
+        confirmDiv.style.display = 'none';
         resetMapCursor();
         isMarkerCreationActive = false; // Deactivate marker creation process
     };
+
+
+function addNewMarker(latLng, category, description, markerId) {
+    var fillColor = getCategoryColor(category);
+    var popupContent = `<div style="text-align: center;">${description}</div>`;
+
+    var marker = L.marker(latLng, {
+        icon: createIcon(24, 2, fillColor, false), // Assuming the new marker is not featured
+        category: category,
+        isMapObject: true,
+        isFeatured: false
+    }).addTo(map);
+
+    marker.bindPopup(popupContent);
+
+    // Attach the markerId to the marker
+    marker.markerId = markerId;
+
+    // Add the new marker to the corresponding category layer
+    if (!categoryLayers[category]) {
+        categoryLayers[category] = L.layerGroup().addTo(map);
+    }
+    marker.addTo(categoryLayers[category]);
+
+    // Update button text for the category
+    updateCategoryButtonText(category);
+
+    console.log(`Created a new marker for the category: ${category}`);
+}
+
+function updateCategoryButtonText(category) {
+    var button = document.querySelector(`button[category-name="${category}"]`);
+    if (button && categoryLayers[category]) {
+        button.innerText = `${category} (${categoryLayers[category].getLayers().length} Beiträge)`;
+    }
+}
 
     document.getElementById('confirm-tryagain').onclick = function() {
         console.log("TryAgain button clicked, temporary marker removed. Placement mode continues");
@@ -3809,30 +3866,6 @@ let selectedLatLng;
 
 
 
-function addMarker(latlng, category, description) {
-    // Ensure fillColor is set based on category
-     var fillColor = getCategoryColor(category);
-    var markerIcon = createIcon(24, 2, fillColor);
-    var marker = L.marker(latlng, {icon: markerIcon}).addTo(map);
-    marker.bindPopup(`<strong>${category}</strong><br>${description}`);
-
-
-    // Add the marker to the map
-    marker.addTo(map);
-	    saveMarkerData(selectedLatLng, category, description);
-
-    console.log("Custom marker added with category:", category, "and description:", description);
-
-    // Add the marker to its respective category layer
-    if (!categoryLayers[category]) {
-        categoryLayers[category] = L.layerGroup().addTo(map);
-    }
-    marker.addTo(categoryLayers[category]);
-	
-	initializeEventListeners();
-
-}
-
 
 
 
@@ -3843,39 +3876,31 @@ function addMarker(latlng, category, description) {
 
 	// Add this function in your JavaScript
 
-function saveMarkerData(latlng, category, description) {
-    // Check if user is authenticated
-    // Note: You need to implement the logic to determine if the user is authenticated
-    var isAuthenticated = false; // Set this based on the user's authentication status
-
-    // Prepare the data to be sent to the server
+function saveMarkerData(latlng, category, description, callback) {
+    var isAuthenticated = false /* logic to determine if the user is authenticated */
+    
     var dataToSend = {
         lat: latlng.lat,
         lng: latlng.lng,
         category: category,
         description: description,
-        isAnonymous: !isAuthenticated // Mark as anonymous if the user is not authenticated
+        isAnonymous: !isAuthenticated
     };
 
-    // Send the data using AJAX
-$.ajax({
-    url: '/add_marker',
-    method: 'POST',
-    data: JSON.stringify(dataToSend),
-    contentType: 'application/json; charset=utf-8',
-    dataType: 'json',
-    success: function(response) {
-        console.log('Marker saved:', response);
-        // Create and add the marker after successful save
-        var fillColor = getCategoryColor(category);
-        var markerIcon = createIcon(24, 2, fillColor);
-        var marker = L.marker(latlng, { icon: markerIcon }).addTo(map);
-        marker.bindPopup(`<strong>${category}</strong><br>${description}`);
-        console.log(`Marker with text "${description}" of category "${category}" just created, creating an icon for it.`);
-        // Check marker limit after adding a marker
-        checkMarkerLimit();
-    },
-    error: function(xhr, textStatus, errorThrown) {
+    $.ajax({
+        url: '/add_marker',
+        method: 'POST',
+        data: JSON.stringify(dataToSend),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(response) {
+            console.log('Marker saved:', response);
+            if (callback) {
+                callback(response); // Execute the callback with the response data
+            }
+            checkMarkerLimit();
+        },
+        error: function(xhr, textStatus, errorThrown) {
         if(xhr.status === 429) {
             alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
             console.log('Rate limit reached for adding markers.');

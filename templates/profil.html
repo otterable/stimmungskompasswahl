@@ -291,7 +291,7 @@
     width: 90%;
     height: 20px;
     background-color: #ddd;
-    border-radius: 30px !important;
+    border-radius: 30px
     margin-top: 0px;
     display: flex;
 }
@@ -299,14 +299,14 @@
 .upvotes {
     height: 100%;
     background-color: #4caf50;
-    border-radius: 30px !important;
+    border-radius: 30px 
     transition: width 0.3s ease;
 }
 
 .downvotes {
     height: 100%;
     background-color: #9A031E;
-    border-radius: 30px !important;
+    border-radius: 30px
     transition: width 0.3s ease;
 }
 
@@ -1511,3 +1511,231 @@ function removeBookmark(projectId) {
     .catch(error => console.error('Error:', error));
 }
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.project-thumbnail').forEach(projectThumbnail => {
+        const upvotesElement = projectThumbnail.querySelector('.upvotes');
+        const downvotesElement = projectThumbnail.querySelector('.downvotes');
+
+        let upvotes = 0, downvotes = 0;
+
+        if (upvotesElement) {
+            upvotes = parseInt(upvotesElement.textContent.match(/\d+/) ? upvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        if (downvotesElement) {
+            downvotes = parseInt(downvotesElement.textContent.match(/\d+/) ? downvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        // Log the project details and adjust border-radius
+        if (upvotes > 0 && downvotes > 0) {
+            console.log(`Project loaded with ${upvotes} upvotes and ${downvotes} downvotes. Adjusting border-radius.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px 0 0 30px';
+            if (downvotesElement) downvotesElement.style.borderRadius = '0 30px 30px 0';
+        } else if (upvotes > 0 && downvotes === 0) {
+            console.log(`Project loaded with ${upvotes} upvotes and 0 downvotes. Adjusting border-radius for upvotes.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px';
+        } else if (downvotes > 0 && upvotes === 0) {
+            console.log(`Project loaded with ${downvotes} downvotes and 0 upvotes. Adjusting border-radius for downvotes.`);
+            if (downvotesElement) downvotesElement.style.borderRadius = '30px';
+        } else {
+            console.log(`Project loaded with 0 upvotes and 0 downvotes. Setting border-radius to 30px on both sides.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px';
+            if (downvotesElement) downvotesElement.style.borderRadius = '30px';
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
+    attachEventListeners();
+});
+function attachEventListeners() {
+    console.log('Attaching event listeners');
+    attachDeleteEventListeners();
+    attachPaginationEventListeners();
+}
+function attachDeleteEventListeners() {
+    document.querySelectorAll('.my-map-objects .project-thumbnail form').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const projectId = new URL(this.action).pathname.split('/').pop();
+            console.log('Attempting to delete project with ID:', projectId);
+
+            fetch(this.action, { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Received response for project deletion');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.success) {
+                    console.log('Project deleted successfully:', projectId);
+                    const thumbnail = this.closest('.project-thumbnail');
+                    if (thumbnail) {
+                        thumbnail.remove();
+                        updateMapObjectsCount();
+                    }
+                    refreshCurrentPage();
+                } else {
+                    console.error('Error deleting project:', data ? data.message : 'No response data');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+}
+
+
+function refreshCurrentPage() {
+    const currentPageLink = document.querySelector('.pagination .page-item.active a');
+    if (currentPageLink) {
+        console.log('Refreshing current page:', currentPageLink.href);
+        fetchPage(currentPageLink.href, true); // Add a flag to indicate page refresh
+    } else {
+        console.error('Current page link not found');
+    }
+}
+
+
+
+function checkAndUpdatePagination() {
+    const remainingProjects = document.querySelectorAll('.my-map-objects .project-thumbnail').length;
+    const currentPageLink = document.querySelector('.pagination .page-item.active a');
+    const prevPageLink = document.querySelector('.pagination .page-item:not(.active)').previousElementSibling?.querySelector('a');
+
+    if (remainingProjects === 0) {
+        const targetPageLink = prevPageLink || currentPageLink;
+        if (targetPageLink) {
+            console.log('Fetching page:', targetPageLink.href);
+            fetchPage(targetPageLink.href);
+        }
+    } else if (currentPageLink) {
+        console.log('Refreshing current page:', currentPageLink.href);
+        fetchPage(currentPageLink.href);
+    }
+}
+
+
+function handlePaginationAfterDeletion() {
+    const remainingProjects = document.querySelectorAll('.my-map-objects .project-thumbnail').length;
+    const currentPageLink = document.querySelector('.pagination .page-item.active a');
+    const prevPageLink = document.querySelector('.pagination .page-item.active').previousElementSibling?.querySelector('a');
+
+    console.log('Handling pagination after deletion, remaining projects:', remainingProjects);
+
+    if (remainingProjects === 0) {
+        if (prevPageLink) {
+            console.log('No remaining projects, fetching previous page:', prevPageLink.href);
+            fetchPage(prevPageLink.href);
+        } else if (currentPageLink) {
+            console.log('No remaining projects or previous page, refreshing current page:', currentPageLink.href);
+            fetchPage(currentPageLink.href);
+        }
+    } else if (currentPageLink) {
+        console.log('Remaining projects found, refreshing current page:', currentPageLink.href);
+        fetchPage(currentPageLink.href);
+    }
+}
+function updateMapObjectsCount() {
+    const countElement = document.getElementById('num-map-objects');
+    if (countElement) {
+        let currentCount = parseInt(countElement.textContent);
+        if (!isNaN(currentCount)) {
+            let updatedCount = currentCount - 1;  // Decrement the count
+            countElement.textContent = updatedCount + (updatedCount === 1 ? " Notiz gepostet" : " Notizen gepostet"); // Update the text correctly
+            console.log('Map objects count updated to:', updatedCount);
+        } else {
+            console.error('Error parsing map objects count:', countElement.textContent);
+        }
+    } else {
+        console.error('Map objects count element not found');
+    }
+}
+
+
+function attachPaginationEventListeners() {
+    console.log('Attaching pagination event listeners');
+    document.querySelectorAll('.pagination .page-link').forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            console.log('Pagination link clicked:', this.href);
+            fetchPage(this.href);
+        });
+    });
+}
+
+function handlePostDeletion() {
+    console.log('Handling post-deletion actions');
+    const currentPageLink = document.querySelector('.pagination .page-item.active a');
+    if (currentPageLink) {
+        console.log('Fetching current page:', currentPageLink.href);
+        fetchPage(currentPageLink.href);
+    } else {
+        console.error('Current page link not found');
+    }
+}
+
+function fetchPage(url, isPageRefresh = false) {
+    console.log('Fetching page:', url);
+    if (!url) return;
+    fetch(url, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => {
+        console.log('Received response for page fetch');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const newContent = doc.querySelector('.my-map-objects');
+        if (newContent) {
+            console.log('Updating content of .my-map-objects');
+            document.querySelector('.my-map-objects').innerHTML = newContent.innerHTML;
+            attachEventListeners(); // Reattach event listeners
+
+            if (isPageRefresh) {
+                updatePaginationAfterPageRefresh(doc); // Handle pagination update
+            }
+        } else {
+            console.error('New content not found in the response');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updatePaginationAfterPageRefresh(doc) {
+    const newPagination = doc.querySelector('.pagination');
+    if (newPagination) {
+        const existingPagination = document.querySelector('.pagination');
+        if (existingPagination) {
+            existingPagination.innerHTML = newPagination.innerHTML; // Update pagination
+        }
+    }
+}
+</script>
+
+
+
+{% if not current_user.is_authenticated %}
+    <script>
+        window.location.href = "{{ url_for('login', next=url_for('profil')) }}";
+    </script>
+{% endif %}
+
+
