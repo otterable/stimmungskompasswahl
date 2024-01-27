@@ -1,16 +1,32 @@
 <!-- Comments Section Partial -->
+
+<style>
+a {
+    color: #003056; /* Custom link color */
+    text-decoration: none; /* Remove underline from links */
+}
+
+/* Optional: Add a hover effect */
+a:hover {
+    text-decoration: underline;
+}
+</style>
+
 <div class="my-comments centered-text">
-    <h2>Sie haben <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentar(e)</span>.</h2>
+    <h2>Sie haben <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentar(e)</span> gepostet.</h2>
     <div class="project-list">
         {% if comment_pagination and comment_pagination.items %}
             {% for comment, project_name in comment_pagination.items %}
-                <div class="project-thumbnail">
+                    <div class="stat-box2">
                     <!-- Comment Text -->
 <h3 style="font-style: italic; font-weight: bold;">"{{ comment.text }}"</h3>
                     <!-- Project Name -->
-                    <p>Commented on project: <a href="{{ url_for('project_details', project_id=comment.project_id) }}">{{ project_name }}</a></p>
-                    <!-- Posted Date -->
-                    <p>Gepostet am: {{ comment.timestamp.strftime('%d.%m.%Y') }}</p>
+					<p class="project-date">
+					
+    Gepostet am: <strong>{{ comment.timestamp.strftime('%d.%m.%Y') }}</strong>,
+    Projekt: <strong><a href="{{ url_for('project_details', project_id=comment.project_id) }}">{{ project_name }}</a></strong>
+</p>
+                   
                     <!-- Löschen Button for Comment -->
                     <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST">
                         <input type="submit" class="register-button" style="font-weight: bold;" value="Löschen">

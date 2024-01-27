@@ -8,7 +8,54 @@
 <body>
 
    <style>
-   
+     #marker-limit-timer {
+        display: none; /* Hide by default */
+    }
+    
+      .marker-limit-info {
+            font-weight: bold !important; /* Make all text bold */
+            color: #000000; /* Set text color to black */
+            background-color: none; /* Light background color */
+            padding: 10px;
+            border-radius: 5px;
+        }
+		
+	
+.marker-limit-info .highlight, 
+.marker-limit-info a,
+.marker-limit-info span.highlight-word {
+    color: #003056; /* Blue color for specific elements */
+}
+
+.marker-limit-info a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 1080px) {
+    .marker-limit-info, .my-statistics h2 {
+        font-size: 1em; /* Slightly smaller font size for mobile */
+    }
+}
+
+@media (max-width: 768px) {
+    .marker-limit-info, .my-statistics h2 {
+        font-size: 0.9em; /* Even smaller font size for smaller devices */
+    }
+}
+		
+		
+   h3 {
+    display: block;
+    font-size: 1.17em;
+    margin-block-start: 0.3em;  /* Adjusted margin at the start */
+    margin-block-end: 0.3em;    /* Adjusted margin at the end */
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: normal;
+}
+
+
 /* Styling the scrollbar */
 ::-webkit-scrollbar {
     width: 12px; /* Adjust the width of the scrollbar */
@@ -95,21 +142,21 @@
 }
 
 
-		      .register-button {
-        background-color: #003056; /* Example color */
-        color: white;
-        border: none;
-        border-radius: 30px;
-        padding: 5px 10px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 14px;
-        margin: 10px 0;
-        cursor: pointer;
-        width: 100%; /* Full width */
-        box-sizing: border-box; /* Include padding in width */
-    }
+	.register-button {
+    background-color: #003056;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold !important;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 10px 0;
+    cursor: pointer;
+    box-sizing: border-box;
+}
 	
         img {
             border-radius: 30px;
@@ -483,7 +530,7 @@ nav[aria-label="Page navigation"] {
 
 .top-bar a {
     color: white;
-    text-decoration: none;
+    text-decoration: none !important;
     margin-right: 20px; /* Add spacing between links */
     font-size: 18px; /* Increase text size */
     font-weight: bold; /* Make text bold */
@@ -991,6 +1038,22 @@ display: block;
         font-size: 24px; /* Font size for links */
     }
 }
+a {
+    color: #003056; /* Custom link color */
+    text-decoration: none; /* Remove underline from links */
+}
+
+a:hover, a:focus {
+    text-decoration: none !important; /* Optional: underline on hover for better UX */
+}
+#content-container a {
+    color: #003056 !important;
+    text-decoration: none;
+}
+
+#content-container a:hover, #content-container a:focus {
+    text-decoration: none !important;
+}
 
 
     </style>
@@ -1037,12 +1100,25 @@ display: block;
        <div id="projectProposalsSection" style="display: none;">
        <div class="info-text-field3-c">
     <div class="my-statistics centered-text">
-        <h2>Sie haben <span style="color: #003056;">{{ user_statistics.num_projects }} Projektvorschläge</span> und <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentare gepostet.</span></h2>
-        {% if user_statistics.most_successful_project %}
-            <h2>Ihr erfolgreichstes Projekt ist: <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}"><span style="color: #003056;">{{ user_statistics.most_successful_project.name }}</span></a>, mit <span style="color: #003056;">{{ user_statistics.most_successful_project.upvotes }} positiven Bewertungen</span>.</h2>
+	
+	<!-- Marker Limit Info Display -->
+    <div class="marker-limit-info">
+
+        <h3 style="font-weight:bold;">Sie haben <span class="highlight">{{ user_statistics.num_projects }}</span> <span class="highlight-word">Projektvorschläge</span> und <span class="highlight">{{ user_statistics.num_comments }}</span> <span class="highlight-word">Kommentare</span> gepostet.</h3>
+	
+	{% if user_statistics.most_viewed_project %}
+			<h3 style="font-weight:bold;">Ihr am häufigsten angesehenes Projekt ist: <a href="{{ url_for('project_details', project_id=user_statistics.most_viewed_project.id) }}">{{ user_statistics.most_viewed_project.name }}</a>, mit <span class="highlight">{{ user_statistics.most_viewed_project.view_count }}</span> Ansichten.</h3>
+		{% else %}
+			<p>Sie haben keine Projekte.</p>
+		{% endif %}	
+
+		{% if user_statistics.most_successful_project %}
+            <h3 style="font-weight:bold;">Ihr am höchsten bewertetes Projekt ist: <a href="{{ url_for('project_details', project_id=user_statistics.most_successful_project.id) }}">{{ user_statistics.most_successful_project.name }}</a>, mit <span class="highlight">{{ user_statistics.most_successful_project.upvotes }}</span> positiven Bewertungen.</h3>
         {% else %}
             <p>Ihre Projekte wurden noch nicht bewertet.</p>
         {% endif %}
+    </div>
+
     </div>
 <div id="projects-container">
     {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %}
@@ -1065,7 +1141,6 @@ display: block;
 </div>
 </div>
 
-</div>
 
 
 <div id="bookmarksSection" style="display: none;">
@@ -1550,182 +1625,175 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM fully loaded and parsed');
-    attachEventListeners();
+    checkMarkerLimit();
 });
-function attachEventListeners() {
-    console.log('Attaching event listeners');
-    attachDeleteEventListeners();
-    attachPaginationEventListeners();
-}
-function attachDeleteEventListeners() {
-    document.querySelectorAll('.my-map-objects .project-thumbnail form').forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const projectId = new URL(this.action).pathname.split('/').pop();
-            console.log('Attempting to delete project with ID:', projectId);
 
-            fetch(this.action, { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                console.log('Received response for project deletion');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.success) {
-                    console.log('Project deleted successfully:', projectId);
-                    const thumbnail = this.closest('.project-thumbnail');
-                    if (thumbnail) {
-                        thumbnail.remove();
-                        updateMapObjectsCount();
-                    }
-                    refreshCurrentPage();
+function checkMarkerLimit() {
+    console.debug("Checking marker limit...");
+
+    fetch('/check_marker_limit')
+        .then(response => response.json())
+        .then(data => {
+            console.debug("Marker limit data received:", data);
+
+            const limitInfoElement = document.getElementById('marker-limit-info');
+            const timerElement = document.getElementById('marker-limit-timer');
+
+            if (limitInfoElement && timerElement) {
+                if (data.limit_reached) {
+                    console.debug("Limit reached. Showing timer...");
+                    limitInfoElement.innerHTML = `Sie haben Ihr Tageslimit von <span class="highlight">${data.max_limit}</span> Notizen erreicht.`;
+                    timerElement.style.display = 'block';
+                    startTimer(data.reset_time);
                 } else {
-                    console.error('Error deleting project:', data ? data.message : 'No response data');
+                    console.debug("Limit not reached. Updating info and hiding timer...");
+                    const markersRemaining = data.max_limit - data.current_count;
+                    limitInfoElement.innerHTML = `Sie können <span class="highlight">${markersRemaining}</span> Notizen pro 24 Stunden posten. Sie haben heute bereits <span class="highlight">${data.current_count}</span> Notiz(en) gepostet.`;
+                    timerElement.style.display = 'none';
                 }
-            })
-            .catch(error => console.error('Error:', error));
+            } else {
+                console.error('Marker limit elements not found in DOM');
+            }
+        })
+        .catch(error => {
+            console.error('Error checking marker limit:', error);
+            if (limitInfoElement) {
+                limitInfoElement.textContent = "Fehler beim Abrufen der Marker-Limit-Informationen.";
+            }
         });
-    });
 }
 
+function startTimer(expiryTime) {
+    if (!expiryTime) return;
 
-function refreshCurrentPage() {
-    const currentPageLink = document.querySelector('.pagination .page-item.active a');
-    if (currentPageLink) {
-        console.log('Refreshing current page:', currentPageLink.href);
-        fetchPage(currentPageLink.href, true); // Add a flag to indicate page refresh
-    } else {
-        console.error('Current page link not found');
-    }
-}
+    var countDownDate = new Date(expiryTime).getTime();
+    var timerElement = document.getElementById('marker-limit-timer');
+    var interval = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
+        timerElement.textContent = `Limit erreicht, läuft in ${hours}h ${minutes}m ${seconds}s ab`;
 
-
-function checkAndUpdatePagination() {
-    const remainingProjects = document.querySelectorAll('.my-map-objects .project-thumbnail').length;
-    const currentPageLink = document.querySelector('.pagination .page-item.active a');
-    const prevPageLink = document.querySelector('.pagination .page-item:not(.active)').previousElementSibling?.querySelector('a');
-
-    if (remainingProjects === 0) {
-        const targetPageLink = prevPageLink || currentPageLink;
-        if (targetPageLink) {
-            console.log('Fetching page:', targetPageLink.href);
-            fetchPage(targetPageLink.href);
+        if (distance < 0) {
+            clearInterval(interval);
+            timerElement.textContent = "Sie können jetzt neue Notizen hinzufügen.";
         }
-    } else if (currentPageLink) {
-        console.log('Refreshing current page:', currentPageLink.href);
-        fetchPage(currentPageLink.href);
+    }, 1000);
+}
+</script>
+
+
+<script>
+let currentPageNumber = 1; // Default to page 1
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded. Initializing event listeners.');
+    attachEventListeners();
+    updateCurrentPageNumberFromURL(); // Initialize currentPageNumber based on URL at load
+});
+
+function attachEventListeners() {
+    document.body.addEventListener('submit', handleFormSubmit);
+    document.addEventListener('click', attachPaginationEventListeners);
+}
+
+function handleFormSubmit(event) {
+    if (event.target.matches('.my-map-objects .project-thumbnail form')) {
+        event.preventDefault();
+        handleDeleteRequest(event.target);
     }
 }
 
-
-function handlePaginationAfterDeletion() {
-    const remainingProjects = document.querySelectorAll('.my-map-objects .project-thumbnail').length;
-    const currentPageLink = document.querySelector('.pagination .page-item.active a');
-    const prevPageLink = document.querySelector('.pagination .page-item.active').previousElementSibling?.querySelector('a');
-
-    console.log('Handling pagination after deletion, remaining projects:', remainingProjects);
-
-    if (remainingProjects === 0) {
-        if (prevPageLink) {
-            console.log('No remaining projects, fetching previous page:', prevPageLink.href);
-            fetchPage(prevPageLink.href);
-        } else if (currentPageLink) {
-            console.log('No remaining projects or previous page, refreshing current page:', currentPageLink.href);
-            fetchPage(currentPageLink.href);
-        }
-    } else if (currentPageLink) {
-        console.log('Remaining projects found, refreshing current page:', currentPageLink.href);
-        fetchPage(currentPageLink.href);
-    }
-}
-function updateMapObjectsCount() {
-    const countElement = document.getElementById('num-map-objects');
-    if (countElement) {
-        let currentCount = parseInt(countElement.textContent);
-        if (!isNaN(currentCount)) {
-            let updatedCount = currentCount - 1;  // Decrement the count
-            countElement.textContent = updatedCount + (updatedCount === 1 ? " Notiz gepostet" : " Notizen gepostet"); // Update the text correctly
-            console.log('Map objects count updated to:', updatedCount);
-        } else {
-            console.error('Error parsing map objects count:', countElement.textContent);
-        }
-    } else {
-        console.error('Map objects count element not found');
+function attachPaginationEventListeners(event) {
+    if (event.target.matches('.pagination .page-link')) {
+        event.preventDefault();
+        updateCurrentPageNumberFromLink(event.target.href);
+        fetchPage(event.target.href);
     }
 }
 
+function handleDeleteRequest(form) {
+    const projectId = new URL(form.action).pathname.split('/').pop();
+    console.log('Attempting to delete project with ID:', projectId);
 
-function attachPaginationEventListeners() {
-    console.log('Attaching pagination event listeners');
-    document.querySelectorAll('.pagination .page-link').forEach(link => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            console.log('Pagination link clicked:', this.href);
-            fetchPage(this.href);
-        });
-    });
-}
-
-function handlePostDeletion() {
-    console.log('Handling post-deletion actions');
-    const currentPageLink = document.querySelector('.pagination .page-item.active a');
-    if (currentPageLink) {
-        console.log('Fetching current page:', currentPageLink.href);
-        fetchPage(currentPageLink.href);
-    } else {
-        console.error('Current page link not found');
-    }
-}
-
-function fetchPage(url, isPageRefresh = false) {
-    console.log('Fetching page:', url);
-    if (!url) return;
-    fetch(url, {
+    fetch(form.action, {
+        method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Project deleted successfully:', projectId);
+            updatePageAfterDeletion();
+        } else {
+            console.error('Error deleting project:', data.message);
+        }
+    })
+    .catch(error => console.error('Error in delete request:', error));
+}
+
+function updateCurrentPageNumberFromLink(url) {
+    const urlObj = new URL(url);
+    const pageParam = urlObj.searchParams.get('map_object_page');
+    if (pageParam) {
+        currentPageNumber = pageParam;
+        console.log('Updated currentPageNumber from link:', currentPageNumber);
+    }
+}
+
+function updatePageAfterDeletion() {
+    const remainingProjects = document.querySelectorAll('.my-map-objects .project-thumbnail').length;
+    const currentBaseURL = window.location.href.split('?')[0];
+
+    let newURL;
+    if (remainingProjects > 0) {
+        newURL = `${currentBaseURL}?project_page=1&map_object_page=${currentPageNumber}&comment_page=1`;
+    } else {
+        // Handle case when no remaining projects on current page
+        let newPageNumber = currentPageNumber > 1 ? currentPageNumber - 1 : 1;
+        newURL = `${currentBaseURL}?project_page=1&map_object_page=${newPageNumber}&comment_page=1`;
+    }
+
+    console.log(`Page update triggered. Fetching URL: ${newURL}`);
+    fetchPage(newURL);
+}
+
+function fetchPage(url) {
+    console.log('Fetching page section:', url);
+    fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
     .then(response => {
-        console.log('Received response for page fetch');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         return response.text();
     })
     .then(html => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const newContent = doc.querySelector('.my-map-objects');
-        if (newContent) {
-            console.log('Updating content of .my-map-objects');
-            document.querySelector('.my-map-objects').innerHTML = newContent.innerHTML;
-            attachEventListeners(); // Reattach event listeners
-
-            if (isPageRefresh) {
-                updatePaginationAfterPageRefresh(doc); // Handle pagination update
-            }
-        } else {
-            console.error('New content not found in the response');
-        }
+        updateSectionContent(html);
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => console.error('Error fetching page section:', error));
 }
 
-function updatePaginationAfterPageRefresh(doc) {
-    const newPagination = doc.querySelector('.pagination');
-    if (newPagination) {
-        const existingPagination = document.querySelector('.pagination');
-        if (existingPagination) {
-            existingPagination.innerHTML = newPagination.innerHTML; // Update pagination
-        }
+function updateSectionContent(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const newContent = doc.querySelector('.my-map-objects');
+    if (newContent) {
+        document.querySelector('.my-map-objects').innerHTML = newContent.innerHTML;
+        console.log('Page content updated.');
+    } else {
+        console.error('New content not found in the response');
+    }
+}
+
+function updateCurrentPageNumberFromURL() {
+    const urlObj = new URL(window.location.href);
+    const pageParam = urlObj.searchParams.get('map_object_page');
+    if (pageParam) {
+        currentPageNumber = pageParam;
+        console.log('Updated currentPageNumber from URL:', currentPageNumber);
     }
 }
 </script>

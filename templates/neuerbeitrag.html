@@ -25,6 +25,8 @@ body {
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
+			    background-attachment: fixed; /* This will fix the background image */
+
         }
 		.leaflet-tile {
     margin: 0 !important;
@@ -32,6 +34,22 @@ body {
     border-radius: 0 !important; /* Removes rounded corners */
 }
 
+
+/* LEAFLET MAP ICONS CSS */
+.leaflet-control-zoom-in, .leaflet-control-zoom-out, .leaflet-draw-draw-polyline, .leaflet-draw-draw-polygon, .leaflet-draw-draw-rectangle, .leaflet-draw-draw-circle, .leaflet-draw-draw-marker, .leaflet-draw-draw-circlemarker, .leaflet-draw-edit-edit, .leaflet-draw-edit-remove {
+  background-color: #f5f1e4 !important; /* Use variable */
+  color: #000000 !important; /* Use variable */
+  border: none !important;
+  font-size: 18px !important;
+  line-height: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.leaflet-disabled {
+  background-color:#3a3a3a !important;
+  color: #ffffff !important;
+}
 
 /* Styling the scrollbar */
 ::-webkit-scrollbar {
@@ -60,6 +78,8 @@ body {
     height: auto; /* Height will adjust based on content */
     margin: auto; /* Center the container */
     overflow: hidden; /* Hide overflow */
+	    overflow-y: auto; /* Enable vertical scrolling inside the container */
+
 }
 
 #image-preview {
@@ -127,6 +147,29 @@ body {
     transition: background-color 0.3s ease; /* Smooth transition for background color */
 }
 
+/* LEAFLET MAP ICON MISC CSS START */
+.leaflet-bar > a:first-child {
+  border-top-left-radius: 30px !important;
+  border-top-right-radius: 30px !important;
+}
+
+.leaflet-bar > a:last-child {
+  border-bottom-left-radius: 30px !important;
+  border-bottom-right-radius: 30px !important;
+}
+
+.leaflet-control-zoom-in, .leaflet-control-zoom-out {
+  border-top: none !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+}
+
+/* LEAFLET MAP PILL CSS */
+.leaflet-bar, .leaflet-draw-section, .leaflet-draw-section {
+  border-radius: 30px !important;
+  border: none;
+  background-color: var(--leaflet-control-bg-dark) !important; /* Use variable */
+}
 
 .header-container {
     display: flex;
@@ -768,7 +811,7 @@ display: block;
 
 <div class="form-container">
 <div class="header-container">
-    <h1 id="page-title">Teilen Sie Ihre eigene Idee!</h1>
+    <h1 id="page-title">Teilen Sie Ihre Idee!</h1>
     <a href="#" id="info-link">
         <img src="{{ url_for('static', filename='infobutton.png') }}" alt="Info" class="info-image">
     </a>
@@ -859,13 +902,15 @@ display: block;
 <script>
 
 // Initialize the map
-var map = L.map('map').setView([48.4102, 15.6022], 15);
+var map = L.map('map', {
+    minZoom: 15
+}).setView([48.4102, 15.6022], 15);
 
-    // Load and display tile layer on the map
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+// Load and display tile layer on the map
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
     // Define the boundaries for the grey area
     var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
@@ -1353,6 +1398,10 @@ var benefitEditor = new Quill('#benefit-editor', { theme: 'snow' });
 var benefitFeedback = document.createElement('div');
 benefitFeedback.id = 'benefitFeedback';
 document.getElementById('benefit-editor').parentNode.insertBefore(benefitFeedback, document.getElementById('benefit-editor').nextSibling);
+
+// Call updateQuillCharCountFeedback immediately for both editors
+updateQuillCharCountFeedback(descriptionEditor, descriptionFeedback, 20, 5000);
+updateQuillCharCountFeedback(benefitEditor, benefitFeedback, 20, 5000);
 
 // Event listener for Quill editors
 descriptionEditor.on('text-change', function() {

@@ -5,9 +5,11 @@
             {% for project in project_pagination.items %}
                 {% if not project.is_mapobject %}
                     <div class="project-thumbnail">
-                        <h3>{{ project.name }}</h3>
-                        <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
-                        <div class="voting-bar">
+                        <h3><strong>{{ project.name }}</strong></h3>
+<p class="project-date">
+    Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+    Ansichten: <strong>{{ project.view_count }}</strong>
+</p>                              <div class="voting-bar">
                             {% if project.upvotes > 0 %}
                                 <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
                                     <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
@@ -19,9 +21,10 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <a href="{{ url_for('project_details', project_id=project.id) }}">
-                            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+                            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
                         </a>
+                        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
                         <form action="{{ url_for('delete_project', project_id=project.id) }}" method="POST">
                             <input type="submit" class="register-button" style="font-weight: bold;" value="Löschen">
                         </form>

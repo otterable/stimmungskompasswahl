@@ -5,8 +5,10 @@
                 {% if not project.is_mapobject %}  <!-- Check if project is not a Notizen -->
                     <div class="project-thumbnail">
                         <h3><strong>{{ project.name }}</strong></h3>
-                        <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
-                              <div class="voting-bar">
+<p class="project-date">
+    Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+    Ansichten: <strong>{{ project.view_count }}</strong>
+</p>                              <div class="voting-bar">
                             {% if project.upvotes > 0 %}
                                 <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
                                     <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>

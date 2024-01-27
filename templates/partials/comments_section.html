@@ -5,13 +5,19 @@
                 <div class="stat-box2">
 <div class="project-description" style="font-weight:bold;">{{ comment.text }}</div>
                     <div class="comment-details" style="margin-bottom: -5px;">
-                        <p style="margin-bottom: -10px;">Projekt: 
-                            <a href="{{ url_for('project_details', project_id=comment.project_id) }}">
-                                {{ comment.project_name }}
-                            </a>
-                        </p>
-                        <p>Autor: {{ comment.author_name }} (ID: {{ comment.author_id }}) | Datum: {{ comment.timestamp.strftime('%d.%m.%Y, %H:%M') }}</p>
-                    </div>
+                  <p style="margin-bottom: -10px;">
+    Projekt: 
+    <strong>
+        <a href="{{ url_for('project_details', project_id=comment.project_id) }}">
+            {{ comment.project_name }}
+        </a>
+    </strong>
+</p>
+<p>
+    Autor: {{ comment.author_name }} (ID: {{ comment.author_id }}) | 
+    Datum: {{ comment.timestamp.strftime('%d.%m.%Y, %H:%M') }}
+</p>
+</div>
                     <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}">
                         <button type="submit" class="register-button">Löschen</button>
                     </form>

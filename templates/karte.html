@@ -48,6 +48,136 @@
 </head>
 
 <style>
+
+.p-mobile-confirm {
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
+
+
+		 @media only screen and (max-width: 767px) {
+
+     .mobile-confirm {
+            position: fixed;
+            height: 150px;
+            bottom: 0;
+            left: 15px !important;
+            right: 15px !important;
+            border-radius: 30px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            width: auto;
+            overflow-y: auto; /* Enables vertical scrolling */
+            background: var(--sidebar-bg); /* Use variable for background */
+        }
+
+           .register-button-c {
+         background-color: #003056; /* Example color */
+    color: white;
+    border: none; /* Remove the border */
+    outline: none; /* Remove the outline */
+    box-shadow: none; /* Remove any shadow that might appear as an outline */
+    border-radius: 30px;
+    padding: 3px 3px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 16px !important;
+    margin: auto;
+    margin-top: 0px !important;
+    margin-bottom: 0px;
+    cursor: pointer;
+        width: 97%;
+    box-sizing: border-box; /* Include padding in width */
+}
+    .p-mobile-confirm {
+        font-size: 16px;
+		margin-bottom: 6px;
+    }
+	
+
+		}
+		
+		
+		
+@media (min-width: 768px) and (max-width: 1080px) {
+
+    .mobile-confirm {
+        position: absolute;
+        bottom: 15px; /* Align with the bottom of #map */
+        right: calc(40% + 0px) !important; /* Adjusting for sidebar width and right margin */
+        background: #f5f1e4;
+        padding: 20px;
+        border-radius: 30px;
+        transform: none; /* Remove the translate transform */
+    }
+
+           .register-button-c {
+         background-color: #003056; /* Example color */
+    color: white;
+    border: none; /* Remove the border */
+    outline: none; /* Remove the outline */
+    box-shadow: none; /* Remove any shadow that might appear as an outline */
+    border-radius: 30px;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 14px !important;
+    margin: auto;
+    margin-top: 0px !important;
+    margin-bottom: 0px;
+    cursor: pointer;
+        width: 97%;
+    box-sizing: border-box; /* Include padding in width */
+}
+    .p-mobile-confirm {
+        font-size: 16px;
+    }
+	
+
+		}
+		
+		
+@media only screen and (min-width: 768px) {
+    .mobile-confirm {
+        position: absolute;
+        bottom: 15px; /* Align with the bottom of #map */
+        right: calc(30% + 15px);
+        background: #f5f1e4;
+        padding: 20px;
+        border-radius: 30px;
+        transform: none; /* Remove the translate transform */
+    }
+	
+	  .register-button-c {
+    background-color: #003056; /* Example color */
+    color: white;
+    border: none; /* Remove the border */
+    outline: none; /* Remove the outline */
+    box-shadow: none; /* Remove any shadow that might appear as an outline */
+    border-radius: 30px;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 16px;
+    margin: auto;
+    margin-top: 0px !important;
+    margin-bottom: 0px;
+    cursor: pointer;
+        width: 97%;
+    box-sizing: border-box; /* Include padding in width */
+}
+
+
+}
+	
+		
   /* BASIC CSS START */
 body, html {
     margin: 0;
@@ -71,9 +201,7 @@ body, html {
 
 
     @media only screen and (max-width: 1080px) {
-        #custom-confirm p {
-            font-size: 1.6vw; /* Adjust as needed */
-        }
+        
 		
 		#nav-links .user-info {
         display: block; /* Make it a block element */
@@ -83,19 +211,8 @@ body, html {
     }
     }
 
-    /* Tablet Devices */
-    @media only screen and (min-width: 1080px) and (max-width: 1445px) {
-        #custom-confirm p {
-            font-size: 1.25vw; /* Adjust as needed */
-        }
-    }
+   
 
-    /* Desktop Devices */
-    @media only screen and (min-width: 1445px) {
-        #custom-confirm p {
-            font-size: 1.25vw; /* Adjust as needed */
-        }
-    }
 #category-filter, #sort-filter {
     display: flex;
     justify-content: center;
@@ -378,9 +495,7 @@ body {
         font-size: 14px !important; /* Smaller font size for mobile devices */
         padding: 10px 15px; /* Adjusted padding for smaller buttons */
     }
-#custom-confirm p {
-        font-size: 3vw; /* Increase the font size for mobile devices */
-    }
+
 
     #custom-confirm button.register-button {
         font-size: 14px; /* Decrease the font size for the buttons */
@@ -2145,6 +2260,7 @@ margin-bottom: 0px !important;
         margin-left: 5px; /* 5px gap on the left */
         margin-right: 5px; /* 5px gap on the right */
         display: block; /* Change display to block for full width */
+		font-size: 16px !important;
     }
 
     .button-container {
@@ -2353,12 +2469,13 @@ margin-bottom: 0px !important;
 
 <!-- Custom Confirmation Dialog -->
 <div id="custom-confirm" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.0); z-index: 10000; text-align: center;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 30px;">
-        <p style="font-weight: bold; color: black; ">Möchten Sie die Notiz hier platzieren?</p>
-        <button id="confirm-yes" class="register-button" style="background-color: #0e3a3a !important;">Ja</button>
-        <button id="confirm-tryagain" class="register-button" style="background-color: #ffa500 !important; margin-top: 10px !important;">Erneut versuchen</button>
-        <button id="confirm-no" class="register-button" style="background-color: #de3a3a !important; margin-top: 10px !important;">Stornieren</button>
+  <div id="mobile-confirm" class="mobile-confirm">
+<p class="p-mobile-confirm">Möchten Sie die Notiz hier platzieren?</p>
+        <button id="confirm-yes" class="register-button-c" style="background-color: #0e3a3a !important;">Ja</button>
+        <button id="confirm-tryagain" class="register-button-c" style="background-color: #ffa500 !important; margin-top: 10px !important;">Erneut versuchen</button>
+        <button id="confirm-no" class="register-button-c" style="background-color: #de3a3a !important; margin-top: 10px !important;">Stornieren</button>
     </div>
+
 </div>
 
 <!-- Overlay for displaying the list of markers -->
@@ -2417,7 +2534,7 @@ margin-bottom: 0px !important;
         </div>
         
         <br>
-        <p>3. Wählen Sie den betrffenden Ort auf der Karte:</p>
+<p id="limit-info">limit info here</p>
         <div class="button-container">
 <button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>
         </div>
@@ -3920,17 +4037,31 @@ function checkMarkerLimit() {
         .then(response => response.json())
         .then(data => {
             console.log("Marker Limit Check: ", data);
+            const limitInfoElement = document.getElementById('limit-info');
             if (data.limit_reached) {
-                console.log(`LIMIT CHECK: 3/3 markers posted, limit has been reached. Turning buttons into timers. Limit expires in: ${data.reset_time}`);
+                console.log(`LIMIT CHECK: ${data.current_count}/${data.max_limit} markers posted, limit has been reached. Turning buttons into timers. Limit expires in: ${data.reset_time}`);
                 document.getElementById('add-marker-button').disabled = true;
                 document.getElementById('open-overlay').disabled = true;
                 startTimer(data.reset_time);
+                limitInfoElement.textContent = `Sie haben Ihr Tageslimit von ${data.max_limit} Markierungen erreicht.`;
             } else {
-                console.log(`LIMIT CHECK: ${data.current_count}/3 markers posted.`);
+                console.log(`LIMIT CHECK: ${data.current_count}/${data.max_limit} markers posted.`);
+                const markersRemaining = data.max_limit - data.current_count;
+                limitInfoElement.textContent = `Sie können ${markersRemaining} Markierungen/Tag posten. Sie haben schon ${data.current_count} gepostet.`;
             }
         })
-        .catch(error => console.error('Error checking marker limit:', error));
+        .catch(error => {
+            console.error('Error checking marker limit:', error);
+            const limitInfoElement = document.getElementById('limit-info');
+            limitInfoElement.textContent = "Fehler beim Abrufen der Marker-Limit-Informationen.";
+        });
 }
+
+// Call checkMarkerLimit on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM fully loaded and parsed. Initiating marker limit check...");
+    checkMarkerLimit();
+});
 
 // Call checkMarkerLimit on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -3954,7 +4085,7 @@ function startTimer(expiryTime) {
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        var timerText = `Limit erreicht. Läuft in ${hours}h ${minutes}m ${seconds}s ab`;
+        var timerText = `Limit erreicht, läuft in ${hours}h${minutes}m ab`;
         addButton.innerText = timerText;
         overlayButton.innerText = timerText;
 

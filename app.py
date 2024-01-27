@@ -1084,7 +1084,7 @@ def check_marker_limit():
     additions = ip_marker_additions.get(ip_address, [])
     additions = [time for time in additions if now - time < timedelta(days=1)]
     current_count = len(additions)
-    max_limit = 300  # Set your max limit here
+    max_limit = 10  # Set your max limit here
     limit_reached = current_count >= max_limit
 
     if limit_reached and additions:
@@ -1586,6 +1586,39 @@ def check_comment_limit():
     else:
         return jsonify(limit_reached=False, reset_time=None, current_count=recent_comments_count)
 
+@app.route('/preview_delete_map_objects_by_date', methods=['POST'])
+@login_required
+def preview_delete_map_objects_by_date():
+    if current_user.id != 1:
+        return jsonify(success=False, error='Unauthorized access.')
+
+    data = request.get_json()
+    from_date = datetime.strptime(data['fromDate'], '%Y-%m-%d')
+    to_date = datetime.strptime(data['toDate'], '%Y-%m-%d')
+
+    map_objects = Project.query.filter(Project.is_mapobject == True, Project.date >= from_date, Project.date <= to_date).all()
+    map_objects_info = [{'id': obj.id, 'descriptionwhy': obj.descriptionwhy} for obj in map_objects]
+
+    return jsonify(success=True, mapObjects=map_objects_info)
+
+
+@app.route('/delete_map_objects_by_date', methods=['POST'])
+@login_required
+def delete_map_objects_by_date():
+    if current_user.id != 1:  # Ensure it's the admin
+        return jsonify(success=False, error='Unauthorized access.')
+
+    data = request.get_json()
+    from_date = datetime.strptime(data['fromDate'], '%Y-%m-%d')
+    to_date = datetime.strptime(data['toDate'], '%Y-%m-%d')
+
+    map_objects_to_delete = Project.query.filter(Project.is_mapobject == True, Project.date >= from_date, Project.date <= to_date)
+    deleted_count = map_objects_to_delete.delete()
+
+    db.session.commit()
+    app.logger.debug(f'Deleted {deleted_count} map objects between {from_date} and {to_date}')
+    
+    return jsonify(success=True, message=f'{deleted_count} map objects deleted successfully.')
 
 
 @app.route('/admintools', methods=['GET', 'POST'])
@@ -1706,6 +1739,23 @@ def admintools():
             else:
                 flash('Project not found for unmarking as featured', 'error')
 
+
+        elif 'remove_reports' in request.form:
+            project_id = request.form.get('project_id')
+            project = Project.query.get(project_id)
+
+            if project:
+                # Remove all reports associated with the project
+                Report.query.filter_by(project_id=project_id).delete()
+
+                # Commit the changes to the database
+                db.session.commit()
+
+                flash('Reports have been removed from the project successfully.', 'success')
+            else:
+                flash('Project not found for removing reports.', 'error')
+                
+                
         elif 'delete_project' in request.form:
             project = Project.query.get(project_id)
             if project:
@@ -1852,6 +1902,13 @@ def admintools():
     # Prepare lists of important and featured projects
     important_projects = [project for project in paginated_projects.items if project.is_important]
     featured_projects = [project for project in paginated_projects.items if project.is_featured]
+    reported_projects = [project for project in paginated_projects.items if Report.query.filter_by(project_id=project.id).first()]
+    user_count = User.query.count()
+    comment_count = Comment.query.count()
+    project_count = Project.query.filter_by(is_mapobject=False).count()
+    mapobject_count = Project.query.filter_by(is_mapobject=True).count()
+    bookmark_count = Bookmark.query.count()
+
 
     # Check if it's an AJAX request
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -1873,10 +1930,16 @@ def admintools():
                            paginated_users=paginated_users,
                            sort=sort,
                            categories=categories,
-                           search_query=search_query, 
-                           users=users, 
+                           search_query=search_query,
+                           user_count=user_count,
+                           comment_count=comment_count,
+                           project_count=project_count,
+                           mapobject_count=mapobject_count,
+                           bookmark_count=bookmark_count,
+                           users=users,
                            important_projects=important_projects, 
                            featured_projects=featured_projects,
+                           reported_projects=reported_projects,
                            top_viewed_projects=top_viewed_projects,
                            top_rated_projects=top_rated_projects,
                            top_commented_projects=top_commented_projects,
@@ -1907,6 +1970,8 @@ def verify_admin_otp():
         
 import os
 import shutil
+
+
 
 @app.route('/delete_my_data', methods=['POST'])
 @login_required
@@ -2161,12 +2226,23 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
             project.downvotes = downvotes
             project.upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
             project.downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
+        
+        for project in bookmarked_projects:
+            upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+            downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
+            total_votes = upvotes + downvotes
+            project.upvotes = upvotes
+            project.downvotes = downvotes
+            project.upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
+            project.downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
+
 
         # Prepare user statistics
         num_projects = Project.query.filter_by(author=current_user.id, is_mapobject=False).count()
         num_map_objects = Project.query.filter_by(author=current_user.id, is_mapobject=True).count()
         num_comments = Comment.query.filter_by(user_id=current_user.id).count()
         bookmarked_projects = Project.query.join(Bookmark, Bookmark.project_id == Project.id).filter(Bookmark.user_id == current_user.id).all()
+        most_viewed_project = Project.query.filter_by(author=current_user.id).order_by(Project.view_count.desc()).first()
 
         # Find the most successful project
         most_successful_project = None
@@ -2181,7 +2257,8 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
             'num_projects': num_projects,
             'num_map_objects': num_map_objects,
             'num_comments': num_comments,
-            'most_successful_project': most_successful_project
+            'most_successful_project': most_successful_project,
+            'most_viewed_project': most_viewed_project
         }
     else:
         paginated_projects = None

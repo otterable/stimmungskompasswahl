@@ -21,7 +21,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
    <style>
-   /* Style for buttons inside filter-overlay to match nav-overlay links */
+   .user-count-container {
+    margin-bottom: 20px; /* Add margin to create space below */
+    clear: both; /* Clear both sides to ensure a new line */
+}
+
+.user-search-container {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    clear: both; /* Clear both sides to ensure a new line */
+}
+
+   
+   .centered-text {
+            text-align: center;
+        }
+		
+		/* Style for buttons inside filter-overlay to match nav-overlay links */
 #filter-overlay .c-button {
     background-color: transparent; /* Same as nav-overlay links */
     color: white; /* Text color to match nav-overlay links */
@@ -356,7 +372,7 @@ margin: auto;
 
 .top-bar a {
     color: white;
-    text-decoration: none;
+    text-decoration: none !important;
     margin-right: 20px; /* Add spacing between links */
     font-size: 18px; /* Increase text size */
     font-weight: bold; /* Make text bold */
@@ -1401,16 +1417,17 @@ nav[aria-label="Page navigation"] {
 
 <!-- Update the buttons in the filter-bar div -->
 <div class="filter-bar">
-
     <button id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</button>
     <button id="toggleExportSection" class="c-button" data-section-id="exportSection">Datenexport</button>
     <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
     <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
     <button id="toggleComments" class="c-button" data-section-id="commentsSection">Kommentare</button>
     <button id="toggleImportantProjects" class="c-button" data-section-id="importantProjectsSection">Markierte Projektvorschläge</button>
+    <button id="toggleReportedProjects" class="c-button" data-section-id="reportedProjectsSection">Gemeldete Projektvorschläge</button>
     <button id="toggleFeaturedProjects" class="c-button" data-section-id="featuredProjectsSection" style="display:none;">Open Ausgewählte Projektvorschläge</button>
     <button id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</button>
 </div>
+
 
 <div id="filter-overlay" class="nav-overlay" style="display:none">
     <div id="nav-links">
@@ -1490,6 +1507,39 @@ nav[aria-label="Page navigation"] {
       </li>  {% endfor %}
 </ul>
 </div>
+
+<div class="stat-box" style="background-color: #FFA69E !important">
+    <h2>Allgemeine Statistik</h2>
+    <ul>
+        <li>
+            <h3>
+                <strong>Projektvorschläge:</strong> {{ project_count }} 
+            </h3>
+        </li>
+        <li>
+            <h3>
+                <strong>Notizen:</strong> {{ mapobject_count }}
+            </h3>
+        </li>
+        <li>
+            <h3>
+                <strong>Kommentare:</strong> {{ comment_count }}
+            </h3>
+        </li>
+        <li>
+            <h3>
+                <strong>Benutzer:</strong> {{ user_count }}
+            </h3>
+        </li>
+        <li>
+            <h3>
+                <strong>Bookmarks:</strong> {{ bookmark_count }}
+            </h3>
+        </li>
+    </ul>
+</div>
+
+
 </div>
 
 <div class="stats-container">
@@ -1701,22 +1751,28 @@ nav[aria-label="Page navigation"] {
 
     <div id="projectProposalsSection" style="display: none;">
 
- <div>
-    <label for="search">Suchen nach Namen:</label>
-    <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()" style="margin-top:20px; margin-bottom:10px;">
+        <h2>Es gibt <span id="num-projects" style="color: #003056;">{{ project_count }} Projektvorschläge.</span></h2>
 
-    <label for="sort">Sortieren nach:</label>
-    <select id="sort" onchange="submitForm()">
-     <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Höchste Bewertung zuerst</option>
-                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Neuester Beitrtag</option>
-                <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Ältester Beitrag</option>
-                <option value="category" {% if sort == 'category' %}selected{% endif %}>Kategorie</option>
-                <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Positive Bewertungen</option>
-                <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Negative Bewertungen</option>
-                <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Anzahl der Kommentare</option>
-                <option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Titel (A-Z)</option>
-                <option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Titel (Z-A)</option>
-				</select>
+
+ <div style="margin-bottom:-5px; margin-top: -20px;">
+ 
+<label for="search" style="font-weight: bold;">Suchen nach Namen:</label>
+<input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()" placeholder="Suchen..." style="margin-top:20px; margin-bottom:10px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+
+
+<label for="sort" style="font-weight: bold;">Sortieren nach:</label>
+<select id="sort" onchange="submitForm()" style="border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer; margin-bottom: 20px;">
+    <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Höchste Bewertung zuerst</option>
+    <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Neuester Beitrag</option>
+    <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Ältester Beitrag</option>
+    <option value="category" {% if sort == 'category' %}selected{% endif %}>Kategorie</option>
+    <option value="upvotes" {% if sort == 'upvotes' %}selected{% endif %}>Positive Bewertungen</option>
+    <option value="downvotes" {% if sort == 'downvotes' %}selected{% endif %}>Negative Bewertungen</option>
+    <option value="comments" {% if sort == 'comments' %}selected{% endif %}>Anzahl der Kommentare</option>
+    <option value="alpha_asc" {% if sort == 'alpha_asc' %}selected{% endif %}>Titel (A-Z)</option>
+    <option value="alpha_desc" {% if sort == 'alpha_desc' %}selected{% endif %}>Titel (Z-A)</option>
+</select>
+
 </div>    
 
     {% with project_page=paginated_projects.page %}
@@ -1730,8 +1786,23 @@ nav[aria-label="Page navigation"] {
 
 <!-- Notizens Search Input -->
 <div class="map-object-search-container" >
-    <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()"  style="margin-top:20px;">
+
+        <h2>Es gibt <span id="num-mapobjects" style="color: #003056;">{{ mapobject_count }} Notizen.</span></h2>
+
+
+<label for="searchMapObject" style="font-weight: bold;">Suchen nach Notizen:</label>
+<input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()" style="margin-bottom: 0px;  border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
 </div>
+<div class="delete-map-objects-by-date">
+    <h2>Löschen von Kartenobjekten nach Datum</h2>
+    <label for="deleteFromDate">Von Datum:</label>
+    <input type="date" id="deleteFromDate">
+    <label for="deleteToDate">Bis Datum:</label>
+    <input type="date" id="deleteToDate">
+    <button id="deleteMapObjectsByDateBtn" class="register-button">Löschen</button>
+</div>
+
+
 
     {% with paginated_map_objects=paginated_map_objects %}
         {% include 'partials/mapobject_list_section.html' %}
@@ -1742,10 +1813,17 @@ nav[aria-label="Page navigation"] {
 
 
    <div id="commentsSection" style="display: none;">
+   
+           <h2>Es gibt <span id="num-comments" style="color: #003056;">{{ comment_count }} Kommentare.</span></h2>
+
+
 <div class="comment-search-container">
-    <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()"  style="margin-top:20px;">
-    <input type="text" id="searchCommentByUserId" placeholder="Nach Benutzer-ID suchen" onkeyup="searchCommentsByUserId()"  style="margin-top:20px;">
-	
+<label for="searchComment" style="font-weight: bold;">Kommentare suchen:</label>
+<input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+
+<label for="searchCommentByUserId" style="font-weight: bold;">Nach Benutzer-ID suchen:</label>
+<input type="text" id="searchCommentByUserId" placeholder="Nach Benutzer-ID suchen" onkeyup="searchCommentsByUserId()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+
 </div>
 {% with paginated_comments=paginated_comments %}
     {% include 'partials/comments_section.html' %}
@@ -1757,19 +1835,30 @@ nav[aria-label="Page navigation"] {
     <div id="importantProjectsSection" style="display: none;">
 
 <!-- Important Projects Section -->
-<h2>Wichtige Projektvorschläge (Nur auf dieser Seite sichtbar)</h2>
+<h2>Wichtige <span style="color: #003056;">Projektvorschläge</span> (Nur auf dieser Seite sichtbar)</h2>
 <div class="project-list">
     {% for project in important_projects %}
-        <div class="project-thumbnail">
-            <h3>{{ project.name }}</h3>
-            <p class="project-date">Kategorie: {{ project.category }}</p>
-            <div class="project-details">
-                Verfasser: ID {{ project.author }} <br>
-                Kommentare: {{ project.comments_count }}, 👍 {{ project.upvotes }}, 👎 {{ project.downvotes }}
-            </div>
-            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
-                <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
-            </a>
+         <div class="project-thumbnail">
+                        <h3><strong>{{ project.name }}</strong></h3>
+<p class="project-date">
+    Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+    Ansichten: <strong>{{ project.view_count }}</strong>
+</p>                              <div class="voting-bar">
+                            {% if project.upvotes > 0 %}
+                                <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                                    <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                                </div>
+                            {% endif %}
+                            {% if project.downvotes > 0 %}
+                                <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                                    <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+                            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
+                        </a>
+                        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
                 <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
@@ -1784,21 +1873,31 @@ nav[aria-label="Page navigation"] {
 
 
 
-
 <!-- Featured Projects Section -->
-<h2>Ausgewählte Projektvorschläge</h2>
+<h2>Ausgewählte <span style="color: #003056;">Projektvorschläge</span></h2>
 <div class="project-list">
     {% for project in featured_projects %}
-        <div class="project-thumbnail">
-            <h3>{{ project.name }}</h3>
-            <p class="project-date">Kategorie: {{ project.category }}</p>
-            <div class="project-details">
-                Verfasser: ID {{ project.author }}<br>
-                Kommentare: {{ project.comments_count }}, 👍 {{ project.upvotes }}, 👎 {{ project.downvotes }}
-            </div>
-            <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
-                <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
-            </a>
+         <div class="project-thumbnail">
+                        <h3><strong>{{ project.name }}</strong></h3>
+<p class="project-date">
+    Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+    Ansichten: <strong>{{ project.view_count }}</strong>
+</p>                              <div class="voting-bar">
+                            {% if project.upvotes > 0 %}
+                                <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                                    <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                                </div>
+                            {% endif %}
+                            {% if project.downvotes > 0 %}
+                                <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                                    <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+                            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
+                        </a>
+                        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
             <form method="POST" action="{{ url_for('admintools') }}">
                 <input type="hidden" name="project_id" value="{{ project.id }}">
                 <button type="submit" name="unmark_featured"  class="register-button" >Von "Ausgewählt" entferen</button>
@@ -1812,8 +1911,56 @@ nav[aria-label="Page navigation"] {
 </div>
 </div>
 
+
+
+
+<div id="reportedProjectsSection" style="display: none;">
+
+<!-- Reported Projects Section -->
+<h2>Gemeldete <span style="color: #003056;">Projektvorschläge</span></h2>
+<div class="project-list">
+    {% for project in reported_projects %}
+    <div class="project-thumbnail">
+        <h3><strong>{{ project.name }}</strong></h3>
+        <p class="project-date">
+            Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+            Ansichten: <strong>{{ project.view_count }}</strong>
+        </p>
+        <div class="voting-bar">
+            {% if project.upvotes > 0 %}
+            <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+            </div>
+            {% endif %}
+            {% if project.downvotes > 0 %}
+            <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+            </div>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+            <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
+        </a>
+        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
+<form method="POST" action="{{ url_for('admintools') }}">
+    <input type="hidden" name="action" value="remove_reports">
+    <input type="hidden" name="project_id" value="{{ project.id }}">
+    <button type="submit" class="register-button" name="remove_reports">Remove Reports</button>
+</form>
+
+
+        <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
+    </div>
+    {% else %}
+    <p>Keine gemeldeten Projektvorschläge gefunden.</p>
+    {% endfor %}
+</div>
+</div>
+
+
    
     <div id="usersSection" style="display: none;">
+        <h2>Es gibt <span id="num-map-objects" style="color: #003056;">{{ user_count }} Benutzer.</span></h2>
 
 
 <div class="project-list" >
@@ -2427,6 +2574,9 @@ document.getElementById('toggleComments').addEventListener('click', function() {
 document.getElementById('toggleImportantProjects').addEventListener('click', function() { toggleSection('importantProjectsSection'); });
 document.getElementById('toggleFeaturedProjects').addEventListener('click', function() { toggleSection('featuredProjectsSection'); });
 document.getElementById('toggleUsers').addEventListener('click', function() { toggleSection('usersSection'); });
+document.getElementById('toggleReportedProjects').addEventListener('click', function() {
+    toggleSection('reportedProjectsSection');
+});
 
 
 function submitExportForm() {
@@ -3451,6 +3601,63 @@ function displayViewerStats(data) {
         document.getElementById('overlay').style.display = 'none';
     }
 	</script>
+
+<script>
+document.getElementById('deleteMapObjectsByDateBtn').addEventListener('click', function() {
+    const fromDate = document.getElementById('deleteFromDate').value;
+    const toDate = document.getElementById('deleteToDate').value;
+
+    if (!fromDate || !toDate) {
+        alert('Bitte wählen Sie sowohl das Von Datum als auch das Bis Datum.');
+        return;
+    }
+
+    fetch('/preview_delete_map_objects_by_date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromDate: fromDate, toDate: toDate })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(`Anzahl der zu löschenden Kartenobjekte: ${data.mapObjects.length}`);
+            data.mapObjects.forEach(obj => console.log(`Beschreibung: ${obj.descriptionwhy}`));
+
+            if (confirm(`Möchten Sie alle Kartenobjekte zwischen ${fromDate} und ${toDate} löschen?`)) {
+                deleteMapObjects(fromDate, toDate);
+            }
+        } else {
+            console.error('Fehler beim Abrufen von Kartenobjekten:', data.error);
+            alert('Fehler beim Abrufen von Kartenobjekten.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+function deleteMapObjects(fromDate, toDate) {
+    console.log(`Löschung von Kartenobjekten angefordert für den Zeitraum: ${fromDate} bis ${toDate}`);
+    fetch('/delete_map_objects_by_date', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromDate: fromDate, toDate: toDate })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(`Kartenobjekte erfolgreich gelöscht für den Zeitraum: ${fromDate} bis ${toDate}`);
+            alert('Kartenobjekte erfolgreich gelöscht.');
+        } else {
+            console.error('Fehler beim Löschen von Kartenobjekten:', data.error);
+            alert('Fehler beim Löschen von Kartenobjekten.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+</script>
+
+
+
 <script>
 fetch('/log_view')
     .then(response => response.json())
