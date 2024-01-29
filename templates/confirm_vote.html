@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Confirm Vote</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <form action="{{ url_for('confirm_vote', vote_id=vote_id) }}" method="post">
-            <input type="text" name="otp" placeholder="Passwort eingeben" required>
-            <input type="submit" value="Confirm Vote">
-        </form>
+      <form action="{{ url_for('confirm_vote', vote_id=vote_id) }}" method="post">
+        <input type="text" name="otp" placeholder="Passwort eingeben" required>
+        <input type="submit" value="Confirm Vote">
+      </form>
     </div>
-</body>
+  </body>
 </html>

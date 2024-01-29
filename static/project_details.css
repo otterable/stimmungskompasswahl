@@ -1,0 +1,1323 @@
+body {
+  font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+
+  background-color: #f5f1e4;
+  color: black;
+  background-image: url('background2.png');
+  /* Updated path */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+}
+
+.leaflet-tile {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  /* Removes rounded corners */
+}
+
+/* Target <h3> within the .text-content class */
+.text-content h3 {
+  margin-block-start: 0.5em;
+  /* Adjust the top margin */
+  margin-block-end: 0.5em;
+  /* Adjust the bottom margin */
+  font-weight: normal;
+  /* Adjust the font weight */
+}
+
+/* Target <h3> immediately following .centered-title.section-title */
+.centered-title.section-title+h3 {
+  margin-block-start: 0.5em;
+  /* Adjust the top margin */
+  margin-block-end: 0.5em;
+  /* Adjust the bottom margin */
+  font-weight: normal;
+  /* Adjust the font weight */
+}
+
+@media only screen and (max-width: 1445px) {
+  .top-bar a button {
+    transition: width 0.3s ease;
+    /* Transition for the transform property */
+    border-radius: 30px;
+    /* If you want to keep the border-radius */
+    padding: 7px;
+    /* Add any other button-specific styles here */
+  }
+}
+
+img {
+  max-width: 100%;
+  /* Ensure images are not larger than their container */
+  height: auto;
+  /* Maintain aspect ratio */
+
+  border-radius: 30px;
+  transition: width 0.3s ease;
+}
+
+.logo {
+  max-width: 1000px;
+  /* Increase the max-width to make it bigger */
+  margin-bottom: 30px;
+}
+
+
+
+#project-map {
+  width: 100%;
+  /* Full width of the parent container */
+  height: 400px;
+  /* Set a fixed height or use vh for a responsive height */
+  border-radius: 30px;
+  /* As per your existing style */
+}
+
+
+.form-container {
+  margin: 40px auto;
+  width: 60%;
+  text-align: left !important;
+  /* Align the form-container content to the left */
+
+  background-color: #fff;
+  padding: 40px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+}
+}
+
+
+.project-details {
+  width: 100%;
+  text-align: left !important;
+  /* Align the form-container content to the left */
+}
+
+.input-field {
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+input[type="text"],
+select,
+#description-editor,
+#benefit-editor {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  color: #333;
+  box-sizing: border-box;
+}
+
+input[type="file"] {
+  border: none;
+}
+
+.button {
+  border-radius: 30px;
+  padding: 15px;
+  background-color: white;
+  font-weight: bold;
+  color: black;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  /* Smooth transition for background color */
+}
+
+.centered-title a {
+  color: #003056;
+  /* The desired color */
+}
+
+
+@media screen and (max-width: 1080px) {
+
+  .arrowleft,
+  .arrowright {
+    display: none !important;
+  }
+}
+
+
+/* Mobile Devices */
+@media only screen and (max-width: 1080px) {
+
+  .clickable-edge-left,
+  .clickable-edge-right {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 5%;
+    z-index: 1000;
+    /* Ensure it's above other elements */
+  }
+
+  .clickable-edge-left {
+    left: 0;
+  }
+
+  .clickable-edge-right {
+    right: 0;
+  }
+}
+
+/* LEAFLET MAP PILL CSS */
+.leaflet-bar,
+.leaflet-draw-section,
+.leaflet-draw-section {
+  border-radius: 30px !important;
+  border: none;
+  background-color: var(--leaflet-control-bg-dark) !important;
+  /* Use variable */
+}
+
+/* LEAFLET MAP ICONS CSS */
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-draw-draw-polyline,
+.leaflet-draw-draw-polygon,
+.leaflet-draw-draw-rectangle,
+.leaflet-draw-draw-circle,
+.leaflet-draw-draw-marker,
+.leaflet-draw-draw-circlemarker,
+.leaflet-draw-edit-edit,
+.leaflet-draw-edit-remove {
+  background-color: #f5f1e4 !important;
+  /* Use variable */
+  color: #000000 !important;
+  /* Use variable */
+  border: none !important;
+  font-size: 18px !important;
+  line-height: 30px !important;
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.leaflet-draw-draw-rectangle {
+  background-image: url('rectangle_darkmode_svg.svg');
+  /* Replace with the path to your new icon */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* LEAFLET MAP ICONS CSS END */
+
+/* Hiding arrows on screens less than 1080px wide */
+@media only screen and (max-width: 1080px) {
+  .arrow-desktop {
+    display: none;
+    /* Hide desktop arrows on mobile */
+  }
+
+  .arrow-mobile {
+    display: block;
+    /* Show mobile arrows */
+  }
+}
+
+
+.arrow-mobile-left,
+.arrow-mobile-right {
+  position: fixed;
+  /* Fixed positioning relative to the viewport */
+  top: 50%;
+  /* Center vertically */
+  width: 60px;
+  /* Width of the arrow */
+  height: 60px;
+  /* Height of the arrow */
+  z-index: 1000;
+  /* Ensure it's above other elements */
+  transform: translateY(-50%);
+  /* Align center with the middle of the image */
+
+}
+
+.arrow-mobile-left {
+  left: 10px;
+  /* Position from the left side */
+}
+
+.arrow-mobile-right {
+  right: 10px;
+  /* Position from the right side */
+}
+
+@media only screen and (max-width: 1080px) {
+  .arrow-desktop {
+    display: none;
+    /* Hide desktop arrows on mobile */
+  }
+
+  .arrow-mobile-left,
+  .arrow-mobile-right {
+    display: block;
+    /* Show mobile arrows */
+  }
+}
+
+@media only screen and (min-width: 1081px) {
+
+  .arrow-mobile-left,
+  .arrow-mobile-right {
+    display: none;
+    /* Hide mobile arrows on desktop */
+  }
+}
+
+
+@media only screen and (min-width: 1081px) {
+  .arrow-mobile {
+    display: none;
+    /* Hide mobile arrows on desktop */
+  }
+}
+
+/* Arrow styling */
+@media screen and (min-width: 1080px) {
+
+  .arrow-left,
+  .arrow-right {
+    position: fixed;
+    /* Fixed positioning relative to the viewport */
+    top: 50%;
+    /* Center vertically */
+    width: 100px;
+    /* Width of the arrow */
+    height: 100px;
+    /* Height of the arrow */
+    z-index: 10;
+    /* Ensure it's above other elements */
+  }
+}
+
+.share-buttons {
+  display: flex;
+  /* Align items in a row */
+  justify-content: center;
+  /* Center items horizontally */
+  align-items: center;
+  /* Center items vertically */
+  gap: 10px;
+  /* Space between buttons */
+}
+
+.share-buttons a img {
+  width: 50px;
+  /* Width of each button */
+  height: 50px;
+  /* Height of each button */
+}
+
+/* Styling the scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  /* Adjust the width of the scrollbar */
+}
+
+/* Styling the track of the scrollbar */
+::-webkit-scrollbar-track {
+  background: #f5f1e4;
+  /* Light grey track */
+  border-radius: 10px;
+  /* Round corners of the track */
+}
+
+/* Styling the thumb of the scrollbar */
+::-webkit-scrollbar-thumb {
+  background: #9b9b9b;
+  /* Black thumb */
+}
+
+/* Hover effect on the thumb of the scrollbar */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  /* Darker shade of grey on hover */
+}
+
+
+/* Position the left arrow */
+.arrow-left {
+  left: 10px;
+  /* Distance from the left side */
+}
+
+/* Position the right arrow */
+.arrow-right {
+  right: 10px;
+  /* Distance from the right side */
+}
+
+
+.leaflet-draw-draw-marker {
+  display: none !important;
+}
+
+.leaflet-draw-draw-polyline {
+  display: none !important;
+}
+
+.leaflet-draw-draw-circlemarker {
+  display: none !important;
+}
+
+/* LEAFLET MAP ICON COLOR CHANGE WHEN DISABLED CSS START */
+.leaflet-disabled {
+  background-color: #3a3a3a !important;
+  color: #ffffff !important;
+}
+
+/* LEAFLET MAP ICON COLOR CHANGE WHEN DISABLED CSS END */
+
+
+
+/* LEAFLET MAP ICON BORDER REMOVAL CSS START */
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  border-top: none !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+}
+
+/* LEAFLET MAP ICON BORDER REMOVAL CSS END */
+
+
+
+/* LEAFLET MAP ICON MISC CSS START */
+.leaflet-bar>a:first-child {
+  border-top-left-radius: 30px !important;
+  border-top-right-radius: 30px !important;
+}
+
+.leaflet-bar>a:last-child {
+  border-bottom-left-radius: 30px !important;
+  border-bottom-right-radius: 30px !important;
+}
+
+
+
+
+
+
+.leaflet-control-layers {
+  border-radius: 30px;
+  opacity: 1;
+}
+
+.leaflet-control-layers::before {
+  content: "";
+  background-image: var(--leaflet-control-layers-before-bg);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 30px;
+  background-size: cover;
+  opacity: 1;
+}
+
+
+
+
+/* Hide the background image when the control layers menu is expanded */
+.leaflet-control-layers-expanded::before {
+  content: none !important;
+}
+
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+  margin-top: 0px !important;
+  /* Reduces the top margin of each label */
+  margin-bottom: 0px !important;
+  /* Adjusts the space between each item */
+
+  font-size: 7px !important;
+  font-weight: bold;
+  padding: 10px;
+  /* Added padding here */
+}
+
+
+.leaflet-control-layers-separator {
+  margin-top: 5px;
+  /* Adjusts the space above the separator line */
+  margin-bottom: 5px;
+  /* Adjusts the space below the separator line */
+}
+
+.leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
+  font-size: 18px !important;
+}
+
+
+/* Your existing rules for .leaflet-control-layers and .leaflet-top leaflet-right had typos, corrected below */
+.leaflet-control-layers.leaflet-control {
+  background-color: #f5f1e4 !important;
+
+  border-radius: 30px;
+}
+
+.leaflet-top.leaflet-right {
+  border-radius: 50px;
+}
+
+.leaflet-popup .shape-image {
+  max-width: 512px;
+  max-height: 512px;
+  display: block;
+  margin: 0 auto;
+}
+
+
+
+.leaflet-popup-content-wrapper {
+  background-color: #f5f1e4 !important;
+  color: #000000 !important;
+  border-radius: 30px !important;
+  width: auto !important;
+}
+
+.leaflet-popup-content {
+  color: #000000 !important;
+}
+
+.leaflet-popup-tip {
+  display: block;
+  /* Optional: hides the tip arrow for a cleaner look */
+  background-color: #f5f1e4 !important;
+}
+
+.leaflet-popup-close-button {
+  display: none;
+  /* Optional: hides the tip arrow for a cleaner look */
+
+}
+
+.leaflet-popup.image-popup .leaflet-popup-tip {
+  display: none;
+}
+
+
+.report-button {
+  background-color: #111111;
+  color: white;
+  padding: 10px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.report-button:hover {
+
+  background-color: #222222;
+  /* Lighter shade of green */
+  transform: scale(1.005);
+}
+
+.bookmark-button {
+  background-color: #003056;
+  color: white;
+  padding: 10px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.bookmark-button:hover {
+
+  background-color: #234770;
+  /* Lighter shade of green */
+  transform: scale(1.005);
+}
+
+.upvote-button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.upvote-button:hover {
+  background-color: #66c46a;
+  /* Lighter shade of green */
+  transform: scale(1.005);
+}
+
+.downvote-button {
+  background-color: #9A031E;
+  color: white;
+  padding: 10px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.downvote-button:hover {
+  background-color: #cc5045;
+  /* Lighter shade of red */
+  transform: scale(1.005);
+}
+
+
+.user-info {
+  color: white;
+  /* Set the text color to match other links */
+  margin-right: 20px;
+  /* Right margin for spacing */
+  font-size: 18px;
+  /* Font size similar to other links */
+  font-weight: bold;
+  /* Bold text */
+  align-self: center;
+  /* Align vertically within the flex container */
+}
+
+.comment-button {
+  background-color: #003056;
+  color: white;
+  padding: 10px;
+  display: block;
+  margin: 20px auto;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.share-button {
+  background-color: #02569d;
+  color: white;
+  padding: 10px;
+  display: block;
+  margin: 20px auto;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.share-button:hover {
+  background-color: #306db8;
+  /* Lighter shade of red */
+  transform: scale(1.005);
+}
+
+
+.comment-button:hover {
+  background-color: #00427a;
+  /* Lighter shade of blue */
+  transform: scale(1.005);
+}
+
+.publish-button {
+  width: 100%;
+  /* Full width */
+  padding: 20px 0;
+  /* Vertical padding */
+  font-size: 20px;
+  /* Font size */
+  background-color: #2874A6;
+  /* Background color */
+  color: white;
+  /* Text color */
+  border-radius: 30px;
+  /* Border radius */
+  border: none;
+  /* No border by default */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  transition: width transform 0.3s ease;
+  /* Smooth transition for transform and border */
+}
+
+.publish-button:hover {
+  transform: scale(1.005);
+  /* Scale up on hover */
+  border: 2px solid black;
+  /* Thin black border on hover */
+}
+
+.left-column img {
+  width: 100%;
+  /* Stretch image to full width of its container */
+  max-height: 600px;
+  /* Set maximum height to 600px */
+  object-fit: cover;
+  /* This will crop the image to fit the container */
+  border-radius: 30px;
+  /* Keep the border-radius as per your design */
+}
+
+.project img {
+  max-width: 800px;
+  /* Adjust the width as needed */
+  max-height: 800px;
+  /* Adjust the height as needed */
+  height: auto;
+  /* Maintain aspect ratio */
+  width: auto;
+  /* Maintain aspect ratio */
+  border-radius: 30px;
+  /* Optional: if you want rounded corners */
+}
+
+.logged-in-info {
+  text-align: center;
+  /* Centers the text inside the div */
+  padding: 2px 0;
+  /* Adds some padding above and below the text */
+  background-color: #f5f1e4;
+  /* Optional: background color, if you want to highlight the div */
+  /* Andere styling as needed, such as font size, color, etc. */
+}
+
+.top-bar {
+  background-color: #003056;
+  /* Background color of the top bar */
+  height: 80px;
+  /* Height of the top bar */
+  width: 100%;
+  /* Full width of the screen */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px;
+  /* Add padding to the left and right */
+  box-sizing: border-box;
+  /* Include padding in width calculation */
+  align-items: center;
+  /* This ensures vertical alignment */
+}
+
+.top-bar a .logo {
+  max-width: auto;
+  /* Adjust this value as needed */
+  max-height: 80px;
+  /* Ensure the logo fits within the bar's height */
+  margin: auto;
+}
+
+/* Styles for buttons inside links in the top bar */
+.top-bar a button {
+  transition: width 0.3s ease;
+  /* Transition for the transform property */
+  border-radius: 30px;
+  /* If you want to keep the border-radius */
+  /* Add any other button-specific styles here */
+}
+
+/* Hover effect for buttons inside links in the top bar */
+
+
+.voting-login-prompt {
+  display: flex;
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+  height: 50px;
+  /* Adjust the height as needed */
+  margin-top: 20px;
+  /* Add some space above the container */
+  /* Add other styling as needed */
+}
+
+
+/* Hover effect for links in the top bar */
+.top-bar a:not(:has(button)):hover::after {
+  transform: scaleX(1);
+  /* Show the underscore on hover */
+  transform-origin: left;
+}
+
+
+.form-container p {
+  margin: 2px 0;
+  /* Adjust the top and bottom margin as needed */
+  text-align: left;
+  /* Center align text */
+}
+
+.form-container .author-text {
+  color: #003056;
+  /* Set the text color */
+  font-style: italic;
+  /* Make the text cursive */
+  margin-bottom: 30px;
+}
+
+.form-container h2.centered-title,
+.form-container p.centered-title {
+  margin: 2px 0;
+  /* Adjust the top and bottom margin as needed */
+  text-align: center;
+  /* Center align text */
+}
+
+.form-container .author-text {
+  color: #003056;
+  /* Set the text color */
+  font-style: italic;
+  /* Make the text cursive */
+  margin-bottom: 30px;
+}
+
+.text-section {
+  text-align: left !important;
+  /* Align text to the left */
+}
+
+.text-section p {
+  font-family: 'Open Sans', sans-serif;
+  /* Change to your preferred font */
+  font-weight: normal !important;
+  /* Ensure the font weight is normal */
+  /* Other existing styles */
+}
+
+.voting-buttons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  /* Spacing between buttons */
+  margin-top: 10px;
+  /* Spacing above the button container */
+}
+
+
+.top-bar a {
+  color: white;
+  text-decoration: none;
+  margin-right: 20px;
+  /* Add spacing between links */
+  font-size: 18px;
+  /* Increase text size */
+  font-weight: bold;
+  /* Make text bold */
+  position: relative;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  /* Transition for color and text shadow */
+}
+
+.share-button-container {
+  text-align: center;
+  /* Center the button */
+  margin-top: 20px;
+  /* Add some space above the button */
+  /* Andere styling as needed */
+}
+
+/* Exclude the logo link from having the underline effect */
+.top-bar a[href="/"]:hover::after {
+  content: none;
+}
+
+.text-content {
+  font-family: 'Open Sans', sans-serif;
+  /* Change to your preferred font */
+  font-weight: normal !important;
+  /* Ensure the font weight is normal */
+  text-align: left;
+  /* Keep text aligned to the left */
+  margin-top: 10px;
+  /* Adjust top margin as needed */
+}
+
+
+/* Underline effect for links that do not contain the logo */
+.top-bar a:not(:has(> .logo))::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s;
+}
+
+/* Additional styles for .logo to ensure it fits well in the top bar */
+.top-bar a .logo {
+  max-width: auto;
+  /* Adjust this value as needed */
+  max-height: 80px;
+  /* Ensure the logo fits within the bar's height */
+  margin: auto;
+}
+
+.top-bar a:hover {
+  color: #a8c0ff;
+  /* Change color on hover */
+  text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7);
+  /* Add text shadow on hover */
+}
+
+.full-width-textarea {
+  width: 100%;
+  height: 100px;
+  /* Adjust this value as needed */
+  min-height: 100px;
+  /* Optional: Ensures a minimum height */
+  resize: none;
+  /* Disables resizing */
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  color: #333;
+  overflow-y: auto;
+  /* Adds a scrollbar when needed */
+  /* Additional styling as needed */
+}
+
+
+.top-bar a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s;
+}
+
+.section-title {
+  border-bottom: 2px solid #003056;
+  /* Solid line of 2px */
+  padding-bottom: 5px;
+  /* Space between the text and the line */
+}
+
+
+/* Hover effect for buttons inside links in the top bar */
+
+
+.voting-bar {
+  width: 100%;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 30px;
+  margin-top: 30px;
+  display: flex;
+}
+
+.upvotes {
+  height: 100%;
+  background-color: #4caf50;
+
+  transition: width 0.3s ease;
+}
+
+.downvotes {
+  height: 100%;
+  background-color: #9A031E;
+
+  transition: width 0.3s ease;
+}
+
+.comment p {
+  color: black !important;
+  /* Black color for the comment text */
+  /* other styling for the comment text */
+}
+
+.comment p:last-child {
+  color: #02569d !important;
+  /* Different color for the author name and date */
+  font-style: italic;
+  /* Optional: to make it look different */
+  /* other styling for the author name and date */
+}
+
+/* Underline effect for links that do not contain buttons */
+.top-bar a:not(:has(> button))::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s;
+}
+
+/* Hover effect to show underline for links that do not contain buttons */
+.top-bar a:not(:has(> button)):hover::after {
+  transform: scaleX(1);
+}
+
+.vote-counts {
+  display: flex;
+  justify-content: center;
+  /* Centers the child divs */
+  /* Add other styling as needed */
+}
+
+.upvotes-info,
+.downvotes-info {
+  text-align: center;
+  /* Centers the text inside the divs */
+  margin: 0 10px;
+  /* Optional: adds margin to the left and right of each div */
+  margin-top: 10px;
+  /* Add other styling as needed */
+}
+
+
+.index-image {
+  width: 100%;
+  object-fit: cover;
+  /* Crop the image when necessary */
+  max-height: 500px;
+  /* Set a maximum height if needed */
+  border-radius: 0;
+  /* Remove border-radius */
+  transition: none !important;
+  /* Remove hover effect */
+  transform: none !important;
+}
+
+.cover-text-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black background with 70% opacity */
+  padding: 20px;
+  border-radius: 30px;
+  text-align: center;
+}
+
+.cover-text-container h1 {
+  font-size: 40px;
+  color: white;
+  margin: 0;
+  padding-bottom: 10px;
+}
+
+.cover-text-container p {
+  font-size: 30px;
+  color: white;
+  margin: 0;
+}
+
+.info-box-container {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 20px;
+}
+
+.info-box {
+  background-color: #1b1b1b;
+  border-radius: 30px;
+  padding: 20px;
+  text-align: center;
+  transition: width 0.3s ease;
+  width: 30%;
+  /* Set a fixed width for each box */
+}
+
+.info-box:hover {
+  transform: scale(1.005);
+}
+
+.info-box-icon {
+  max-width: 70px;
+  /* Icon size */
+  border-radius: 50%;
+  /* Make it circular */
+}
+
+.info-box-title {
+  color: white;
+  font-size: 30px;
+  margin: 10px 0;
+}
+
+.info-box-undertitle {
+  color: white;
+  font-size: 16px;
+}
+
+/* Specific colors for each box */
+.box-red {
+  background-color: #06467c;
+}
+
+.box-blue {
+  background-color: #02569d;
+}
+
+.box-green {
+  background-color: #2874A6;
+}
+
+.comments p {
+  font-weight: normal;
+  /* Non-bold text */
+  color: #02569d;
+  /* Text color for comments */
+}
+
+.comments .comment p:last-child {
+  font-style: italic;
+  /* Cursive for author and timestamp */
+  color: #02569d;
+  /* Text color for author and timestamp */
+}
+
+.comment {
+  margin-bottom: 20px;
+  /* Adds a 20px margin below each comment */
+
+  .info-text-field {
+    background-color: #F4F4F8;
+    /* Light grey background */
+    width: 100%;
+    /* Full width */
+    height: 400px;
+    /* Specified height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    /* Include padding in width calculation */
+  }
+
+  .info-text-container {
+    width: 50%;
+    /* Width of the text container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .info-text-title {
+    font-size: 30px;
+    color: black;
+    margin-bottom: 10px;
+  }
+
+  .info-text-undertitle {
+    font-size: 20px;
+    color: black;
+    margin-top: 10px;
+  }
+
+  @media only screen and (max-width: 1445px) {
+    .top-bar a button {
+      transition: width 0.3s ease;
+      border-radius: 30px;
+      padding: 7px;
+    }
+  }
+}
+
+#hamburger-button {
+  display: none;
+  /* Hidden by default */
+}
+
+@media only screen and (max-width: 1080px) {
+  body {
+    font-size: 14px;
+    /* Smaller font size */
+  }
+
+  #nav-links .user-info {
+    display: block;
+    /* Make it a block element */
+    width: 100%;
+    /* Full width */
+    text-align: center;
+    /* Center text horizontally */
+    margin: 10px 0;
+    /* Optional: adjust top and bottom margin as needed */
+  }
+
+  .top-bar {
+    flex-direction: column;
+    /* Stack items vertically */
+    height: auto;
+    /* Adjust height automatically */
+  }
+
+  .form-container {
+    width: 90%;
+    /* Full width with some margin */
+    padding: 20px;
+    /* Smaller padding */
+  }
+
+  .publish-button {
+    font-size: 18px;
+    /* Slightly smaller font size */
+    padding: 15px 0;
+    /* Adjust padding */
+  }
+
+
+  /* Hamburger Menu Button */
+  #hamburger-button {
+    display: none;
+    /* Hidden by default */
+    font-size: 30px;
+    /* Icon size */
+    color: white;
+    /* Icon color */
+    background: none;
+    /* No background */
+    border: none;
+    /* No border */
+    cursor: pointer;
+    /* Pointer cursor */
+  }
+
+  /* Navigation Overlay */
+  .nav-overlay {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed position */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    /* Semi-transparent black */
+    overflow-x: hidden;
+    /* Hide horizontal overflow */
+    transition: 0.5s;
+    /* Smooth transition for opening/closing */
+    z-index: 1002;
+    /* High z-index to ensure it's on top */
+  }
+
+  .nav-overlay-active {
+    display: block;
+  }
+
+  .nav-overlay-active .main-content {
+    pointer-events: none;
+  }
+
+  /* Mobile Devices */
+  @media only screen and (max-width: 1080px) {
+    #hamburger-button {
+      display: block;
+      /* Show the button on mobile */
+    }
+
+    .top-bar a .logo {
+      margin-left: auto;
+      /* Adjust logo position */
+      margin-right: auto;
+    }
+
+    #nav-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    #nav-links a {
+      padding: 20px;
+      /* Larger clickable area */
+      font-size: 24px;
+      /* Larger font size */
+    }
+  }
+
+  /* Mobile Devices */
+  @media only screen and (max-width: 1080px) {
+    .top-bar {
+      flex-direction: row;
+      /* Align items horizontally */
+      justify-content: space-between;
+      /* Space between items */
+      align-items: center;
+      /* Vertically center items */
+      padding: 10px 15px;
+      /* Consistent padding */
+    }
+
+    .top-bar a {
+      display: flex;
+      /* Flex container for the logo */
+      align-items: center;
+      /* Vertically center logo */
+      margin: 0;
+      /* Remove any default margin */
+    }
+
+    .top-bar a .logo {
+      max-width: 350px;
+      /* Adjust logo size */
+      max-height: 350px;
+      /* Adjust height automatically */
+    }
+
+    #hamburger-button {
+      display: block;
+      /* Show the button on mobile */
+      margin: 0;
+      /* Remove any margin */
+      align-self: center;
+      /* Explicitly center the button vertically */
+    }
+
+
+    #nav-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+
+      #nav-links a {
+        padding: 20px;
+        /* Padding for each link */
+        font-size: 24px;
+        /* Font size for links */
+      }
+    }
+
+    .centered-title .category-link {
+      text-decoration: none !important;
+      /* Remove underline and ensure override */
+      font-weight: bold !important;
+      /* Make it bold and ensure override */
+      color: inherit;
+      /* Inherits the parent's text color */
+    }
+
+    .centered-title .category-link:hover {
+      text-decoration: underline !important;
+      /* Add underline on hover and ensure override */
+    }
