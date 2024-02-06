@@ -115,7 +115,6 @@
         </div>
 
 
-	<button id="no-location-btn" class="button">Dieses Projekt benötigt keinen Ort</button>
     <!-- Map Container -->
     <div class="input-field">
         <label for="map">6. Wählen Sie den betreffenden Ort auf der Stadtkarte aus.</label>
@@ -286,23 +285,32 @@ function handleImageChange(event) {
 
             var img = new Image();
             img.onload = function() {
-                // Display original size only once
                 if (!originalSizeDisplayed) {
                     var originalSizeText = `Originalbildgröße: ${this.naturalWidth} x ${this.naturalHeight} Pixel, ${formatBytes(file.size)}`;
                     var originalSizeDiv = document.createElement('div');
                     originalSizeDiv.textContent = originalSizeText;
                     imageContainer.appendChild(originalSizeDiv);
-                    originalSizeDisplayed = true; // Set flag to true after displaying
+                    originalSizeDisplayed = true;
                 }
 
-                if (this.naturalWidth > 1920 || this.naturalHeight > 1440) {
+                // Adjust canvas size to maintain aspect ratio
+                var aspectRatio = this.naturalWidth / this.naturalHeight;
+                var targetWidth = 1920;
+                var targetHeight = 1440;
+                if (aspectRatio > targetWidth / targetHeight) {
+                    targetHeight = targetWidth / aspectRatio;
+                } else {
+                    targetWidth = targetHeight * aspectRatio;
+                }
+
+                if (this.naturalWidth > targetWidth || this.naturalHeight > targetHeight) {
                     var canvas = document.createElement('canvas');
-                    canvas.width = 1920;
-                    canvas.height = 1440;
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
                     var ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     canvas.toBlob(function(blob) {
-                        var compressedSizeText = `Komprimiert auf 1920x1440, ${formatBytes(blob.size)}`;
+                        var compressedSizeText = `Komprimiert auf ${canvas.width}x${canvas.height}, ${formatBytes(blob.size)}`;
                         var compressedSizeDiv = document.createElement('div');
                         compressedSizeDiv.textContent = compressedSizeText;
                         imageContainer.appendChild(compressedSizeDiv);
@@ -317,7 +325,8 @@ function handleImageChange(event) {
                     cropper = new Cropper(img, {
                         aspectRatio: 4 / 3,
                         viewMode: 1,
-                        zoomable: false
+                        zoomable: false,
+                        autoCropArea: 1 // Set crop area to cover entire image
                     });
                 }
             };
@@ -627,17 +636,36 @@ function updateInputCharCountFeedback(inputElement, feedbackElement, minLimit, m
     feedbackElement.style.color = '#003056';
 }
 
-// Initialize Quill editor for 'descriptionwhy'
-var descriptionEditor = new Quill('#description-editor', { theme: 'snow' });
+// Custom toolbar options with limited features
+var toolbarOptions = [
+    [{ 'header': '2' }],   // Heading settings (h1, h2)
+    ['bold', 'underline'],                    // Bold, underline
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }], // Number points, bullet points
+    ['clean']                                 // Style removal
+];
+
+// Initialize Quill editor for 'descriptionwhy' with limited toolbar
+var descriptionEditor = new Quill('#description-editor', {
+    theme: 'snow',
+    modules: {
+        toolbar: toolbarOptions
+    }
+});
 var descriptionFeedback = document.createElement('div');
 descriptionFeedback.id = 'descriptionFeedback';
 document.getElementById('description-editor').parentNode.insertBefore(descriptionFeedback, document.getElementById('description-editor').nextSibling);
 
-// Initialize Quill editor for 'public_benefit'
-var benefitEditor = new Quill('#benefit-editor', { theme: 'snow' });
+// Initialize Quill editor for 'public_benefit' with limited toolbar
+var benefitEditor = new Quill('#benefit-editor', {
+    theme: 'snow',
+    modules: {
+        toolbar: toolbarOptions
+    }
+});
 var benefitFeedback = document.createElement('div');
 benefitFeedback.id = 'benefitFeedback';
 document.getElementById('benefit-editor').parentNode.insertBefore(benefitFeedback, document.getElementById('benefit-editor').nextSibling);
+
 
 // Call updateQuillCharCountFeedback immediately for both editors
 updateQuillCharCountFeedback(descriptionEditor, descriptionFeedback, 20, 5000);
@@ -797,30 +825,28 @@ document.getElementById('info-link').addEventListener('click', function(e) {
 
 function openVideoOverlay() {
     var iframe = document.getElementById('youtube-iframe');
-var videoSrc = 'https://www.youtube.com/embed/NVxULSdV05E?autoplay=1&mute=1&enablejsapi=1';
+    var videoSrc;
+
+    // Check screen width and set the video source accordingly
+    if (window.innerWidth > 1080) {
+        // Desktop video
+        videoSrc = 'https://www.youtube.com/embed/NVxULSdV05E?autoplay=1&mute=1&enablejsapi=1';
+    } else {
+        // Mobile video
+        videoSrc = 'https://www.youtube.com/embed/xJl7DoTu410?autoplay=1&mute=1&enablejsapi=1';
+    }
+
     iframe.src = videoSrc;
     document.getElementById('video-overlay').style.display = 'flex';
     console.log('Video overlay opened');
 }
 
 function closeVideoOverlay() {
-    if (player && player.pauseVideo) {
-        player.pauseVideo();
-    }
+    var iframe = document.getElementById('youtube-iframe');
+    iframe.src = ''; // Clear the iframe src
     document.getElementById('video-overlay').style.display = 'none';
     console.log('Video overlay closed');
 }
-
-
-
-// Add an event listener to the video-overlay
-document.getElementById('video-overlay').addEventListener('click', function(event) {
-    // Check if the clicked element is not the video itself
-    if (!event.target.closest('#youtube-iframe, #replay-image')) {
-        closeVideoOverlay();
-        console.log('Clicked outside the video, overlay closed');
-    }
-});
 
 // Prevent closing when clicking on the video (event propagation)
 document.getElementById('youtube-iframe').addEventListener('click', function(event) {

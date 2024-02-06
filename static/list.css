@@ -576,12 +576,11 @@
      /* Adjust the font size for labels */
    }
 
-   .filter-item {
-     display: flex;
-     align-items: center;
-     margin-right: 20px;
-     /* Spacing between filter items */
-   }
+.filter-item {
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
 
    .filter-item label {
      color: white;
@@ -1102,19 +1101,17 @@
 
        /* Specific styles for filter form in overlay */
        #filter-form-mobile {
-         display: flex;
-
-         flex-direction: column;
-         align-items: stretch;
-         /* Stretch items to fill the width */
-         justify-content: center;
-         padding: 20px;
-         width: 90%;
-         max-width: 400px;
-         margin: auto;
-         border-radius: 30px;
-         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-       }
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center items horizontally */
+        justify-content: center;
+        padding: 20px;
+        width: 100%; /* Use full width */
+        max-width: 400px; /* Limit the maximum width */
+        margin: auto; /* Center the form */
+        border-radius: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
 
 

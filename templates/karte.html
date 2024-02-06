@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     </script>
+	  <script src="static/spamFilter.js"></script>
+
     <!-- Leaflet Draw CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" rel="stylesheet" />
     <!-- Leaflet Draw JavaScript -->
@@ -36,6 +38,91 @@
     </style>
   </head>
   <style>
+  
+#marker-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+}
+
+#overlay-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 30px;
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  #overlay-content {
+    position: absolute;
+    top: calc(9vh + 9px); /* Estimate based on viewport height and gap */
+    left: 15px;
+    right: 15px;
+    bottom: 15px; /* Distance from the bottom of the viewport */
+    width: auto; /* Allow width to adjust to left and right margins */
+    min-width: calc(100% - 30px); /* Ensure it takes at least the width minus margins */
+    height: auto; /* Adjust height automatically */
+    padding: 20px;
+    box-sizing: border-box; /* Include padding in width/height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center content */
+    align-items: center; /* Horizontally center content */
+    background: white;
+    border-radius: 30px;
+    margin-top: 7.5px !important;
+    z-index: 1500 !important;
+    overflow: auto; /* Enables scrolling if content is larger than the overlay */
+    transform: none;
+  }
+  
+  #markers-list-overlay {
+    position: absolute; /* Changed from fixed to absolute */
+    top: calc(9vh + 9px); /* Estimate based on viewport height and gap */
+    left: 15px;
+    right: 15px;
+	  word-wrap: break-word; /* Break long words to prevent horizontal overflow */
+    bottom: 15px; /* 15px away from the bottom */
+    width: auto; /* Allow width to adjust to left and right margins */
+    min-width: calc(100% - 30px); /* Ensure it takes at least the width minus margins */
+    height: auto; /* Adjust height automatically */
+    padding: 20px;
+    box-sizing: border-box; /* Include padding in width/height */
+    display: none;
+    flex-direction: column;
+    justify-content: center; /* Vertically center content */
+    align-items: center; /* Horizontally center content */
+    background: white;
+    border-radius: 30px;
+    margin-top: 7.5px !important;
+    z-index: 1500 !important;
+    overflow: auto; /* Enables scrolling if content is larger than the overlay */
+  }
+  
+   .leaflet-control-layers-toggle {
+	  display: none !important;
+	  }
+}
+
+
+
+
     .p-mobile-confirm {
       font-size: 18px;
       font-weight: bold;
@@ -231,42 +318,36 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
+	
+	.marker-item {
+  /* Assuming this class is for individual marker items in the list */
+  border-bottom: 1px solid #cccccc; /* Thin gray line */
+  padding-bottom: 10px; /* Space below the text and above the line */
+  margin-bottom: 10px; /* Space between items in the list */
+}
+
+
+
+	
+	#markers-list {
+  /* Styles for the list containing the markers */
+  list-style-type: none; /* Remove default list styling */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+}
+
 
     /* Adjust the #markers-list-overlay */
     #markers-list-overlay {
       overflow: auto;
+	    word-wrap: break-word; /* Break long words to prevent horizontal overflow */
+
       /* Allow scrolling inside the overlay */
       padding-bottom: 20px;
       /* Add some padding at the bottom for better spacing */
     }
 
     /* Ensure the #markers-list has enough space and doesn't overflow */
-    #markers-list {
-      max-height: calc(100% - 60px);
-      /* Set maximum height, subtracting the height of other elements */
-      overflow-y: auto;
-      /* Enable vertical scrolling */
-      margin: 0;
-      /* Reset default margins */
-      padding: 0 10px;
-      /* Add horizontal padding for better readability */
-    }
-
-    /* Additional styling for list items to ensure proper spacing */
-    #markers-list li {
-      margin-bottom: 10px;
-      /* Add some space between list items */
-      list-style: none;
-      /* Remove default list styling */
-    }
-
-    /* Adjust the #markers-list for smaller devices */
-    @media (max-width: 768px) {
-      #markers-list {
-        max-height: calc(100% - 40px);
-        /* Adjust maximum height for smaller screens */
-      }
-    }
 
     .filterx-container {
       display: none !important;
@@ -400,6 +481,8 @@
         overflow-y: auto;
         /* Enables vertical scrolling */
       }
+	  
+	 
 
       /* CSS for sidebar visibility toggle */
       #map.sidebar-visible {
@@ -490,6 +573,8 @@
       background-color: transparent;
       /* Invisible scrollbar thumb globally */
     }
+	
+	
 
     .user-info {
       color: white;
@@ -506,6 +591,7 @@
 
     /* Hide scrollbar for IE, Edge, and Firefox */
     body {
+	word-wrap: break-word; /* Break long words to prevent horizontal overflow */
       -ms-overflow-style: none;
       /* IE and Edge */
       scrollbar-width: none;
@@ -799,6 +885,7 @@
     }
 
     .leaflet-popup-content {
+	word-wrap: break-word; /* Break long words to prevent horizontal overflow */
       color: #000000 !important;
     }
 
@@ -819,6 +906,7 @@
 
     @media (max-width: 1080px) {
       .leaflet-popup-content {
+	  	word-wrap: break-word; /* Break long words to prevent horizontal overflow */
         width: 200px;
         /* Adjust the width as needed for smaller screens */
       }
@@ -1061,38 +1149,7 @@
     }
 
     /* SMALL OPTIONS MENU BUTTON CSS END */
-    @media (max-width: 768px) {
-      .markers-sidebar {
-        position: fixed;
-        /* Overlay the entire screen */
-        top: 50%;
-        /* Adjust vertical position to better fit the screen */
-        left: 50%;
-        /* Center horizontally */
-        transform: translate(-50%, -50%);
-        /* Adjust for the centering */
-        width: 80%;
-        /* Set a relative width for mobile devices */
-        max-width: 400px;
-        /* Maximum width */
-        max-height: 80vh;
-        /* Adjusted maximum height relative to the viewport height */
-        height: auto;
-        /* Auto height based on content, but not exceeding the viewport */
-        overflow-y: auto;
-        /* Enable vertical scrolling if content exceeds height */
-        background: white;
-        border-radius: 30px;
-        z-index: 1001;
-        padding: 20px;
-        border: 1px solid #ccc;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-        /* Optional: Add some shadow for visibility */
-        display: none;
-        /* Keep it hidden initially */
-      }
-    }
-
+   
     /* BUTTON MAIN UNIVERSAL CSS START */
     .button-u {
       font-weight: bold;
@@ -1409,6 +1466,7 @@
     .no-cursor .leaflet-container * {
       cursor: none !important;
     }
+	
 
     /* Hide the Leaflet draw tooltip */
     .leaflet-draw-tooltip {
@@ -2514,6 +2572,16 @@
     #benefit-editor {
       margin-bottom: 0px !important;
     }
+	
+	/* Media Query for Desktop Sizes Between 768px and 1445px */
+@media (min-width: 768px) and (max-width: 1445px) {
+  .markers-sidebar {
+    width: 35%;
+    /* Adjusted width to 35% */
+  }
+}
+
+
 
     @media only screen and (max-width: 1445px) {
       .top-bar a button {
@@ -2605,7 +2673,7 @@
     @media only screen and (max-width: 1080px) {
       label {
         display: block;
-        font-size: 12px;
+        font-size: 16px;
         color: #333;
       }
 
@@ -2700,6 +2768,8 @@
           /* Font size for links */
         }
       }
+	  
+	  
 
       @media only screen and (max-width: 768px) {
         .info-box-container {
@@ -2861,7 +2931,7 @@
         <div id="category-filter"></div>
         <div id="sort-filter"></div>
         <div id="full-project-filter"></div>
-        <ul id="markers-list">
+        <ul id="markers-list" style="margin-bottom:20px;">
           <!-- Marker items will be added here dynamically -->
         </ul>
         <button id="show-more-markers" onclick="loadMoreMarkers()" style="display: none;">Mehr anzeigen</button>
@@ -2869,20 +2939,20 @@
       <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-f" style="margin-top: 10px !important;">Schließen</button>
     </div>
     <!-- Marker Placing Overlay -->
-    <div id="marker-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0, 0, 0, 0.2); z-index:10000;">
-      <div id="overlay-content" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:30px; width: 80%; max-width: 500px; text-align: center;">
+    <div id="marker-overlay">
+      <div id="overlay-content">
         <div class="title-button-container">
-          <h2 class="title-imagebutton">Notiz hinzufügen</h2>
+          <h2 class="title-imagebutton" style="font-size: 21px;">Notiz hinzufügen</h2>
           <a href="#" id="info-link">
             <img src="{{ url_for('static', filename='infobutton.png') }}" alt="Info" class="info-image">
           </a>
         </div>
-        <p style="font-size: 14px;">
+        <h3 style="font-size: 16px;">
           <a href="/neuerbeitrag" style="color: #003056; text-decoration: underline;">Hier klicken, um Projektvorschläge zu posten.</a>
-        </p>
+        </h3>
         <!-- Wrapper div for the select and the textarea -->
         <div style="width: 100%; box-sizing: border-box; text-align: center;">
-          <p>1. Kategorie auswählen:</p>
+          <h2 style="font-size: 21px;">1. Kategorie auswählen:</h2>
           <select id="marker-category" onchange="updateMarkerCategoryDescription()" style="width: 100%; box-sizing: border-box; text-align: center; border: 1px solid black;">
             <option value="Transport">Transport</option>
             <option value="Öffentliche Plätze">Öffentliche Plätze</option>
@@ -2896,14 +2966,14 @@
           </select>
           <br>
           <br>
-          <p>Die ausgewählte Kategorie betrifft Themen wie:</p>
-          <p id="marker-category-description" style="color:#003056;"></p>
+          <h2 style="font-size: 21px;">Die ausgewählte Kategorie betrifft Themen wie:</h2>
+          <h3 id="marker-category-description" style="color:#003056; font-size: 16px;"></h3>
           <!-- Description will appear here -->
-          <p>2. Beschreiben Sie die Umstände:</p>
+          <h2>2. Beschreiben Sie die Umstände:</h2>
           <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Was beschäftigt Sie?"></textarea>
         </div>
         <br>
-        <p id="limit-info">limit info here</p>
+        <h3 style="font-size: 16px" id="limit-info">limit info here</h3>
         <div class="button-container">
           <button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>
         </div>
@@ -2945,7 +3015,26 @@
           <!-- Buttons will be added here dynamically -->
         </div>
       </div> <?php CATEGORIES PULL END ?>
-    </div> <?php SIDEBAR BODY END ?> <script type="text/javascript">
+    </div> <?php SIDEBAR BODY END ?>
+	
+<script type="text/javascript">
+	
+	var swearWords = {
+  "de": [],
+  "en": []
+};
+
+// Function to load swear words from filter.json
+function loadSwearWords() {
+  fetch('/static/filter.json').then(response => response.json()).then(data => {
+    swearWords = data;
+  }).catch(error => console.error('Error loading swear words:', error));
+}
+
+// Call this function when the page loads
+loadSwearWords();
+
+
 	  var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
       // Initialize the map
       var map = L.map('map').setView([48.4102, 15.6022], 15);
@@ -3319,11 +3408,16 @@
       function postMarker() {
         // Get the textarea and its value
         var markerDescriptionTextarea = document.getElementById('marker-description');
-        var description = markerDescriptionTextarea.value;
-        if (containsSwearWords(description, 'de')) {
-          alert("Bitte entfernen Sie unangebrachte Ausdrücke aus Ihrer Beschreibung.");
-          return; // Stop the function here if swear words are found
-        }
+  var description = markerDescriptionTextarea.value;
+
+  if (containsSwearWords(description, 'de') || containsSwearWords(description, 'en')) {
+    alert("Bitte entfernen Sie unangebrachte Ausdrücke aus Ihrer Beschreibung.");
+    return; // Stop the function here if swear words are found
+  }
+  if (isSpam(description)) {
+    alert("Ihr Text scheint Spam zu enthalten. Bitte überprüfen Sie ihn und versuchen Sie es erneut.");
+    return;
+  }
         // Check if the description meets the minimum character requirement
         if (description.length < 15) {
           alert("Bitte geben Sie mindestens 15 Zeichen ein.");
@@ -3940,39 +4034,79 @@
       }
       var markersListOverlay = document.getElementById('markers-list-overlay');
 
-      function centerMapOnMarker(markerId) {
-        var marker = markersById[markerId];
-        if (marker) {
-          var mapBounds = map.getBounds();
-          var markerLatLng = marker.getLatLng();
-          // Calculate the visible center of the map
-          var sidebar = document.getElementById('markers-list-overlay');
-          var isSidebarVisible = sidebar && sidebar.style.display !== 'none';
-          var sidebarWidth = isSidebarVisible ? sidebar.offsetWidth : 0;
-          var southWest = mapBounds.getSouthWest();
-          var northEast = mapBounds.getNorthEast();
-          var lngSpan = northEast.lng - southWest.lng;
-          // Adjust the longitude of the center based on the sidebar width
-          var centerLng = isSidebarVisible ? markerLatLng.lng - (lngSpan * sidebarWidth / map.getSize().x) / 2 : markerLatLng.lng;
-          var newCenter = new L.LatLng(markerLatLng.lat, centerLng);
-          // Set the map view to the new position
-          map.setView(newCenter, map.getZoom());
-          // Open the popup after a short delay to allow the map to finish moving
-          setTimeout(function() {
-            marker.openPopup();
-          }, 300); // 300 milliseconds delay
-          console.log("Marker with ID", markerId, "centered on map");
-          // Close the markers list overlay on mobile and tablet, and update button text
-          if (window.innerWidth <= 1080) { // Adjust 1024 to include tablets
-            sidebar.style.display = 'none';
-            var showMarkersBtn = document.getElementById('show-markers-btn');
-            showMarkersBtn.innerText = 'Liste anzeigen';
-            console.log("Markers list overlay closed and button text updated");
-          }
-        } else {
-          console.error("Marker with ID", markerId, "not found");
-        }
-      }
+
+
+function containsSwearWords(text, language) {
+  var words = swearWords[language] || [];
+  var textWords = text.toLowerCase().split(/\s+/);
+  return textWords.some(word => words.includes(word));
+}
+
+
+
+
+
+function centerMapOnMarker(markerId) {
+  var marker = markersById[markerId];
+  if (marker) {
+    var markerLatLng = marker.getLatLng();
+    var popup = marker.getPopup();
+
+    // Temporarily open the popup offscreen to measure its size if it's not already open
+    var wasPopupOpen = map.hasLayer(popup);
+    if (!wasPopupOpen) {
+      popup.setLatLng(new L.LatLng(-90, -180)); // Offscreen position
+      popup.openOn(map);
+    }
+
+    // Measure the popup size or use default values
+    var popupWidth = popup.getElement() ? popup.getElement().clientWidth : 300; // Default width
+    var popupHeight = popup.getElement() ? popup.getElement().clientHeight : 200; // Default height
+
+    // Close the popup if it was not originally open
+    if (!wasPopupOpen) {
+      map.closePopup(popup);
+    }
+
+    var xOffset = 0;
+    var yOffset = 0;
+    // Adjust offsets for mobile screens
+    if (window.innerWidth <= 1080) {
+      xOffset = 0; // Adjust xOffset as needed based on mobile layout
+      yOffset = popupHeight / 4 + 20; // Adjust yOffset as needed to center on mobile, and additional 20 pixels to move it below
+    } else {
+      yOffset = 20; // For non-mobile, move the marker 20px below the center
+    }
+
+    // Calculate the new center of the map
+    var point = map.project(markerLatLng, map.getZoom()).subtract([xOffset, yOffset]);
+    var newCenter = map.unproject(point, map.getZoom());
+
+    // Set the map view to the new position
+    map.setView(newCenter, map.getZoom());
+
+    // Open the popup after a short delay to allow the map to finish moving
+    setTimeout(function() {
+      marker.openPopup();
+    }, 300); // 300 milliseconds delay
+    console.log("Marker with ID", markerId, "centered on map");
+
+    // Close the markers list overlay on mobile and tablet, and update button text
+    if (window.innerWidth <= 1080) {
+      var sidebar = document.getElementById('markers-list-overlay');
+      sidebar.style.display = 'none';
+      var showMarkersBtn = document.getElementById('show-markers-btn');
+      showMarkersBtn.innerText = 'Liste anzeigen';
+      console.log("Markers list overlay closed and button text updated");
+    }
+  } else {
+    console.error("Marker with ID", markerId, "not found");
+  }
+}
+
+
+
+
 
       function createCategoryButtons() {
         var container = document.getElementById('category-toggle-buttons');
@@ -4130,7 +4264,7 @@
           } else {
             console.log(`LIMIT CHECK: ${data.current_count}/${data.max_limit} markers posted.`);
             const markersRemaining = data.max_limit - data.current_count;
-            limitInfoElement.textContent = `Sie können ${markersRemaining} Markierungen/Tag posten. Sie haben schon ${data.current_count} gepostet.`;
+            limitInfoElement.textContent = `Sie haben heute schon ${data.current_count} / 10 Markierungen gepostet.`;
           }
         }).catch(error => {
           console.error('Error checking marker limit:', error);
@@ -4138,11 +4272,6 @@
           limitInfoElement.textContent = "Fehler beim Abrufen der Marker-Limit-Informationen.";
         });
       }
-      // Call checkMarkerLimit on page load
-      document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM fully loaded and parsed. Initiating marker limit check...");
-        checkMarkerLimit();
-      });
       // Call checkMarkerLimit on page load
       document.addEventListener('DOMContentLoaded', function() {
         console.log("DOM fully loaded and parsed. Initiating marker limit check...");
@@ -4237,31 +4366,58 @@
         }
       };
     </script>
+	
+	
+	
+	<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var submitButton = document.getElementById('add-marker-button'); // Assuming this is your submit button's ID
+    submitButton.addEventListener('click', validateMarkerDescription);
+  });
+
+  function validateMarkerDescription(event) {
+    var description = document.getElementById('marker-description').value;
+
+    // Check for spammy content
+    if (isSpam(description)) {
+      event.preventDefault(); // Prevent form submission
+      return false;
+    }
+
+    // Add more validation checks as needed
+  }
+
+
+</script>
+
+
+
     <script>
       document.getElementById('info-link').addEventListener('click', function(e) {
         e.preventDefault();
-        openVideoOverlay('youtube-iframe', 'video-overlay', 'aV6s-reibEc');
-      });
-      document.getElementById('info-link2').addEventListener('click', function(e) {
+        openVideoOverlay('youtube-iframe', 'video-overlay', 'aV6s-reibEc', 'xJl7DoTu410');
+    });
+    document.getElementById('info-link2').addEventListener('click', function(e) {
         e.preventDefault();
-        openVideoOverlay('youtube-iframe-2', 'video-overlay-2', 'aoqu_9iibPo');
-      });
+        openVideoOverlay('youtube-iframe-2', 'video-overlay-2', 'aoqu_9iibPo', 'G87UXIH8Lzo');
+    });
 
-      function openVideoOverlay(iframeId, overlayId, videoId) {
+    function openVideoOverlay(iframeId, overlayId, desktopVideoId, mobileVideoId) {
         var iframe = document.getElementById(iframeId);
+        var videoId = window.innerWidth > 1080 ? desktopVideoId : mobileVideoId; // Choose video based on screen width
         iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&enablejsapi=1';
         document.getElementById(overlayId).style.display = 'flex';
         console.log('Video overlay opened for ' + iframeId);
-      }
+    }
 
-      function closeVideoOverlay(iframeId, overlayId) {
+    function closeVideoOverlay(iframeId, overlayId) {
         var iframe = document.getElementById(iframeId);
         if (iframe.src) {
-          iframe.src = '';
+            iframe.src = '';
         }
         document.getElementById(overlayId).style.display = 'none';
         console.log('Video overlay closed for ' + iframeId);
-      }
+    }
       // Initialize YouTube API
       var tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";

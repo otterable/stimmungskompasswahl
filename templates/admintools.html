@@ -67,7 +67,7 @@
         <a href="#" id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</a>
       </div>
     </div>
-    <button id="hamburger-button-filter">&#9776; Filtern</button>
+    <button id="hamburger-button-filter">&#9776; Menu</button>
     <div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
       <div class="stats-container">
         <div class="stat-box" style="background-color: #fff3c3 !important">
@@ -1149,7 +1149,7 @@
       const togglePercentageBtn = document.getElementById('togglePercentage');
       togglePercentageBtn.addEventListener('click', () => {
         showPercentage = !showPercentage;
-        console.log(`Toggle Percentage: Now showing ${showPercentage ? 'percentages' : 'numbers'}`);
+        console.log(`Toggle PercentAlter: Now showing ${showPercentage ? 'percentages' : 'numbers'}`);
         togglePercentageBtn.textContent = showPercentage ? 'Show Numbers' : 'Show Percentages';
         fetchChartData(true); // Update only project category chart
       });

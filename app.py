@@ -4,7 +4,6 @@ from flask import (
     url_for,
     request,
     redirect,
-    flash,
     session,
     jsonify,
     Response,
@@ -1083,7 +1082,6 @@ def zip_user_submissions():
 def delete_all_projects():
     # Check if the user is the admin
     if current_user.id != 1:
-        flash("Access Denied: You are not authorized to perform this action.", "danger")
         return redirect(url_for("index"))
 
     try:
@@ -1096,16 +1094,10 @@ def delete_all_projects():
 
         # Commit the changes to the database
         db.session.commit()
-        flash(
-            "All projects and associated comments have been successfully deleted.",
-            "success",
-        )
+
     except Exception as e:
         db.session.rollback()  # Rollback in case of error
-        flash(
-            f"An error occurred while deleting all projects and comments: {e}", "danger"
-        )
-
+      
     return redirect(url_for("admintools"))
 
 
@@ -1634,7 +1626,7 @@ def submit_project():
 @app.route("/list")
 @app.route("/list/pages/<int:page>")
 def list_view(page=1):
-    per_page = 9  # Number of projects per page
+    per_page = 50  # Number of projects per page
     query = Project.query.filter(Project.is_mapobject != True)
 
     category = request.args.get("category")
@@ -1805,6 +1797,9 @@ def project_details(project_id):
             db.session.commit()
             return redirect(url_for("project_details", project_id=project_id))
 
+
+        
+
         votes = Vote.query.filter_by(project_id=project_id).all()
         upvote_count = sum(vote.upvote for vote in votes)
         downvote_count = sum(vote.downvote for vote in votes)
@@ -1825,23 +1820,19 @@ def project_details(project_id):
             .first()
         )
 
+        prev_project_id = prev_project.id if prev_project else None
+        next_project_id = next_project.id if next_project else None
+
         if prev_project:
-            print(
-                f"Previous project_details page with is_mapobject=false found, it is page number {prev_project.id}"
-            )
+            print(f"Previous project_details page with is_mapobject=false found, it is page number {prev_project.id}")
         else:
-            print(
-                "Previous project_details page with is_mapobject=false does not exist, hiding the arrowleft."
-            )
+            print("Previous project_details page with is_mapobject=false does not exist, hiding the arrowleft.")
 
         if next_project:
-            print(
-                f"Next project_details page with is_mapobject=false found, it is page number {next_project.id}"
-            )
+            print(f"Next project_details page with is_mapobject=false found, it is page number {next_project.id}")
         else:
-            print(
-                "Next project_details page with is_mapobject=false does not exist, hiding the arrowright."
-            )
+            print("Next project_details page with is_mapobject=false does not exist, hiding the arrowright.")
+
 
         project_author = User.query.get(project.author)
         author_name = project_author.name if project_author else "Unknown"
@@ -1861,8 +1852,8 @@ def project_details(project_id):
         return render_template(
             "project_details.html",
             project=project,
-            prev_project_id=prev_project.id if prev_project else None,
-            next_project_id=next_project.id if next_project else None,
+            prev_project_id=prev_project_id,
+            next_project_id=next_project_id,
             upvote_percentage=upvote_percentage,
             downvote_percentage=downvote_percentage,
             upvote_count=upvote_count,
@@ -2709,7 +2700,7 @@ def bookmarked():
     "/profil/projects/<int:project_page>/map_objects/<int:map_object_page>/comments/<int:comment_page>"
 )
 def profil(project_page=1, map_object_page=1, comment_page=1):
-    per_page = 9  # Number of items per page
+    per_page = 50  # Number of items per page
     user_statistics = {}
     paginated_projects = []
     paginated_map_objects = []

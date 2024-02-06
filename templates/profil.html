@@ -46,7 +46,7 @@
         <a href="#" id="toggleUsersOverlay" class="c-button" data-section-id="usersSection">Meine Konto</a>
     </div>
 	</div>
-	    <button id="hamburger-button-filter">&#9776; Filtern</button>
+	    <button id="hamburger-button-filter">&#9776; Menu</button>
 
     <div class="my-projects centered-text"> {% if current_user.is_authenticated %} <div id="projectProposalsSection" style="display: none;">
         <div class="info-text-field3-c">
@@ -81,20 +81,20 @@
         <div class="info-text-field2">
           <div class="centered-text">
             <div class="stats-container">
-              <div class="stat-box"> {% if current_user.is_authenticated %} <p>Ihr Benutzername ist: <span style="color: #003056;">Benutzer: {{ current_user.name }}</span>
-                </p> {% if not current_user.is_googleaccount %} <p>Die verknüpfte Handynummer lautet: <span style="color: #003056;">{{ current_user.phone_number }}</span>. </p>
-                <p>Hier klicken, um das Passwort zurückzusetzen: <a href="{{ url_for('password_recovery') }}" style="color: #003056;">Passwort zurücksetzen</a>. </p> {% else %} <p>Das verknüpfte Google-Konto ist: <span style="color: #003056;">{{ current_user.phone_number }}</span>. </p> {% endif %} <p>Das Konto wurde erstellt am: <span style="color: #003056;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>. </p> {% endif %}
+              <div class="stat-box"> {% if current_user.is_authenticated %} <p>Ihr Benutzername ist: <span style="color: #003056; font-weight: bold;">{{ current_user.name }}</span>
+                </p> {% if not current_user.is_googleaccount %} <p>Die verknüpfte Handynummer lautet: <span style="color: #003056;font-weight: bold;">{{ current_user.phone_number }}</span>. </p>
+                <p>Hier klicken, um das Passwort zurückzusetzen: <a href="{{ url_for('password_recovery') }}" style="color: #003056; font-weight: bold;">Reset</a>. </p> {% else %} <p>Das verknüpfte Google-Konto ist: <span style="color: #003056; font-weight: bold;">{{ current_user.phone_number }}</span>. </p> {% endif %} <p>Das Konto wurde erstellt am: <span style="color: #003056; font-weight: bold;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>. </p> {% endif %}
               </div> {% else %} <div class="login-prompt centered-text">
                 <p>Sie müssen angemeldet sein, um die Details zu sehen.</p>
               </div> {% endif %}
               <!-- My Account Section --> {% if is_authenticated %} <div class="stat-box">
                 <!-- Download My Data Section -->
-                <p>Meine Daten herunterladen:</p>
+                <strong><p>Meine Daten herunterladen:</p>
                 <a href="{{ url_for('download_my_data') }}" class="register-button" style="font-weight: bold; display: inline-block; width: auto; padding: 5px 10px;">Daten herunterladen</a>
                 <a href="{{ url_for('download_data') }}" class="register-button" style="display:none">Website herunterladen</a>
                 <a href="{{ url_for('download_images') }}" class="publish-button" style="display:none">Bilder herunterladen</a>
                 <p>Möchten Sie Ihr Konto und Ihre gesamten Aktivitäten inklusive Ihrer Notizen und Projektvorschläge von der Website löschen? </p>
-                <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold; display: inline-block; width: auto; padding: 5px 10px;" id="delete-data-btn">Meine gesamten Daten löschen</a>
+                <a href="{{ url_for('delete_my_data') }}" class="register-button" style="font-weight: bold; display: inline-block; width: auto; padding: 5px 10px;" id="delete-data-btn">Meine gesamten Daten löschen</a></strong>
               </div>
             </div> {% endif %}
           </div>

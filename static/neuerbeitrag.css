@@ -21,6 +21,38 @@ body {
   /* Removes rounded corners */
 }
 
+input[type="file"] {
+    padding: 5px;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-left: 0 !important; /* Remove left margin */
+}
+
+/* For Webkit browsers like Chrome and Safari */
+input[type="file"]::-webkit-file-upload-button {
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 30px;
+    cursor: pointer;
+    background-color: #003056; /* Set background color */
+    color: white; /* Set text color to white for better visibility */
+    font-size: 14px;
+    font-weight: bold; /* Make text bold */
+    margin-left: -1px; /* Adjust for any inherent margin/padding */
+}
+
+/* For Firefox */
+input[type="file"]::file-selector-button {
+    padding: 5px;
+    border: 1px solid black;
+    border-radius: 30px;
+    cursor: pointer;
+    background-color: #003056; /* Set background color */
+    color: white; /* Set text color to white for better visibility */
+    font-size: 14px;
+    font-weight: bold; /* Make text bold */
+    margin-left: -1px; /* Adjust for any inherent margin/padding */
+}
 
 /* LEAFLET MAP ICONS CSS */
 .leaflet-control-zoom-in,
@@ -751,7 +783,7 @@ input[type="file"] {
   }
 
   body {
-    font-size: 14px;
+    font-size: 17px;
     /* Smaller font size */
   }
 
@@ -885,6 +917,54 @@ input[type="file"] {
       /* Larger font size */
     }
   }
+
+
+@media only screen and (max-width: 1080px) {
+  p {
+    font-size: 18px; /* Increased font size for mobile */
+  }
+
+  .top-bar a {
+    font-size: 20px; /* Larger font size for top bar links */
+  }
+
+  .form-container label,
+  .form-container input[type="text"],
+  .form-container select,
+  .form-container textarea {
+    font-size: 20px; /* Larger font size for form elements */
+	font-weight: bold;
+  }
+  
+  
+
+  .button,
+  .publish-button {
+    font-size: 20px; /* Larger font size for buttons */
+  }
+
+  #nav-links a {
+    font-size: 22px; /* Larger font size for navigation links */
+  }
+
+  .info-box-title,
+  .info-box-undertitle {
+    font-size: 32px; /* Larger font size for info box titles */
+    font-size: 18px; /* Larger font size for info box undertitles */
+  }
+
+  .cover-text-container h1,
+  .cover-text-container p {
+    font-size: 50px; /* Larger font size for cover text */
+    font-size: 32px; /* Larger font size for cover text paragraphs */
+  }
+
+  .info-text-title,
+  .info-text-undertitle {
+    font-size: 32px; /* Larger font size for info text titles */
+    font-size: 22px; /* Larger font size for info text undertitles */
+  }
+}
 
   /* Mobile Devices */
   @media only screen and (max-width: 1080px) {
