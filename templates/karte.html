@@ -2882,7 +2882,7 @@
   <body>
     <!-- Video Overlay -->
     <div id="video-overlay" class="video-overlay" style="display:none;">
-      <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/aV6s-reibEc" frameborder="0" allowfullscreen></iframe>
+      <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/9-bWivUusZ4" frameborder="0" allowfullscreen></iframe>
       <div id="replay-container" style="display: none;"></div>
       <!-- Container for replay image -->
       <button onclick="closeVideoOverlay()">Schließen</button>
@@ -4395,11 +4395,11 @@ function centerMapOnMarker(markerId) {
     <script>
       document.getElementById('info-link').addEventListener('click', function(e) {
         e.preventDefault();
-        openVideoOverlay('youtube-iframe', 'video-overlay', 'aV6s-reibEc', 'xJl7DoTu410');
+        openVideoOverlay('youtube-iframe', 'video-overlay', 'aXB8KE_gpm8', 'V7EjnHuLZjI');
     });
     document.getElementById('info-link2').addEventListener('click', function(e) {
         e.preventDefault();
-        openVideoOverlay('youtube-iframe-2', 'video-overlay-2', 'aoqu_9iibPo', 'G87UXIH8Lzo');
+        openVideoOverlay('youtube-iframe-2', 'video-overlay-2', '9-bWivUusZ4', '9xEXWG8TybY');
     });
 
     function openVideoOverlay(iframeId, overlayId, desktopVideoId, mobileVideoId) {
@@ -4427,13 +4427,13 @@ function centerMapOnMarker(markerId) {
 
       function onYouTubeIframeAPIReady() {
         player = new YT.Player('youtube-iframe', {
-          videoId: 'aV6s-reibEc',
+          videoId: 'aXB8KE_gpm8',
           events: {
             'onStateChange': onPlayerStateChange
           }
         });
         player2 = new YT.Player('youtube-iframe-2', {
-          videoId: 'aoqu_9iibPo',
+          videoId: '9-bWivUusZ4',
           events: {
             'onStateChange': onPlayerStateChange2
           }

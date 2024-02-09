@@ -11,6 +11,7 @@ from flask import (
     send_file,
     send_from_directory,
     make_response,
+    flash
 )
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, desc, asc, and_, cast, Date
@@ -1115,11 +1116,11 @@ def download_images():
             # Return the script as an HTML response
             return Response(download_script, mimetype="text/html")
         else:
-            # flash('No images available to download.', 'info')
+            flash('No images available to download.', 'info')
             return redirect(url_for("profil"))
     except Exception as e:
         logging.error("Error in downloading images: %s", e)
-        # flash('Error in downloading images.', 'danger')
+        flash('Error in downloading images.', 'danger')
         return redirect(url_for("profil"))
 
 
@@ -1238,7 +1239,7 @@ def register():
         # Check for existing user with the same Ihre Handynummer
         existing_user = User.query.filter_by(phone_number=phone_number).first()
         if existing_user:
-            # flash('An account with this Ihre Handynummer already exists.', 'danger')
+            flash('An account with this Ihre Handynummer already exists.', 'danger')
             logging.debug(
                 "Account registration failed: Ihre Handynummer already exists"
             )
@@ -1541,12 +1542,12 @@ def reset_password():
                 logging.debug(
                     f"Password reset for user with Ihre Handynummer {phone_number}"
                 )
-                # flash('Your password has been reset successfully.', 'success')
+                flash('Your password has been reset successfully.', 'success')
                 return redirect(url_for("login"))
             # else:
-            # flash('Invalid Ihre Handynummer.', 'danger')
+            flash('Invalid Ihre Handynummer.', 'danger')
         # else:
-        # flash('Invalid OTP. Please try again.', 'danger')
+        flash('Invalid OTP. Please try again.', 'danger')
     return render_template("reset_password.html")
 
 
@@ -2576,7 +2577,7 @@ def downvote(project_id):
     ).first()
 
     if existing_downvote:
-        # flash('You have already downvoted this project.', 'info')
+        flash('You have already downvoted this project.', 'info')
         return redirect(url_for("list_view"))
 
     downvote = Downvote(
@@ -2584,7 +2585,7 @@ def downvote(project_id):
     )
     db.session.add(downvote)
     db.session.commit()
-    # flash('Your downvote has been recorded!', 'success')
+    flash('Your downvote has been recorded!', 'success')
     return redirect(url_for("list_view"))
 
 
@@ -2979,9 +2980,9 @@ def delete_comment(comment_id):
     ):  # Assuming admin has user ID 1
         db.session.delete(comment)
         db.session.commit()
-        # flash('Comment deleted successfully.', 'success')
+        flash('Comment deleted successfully.', 'success')
     # else:
-    # flash('You do not have permission to delete this comment.', 'danger')
+    flash('You do not have permission to delete this comment.', 'danger')
 
     # Redirect to the appropriate page based on the referrer
     referrer = request.referrer
@@ -3129,7 +3130,7 @@ def single_vote(project_id):
         )
         db.session.add(vote)
         db.session.commit()
-        # flash('Your vote has been recorded!', 'success')
+        flash('Your vote has been recorded!', 'success')
         return redirect(url_for("index"))
     return render_template("vote.html", project=project)
 
