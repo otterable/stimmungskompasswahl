@@ -1,6 +1,6 @@
 <div class="my-projects centered-text"> {% if paginated_projects and paginated_projects.items %} <div class="project-list" id="project-list-container"> {% for project in paginated_projects.items %} {% if not project.is_mapobject %}
     <!-- Check if project is not a Notizen -->
-    <div class="project-thumbnail">
+<div class="project-thumbnail" id="project-{{ project.id }}">
       <h3>
         <strong>{{ project.name }}</strong>
       </h3>
@@ -18,7 +18,7 @@
       <!-- Admin actions for each project -->
       <form method="POST" action="{{ url_for('admintools') }}">
         <input type="hidden" name="project_id" value="{{ project.id }}">
-        <button type="submit" name="delete_project" class="register-button" style="font-weight: bold;">Löschen</button>
+<button type="button" onclick="deleteProject(event, {{ project.id }});" class="register-button" style="font-weight: bold;">Löschen</button>
         <button type="submit" class="register-button" name="mark_important">Als "Wichtig" markieren</button>
         <button type="submit" class="register-button" name="mark_featured">Als "Ausgewählt" markieren</button>
         <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>

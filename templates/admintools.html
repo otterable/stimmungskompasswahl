@@ -751,26 +751,51 @@
     }
   </script>
   <script>
-    function deleteComment(commentId) {
-      if (!confirm("Are you sure you want to delete this comment?")) {
-        return; // Do nothing if user cancels the confirmation
-      }
-      // Send the AJAX request
-      fetch('/delete_comment/' + commentId, {
+function deleteComment(commentId) {
+    if (!confirm("Möchten Sie diesen Kommentar wirklich löschen?")) {
+        return; // User canceled the action
+    }
+
+    // AJAX request to the deletion endpoint
+    fetch(`/delete_comment/${commentId}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => response.json()).then(data => {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ commentId })
+    })
+    .then(response => response.json())
+    .then(data => {
         if (data.success) {
-          // Remove the comment from the DOM
-          const commentElement = document.getElementById('comment-' + commentId);
-          commentElement.remove();
+            // Remove the comment from the DOM
+            const commentElement = document.getElementById(`comment-${commentId}`);
+            if (commentElement) {
+                commentElement.remove();
+            }
+
+            // Optionally, update the comment count display
+            updateCommentCountDisplay();
         } else {
-          alert(data.message); // Show error message
+            alert('Fehler beim Löschen des Kommentars: ' + data.error);
         }
-      }).catch(error => console.error('Error:', error));
+    })
+    .catch(error => {
+        console.error('Fehler:', error);
+    });
+}
+
+function updateCommentCountDisplay() {
+    const countSpan = document.getElementById('num-comments'); // Assuming you have a span with this ID
+    if (countSpan) {
+        let currentCount = parseInt(countSpan.innerText);
+        if (!isNaN(currentCount)) {
+            currentCount -= 1; // Decrement the count
+            countSpan.innerText = `${currentCount} Kommentare.`; // Update the text
+        }
     }
+}
+
   </script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -1927,6 +1952,102 @@
         }
       }).catch(error => console.error('Error:', error));
     }
+	
+function deleteMapObject(event, projectId) {
+    event.preventDefault(); // Prevent form submission and page reload
+
+    if (!confirm("Möchten Sie dieses Kartenobjekt wirklich löschen?")) {
+        return; // User canceled the action
+    }
+
+    // AJAX request to the deletion endpoint
+    fetch(`/delete_project/${projectId}`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ projectId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the map object from the DOM
+            const mapObjectElement = document.getElementById(`map-object-${projectId}`);
+            if (mapObjectElement) {
+                mapObjectElement.remove();
+            }
+
+            // Update the map object count display
+            updateMapObjectCountDisplay();
+        } else {
+            alert('Fehler beim Löschen des Kartenobjekts: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Fehler:', error);
+    });
+}
+
+
+
+function updateMapObjectCountDisplay() {
+    const countSpan = document.getElementById('num-mapobjects'); // Locate the span by its ID
+    if (countSpan) {
+        let currentCount = parseInt(countSpan.innerText);
+        if (!isNaN(currentCount)) {
+            currentCount -= 1; // Decrement the count
+            countSpan.innerText = `${currentCount} Notizen.`; // Update the text to include "Notizen"
+        }
+    }
+}
+
+function deleteProject(event, projectId) {
+    event.preventDefault(); // Prevent form submission
+
+    if (!confirm("Möchten Sie dieses Projekt wirklich löschen?")) {
+        return; // User canceled the action
+    }
+
+    // AJAX request to the deletion endpoint
+    fetch(`/delete_project/${projectId}`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ projectId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove the project from the DOM
+            const projectElement = document.getElementById(`project-${projectId}`);
+            if (projectElement) {
+                projectElement.parentNode.removeChild(projectElement); // Ensure removal from DOM
+                updateProjectCountDisplay(); // Update the project count display
+            }
+        } else {
+            alert('Fehler beim Löschen des Projekts: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Fehler:', error);
+    });
+}
+
+
+function updateProjectCountDisplay() {
+    const countSpan = document.getElementById('num-projects'); // Assuming you have a span with this ID for projects count
+    if (countSpan) {
+        let currentCount = parseInt(countSpan.innerText);
+        if (!isNaN(currentCount)) {
+            currentCount -= 1; // Decrement the count
+            countSpan.innerText = `${currentCount} Projektvorschläge.`; // Update the text
+        }
+    }
+}
+
   </script>
   <script>
     fetch('/log_view').then(response => response.json()).then(data => console.debug(data.message)).catch(console.error);

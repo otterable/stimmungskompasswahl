@@ -1710,7 +1710,7 @@ def remove_bookmark(project_id):
             f"No bookmark found for project ID {project_id} and user ID {current_user.id}"
         )
 
-    return redirect(url_for("bookmarked"))
+    return jsonify(success=True, message="Bookmark removed successfully.")
 
 
 @app.route("/project_details/<int:project_id>", methods=["GET", "POST"])
@@ -2408,6 +2408,17 @@ def admintools():
     )
 
 
+
+@app.route('/delete_map_object/<int:map_object_id>', methods=['POST'])
+@login_required
+def delete_map_object(map_object_id):
+    # Authentication and authorization checks here
+    map_object = MapObject.query.get_or_404(map_object_id)
+    db.session.delete(map_object)
+    db.session.commit()
+    return jsonify(success=True)
+
+
 @app.route("/verify_admin_otp", methods=["GET", "POST"])
 @login_required
 def verify_admin_otp():
@@ -2969,27 +2980,17 @@ def download_my_data():
     return response
 
 
+
 @app.route("/delete_comment/<int:comment_id>", methods=["POST"])
 @login_required
 def delete_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-
-    # Check if the current user is the author of the comment or an admin
-    if (
-        comment.user_id == current_user.id or current_user.id == 1
-    ):  # Assuming admin has user ID 1
+    if comment.user_id == current_user.id or current_user.id == 1:  # Assuming admin has user ID 1
         db.session.delete(comment)
         db.session.commit()
-        flash('Comment deleted successfully.', 'success')
-    # else:
-    flash('You do not have permission to delete this comment.', 'danger')
-
-    # Redirect to the appropriate page based on the referrer
-    referrer = request.referrer
-    if referrer and "/admintools" in referrer:
-        return redirect(url_for("admintools"))
+        return jsonify(success=True, comment_id=comment_id)
     else:
-        return redirect(url_for("profil"))
+        return jsonify(success=False, error="Permission denied"), 403
 
 
 @app.route("/verify_otp", methods=["GET", "POST"])

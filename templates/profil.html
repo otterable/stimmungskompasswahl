@@ -377,30 +377,141 @@
     let sections = document.querySelectorAll('.section');
     return Array.from(sections).some(section => section.style.display === 'block');
   }
+  
+function deleteComment(event, commentId) {
+  event.preventDefault(); // Prevent the form from submitting normally
+
+  if (!confirm('Möchten Sie diesen Kommentar wirklich löschen?')) {
+    return; // User canceled the action
+  }
+
+  fetch(`/delete_comment/${commentId}`, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ commentId: commentId })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Remove the comment from the DOM
+      document.querySelector(`.stat-box2[data-comment-id="${commentId}"]`).remove();
+      
+      // Update the number of comments displayed in the comments section
+      updateNumComments();
+
+      // Specifically update the comment count in the "marker-limit-info" div
+      updateCommentCountInStatistics();
+    } else {
+      alert('Fehler beim Löschen des Kommentars.');
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function updateNumComments() {
+  const numCommentsSpan = document.querySelector('.my-comments h2 span');
+  let numComments = parseInt(numCommentsSpan.textContent);
+  if (!isNaN(numComments) && numComments > 0) {
+    numCommentsSpan.textContent = `${numComments - 1} Kommentar(e)`; // Decrement the comment count
+  }
+}
+
+function updateCommentCountInStatistics() {
+  // Assuming the comment count is the second element with the class 'highlight' in its parent container
+  const numCommentsStatSpan = document.querySelectorAll('.marker-limit-info .highlight')[1];
+  if (numCommentsStatSpan) {
+    let numComments = parseInt(numCommentsStatSpan.textContent);
+    if (!isNaN(numComments) && numComments > 0) {
+      numCommentsStatSpan.textContent = `${numComments - 1}`;
+      // If there is a specific wording to update (e.g., "Kommentare" word itself), handle that here as well
+    }
+  }
+}
+
+
+
 </script>
 <script>
-  function removeBookmark(projectId) {
-    console.log("Removing bookmark for project ID:", projectId);
-    fetch(`/bookmark/${projectId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    }).then(response => response.json()).then(data => {
-      if (data.success) {
-        console.log('Bookmark removed:', data);
-        // Remove the project thumbnail from the DOM
-        var thumbnailToRemove = document.getElementById('project-thumbnail-' + projectId);
-        if (thumbnailToRemove) {
-          thumbnailToRemove.remove();
-          console.log('Project thumbnail removed for project ID:', projectId);
-        }
-      } else {
-        console.error('Error:', data.message);
-      }
-    }).catch(error => console.error('Error:', error));
+function removeBookmark(event, projectId) {
+  event.preventDefault(); // Stop the form from submitting
+  const confirmation = confirm('Möchten Sie dieses Lesezeichen wirklich entfernen?');
+  if (!confirmation) {
+    return; // User canceled the action
   }
+
+  fetch(`/remove_bookmark/${projectId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      // Include CSRF token if your application requires it
+    },
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok.');
+    }
+    return response.json();
+  }).then(data => {
+    console.log('Bookmark removed:', data);
+    // Remove the project thumbnail from the DOM
+    const thumbnailToRemove = document.getElementById(`project-thumbnail-${projectId}`);
+    if (thumbnailToRemove) {
+      thumbnailToRemove.remove();
+    }
+    // Update the number of bookmarks displayed
+    updateNumBookmarks();
+  }).catch(error => console.error('Error:', error));
+}
+
+function updateNumBookmarks() {
+  const numBookmarksSpan = document.getElementById('num-bookmarks');
+  let numBookmarks = parseInt(numBookmarksSpan.textContent);
+  if (!isNaN(numBookmarks)) {
+    numBookmarksSpan.textContent = `${numBookmarks - 1} Lesezeichen`; // Decrement the bookmark count
+  }
+}
+
+function confirmDeleteMapObject(event, projectId) {
+  event.preventDefault(); // Prevent default form submission
+  const confirmation = confirm('Möchten Sie diese Notiz wirklich löschen?');
+  if (!confirmation) {
+    return; // User canceled the action
+  }
+
+  fetch(`/delete_project/${projectId}`, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'application/json'
+      // Include CSRF token as necessary
+    },
+  }).then(response => response.json()).then(data => {
+    if (data.success) {
+      alert('Notiz erfolgreich gelöscht.');
+      // Remove the map object from the DOM
+      document.querySelector(`.project-thumbnail[data-project-id="${projectId}"]`).remove();
+      // Update the count of map objects
+      updateNumMapObjects();
+    } else {
+      alert('Fehler beim Löschen der Notiz.');
+    }
+  }).catch(error => console.error('Error:', error));
+}
+
+function updateNumMapObjects() {
+  const numMapObjectsSpan = document.getElementById('num-map-objects');
+  let numMapObjects = parseInt(numMapObjectsSpan.textContent);
+  if (!isNaN(numMapObjects)) {
+    // Reconstruct the sentence with the updated count
+    numMapObjectsSpan.innerHTML = `${numMapObjects - 1} Notizen <span style="color: #003056;">gepostet.</span>`; // Decrement the count and ensure "gepostet." remains
+  }
+}
+
+
+
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", function() {
@@ -434,61 +545,7 @@
     });
   });
 </script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    checkMarkerLimit();
-  });
 
-  function checkMarkerLimit() {
-    console.debug("Checking marker limit...");
-    fetch('/check_marker_limit').then(response => response.json()).then(data => {
-      console.debug("Marker limit data received:", data);
-      const limitInfoElement = document.getElementById('marker-limit-info');
-      const timerElement = document.getElementById('marker-limit-timer');
-      if (limitInfoElement && timerElement) {
-        if (data.limit_reached) {
-          console.debug("Limit reached. Showing timer...");
-          limitInfoElement.innerHTML = `Sie haben Ihr Tageslimit von 
-						<span class="highlight">${data.max_limit}</span> Notizen erreicht.`;
-          timerElement.style.display = 'block';
-          startTimer(data.reset_time);
-        } else {
-          console.debug("Limit not reached. Updating info and hiding timer...");
-          const markersRemaining = data.max_limit - data.current_count;
-          limitInfoElement.innerHTML = `Sie können 
-						<span class="highlight">${markersRemaining}</span> Notizen pro 24 Stunden posten. Sie haben heute bereits 
-						<span class="highlight">${data.current_count}</span> Notiz(en) gepostet.`;
-          timerElement.style.display = 'none';
-        }
-      } else {
-        console.error('Marker limit elements not found in DOM');
-      }
-    }).catch(error => {
-      console.error('Error checking marker limit:', error);
-      if (limitInfoElement) {
-        limitInfoElement.textContent = "Fehler beim Abrufen der Marker-Limit-Informationen.";
-      }
-    });
-  }
-
-  function startTimer(expiryTime) {
-    if (!expiryTime) return;
-    var countDownDate = new Date(expiryTime).getTime();
-    var timerElement = document.getElementById('marker-limit-timer');
-    var interval = setInterval(function() {
-      var now = new Date().getTime();
-      var distance = countDownDate - now;
-      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      timerElement.textContent = `Limit erreicht, läuft in ${hours}h ${minutes}m ${seconds}s ab`;
-      if (distance < 0) {
-        clearInterval(interval);
-        timerElement.textContent = "Sie können jetzt neue Notizen hinzufügen.";
-      }
-    }, 1000);
-  }
-</script>
 <script>
   let currentPageNumber = 1; // Default to page 1
   document.addEventListener('DOMContentLoaded', function() {
@@ -687,9 +744,47 @@
   }
 </script>
 
+<script>
+function deleteProject(event, projectId) {
+  event.preventDefault(); // Prevent form submission
+  const confirmation = confirm('Möchten Sie dieses Projekt wirklich löschen?');
+  if (!confirmation) {
+    return; // Stop if the user cancels
+  }
+  
+  fetch(`/delete_project/${projectId}`, {
+    method: 'POST',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'application/json'
+    },
+    // Include CSRF token as needed
+  }).then(response => response.json()).then(data => {
+    if (data.success) {
+      alert('Projekt erfolgreich gelöscht.');
+      document.querySelector(`form[data-project-id="${projectId}"]`).closest('.project-thumbnail').remove();
+      // Call function to update project counts
+      updateProjectCounts();
+    } else {
+      alert('Fehler beim Löschen des Projekts.');
+    }
+  }).catch(error => console.error('Error:', error));
+}
+</script>
 
+<script>
+function updateProjectCounts() {
+  const projectCountSpan = document.querySelector('.highlight'); // Adjust the selector as necessary
+  let currentCount = parseInt(projectCountSpan.textContent);
+  if (!isNaN(currentCount)) {
+    projectCountSpan.textContent = currentCount - 1; // Decrement count
+  }
+}
+
+</script>
 
 
   {% if not current_user.is_authenticated %} <script>
   window.location.href = "{{ url_for('login', next=url_for('profil')) }}";
 </script> {% endif %}
+

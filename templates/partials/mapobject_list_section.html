@@ -1,4 +1,5 @@
-<div class="my-projects centered-text"> {% if paginated_map_objects and paginated_map_objects.items %} <div class="stats-container2" id="map-object-list-container"> {% for project in paginated_map_objects.items %} {% if project.is_mapobject %} <div class="stat-box2">
+<div class="my-projects centered-text"> {% if paginated_map_objects and paginated_map_objects.items %} <div class="stats-container2" id="map-object-list-container"> {% for project in paginated_map_objects.items %} {% if project.is_mapobject %} <div class="stat-box2" id="map-object-{{ project.id }}">
+
       <div class="project-description" style="font-weight:bold;">{{ project.descriptionwhy|safe }}</div>
       <p class="project-category">Kategorie: <strong>{{ project.category }}</strong>
       </p>
@@ -6,7 +7,7 @@
       <!-- Admin actions for each project -->
       <form method="POST" action="{{ url_for('admintools') }}">
         <input type="hidden" name="project_id" value="{{ project.id }}">
-        <button type="submit" name="delete_project" class="register-button2" style="font-weight: bold;">Löschen</button>
+<button onclick="deleteMapObject(event, {{ project.id }});" class="register-button">Löschen</button>
       </form>
     </div> {% endif %} {% endfor %} </div> {% if not paginated_map_objects.items %} <p>Keine Notizen gefunden.</p> {% endif %} {% endif %}
   <!-- Pagination for Notizens --> {% if paginated_map_objects.pages > 1 %} <nav aria-label="Notizen Page navigation" class="pagination-container" data-pagination-type="map_object">
