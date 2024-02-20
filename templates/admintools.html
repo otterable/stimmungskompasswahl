@@ -354,7 +354,8 @@
     <div id="importantProjectsSection" style="display: none;">
       <!-- Important Projects Section -->
       <h2>Wichtige <span style="color: #003056;">Projektvorschläge</span> (Nur auf dieser Seite sichtbar) </h2>
-      <div class="project-list"> {% for project in important_projects %} <div class="project-thumbnail">
+ <div id="important-projects-list" class="project-list">
+ {% for project in important_projects %} <div class="project-thumbnail">
           <h3>
             <strong>{{ project.name }}</strong>
           </h3>
@@ -378,7 +379,8 @@
       <!-- Featured Projects Section -->
       <h2>Ausgewählte <span style="color: #003056;">Projektvorschläge</span>
       </h2>
-      <div class="project-list"> {% for project in featured_projects %} <div class="project-thumbnail">
+    <div id="featured-projects-list" class="project-list">
+ {% for project in featured_projects %} <div class="project-thumbnail">
           <h3>
             <strong>{{ project.name }}</strong>
           </h3>
@@ -2003,8 +2005,9 @@ function updateMapObjectCountDisplay() {
 }
 
 function deleteProject(event, projectId) {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault(); // Prevent the form from submitting
 
+    // Confirm deletion
     if (!confirm("Möchten Sie dieses Projekt wirklich löschen?")) {
         return; // User canceled the action
     }
@@ -2047,6 +2050,132 @@ function updateProjectCountDisplay() {
         }
     }
 }
+
+function markProjectImportant(projectId, event) {
+    event.preventDefault(); // Prevent form submission
+    if (!confirm("Möchten Sie dieses Projekt als wichtig markieren?")) {
+        return;
+    }
+
+    // AJAX request here
+    fetch(`/mark_important/${projectId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ projectId })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Projekt als wichtig markiert.');
+            addToImportantProjects(data.project); // Assuming data.project contains all the project details
+        } else {
+            // Handle failure
+            alert('Fehler beim Markieren des Projekts als wichtig.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+
+function markAsFeatured(projectId) {
+    fetch(`/mark_featured/${projectId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ projectId: projectId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Project marked as featured successfully.');
+            // Find the project element in the DOM and update its visual state
+            // For example, add a class to highlight it or update text/icon
+            const projectElement = document.getElementById(`project-${projectId}`);
+            if (projectElement) {
+                projectElement.classList.add('featured'); // Assuming you have CSS styles for .featured
+                // Optionally, update a specific part of the project element, like an icon or text
+                const featuredStatusElement = projectElement.querySelector('.featured-status');
+                if (featuredStatusElement) {
+                    featuredStatusElement.textContent = 'Featured'; // Update text or icon
+                }
+            }
+        } else {
+            alert('Failed to mark the project as featured.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Example of attaching the function to a button click event
+document.querySelectorAll('.mark-featured-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const projectId = this.getAttribute('data-project-id'); // Ensure your button has a data-project-id attribute
+        markAsFeatured(projectId);
+    });
+});
+
+function addToImportantProjects(project) {
+    const list = document.getElementById('important-projects-list'); // Get the container where important projects are displayed
+
+    // Create the HTML structure for the new project
+    const projectElement = document.createElement('div');
+    projectElement.className = 'project-thumbnail'; // Assuming this is the class for styling project thumbnails
+    projectElement.innerHTML = `
+        <h3>
+            <strong>${project.name}</strong>
+        </h3>
+        <p class="project-date"> Gepostet am: <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong>
+        </p>
+        <div class="voting-bar">
+            ${project.upvotes > 0 ? `<div class="upvotes" style="width: ${project.upvote_percentage}%;"><span>${project.upvotes} 👍 (${project.upvote_percentage}%)</span></div>` : ''}
+            ${project.downvotes > 0 ? `<div class="downvotes" style="width: ${project.downvote_percentage}%;"><span>${project.downvotes} 👎 (${project.downvote_percentage}%)</span></div>` : ''}
+        </div>
+        <a href="/project_details/${project.id}" target="_blank">
+            <img src="/static/usersubmissions/${project.image_file}" alt="${project.name}" class="project-image">
+        </a>
+        <div class="project-description">${project.descriptionwhy}</div>
+        <form method="POST" action="/admintools">
+            <input type="hidden" name="project_id" value="${project.id}">
+            <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
+            <a href="/project_details/${project.id}" class="register-button" target="_blank">Anzeigen</a>
+        </form>
+    `;
+
+    // Append the new project element to the list
+    list.appendChild(projectElement);
+}
+
+
+function addToFeaturedProjects(projectId, projectName) {
+    const list = document.getElementById('featured-projects-list');
+    if (!document.getElementById(`featured-project-${projectId}`)) {
+        const projectElement = document.createElement('div');
+        projectElement.id = `featured-project-${projectId}`;
+        projectElement.className = 'project-thumbnail';
+        projectElement.innerHTML = `
+            <h3>
+                <strong>${projectName}</strong>
+            </h3>
+            <p>Project details and actions here</p>
+        `;
+        list.appendChild(projectElement);
+    }
+}
+
+
 
   </script>
   <script>

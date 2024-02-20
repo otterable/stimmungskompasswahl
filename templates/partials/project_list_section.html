@@ -19,8 +19,10 @@
       <form method="POST" action="{{ url_for('admintools') }}">
         <input type="hidden" name="project_id" value="{{ project.id }}">
 <button type="button" onclick="deleteProject(event, {{ project.id }});" class="register-button" style="font-weight: bold;">Löschen</button>
-        <button type="submit" class="register-button" name="mark_important">Als "Wichtig" markieren</button>
-        <button type="submit" class="register-button" name="mark_featured">Als "Ausgewählt" markieren</button>
+<button type="button" onclick="markProjectImportant({{ project.id }}, event);" class="register-button">Als "Wichtig" markieren</button>
+<button type="button" onclick="markProjectFeatured({{ project.id }}, event);" class="register-button">Als "Ausgewählt" markieren</button>
+
+
         <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
       </form>
     </div> {% endif %} {% endfor %}

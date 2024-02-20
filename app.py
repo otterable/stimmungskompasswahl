@@ -2111,16 +2111,7 @@ def admintools():
     if request.method == "POST":
         project_id = request.form.get("project_id")
 
-        if "mark_important" in request.form:
-            project = Project.query.get(project_id)
-            if project:
-                project.is_important = True
-                db.session.commit()
-                flash("Project marked as important", "success")
-            else:
-                flash("Project not found for marking as important", "error")
-
-        elif "unmark_important" in request.form:
+        if "unmark_important" in request.form:
             project = Project.query.get(project_id)
             if project:
                 project.is_important = False
@@ -2128,15 +2119,6 @@ def admintools():
                 flash("Project unmarked as important", "success")
             else:
                 flash("Project not found for unmarking as important", "error")
-
-        elif "mark_featured" in request.form:
-            project = Project.query.get(project_id)
-            if project:
-                project.is_featured = True
-                db.session.commit()
-                flash("Project marked as featured", "success")
-            else:
-                flash("Project not found for marking as featured", "error")
 
         elif "unmark_featured" in request.form:
             project = Project.query.get(project_id)
@@ -2409,6 +2391,81 @@ def admintools():
 
 
 
+
+@app.route('/mark_important/<int:projectId>', methods=['POST'])
+def mark_important(projectId):
+    project = Project.query.get_or_404(projectId)
+    
+    # Use the correct attributes from the Vote model
+    upvotes = sum(1 for vote in project.votes if vote.upvote)
+    downvotes = sum(1 for vote in project.votes if vote.downvote)
+    total_votes = upvotes + downvotes
+    upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
+    downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
+
+    # Logic to mark the project as important
+    project.is_important = True
+    db.session.commit()  # Save the changes to the database
+
+    # Construct the response data with calculated vote counts and project details
+    response_data = {
+        "success": True,
+        "project": {
+            "name": project.name,
+            "date": project.date.strftime('%d.%m.%Y'),
+            "view_count": project.view_count,
+            "image_file": project.image_file,
+            "descriptionwhy": project.descriptionwhy,
+            "id": project.id,
+            "upvotes": upvotes,
+            "downvotes": downvotes,
+            "upvote_percentage": upvote_percentage,
+            "downvote_percentage": downvote_percentage
+        }
+    }
+    
+    # Return the success response
+    return jsonify(response_data)
+
+
+
+
+@app.route('/mark_featured/<int:project_id>', methods=['POST'])
+@login_required
+def mark_featured(project_id):
+    project = Project.query.get_or_404(project_id)
+
+    # Calculate upvotes, downvotes, and their percentages
+    upvotes = sum(1 for vote in project.votes if vote.upvote)
+    downvotes = sum(1 for vote in project.votes if not vote.upvote)  # Assuming 'not vote.upvote' marks a downvote
+    total_votes = upvotes + downvotes
+    upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
+    downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
+
+    # Mark the project as featured
+    project.is_featured = True
+    db.session.commit()  # Save the changes to the database
+
+    # Construct the response data
+    response_data = {
+        "success": True,
+        "project_id": project.id,
+        "is_featured": project.is_featured,
+        "project_details": {
+            "name": project.name,
+            "date": project.date.strftime('%Y-%m-%d'),  # Adjust the date format as per your requirements
+            "view_count": project.view_count,
+            "image_file": project.image_file,
+            "descriptionwhy": project.descriptionwhy,
+            "upvotes": upvotes,
+            "downvotes": downvotes,
+            "upvote_percentage": upvote_percentage,
+            "downvote_percentage": downvote_percentage
+        }
+    }
+
+    # Return the success response with detailed project information
+    return jsonify(response_data)
 @app.route('/delete_map_object/<int:map_object_id>', methods=['POST'])
 @login_required
 def delete_map_object(map_object_id):
