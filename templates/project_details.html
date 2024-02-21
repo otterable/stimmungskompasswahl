@@ -193,7 +193,10 @@
 </div>
 
 
-
+	<div class="bottom-bar" style="margin-top: 10px;">
+<p> <a href="mailto:office@stimmungskompass.at" style="color: inherit; text-decoration: underline;">office@stimmungskompass.at</a> | <a href="/privacy" style="color: inherit; text-decoration: underline;">Impressum / Datenschutz</a></p>
+<p>Stimmungskompass Demo b18c, nur zu Demonstrationszwecken</a></p>
+</div>
 
 
 	
@@ -685,8 +688,9 @@ function vote(projectId, voteType) {
             const upvotePercentage = data.upvote_percentage.toFixed(1);
             const downvotePercentage = data.downvote_percentage.toFixed(1);
 
-            document.getElementById('upvote-count').innerText = `Gefällt: ${upvoteCount} (${upvotePercentage}%)`;
-            document.getElementById('downvote-count').innerText = `Gefällt nicht: ${downvoteCount} (${downvotePercentage}%)`;
+        document.getElementById('upvote-count').innerHTML = `Gefällt: <strong style="font-weight: bold;">${upvoteCount}</strong> (${upvotePercentage}%)`;
+document.getElementById('downvote-count').innerHTML = `Gefällt nicht: <strong style="font-weight: bold;">${downvoteCount}</strong> (${downvotePercentage}%)`;
+
             upvoteElement.style.width = `${upvotePercentage}%`;
             downvoteElement.style.width = `${downvotePercentage}%`;
 

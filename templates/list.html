@@ -12,6 +12,9 @@
 
 
 <!-- Video Overlay -->
+<div class="page-container">
+    <div class="content-wrapper">
+	
 <div id="video-overlay" class="video-overlay" style="display:none;">
     <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/uolKHGe9c4Y?si=kMLiCkfo10E" frameborder="0" allowfullscreen></iframe>
     <div id="replay-container" style="display: none;"></div> <!-- Container for replay image -->
@@ -76,9 +79,8 @@
 <div class="filter-item">
     <label for="sort">Sortieren:</label>
     <select name="sort" id="sort">
+	    <option value="highest_views" {% if request.args.get('sort', '') == 'highest_views' %}selected{% endif %}>Meistgesehene zuerst</option>
         <option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
-        <option value="lowest" {% if request.args.get('sort', '') == 'lowest' %}selected{% endif %}>Niedrigste Bewertung zuerst</option>
-		<option value="highest_views" {% if request.args.get('sort', '') == 'highest_views' %}selected{% endif %}>Meistgesehene zuerst</option>
         <option value="newest" {% if request.args.get('sort', '') == 'newest' %}selected{% endif %}>Neuester Beitrag zuerst</option>
         <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Ältester Beitrag zuerst</option>
     </select>
@@ -125,25 +127,17 @@
                 <option value="Andere" {% if current_category == 'Andere' %}selected{% endif %}>Andere</option>
             </select>
         </div>
+<div class="filter-item">
+    <label for="sort">Sortieren:</label>
+    <select name="sort" id="sort">
+	    <option value="highest_views" {% if request.args.get('sort', '') == 'highest_views' %}selected{% endif %}>Meistgesehene zuerst</option>
+        <option value="highest" {% if request.args.get('sort', '') == 'highest' %}selected{% endif %}>Höchste Bewertung zuerst</option>
+        <option value="newest" {% if request.args.get('sort', '') == 'newest' %}selected{% endif %}>Neuester Beitrag zuerst</option>
+        <option value="oldest" {% if request.args.get('sort', '') == 'oldest' %}selected{% endif %}>Ältester Beitrag zuerst</option>
+    </select>
+</div>
 
-        <div class="filter-item">
-            <label for="age">Alter:</label>
-            <select name="age" id="age">
-                {% set current_age = request.args.get('age', '') %}
-                <option value="" {% if current_age == 'newest' %}selected{% endif %}>Neuester zuerst</option>
-                <option value="oldest" {% if current_age == 'oldest' %}selected{% endif %}>Ältester zuerst</option>
-            </select>
-        </div>
 
-        <div class="filter-item">
-            <label for="score">Bewertung:</label>
-            <select name="score" id="score">
-                <option value="">Nach Bewertung</option>
-                {% set current_score = request.args.get('score', '') %}
-                <option value="highest" {% if current_score == 'highest' %}selected{% endif %}>Höchste Bewertung</option>
-                <option value="lowest" {% if current_score == 'lowest' %}selected{% endif %}>Niedrigste Bewertung</option>
-            </select>
-        </div>
 		        <button type="submit" class="filter-button">Filtern</button>
 
     </form>
@@ -238,7 +232,13 @@
         <div id="modalBody"></div>
     </div>
 </div>
+    </div>
 
+<div class="bottom-bar" style="margin-top: 10px;">
+<p> <a href="mailto:office@stimmungskompass.at" style="color: inherit; text-decoration: underline;">office@stimmungskompass.at</a> | <a href="/privacy" style="color: inherit; text-decoration: underline;">Impressum / Datenschutz</a></p>
+<p>Stimmungskompass Demo b18c, nur zu Demonstrationszwecken</a></p>
+</div>
+</div>
 <script>
     function openModal(projectId) {
         // AJAX request to get project details
@@ -530,4 +530,16 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.project-thumbnail').forEach((element) => {
+        element.style.transform = 'scale(0.95)';
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            element.style.transform = 'scale(1)';
+        }, 150);
+    });
+});
+
 </script>

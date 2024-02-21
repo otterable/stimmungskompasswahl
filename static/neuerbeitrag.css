@@ -21,6 +21,23 @@ body {
   /* Removes rounded corners */
 }
 
+.bottom-bar {
+  background-color: #003056;
+  /* Dark blue background */
+  color: white;
+  /* White text color */
+  text-align: center;
+  /* Center align text */
+  padding: 1px 0;
+  /* Padding on top and bottom */
+  width: 100%;
+  /* Full width */
+  box-sizing: border-box;
+  /* Include padding in width calculation */
+}
+
+
+
 input[type="file"] {
     padding: 5px;
     border-radius: 30px;

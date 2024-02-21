@@ -1645,8 +1645,13 @@ def list_view(page=1):
         query = query.order_by(Project.date.asc())
     elif sort == "newest":
         query = query.order_by(Project.date.desc())
-    elif sort == "highest_views":
-        query = query.order_by(Project.view_count.desc())
+    elif sort == "highest":
+        # Default to highest score (more upvotes)
+        query = (
+            query.outerjoin(Vote, Project.id == Vote.project_id)
+            .group_by(Project.id)
+            .order_by(func.coalesce(func.sum(Vote.upvote - Vote.downvote), 0).desc())
+        )
     elif sort == "lowest":
         # Sorting by lowest score (more downvotes)
         query = (
@@ -1654,12 +1659,10 @@ def list_view(page=1):
             .group_by(Project.id)
             .order_by(func.coalesce(func.sum(Vote.upvote - Vote.downvote), 0))
         )
-    else:  # Default to highest score (more upvotes)
-        query = (
-            query.outerjoin(Vote, Project.id == Vote.project_id)
-            .group_by(Project.id)
-            .order_by(func.coalesce(func.sum(Vote.upvote - Vote.downvote), 0).desc())
-        )
+    else:  # Change this part to default to sorting by views
+        query = query.order_by(Project.view_count.desc())
+
+    
 
     # Paginate the query
     paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)

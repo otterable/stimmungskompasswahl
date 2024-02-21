@@ -50,6 +50,27 @@ body {
   }
 }
 
+.upvotes-info strong,
+.downvotes-info strong {
+  font-weight: bold;
+  /* Ensures numbers remain bold */
+}
+
+.bottom-bar {
+  background-color: #003056;
+  /* Dark blue background */
+  color: white;
+  /* White text color */
+  text-align: center;
+  /* Center align text */
+  padding: 1px 0;
+  /* Padding on top and bottom */
+  width: 100%;
+  /* Full width */
+  box-sizing: border-box;
+  /* Include padding in width calculation */
+}
+
 img {
   max-width: 100%;
   /* Ensure images are not larger than their container */
@@ -980,7 +1001,6 @@ input[type="file"] {
   /* Add other styling as needed */
 }
 
-
 .index-image {
   width: 100%;
   object-fit: cover;
@@ -993,6 +1013,11 @@ input[type="file"] {
   /* Remove hover effect */
   transform: none !important;
 }
+
+.vote-counts .upvotes-info strong, .vote-counts .downvotes-info strong {
+  font-weight: bold !important;
+}
+
 
 .cover-text-container {
   position: absolute;

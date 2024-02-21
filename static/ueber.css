@@ -35,6 +35,21 @@
   box-sizing: border-box;
 }
 
+.bottom-bar {
+  background-color: #003056;
+  /* Dark blue background */
+  color: white;
+  /* White text color */
+  text-align: center;
+  /* Center align text */
+  padding: 1px 0;
+  /* Padding on top and bottom */
+  width: 100%;
+  /* Full width */
+  box-sizing: border-box;
+  /* Include padding in width calculation */
+}
+
 .nav-link:hover { /* Replace .nav-link with your actual selector */
   transform: scale(1.02);
 }

@@ -21,6 +21,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='admintools.css') }}">
   <body>
+  
+
+	
     <div class="top-bar">
       <a href="/">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
@@ -55,6 +58,8 @@
       <button id="toggleFeaturedProjects" class="c-button" data-section-id="featuredProjectsSection" style="display:none;">Open Ausgewählte Projektvorschläge</button>
       <button id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</button>
     </div>
+	    <div class="page-container">
+    <div class="content-wrapper">
     <div id="filter-overlay" class="nav-overlay" style="display:none">
       <div id="nav-links">
         <a href="#" id="toggleDeleteAllProjects" class="c-button" data-section-id="deleteAllProjectsSection">Statistik</a>
@@ -434,6 +439,15 @@
       </h2>
       <div class="project-list"> {% with paginated_users=paginated_users %} {% include 'partials/user_list_section.html' %} {% endwith %} </div>
     </div>
+	</div>
+		</div>
+
+	<div class="bottom-bar" style="margin-top: 10px;">
+<p> <a href="mailto:office@stimmungskompass.at" style="color: inherit; text-decoration: underline;">office@stimmungskompass.at</a> | <a href="/privacy" style="color: inherit; text-decoration: underline;">Impressum / Datenschutz</a></p>
+<p>Stimmungskompass Demo b18c, nur zu Demonstrationszwecken</a></p>
+</div>
+
+
     <!-- Section for Deleting All Projects -->
   </body>
   <script>
@@ -2312,6 +2326,19 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.project-thumbnail').forEach((element) => {
+        element.style.transform = 'scale(0.95)';
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            element.style.transform = 'scale(1)';
+        }, 150);
+    });
+});
+
   </script>
   <script>
     fetch('/log_view').then(response => response.json()).then(data => console.debug(data.message)).catch(console.error);

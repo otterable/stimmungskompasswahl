@@ -188,6 +188,7 @@ h3 {
 
 body {
 	font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  height: 100%; /* Ensure the root elements span the full height */
 
 	background-color: #f5f1e4;
 	color: black;
@@ -201,6 +202,26 @@ body {
 
 	transform: scale(1.005);
 	/* Scale up on hover */
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* This should ensure the container takes at least the height of the viewport */
+}
+
+.content-wrapper {
+  flex: 1; /* This ensures that it takes up all available space */
+  display: flex;
+  flex-direction: column;
+}
+
+.bottom-bar {
+  background-color: #003056;
+  color: white;
+  text-align: center;
+  padding: 1px 0;
+  width: 100%;
 }
 
 .project-description {
@@ -367,7 +388,8 @@ input[type="file"] {
 	overflow: visible;
 	/* Ensure the content is not clipped */
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-
+    transition: transform 0.3s ease-out;
+    will-change: transform;
 }
 
 /* Hover effect for project thumbnails */

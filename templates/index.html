@@ -81,8 +81,9 @@
       <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
       <div class="project-description">{{ project.descriptionwhy|safe }}</div>
     </div> {% endfor %} {% else %} <p style="text-align: center;">Keine hervorgehobenen Projekte gefunden.</p> {% endif %} </div>
-<div class="bottom-bar">
-  <p>v21.2.2024 b17j, Kontakt: office@stimmungskompass.at | <a href="/privacy" style="color: white;">Impressum / Datenschutz</a></p>
+<div class="bottom-bar" style="margin-top: 10px;">
+<p> <a href="mailto:office@stimmungskompass.at" style="color: inherit; text-decoration: underline;">office@stimmungskompass.at</a> | <a href="/privacy" style="color: inherit; text-decoration: underline;">Impressum / Datenschutz</a></p>
+<p>Stimmungskompass Demo b18c, nur zu Demonstrationszwecken</a></p>
 </div>
 
   </body>
@@ -152,4 +153,16 @@
       x.style.display = "block";
     }
   }
+  
+  let resizeTimer;
+window.addEventListener('resize', () => {
+    document.querySelectorAll('.project-thumbnail').forEach((element) => {
+        element.style.transform = 'scale(0.95)';
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            element.style.transform = 'scale(1)';
+        }, 150);
+    });
+});
+
 </script>

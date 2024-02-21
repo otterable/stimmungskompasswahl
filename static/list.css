@@ -25,6 +25,26 @@
      margin-bottom: 30px;
    }
 
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  flex: 1;
+}
+
+.bottom-bar {
+  background-color: #003056;
+  color: white;
+  text-align: center;
+  padding: 1px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
 
 
    .button {
@@ -747,8 +767,9 @@
      overflow: visible;
      /* Ensure the content is not clipped */
      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-
-   }
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+}
 
 
    .user-info {
