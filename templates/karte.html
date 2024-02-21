@@ -4,9 +4,25 @@
     <title> Stimmungskompass </title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.stimmungskompass.at/">
+<meta property="og:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
+<meta property="og:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
+<meta property="og:image" content="https://www.stimmungskompass.at/static/stimmungskompass_ueber_fullsize_insert_a1_cropped.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://www.stimmungskompass.at/">
+<meta property="twitter:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
+<meta property="twitter:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
+<meta property="twitter:image" content="https://www.stimmungskompass.at/static/stimmungskompass_ueber_fullsize_insert_a1_cropped.png">
+<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
     <link rel="icon" href="{{ url_for('favicon') }}" type="image/x-icon">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     </script>
 	  <script src="static/spamFilter.js"></script>
@@ -38,7 +54,20 @@
     </style>
   </head>
   <style>
-  
+
+
+.overlay-button {
+  border-radius: 30px;
+  padding: 15px;
+  background-color: white;
+  font-weight: bold;
+  color: black;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  /* Smooth transition for background color */
+}
+
 #marker-overlay {
   display: none;
   position: fixed;
@@ -2660,7 +2689,7 @@
         /* Hide horizontal overflow */
         transition: 0.5s;
         /* Smooth transition for opening/closing */
-        z-index: 1000;
+        z-index: 10001 !important;
         /* High z-index to ensure it's on top */
       }
 
@@ -2899,7 +2928,7 @@
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
       </a>
       <button id="hamburger-button">&#9776;</button>
-      <div id="nav-overlay" class="nav-overlay">
+      <div id="nav-overlay" class="nav-overlay" style="z-index: 10001 !important;">
         <div id="nav-links">
           <a href="/karte">Karte</a>
           <a href="/list">Projektvorschläge</a>
@@ -2908,9 +2937,9 @@
           <a href="/profil">Profil</a> {% if current_user.is_authenticated %} <span class="user-info" style="margin-top: 10px;"> Benutzer: {{ current_user.name }}
           </span>
           <a href="{{ url_for('logout', next=request.path) }}">
-            <button class="button">Abmelden</button>
+            <button class="overlay-button">Abmelden</button>
           </a> {% else %} <a href="{{ url_for('login', next=request.path) }}">
-            <button class="button">Anmelden</button>
+            <button class="overlay-button">Anmelden</button>
           </a> {% endif %}
         </div>
       </div>
@@ -2986,7 +3015,7 @@
         <h3 class="appear-on-mobiledisabled resistant-h3" style="display: none; color: white; text-align: center; margin-top: -12px; margin-bottom: 7px"> Lassen Sie es uns auf dieser Karte wissen! </h3>
       </div>
       <div id="map">
-        <a href="#" id="info-link2" style="z-index:10000 !important;">
+        <a href="#" id="info-link2">
           <img src="{{ url_for('static', filename='infobutton2.png') }}" alt="Info" class="info-image2" style="z-index: 1002 !important;">
         </a>
         <!-- Inside the map div -->

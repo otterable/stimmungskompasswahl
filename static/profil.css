@@ -388,16 +388,18 @@ input[type="file"] {
 	overflow: visible;
 	/* Ensure the content is not clipped */
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease-out;
-    will-change: transform;
+   transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
+    will-change: auto; /* Default state, only specify if needed for performance */
+    /* Removed transform scale to prevent blurriness */
 }
 
 /* Hover effect for project thumbnails */
-.project-thumbnail:hover {
-	transform: scale(1.005);
-	transition: width 0.3s ease;
-}
+   .project-thumbnail:hover {
+     transform: scale(1.005);
+     transition: width 0.3s ease;
+	     box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Example shadow */
 
+   }
 /* Image style within project thumbnails */
 .project-thumbnail img {
 	width: 90%;

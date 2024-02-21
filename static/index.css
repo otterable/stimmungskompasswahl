@@ -5,6 +5,11 @@ img {
   height: auto;
 }
 
+:root {
+  color-scheme: light dark !important;
+}
+
+
 .info-box-icon {
   max-width: 70px;
   /* Adjust this value as needed */
@@ -337,18 +342,21 @@ input[type="file"] {
   align-items: center;
   /* Center items horizontally */
   box-sizing: border-box;
-  transition: width 0.3s ease;
   position: relative;
   overflow: visible;
-    transition: transform 0.3s ease-out;
-    will-change: transform;
+       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+    transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
+    will-change: auto; /* Default state, only specify if needed for performance */
 }
 
 /* Hover effect for project thumbnails */
-.project-thumbnail:hover {
-  transform: scale(1.005);
-  transition: width 0.3s ease;
-}
+   .project-thumbnail:hover {
+     transform: scale(1.005);
+     transition: width 0.3s ease;
+	     box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Example shadow */
+
+   }
 
 /* Image style within project thumbnails */
 .project-thumbnail img {
@@ -368,7 +376,7 @@ input[type="file"] {
   width: 90%;
   /* Adjust the width to match the image */
   text-align: center;
-  /* Center the text */
+    font-style: normal; /* Override italic style */
 }
 
 .project-thumbnail p {

@@ -20,6 +20,24 @@
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='admintools.css') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+  <!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.stimmungskompass.at/">
+<meta property="og:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
+<meta property="og:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
+<meta property="og:image" content="https://www.stimmungskompass.at/static/stimmungskompass_ueber_fullsize_insert_a1_cropped.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://www.stimmungskompass.at/">
+<meta property="twitter:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
+<meta property="twitter:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
+<meta property="twitter:image" content="https://www.stimmungskompass.at/static/stimmungskompass_ueber_fullsize_insert_a1_cropped.png">
+
+
   <body>
   
 
@@ -2328,16 +2346,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-let resizeTimer;
-window.addEventListener('resize', () => {
-    document.querySelectorAll('.project-thumbnail').forEach((element) => {
-        element.style.transform = 'scale(0.95)';
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            element.style.transform = 'scale(1)';
-        }, 150);
-    });
-});
 
   </script>
   <script>
