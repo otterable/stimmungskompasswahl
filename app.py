@@ -1623,6 +1623,14 @@ def submit_project():
 
     return render_template("neuerbeitrag.html")
 
+@app.route('/robots.txt')
+def robots_txt():
+    return app.send_static_file('robots.txt')
+
+@app.route('/service-worker.js')
+def service_worker():
+    return app.send_static_file('service-worker.js')
+
 
 @app.route("/list")
 @app.route("/list/pages/<int:page>")

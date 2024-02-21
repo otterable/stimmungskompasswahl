@@ -187,50 +187,10 @@
     }).catch(error => console.error('Error:', error));
   }
 </script>
+
+
 <script>
-  // Toggle the navigation overlay when the hamburger button is clicked
-  document.getElementById('hamburger-button').addEventListener('click', function() {
-    var navOverlay = document.getElementById('nav-overlay');
-    navOverlay.classList.toggle('nav-overlay-active');
-  });
-  // Close the navigation overlay when clicking on the overlay background or on a non-button element
-  document.getElementById('nav-overlay').addEventListener('click', function(event) {
-    // Close only if the clicked element is not a button or a link
-    if (!event.target.closest('button, a')) {
-      closeNavOverlay();
-    }
-  });
-  // Function to close the navigation overlay
-  function closeNavOverlay() {
-    var navOverlay = document.getElementById('nav-overlay');
-    navOverlay.classList.remove('nav-overlay-active');
-  }
-  // Prevent closing when clicking on buttons (delegation)
-  document.getElementById('nav-links').addEventListener('click', function(event) {
-    if (event.target.tagName === 'BUTTON' || event.target.tagName === 'A') {
-      event.stopPropagation();
-    }
-  });
-  // Resize event listener
-  window.addEventListener('resize', function() {
-    // Check if the window width is greater than the threshold for mobile view
-    if (window.innerWidth > 1080) {
-      // Make sure the nav-overlay is displayed
-      document.getElementById('nav-overlay').classList.add('nav-overlay-active');
-    } else {
-      // For mobile view, revert back to the default behavior
-      document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
-    }
-  });
-  // Call the function on page load to set the initial state
-  function toggleOverlay() {
-    var overlay = document.getElementById("category-choices");
-    if (overlay.style.display === "none") {
-      overlay.style.display = "flex";
-    } else {
-      overlay.style.display = "none";
-    }
-  }
+
   // JavaScript function to handle redirection to Stimmungskarte
   function redirectToStimmungskarte() {
     window.location.href = '/karte';
@@ -682,95 +642,72 @@ function updateNumMapObjects() {
   }
 </script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    let currentOpenSection = null;
+document.addEventListener('DOMContentLoaded', function() {
+    console.debug('DOMContentLoaded event triggered for overlays.');
 
-    function toggleSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      if (!section) {
-        console.error("Section not found:", sectionId);
-        return;
-      }
-
-      // Toggle only if the section is not already open
-      if (section.style.display === 'none') {
-        section.style.display = 'block';
-        if (currentOpenSection && currentOpenSection !== sectionId) {
-          const currentSection = document.getElementById(currentOpenSection);
-          if (currentSection) {
-            currentSection.style.display = 'none';
-            console.debug(currentOpenSection + ' section closed');
-          }
+    // Generalized function to toggle overlay visibility using classList for 'nav-overlay-active' and direct style manipulation for 'filter-overlay'
+    function toggleOverlayVisibility(overlayId, useDisplayProperty = false) {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay) {
+            console.debug(`Cannot find overlay with ID: ${overlayId}`);
+            return;
         }
-        currentOpenSection = sectionId;
-        console.debug(sectionId + ' section opened');
-      } else {
-        section.style.display = 'none';
-        console.debug(sectionId + ' section closed');
-        currentOpenSection = null;
-      }
-    }
 
-    const filterOverlayButtons = document.querySelectorAll('#filter-overlay .c-button');
-    filterOverlayButtons.forEach(button => {
-      button.addEventListener('click', function(event) {
-        event.preventDefault();
-        const sectionId = this.getAttribute('data-section-id');
-        
-        // Check if the clicked section is the same as the currently open section
-        if (currentOpenSection === sectionId) {
-          // Close only the overlay
-          document.getElementById('filter-overlay').style.display = 'none';
-          console.debug('Overlay closed, current section remains open:', sectionId);
+        if (useDisplayProperty) {
+            // Toggle using display property for filter-overlay
+            overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+            console.debug(`${overlayId} overlay display toggled to ${overlay.style.display}.`);
         } else {
-          // Toggle the section and close the overlay
-          toggleSection(sectionId);
-          document.getElementById('filter-overlay').style.display = 'none';
+            // Toggle using class for nav-overlay
+            overlay.classList.toggle('nav-overlay-active');
+            console.debug(`${overlayId} overlay class toggled to ${overlay.classList.contains('nav-overlay-active') ? 'visible' : 'hidden'}.`);
         }
-      });
-    });
-
-    // Opening 'projectProposalsSection' by default
-    if (!isAnySectionOpen()) {
-      toggleSection('projectProposalsSection');
     }
 
-    // Open 'projectProposalsSection' by default when the page loads
-    toggleSection('projectProposalsSection');
+    // Setup listeners for both overlays
+    setupOverlayListener('nav-overlay', false); // Use classList toggle for nav-overlay
+    setupOverlayListener('filter-overlay', true); // Use display property toggle for filter-overlay
 
-    // Toggle filter overlay
-    const hamburgerButtonFilter = document.getElementById('hamburger-button-filter');
-    const filterOverlay = document.getElementById('filter-overlay');
-    if (hamburgerButtonFilter && filterOverlay) {
-      hamburgerButtonFilter.addEventListener('click', function() {
-        filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
-      });
-    }
+    // Closes overlay if clicked outside of nav-links, with enhanced logging
+    function setupOverlayListener(overlayId, useDisplayProperty) {
+        const overlay = document.getElementById(overlayId);
+        overlay.addEventListener('click', function(event) {
+            if (!event.target.closest('.nav-links')) {
+                if (useDisplayProperty) {
+                    this.style.display = 'none';
+                } else {
+                    this.classList.remove('nav-overlay-active');
+                }
+                console.debug(`Click outside nav-links, closing ${overlayId} overlay.`);
+            }
+        });
 
-    // Close filter overlay when clicking outside
-    if (filterOverlay) {
-      filterOverlay.addEventListener('click', function(event) {
-        if (event.target === this) {
-          this.style.display = 'none';
+        const navLinks = overlay.querySelector('.nav-links');
+        if (navLinks) {
+            navLinks.addEventListener('click', function(event) {
+                event.stopPropagation(); // Prevents overlay from closing when clicking inside nav-links
+                console.debug(`Click inside nav-links detected, keeping ${overlayId} overlay open.`);
+            });
         }
-      });
     }
 
-    // Toggle navigation overlay
+    // Toggle overlay visibility on button click
     const hamburgerButton = document.getElementById('hamburger-button');
-    const navOverlay = document.getElementById('nav-overlay');
-    if (hamburgerButton && navOverlay) {
-      hamburgerButton.addEventListener('click', function() {
-        navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
-      });
+    if (hamburgerButton) {
+        hamburgerButton.addEventListener('click', function() {
+            toggleOverlayVisibility('nav-overlay');
+        });
     }
-  });
-  
-   function isAnySectionOpen() {
-    let sections = document.querySelectorAll('.section');
-    return Array.from(sections).some(section => section.style.display === 'block');
-  }
+
+    const hamburgerButtonFilter = document.getElementById('hamburger-button-filter');
+    if (hamburgerButtonFilter) {
+        hamburgerButtonFilter.addEventListener('click', function() {
+            toggleOverlayVisibility('filter-overlay', true); // Use display property toggle for filter-overlay
+        });
+    }
+});
 </script>
+
 
 <script>
 function deleteProject(event, projectId) {
