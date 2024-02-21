@@ -578,14 +578,14 @@ nav[aria-label="Page navigation"] {
 .upvotes {
 	height: 100%;
 	background-color: #4caf50;
-	border-radius: 30px !important;
+	border-radius: 30px;
 	transition: width 0.3s ease;
 }
 
 .downvotes {
 	height: 100%;
 	background-color: #9A031E;
-	border-radius: 30px !important;
+	border-radius: 30px;
 	transition: width 0.3s ease;
 }
 

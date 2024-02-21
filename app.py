@@ -2390,43 +2390,34 @@ def admintools():
     )
 
 
+@app.route('/unmark_important/<int:projectId>', methods=['POST'])
+@login_required
+def unmark_important(projectId):
+    project = Project.query.get_or_404(projectId)
+    project.is_important = False
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Project unmarked as important.', 'projectId': projectId})
 
+
+@app.route('/unmark_featured/<int:projectId>', methods=['POST'])
+def unmark_featured(projectId):
+    # Example logic to unmark a project as featured
+    # Replace this with your actual database update logic
+    project = Project.query.get_or_404(projectId)
+    project.is_featured = False
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'Projekt erfolgreich als nicht ausgewählt markiert.'})
+    
+    
 
 @app.route('/mark_important/<int:projectId>', methods=['POST'])
+@login_required
 def mark_important(projectId):
     project = Project.query.get_or_404(projectId)
-    
-    # Use the correct attributes from the Vote model
-    upvotes = sum(1 for vote in project.votes if vote.upvote)
-    downvotes = sum(1 for vote in project.votes if vote.downvote)
-    total_votes = upvotes + downvotes
-    upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
-    downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
-
-    # Logic to mark the project as important
     project.is_important = True
-    db.session.commit()  # Save the changes to the database
-
-    # Construct the response data with calculated vote counts and project details
-    response_data = {
-        "success": True,
-        "project": {
-            "name": project.name,
-            "date": project.date.strftime('%d.%m.%Y'),
-            "view_count": project.view_count,
-            "image_file": project.image_file,
-            "descriptionwhy": project.descriptionwhy,
-            "id": project.id,
-            "upvotes": upvotes,
-            "downvotes": downvotes,
-            "upvote_percentage": upvote_percentage,
-            "downvote_percentage": downvote_percentage
-        }
-    }
-    
-    # Return the success response
-    return jsonify(response_data)
-
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Project marked as important.', 'projectId': projectId})
 
 
 
@@ -2466,6 +2457,8 @@ def mark_featured(project_id):
 
     # Return the success response with detailed project information
     return jsonify(response_data)
+    
+    
 @app.route('/delete_map_object/<int:map_object_id>', methods=['POST'])
 @login_required
 def delete_map_object(map_object_id):
@@ -2474,6 +2467,7 @@ def delete_map_object(map_object_id):
     db.session.delete(map_object)
     db.session.commit()
     return jsonify(success=True)
+
 
 
 @app.route("/verify_admin_otp", methods=["GET", "POST"])
@@ -2958,6 +2952,13 @@ def ueber():
     WebsiteViews.add_view(ip_address)
     # Additional logic can be added here if needed
     return render_template("ueber.html")
+
+@app.route("/privacy")
+def privacy():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    # Additional logic can be added here if needed
+    return render_template("privacy.html")
 
 
 @app.route("/delete_project/<int:project_id>", methods=["POST"])

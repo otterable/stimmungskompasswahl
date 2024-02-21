@@ -372,7 +372,7 @@
           <div class="project-description">{{ project.descriptionwhy|safe }}</div>
           <form method="POST" action="{{ url_for('admintools') }}">
             <input type="hidden" name="project_id" value="{{ project.id }}">
-            <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
+<button type="button" class="register-button" name="unmark_important" data-project-id="{{ project.id }}">Von "Wichtig" entfernen</button>
             <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
           </form>
         </div> {% else %} <p>Keine Projektvorschläge gefunden.</p> {% endfor %} </div>
@@ -397,7 +397,7 @@
           <div class="project-description">{{ project.descriptionwhy|safe }}</div>
           <form method="POST" action="{{ url_for('admintools') }}">
             <input type="hidden" name="project_id" value="{{ project.id }}">
-            <button type="submit" name="unmark_featured" class="register-button">Von "Ausgewählt" entferen</button>
+<button type="button" class="register-button" name="unmark_featured" data-project-id="{{ project.id }}">Von "Ausgewählt" entferen</button>
             <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
           </form>
         </div> {% else %} <p>Keine Projekte gefunden.</p> {% endfor %} </div>
@@ -2050,14 +2050,7 @@ function updateProjectCountDisplay() {
         }
     }
 }
-
-function markProjectImportant(projectId, event) {
-    event.preventDefault(); // Prevent form submission
-    if (!confirm("Möchten Sie dieses Projekt als wichtig markieren?")) {
-        return;
-    }
-
-    // AJAX request here
+function markProjectImportant(projectId) {
     fetch(`/mark_important/${projectId}`, {
         method: 'POST',
         headers: {
@@ -2067,23 +2060,47 @@ function markProjectImportant(projectId, event) {
         },
         body: JSON.stringify({ projectId })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
             alert('Projekt als wichtig markiert.');
-            addToImportantProjects(data.project); // Assuming data.project contains all the project details
+            addToImportantProjects(data.project); // Use the project details from the response
         } else {
-            // Handle failure
             alert('Fehler beim Markieren des Projekts als wichtig.');
         }
     })
     .catch(error => console.error('Error:', error));
 }
+
+// Assuming this function is correctly defined to take a project object and add it to the DOM
+function addToImportantProjects(project) {
+    // Ensure this selector targets the correct container for important projects
+    const list = document.getElementById('important-projects-list');
+    if (!list) {
+        console.error('Important projects list container not found.');
+        return;
+    }
+
+    // Dynamically create the HTML structure for the new project
+    const projectElement = document.createElement('div');
+    projectElement.className = 'project-thumbnail';
+    projectElement.innerHTML = `
+        <h3><strong>${project.name}</strong></h3>
+        <p class="project-date"> Gepostet am: <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong></p>
+        <!-- Add other project details as needed -->
+    `;
+
+    // Append the new project element to the list
+    list.appendChild(projectElement);
+}
+
+// Example usage: attaching the markProjectImportant function to button click events
+document.querySelectorAll('.mark-important-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const projectId = this.getAttribute('data-project-id');
+        markProjectImportant(projectId);
+    });
+});
 
 
 
@@ -2158,25 +2175,143 @@ function addToImportantProjects(project) {
     list.appendChild(projectElement);
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listener for unmarking a project as important
+    document.querySelectorAll("button[name='unmark_important']").forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const projectId = this.getAttribute('data-project-id');
+            fetch(`/unmark_important/${projectId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ projectId: projectId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Projekt erfolgreich als nicht wichtig markiert.');
+                    // Remove the project-thumbnail div for this project
+                    const projectThumbnail = this.closest('.project-thumbnail');
+                    if (projectThumbnail) {
+                        projectThumbnail.remove();
+                    }
+                } else {
+                    alert('Fehler beim Markieren des Projekts als nicht wichtig.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
 
-function addToFeaturedProjects(projectId, projectName) {
-    const list = document.getElementById('featured-projects-list');
-    if (!document.getElementById(`featured-project-${projectId}`)) {
-        const projectElement = document.createElement('div');
-        projectElement.id = `featured-project-${projectId}`;
-        projectElement.className = 'project-thumbnail';
-        projectElement.innerHTML = `
-            <h3>
-                <strong>${projectName}</strong>
-            </h3>
-            <p>Project details and actions here</p>
-        `;
-        list.appendChild(projectElement);
-    }
+    // Event listener for unmarking a project as featured
+    document.querySelectorAll("button[name='unmark_featured']").forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const projectId = this.getAttribute('data-project-id');
+            fetch(`/unmark_featured/${projectId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ projectId: projectId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Projekt erfolgreich als nicht ausgewählt markiert.');
+                    // Remove the project-thumbnail div for this project
+                    const projectThumbnail = this.closest('.project-thumbnail');
+                    if (projectThumbnail) {
+                        projectThumbnail.remove();
+                    }
+                } else {
+                    alert('Fehler beim Markieren des Projekts als nicht ausgewählt.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+
+
+// Function to add a project to the DOM
+function addProjectToDOM(project) {
+    $('#project-list').append(`
+        <div id="project-${project.id}">
+            <h3>${project.name}</h3>
+            <!-- Other project details -->
+            <button class="mark-important" data-project-id="${project.id}">Mark as Important</button>
+            <button class="unmark-important" data-project-id="${project.id}" style="display:none;">Unmark as Important</button>
+        </div>
+    `);
 }
 
+// Example of dynamically adding a project (this could be retrieved from the server on page load)
+addProjectToDOM({id: 1, name: "Project 1"});
+
+$(document).ready(function() {
+    // Delegate event for dynamically added elements
+    $(document).on('click', '.mark-important', function() {
+        const projectId = $(this).data('project-id');
+        $.post('/mark_important/' + projectId, function(response) {
+            if(response.success) {
+                alert(response.message);
+                $(`#project-${projectId} .mark-important`).hide();
+                $(`#project-${projectId} .unmark-important`).show();
+            }
+        });
+    });
+
+    $(document).on('click', '.unmark-important', function() {
+        const projectId = $(this).data('project-id');
+        $.post('/unmark_important/' + projectId, function(response) {
+            if(response.success) {
+                alert(response.message);
+                $(`#project-${projectId} .unmark-important`).hide();
+                $(`#project-${projectId} .mark-important`).show();
+            }
+        });
+    });
+});
 
 
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.project-thumbnail').forEach(projectThumbnail => {
+        const upvotesElement = projectThumbnail.querySelector('.upvotes');
+        const downvotesElement = projectThumbnail.querySelector('.downvotes');
+
+        let upvotes = 0, downvotes = 0;
+
+        if (upvotesElement) {
+            upvotes = parseInt(upvotesElement.textContent.match(/\d+/) ? upvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        if (downvotesElement) {
+            downvotes = parseInt(downvotesElement.textContent.match(/\d+/) ? downvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        // Log the project details and adjust border-radius
+        if (upvotes > 0 && downvotes > 0) {
+            console.log(`Project loaded with ${upvotes} upvotes and ${downvotes} downvotes. Adjusting border-radius.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px 0 0 30px';
+            if (downvotesElement) downvotesElement.style.borderRadius = '0 30px 30px 0';
+        } else if (upvotes > 0 && downvotes === 0) {
+            console.log(`Project loaded with ${upvotes} upvotes and 0 downvotes. Adjusting border-radius for upvotes.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px';
+        } else if (downvotes > 0 && upvotes === 0) {
+            console.log(`Project loaded with ${downvotes} downvotes and 0 upvotes. Adjusting border-radius for downvotes.`);
+            if (downvotesElement) downvotesElement.style.borderRadius = '30px';
+        } else {
+            console.log(`Project loaded with 0 upvotes and 0 downvotes. Setting border-radius to 30px on both sides.`);
+            if (upvotesElement) upvotesElement.style.borderRadius = '30px';
+            if (downvotesElement) downvotesElement.style.borderRadius = '30px';
+        }
+    });
+});
   </script>
   <script>
     fetch('/log_view').then(response => response.json()).then(data => console.debug(data.message)).catch(console.error);

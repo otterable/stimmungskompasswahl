@@ -18,6 +18,27 @@
         border-radius: 30px;
         transition: width 0.3s ease;
       }
+	  
+	  .nav-link { /* Replace .nav-link with your actual selector */
+  background-color: #003056;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold !important;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin: 10px 0;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.nav-link:hover { /* Replace .nav-link with your actual selector */
+  transform: scale(1.02);
+}
+
 
       .logo {
         max-width: 1000px;

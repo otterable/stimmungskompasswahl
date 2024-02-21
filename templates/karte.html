@@ -3018,7 +3018,11 @@
     </div> <?php SIDEBAR BODY END ?>
 	
 <script type="text/javascript">
-	
+	if (typeof isSpam === 'undefined') {
+  window.isSpam = function() { return false; };
+}
+
+
 	var swearWords = {
   "de": [],
   "en": []
