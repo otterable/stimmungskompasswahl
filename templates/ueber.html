@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='ueber.css') }}">
-	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('serve_image', filename='ueber.css') }}">
+	<link rel="manifest" href="{{ url_for('serve_image', filename='site.webmanifest') }}">
 	<!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.stimmungskompass.at/">
@@ -18,14 +18,14 @@
 <meta property="twitter:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
 <meta property="twitter:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
 <meta property="twitter:image" content="https://www.stimmungskompass.at/static/twitter_card.png">
-<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="icon" type="image/x-icon" href="{{ url_for('serve_image', filename='favicon.ico') }}">
 
     <title>Open Data - Stimmungskompass</title>
   </head>
   <body>
     <div class="top-bar">
       <a href="/">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
       </a>
       <button id="hamburger-button">&#9776;</button>
       <div id="nav-overlay" class="nav-overlay">

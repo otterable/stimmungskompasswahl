@@ -6,7 +6,7 @@
     <title>Login</title>
     <meta name="google-signin-client_id" content="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.comLogin successful!">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+	<link rel="manifest" href="{{ url_for('serve_image', filename='site.webmanifest') }}">
 	<!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.stimmungskompass.at/">
@@ -20,7 +20,7 @@
 <meta property="twitter:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
 <meta property="twitter:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
 <meta property="twitter:image" content="https://www.stimmungskompass.at/static/twitter_card.png">
-<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="icon" type="image/x-icon" href="{{ url_for('serve_image', filename='favicon.ico') }}">
 
   </head>
   <style>
@@ -341,7 +341,7 @@
   <body>
     <div class="logo-container" onclick="redirectToIndex()">
       <a href="/">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
       </a>
     </div>
     <div class="container">
@@ -370,7 +370,7 @@
       </div>
       <!-- Right side - Cover Image Section -->
       <div class="cover-section">
-        <img src="{{ url_for('static', filename='login_titleimage.png') }}" alt="Cover Image" class="cover-image">
+        <img src="{{ url_for('serve_image', filename='login_titleimage.png') }}" alt="Cover Image" class="cover-image">
       </div>
     </div>
   </body>

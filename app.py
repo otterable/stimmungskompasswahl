@@ -11,7 +11,8 @@ from flask import (
     send_file,
     send_from_directory,
     make_response,
-    flash
+    flash,
+    abort
 )
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, desc, asc, and_, cast, Date
@@ -57,6 +58,7 @@ from bs4 import BeautifulSoup
 import logging
 import shutil
 from pathlib import Path
+from PIL import Image
 from collections import Counter
 import os
 import pandas as pd
@@ -125,6 +127,30 @@ google = oauth.register(
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
+
+
+
+
+@app.route('/images/<path:filename>')
+def serve_image(filename):
+    image_dir = os.path.join(app.root_path, 'static')
+    image_path = os.path.join(image_dir, filename)
+    
+    if 'image/webp' in request.headers.get('Accept', ''):
+        webp_path = os.path.splitext(image_path)[0] + '.webp'
+        
+        if not os.path.exists(webp_path):
+            os.makedirs(os.path.dirname(webp_path), exist_ok=True)
+            try:
+                with Image.open(image_path) as img:
+                    # Adjust the quality parameter here (e.g., quality=75 for 75% quality)
+                    img.save(webp_path, 'WEBP', quality=75)
+            except IOError:
+                abort(404)  # Image not found or unable to convert
+        
+        return send_from_directory(os.path.dirname(webp_path), os.path.basename(webp_path), mimetype='image/webp')
+    else:
+        return send_from_directory(os.path.dirname(image_path), os.path.basename(filename))
 
 
 @app.route("/log_view")

@@ -4,17 +4,19 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Stimmungskompass DEMO</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
-    
+    <link rel="stylesheet" href="{{ url_for('serve_image', filename='index.css') }}">
+    <link rel="manifest" href="{{ url_for('serve_image', filename='site.webmanifest') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('serve_image', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('serve_image', filename='apple-touch-icon.png') }}">
+    <link rel="preload" href="{{ url_for('serve_image', filename='index_titleimage_big.webp') }}" as="image">
+
     <!-- Meta tags for iOS support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Stimmungskompass">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="theme-color" content="#003056">
     
-    <!-- Open Graph / Facebook -->
+	<!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.stimmungskompass.at/">
     <meta property="og:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
@@ -28,6 +30,26 @@
     <meta property="twitter:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
     <meta property="twitter:image" content="https://www.stimmungskompass.at/static/twitter_card.png">
     
+	
+<div id="ios-install-prompt" style="display:none;">
+	<p>Stimmungskompass App verfügbar:</p>
+    <p>Tippen Sie auf <img src="{{ url_for('serve_image', filename='share-icon.png') }}" alt="Teilen-Symbol">, dann "Zum Home-Bildschirm".</p>
+    <button id="close-prompt">Schließen</button>
+</div>
+
+
+<script>
+// Display the prompt
+if(/iPhone|iPad|iPod/.test(navigator.platform) && !navigator.standalone) {
+    document.getElementById('ios-install-prompt').style.display = 'block';
+}
+
+// Close the prompt
+document.getElementById('close-prompt').addEventListener('click', function() {
+    document.getElementById('ios-install-prompt').style.display = 'none';
+});
+</script>
+	
     <!-- Service Worker Registration -->
     <script>
 if ('serviceWorker' in navigator) {
@@ -43,9 +65,25 @@ if ('serviceWorker' in navigator) {
     </script>
 
   </head>
+  
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="position: absolute; width: 0; height: 0;">
+  <defs>
+    <filter id="text-border-filter" x="-0.2" y="-0.2" width="1.4" height="1.4">
+      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="4"/>
+      <feFlood flood-color="#000000" result="PINK"/>
+      <feComposite in="PINK" in2="DILATED" operator="in" result="OUTLINE"/>
+      <feMerge>
+        <feMergeNode in="OUTLINE"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>
+
+
   <div class="top-bar">
     <a href="/">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+<img src="{{ url_for('serve_image', filename='logo.png', width=550) }}" alt="Logo" class="logo">
     </a>
     <button id="hamburger-button">&#9776;</button>
     <div id="nav-overlay" class="nav-overlay">
@@ -66,22 +104,23 @@ if ('serviceWorker' in navigator) {
   </div>
   </div>
   <div class="index-image">
-    <img alt="Index Title Image" class="index-image" src="{{ url_for('static', filename='index_titleimage.png') }}" style="; max-width: 100%; height: auto;" />
+    <img alt="Index Title Image" class="index-image lazyload" data-src="{{ url_for('serve_image', filename='index_titleimage_big.webp') }}" style="max-width: 100%; height: auto;">
     <div class="cover-text-container">
-      <h1>Verschönern Sie Ihre Stadt!</h1>
-      <p>Tragen Sie zu einer höheren Lebensqualität bei!</p>
+        <h1>Verschönern Sie Ihre Stadt!</h1>
+        <p>Tragen Sie zu einer höheren Lebensqualität bei!</p>
     </div>
-  </div>
+</div>
+
   <div class="info-box-container">
     <!-- Box 1 -->
     <div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer; margin: 10px">
-      <img alt="Map Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_map.png') }}">
+<img src="{{ url_for('serve_image', filename='index_icon_map.png', width=50) }}" alt="Map Icon" class="info-box-icon">
       <p class="info-box-title">Karte</p>
       <p class="info-box-undertitle">Posten Sie neue Notizen und sehen Sie sich andere Beiträge an, die andere Leute gepostet haben!</p>
     </div>
     <!-- Box 2 -->
     <div class="info-box box-blue" onclick="redirectToneuerbeitrag()" style="cursor: pointer; margin: 10px">
-      <img alt="Public Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_public.png') }}">
+      <img alt="Public Icon" class="info-box-icon" src="{{ url_for('serve_image', filename='index_icon_public.png') }}">
       <p class="info-box-title">Machen Sie einen Vorschlag!</p>
       <p class="info-box-undertitle">Teilen Sie Ihrer Stadt mit, welche Veränderungen oder Verbesserungen Sie sich wünschen!</p>
       <p class="info-box-undertitle">Aktuelle Projektvorschläge: {{ project_count }}</p>
@@ -89,7 +128,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <!-- Box 3 -->
     <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
-      <img alt="List Icon" class="info-box-icon" src="{{ url_for('static', filename='index_icon_list.png') }}">
+      <img alt="List Icon" class="info-box-icon" src="{{ url_for('serve_image', filename='index_icon_list.png') }}">
       <p class="info-box-title">Aktuelle Projektvorschläge</p>
       <p class="info-box-undertitle">Stimmen Sie über Projektvorschläge ab und verhelfen Sie ihnen zum Erfolg!</p>
     </div>
@@ -115,13 +154,14 @@ if ('serviceWorker' in navigator) {
         </div> {% endif %} {% if project.downvotes > 0 %} <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
           <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
         </div> {% endif %} </div>
-      <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+      <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
       <div class="project-description">{{ project.descriptionwhy|safe }}</div>
     </div> {% endfor %} {% else %} <p style="text-align: center;">Keine hervorgehobenen Projekte gefunden.</p> {% endif %} </div>
 <div class="bottom-bar" style="margin-top: 10px;">
 <p> <a href="mailto:office@stimmungskompass.at" style="color: inherit; text-decoration: underline;">office@stimmungskompass.at</a> | <a href="/privacy" style="color: inherit; text-decoration: underline;">Impressum / Datenschutz</a></p>
 <p>Stimmungskompass Demo b18c, nur zu Demonstrationszwecken</a></p>
 </div>
+<div class="extended-background"></div> <!-- This div extends the background color -->
 
   </body>
 </html>
@@ -200,6 +240,27 @@ window.addEventListener('resize', () => {
             element.style.transform = 'scale(1)';
         }, 150);
     });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  var lazyImages = [].slice.call(document.querySelectorAll("img.lazyload"));
+
+  if ("IntersectionObserver" in window) {
+    let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          let lazyImage = entry.target;
+          lazyImage.src = lazyImage.dataset.src;
+          lazyImage.classList.remove("lazyload");
+          lazyImageObserver.unobserve(lazyImage);
+        }
+      });
+    });
+
+    lazyImages.forEach(function(lazyImage) {
+      lazyImageObserver.observe(lazyImage);
+    });
+  }
 });
 
 </script>

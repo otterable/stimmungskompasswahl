@@ -12,7 +12,7 @@
           <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
         </div> {% endif %} </div>
       <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
-        <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
+        <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
       </a>
       <div class="project-description">{{ project.descriptionwhy|safe }}</div>
 <form data-project-id="{{ project.id }}" onsubmit="deleteProject(event, {{ project.id }});">

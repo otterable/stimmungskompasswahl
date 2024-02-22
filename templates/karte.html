@@ -17,12 +17,12 @@
 <meta property="twitter:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
 <meta property="twitter:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
 <meta property="twitter:image" content="https://www.stimmungskompass.at/static/twitter_card.png">
-<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="icon" type="image/x-icon" href="{{ url_for('serve_image', filename='favicon.ico') }}">
 
     <link rel="icon" href="{{ url_for('favicon') }}" type="image/x-icon">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+	<link rel="manifest" href="{{ url_for('serve_image', filename='site.webmanifest') }}">
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     </script>
 	  <script src="static/spamFilter.js"></script>
@@ -2925,7 +2925,7 @@
     </div>
     <div class="top-bar">
       <a href="/">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
       </a>
       <button id="hamburger-button">&#9776;</button>
       <div id="nav-overlay" class="nav-overlay" style="z-index: 10001 !important;">
@@ -2973,7 +2973,7 @@
         <div class="title-button-container">
           <h2 class="title-imagebutton" style="font-size: 21px;">Notiz hinzufügen</h2>
           <a href="#" id="info-link">
-            <img src="{{ url_for('static', filename='infobutton.png') }}" alt="Info" class="info-image">
+            <img src="{{ url_for('serve_image', filename='infobutton.png') }}" alt="Info" class="info-image">
           </a>
         </div>
         <h3 style="font-size: 16px;">
@@ -3016,7 +3016,7 @@
       </div>
       <div id="map">
         <a href="#" id="info-link2">
-          <img src="{{ url_for('static', filename='infobutton2.png') }}" alt="Info" class="info-image2" style="z-index: 1002 !important;">
+          <img src="{{ url_for('serve_image', filename='infobutton2.png') }}" alt="Info" class="info-image2" style="z-index: 1002 !important;">
         </a>
         <!-- Inside the map div -->
       </div> <?php MAP END ?> <?php SIDEBAR BODY START ?> <div id="sidebar">

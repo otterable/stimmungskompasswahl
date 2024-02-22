@@ -783,6 +783,18 @@ input[type="file"] {
   /* Center align text */
 }
 
+/* Default style for .centered-title (for mobile devices) */
+.centered-title {
+    margin-top: -10px;
+}
+
+/* Media query for desktop devices */
+@media only screen and (min-width: 1081px) {
+    .centered-title {
+        margin-top: -20px;
+    }
+}
+
 .form-container .author-text {
   color: #003056;
   /* Set the text color */

@@ -7,10 +7,10 @@
 	<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
-	<link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+	<link rel="manifest" href="{{ url_for('serve_image', filename='site.webmanifest') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"/>
-     <link rel="stylesheet" href="{{ url_for('static', filename='neuerbeitrag.css') }}">
+     <link rel="stylesheet" href="{{ url_for('serve_image', filename='neuerbeitrag.css') }}">
 	 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.stimmungskompass.at/">
@@ -24,7 +24,7 @@
 <meta property="twitter:title" content="Stimmungskompass - Eine Plattform zur Bürgerbeteiligung">
 <meta property="twitter:description" content="Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!">
 <meta property="twitter:image" content="https://www.stimmungskompass.at/static/twitter_card.png">
-<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<link rel="icon" type="image/x-icon" href="{{ url_for('serve_image', filename='favicon.ico') }}">
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
@@ -42,7 +42,7 @@
 
 <div class="top-bar">
     <a href="/">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
     </a>  
     <button id="hamburger-button">&#9776;</button>
 
@@ -69,7 +69,7 @@
 <div class="header-container">
     <h1 id="page-title">Teilen Sie Ihre Idee!</h1>
     <a href="#" id="info-link">
-        <img src="{{ url_for('static', filename='infobutton.png') }}" alt="Info" class="info-image">
+        <img src="{{ url_for('serve_image', filename='infobutton.png') }}" alt="Info" class="info-image">
     </a>
 </div>
 
