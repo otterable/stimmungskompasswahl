@@ -1,0 +1,533 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.596978148632386,
+                    48.406628217526446
+                ]
+            },
+            "properties": {
+                "id": 1,
+                "name": "Alten Spielplatz erneuen",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Der alte Spielplatz im Stadtpark ist schon etwas heruntergekommen. Es w\u00e4re sinnvoll, einige Installationen zu erneuern (z.B. Schaukeln, Karusell) oder \u00fcberhaupt die eine oder andere neue Attraktion zu errichten - die Kinder w\u00fcrden sich freuen.</p>",
+                "public_benefit": "<p>Ein besserer Spielplatz in der Stadt f\u00fcr unsere Kinder.</p>",
+                "image_file": "cropped-1705410546636.jpg",
+                "geoloc": "48.406628217526446,15.596978148632386",
+                "date": "2024-01-12 18:34:02",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.599952179923742,
+                    48.4114002197786
+                ]
+            },
+            "properties": {
+                "id": 2,
+                "name": "Mehr Markttage bitte",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Der Bauernmarkt hat bekanntlich nur am Samstagvormittag offen. Einige w\u00fcnschen sich aber auch einen oder vielleicht sogar mehrere zus\u00e4tzliche Tage zum Einkaufen am Markt. Auch die \u00d6ffnungszeiten k\u00f6nnen \u00fcberdenkt werden. Das erweiterete Angebot wird auch bestimmt gut angenommen werden.</p>",
+                "public_benefit": "<p>Mehr M\u00f6glichkeiten, Obst, Gem\u00fcse und andere Schmankeln regional einzukaufen. </p>",
+                "image_file": "cropped-86558428535058272468.jpg",
+                "geoloc": "48.4114002197786,15.599952179923742",
+                "date": "2024-01-12 18:41:24",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.579311321073867,
+                    48.400403343800946
+                ]
+            },
+            "properties": {
+                "id": 3,
+                "name": "Verbesserungen am Radweg",
+                "category": "Sport",
+                "descriptionwhy": "<p>Der Radweg entlang des Flusses hat mittlerweile einige Sch\u00e4den durch Wurzeln nahestehender B\u00e4ume. Au\u00dferdem ist er zwischendurch durch die Stra\u00dfe unterbrochen - auch das sollte f\u00fcr eine verbesserte Sicherheit behoben werden.</p>",
+                "public_benefit": "<p>Der Radweg wird sicherer und angenehmer zu befahren, vor allem f\u00fcr Kinder.</p>",
+                "image_file": "cropped-00235735669304345436.jpg",
+                "geoloc": "48.400403343800946,15.579311321073867",
+                "date": "2024-01-12 18:47:16",
+                "author": "1",
+                "is_important": true,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.596291026774496,
+                    48.40768129470201
+                ]
+            },
+            "properties": {
+                "id": 4,
+                "name": "Zu wenige Parkpl\u00e4tze in der Innenstadt",
+                "category": "Transport",
+                "descriptionwhy": "<p>Leider sind die paar wenigen Parkpl\u00e4tze immer belegt, sodass ich oft auch als Anwohner keinen Platz finde. Es w\u00e4re gut, die Regelungen f\u00fcrs Parken zu \u00fcberarbeiten und die Parkpl\u00e4tze nur f\u00fcr Anwohner zu vergeben.</p>",
+                "public_benefit": "<p>Gesicherte Autostellpl\u00e4tze f\u00fcr die Anwohner.</p>",
+                "image_file": "cropped-1705924254619.jpg",
+                "geoloc": "48.40768129470201,15.596291026774496",
+                "date": "2024-01-12 18:52:29",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.605706324109194,
+                    48.4054718440058
+                ]
+            },
+            "properties": {
+                "id": 6,
+                "name": "Sportplatz ernueuern",
+                "category": "Sport",
+                "descriptionwhy": "<p>Der Sportplatz geh\u00f6rt von Grund auf erneuert, alles ist alt und marod. </p>",
+                "public_benefit": "<p>Schulklassen zum Turnen und Sportvereine f\u00fcr sehr von einem neuen, modernen Platz profitieren.</p>",
+                "image_file": "cropped-54330418508336896590.jpg",
+                "geoloc": "48.4054718440058,15.605706324109194",
+                "date": "2024-01-12 19:06:10",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": true
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.60495130128018,
+                    48.41224055679706
+                ]
+            },
+            "properties": {
+                "id": 7,
+                "name": "Besserer Busfahrplan",
+                "category": "Transport",
+                "descriptionwhy": "<p>Vor allem die wichtigsten Buslinien (1, 2 und 5) sollten in dichteren Intervallen fahren - zumindest alle 30 Minuten. Au\u00dferdem solten auch nach 20 Uhr noch Busse fahren. </p>",
+                "public_benefit": "<p>Vor allem f\u00fcr die vielen Studenten und jungen Menschen w\u00e4re das ein Vorteil, aber auch alle anderen, die mit dem Bus in die Arbeit fahren.</p>",
+                "image_file": "cropped-69924554941910644511.jpg",
+                "geoloc": "48.41224055679706,15.60495130128018",
+                "date": "2024-01-12 19:18:22",
+                "author": "1",
+                "is_important": true,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.604708562841669,
+                    48.40926337335804
+                ]
+            },
+            "properties": {
+                "id": 8,
+                "name": "Bahnhofsvorplatz unsicher",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Am Bahnhofsvorplatz sind h\u00e4ufig, vor allem am Abend, Betrunkene und verhaltensauff\u00e4llige Leute unterwegs. Ich f\u00fchle dort nicht immer sicher. Vielleicht braucht es mehr Sicherheitspersonal oder ein Alkoholverbot rund um den Bahnhof.</p>",
+                "public_benefit": "<p>Der Bahnhof soll sicherer und auch ein angenehmerer Ort zum Warten werden. Gerade am Abend ist es oft nicht angenehm dort.</p>",
+                "image_file": "cropped-45653384914373200164.jpg",
+                "geoloc": "48.40926337335804,15.604708562841669",
+                "date": "2024-01-12 19:30:35",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.61292928192781,
+                    48.411392875670366
+                ]
+            },
+            "properties": {
+                "id": 9,
+                "name": "Keine Pl\u00e4tze im Pflegeheim",
+                "category": "Gesundheit",
+                "descriptionwhy": "<p>Ich bin sicher nicht alleine damit, f\u00fcr meine Mutter, die nicht mehr nalleine leben kann, keinen Platz in der n\u00e4heren Umgebung zu finden. Die Pl\u00e4tze werden aber dringend ben\u00f6tigt. Ich hoffe, wir k\u00f6nne nein L\u00f6sung finden.</p>",
+                "public_benefit": "<p>Alte Menschen und alle Angeh\u00f6rige, die mit der Pflege \u00fcberfordert sind.</p>",
+                "image_file": "cropped-51550415069287437330.jpg",
+                "geoloc": "48.411392875670366,15.61292928192781",
+                "date": "2024-01-12 19:37:53",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.604160514062153,
+                    48.411347253155945
+                ]
+            },
+            "properties": {
+                "id": 10,
+                "name": "Volksschule neuer Garten",
+                "category": "Bildung",
+                "descriptionwhy": "<p>Die Volksschule sollte die Wiese dahinter als Garten dazubekommen. Die Wise ist momtentan sowieso ungenutzt. Das w\u00e4re super f\u00fcr die Kinder in der Pause.</p>",
+                "public_benefit": "<p>Sch\u00f6nere Pausen und besserer Turnunterricht f\u00fcr die Volksschulkinder, bessere Nutzung f\u00fcr die Wiese.</p>",
+                "image_file": "cropped-50106647535760397955.jpg",
+                "geoloc": "48.411347253155945,15.604160514062153",
+                "date": "2024-01-12 19:47:19",
+                "author": "1",
+                "is_important": true,
+                "p_reports": 0,
+                "is_featured": true
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.604580248702835,
+                    48.4152141166829
+                ]
+            },
+            "properties": {
+                "id": 11,
+                "name": "Neue Tiefgarage",
+                "category": "Transport",
+                "descriptionwhy": "<p>Testing how this overwriting worksfgf</p>",
+                "public_benefit": "<p>Testing how this overwriting works</p>",
+                "image_file": "cropped-1705923673433.jpg",
+                "geoloc": "48.4152141166829,15.604580248702835",
+                "date": "2024-01-13 09:18:25",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.581531524658205,
+                    48.403195076809354
+                ]
+            },
+            "properties": {
+                "id": 12,
+                "name": "User Generated Marker",
+                "category": "Transport",
+                "descriptionwhy": "In dieser Gegend gibt es leider keine Buslinie.",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.403195076809354, 15.581531524658205",
+                "date": "2024-01-17 17:04:46",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.613074302673342,
+                    48.40835165604796
+                ]
+            },
+            "properties": {
+                "id": 16,
+                "name": "User Generated Marker",
+                "category": "Gesundheit",
+                "descriptionwhy": "Hausarzt bitte nachbesetzen - leider gibt es schon seit einem Jahr keinen Arzt mehr in der N\u00e4he. K\u00f6nnte sich vielleicht jemand darum bem\u00fchen?",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.40835165604796, 15.613074302673342",
+                "date": "2024-01-17 17:14:57",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.615413188934328,
+                    48.41185555241866
+                ]
+            },
+            "properties": {
+                "id": 17,
+                "name": "User Generated Marker",
+                "category": "Gesundheit",
+                "descriptionwhy": "Viel zu lange Wartezeiten im Krankenhaus",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.41185555241866, 15.615413188934328",
+                "date": "2024-01-17 17:15:26",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.589985847473146,
+                    48.41595736821784
+                ]
+            },
+            "properties": {
+                "id": 18,
+                "name": "User Generated Marker",
+                "category": "Gesundheit",
+                "descriptionwhy": "Ein paar mehr Sitz- und Liegeb\u00e4nke im Kurpark w\u00e4ren nett - vor allem rund um die Kuranstalt\n",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.41595736821784, 15.589985847473146",
+                "date": "2024-01-17 17:19:58",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.612323284149172,
+                    48.41013212136694
+                ]
+            },
+            "properties": {
+                "id": 19,
+                "name": "User Generated Marker",
+                "category": "Umwelt",
+                "descriptionwhy": "Wann kommt endlich die Renaturierung des Flussufers?",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.41013212136694, 15.612323284149172",
+                "date": "2024-01-17 17:21:22",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.617752075195314,
+                    48.419061994862304
+                ]
+            },
+            "properties": {
+                "id": 20,
+                "name": "User Generated Marker",
+                "category": "Sport",
+                "descriptionwhy": "Ich w\u00fcnsche mir das j\u00e4hrliche Radrennen zur\u00fcck - bis vor ein paar Jahren gab es das noch.",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.419061994862304, 15.617752075195314",
+                "date": "2024-01-17 17:23:44",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.580072402954103,
+                    48.40202693927076
+                ]
+            },
+            "properties": {
+                "id": 21,
+                "name": "User Generated Marker",
+                "category": "Umwelt",
+                "descriptionwhy": "Vor einiger Zeit wurden in der Allee alte B\u00e4ume umgeschnitten - hoffentlich werden die bald durch neue ersetzt",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.40202693927076, 15.580072402954103",
+                "date": "2024-01-17 17:25:28",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.600779056549074,
+                    48.41001817345367
+                ]
+            },
+            "properties": {
+                "id": 22,
+                "name": "User Generated Marker",
+                "category": "Verwaltung",
+                "descriptionwhy": "Bitte um l\u00e4nger \u00d6ffnungszeiten im Rathaus - oder ein bis zwei Stunden am Samstag",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.41001817345367, 15.600779056549074",
+                "date": "2024-01-17 17:26:55",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.599040985107424,
+                    48.41081580348463
+                ]
+            },
+            "properties": {
+                "id": 23,
+                "name": "User Generated Marker",
+                "category": "Kultur",
+                "descriptionwhy": "Ich w\u00fcrde mich \u00fcber mehr Kunstinstallationen oder \u00f6ffentlich ausgestellte Kunst freuen.",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.41081580348463, 15.599040985107424",
+                "date": "2024-01-17 17:28:34",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.594685077667238,
+                    48.40583041052556
+                ]
+            },
+            "properties": {
+                "id": 24,
+                "name": "User Generated Marker",
+                "category": "Kultur",
+                "descriptionwhy": "Was wurde aus der wechselnden Austellung der Stadtgallerie? In letzter Zeit gibt es leider nur selten neue Austellungen.",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.40583041052556, 15.594685077667238",
+                "date": "2024-01-17 17:29:48",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.601186752319338,
+                    48.408038287700606
+                ]
+            },
+            "properties": {
+                "id": 25,
+                "name": "User Generated Marker",
+                "category": "Andere",
+                "descriptionwhy": "Hier gibt es h\u00e4ufig viel L\u00e4rm abends - kann man dagegen vielleicht etwsa tun?",
+                "public_benefit": "Default public benefit description",
+                "image_file": "default_image.jpg",
+                "geoloc": "48.408038287700606, 15.601186752319338",
+                "date": "2024-01-17 17:31:44",
+                "author": "0",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.596143375203608,
+                    48.40761986672636
+                ]
+            },
+            "properties": {
+                "id": 80,
+                "name": "Wir brauchen mehr Z\u00fcge",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Eine treffende Beschreibung</p>",
+                "public_benefit": "<p>Eine treffende Beschreibung!</p>",
+                "image_file": "cropped-1706628678299.jpg",
+                "geoloc": "48.40761986672636,15.596143375203608",
+                "date": "2024-01-22 14:01:33",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "is_featured": false
+            }
+        }
+    ]
+}
