@@ -1854,7 +1854,7 @@ def project_details(project_id):
         
         g.metaData['og_url']="https://stimmungskompass.ermine.at/project_details/"+str(project_id)
         g.metaData['og_description']=remove_p_tags(project.descriptionwhy)
-        g.metaData['og_image']="https://stimmungskompass.ermine.at" + project.image_file
+        g.metaData['og_image']="https://stimmungskompass.ermine.at/static/usersubmissions/" + project.image_file
         g.metaData['og_title']=project.name
         metaData=g.metaData
         return render_template(
