@@ -143,20 +143,21 @@ def serve_image(filename):
     image_dir = os.path.join(app.root_path, 'static')
     image_path = os.path.join(image_dir, filename)
     
-    if not os.path.exists(image_path):
-        abort(404)  # Ensure we don't hit a 503 by trying to serve non-existent files
-
     if 'image/webp' in request.headers.get('Accept', ''):
         webp_path = os.path.splitext(image_path)[0] + '.webp'
+        
         if not os.path.exists(webp_path):
+            os.makedirs(os.path.dirname(webp_path), exist_ok=True)
             try:
                 with Image.open(image_path) as img:
+                    # Adjust the quality parameter here (e.g., quality=75 for 75% quality)
                     img.save(webp_path, 'WEBP', quality=75)
             except IOError:
                 abort(404)  # Image not found or unable to convert
+        
         return send_from_directory(os.path.dirname(webp_path), os.path.basename(webp_path), mimetype='image/webp')
     else:
-        return send_from_directory(image_dir, filename)
+        return send_from_directory(os.path.dirname(image_path), os.path.basename(filename))
 
 
 @app.route("/log_view")
