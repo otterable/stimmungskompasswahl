@@ -121,12 +121,11 @@ ip_project_submissions = {}
 
 google = oauth.register(
     "google",
-    client_id="FREELANCER",
-    client_secret="FREELANCER",
+    client_id="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com",
+    client_secret="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",
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
-
 
 @app.before_request
 def before_request():
