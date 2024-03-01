@@ -29,8 +29,6 @@ from models import (
     Bookmark,
     Report,
     WebsiteViews,
-    Baustelle,
-    Question
 )
 from flask_login import (
     LoginManager,
@@ -138,115 +136,6 @@ def before_request():
         'og_description': 'Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!',
         'og_image': 'https://www.stimmungskompass.at/static/facebook_card.png'
     }
-
-
-
-@app.route('/get_questions/<int:baustelle_id>')
-def get_questions(baustelle_id):
-    questions = Question.query.filter_by(baustelle_id=baustelle_id).all()
-    questions_data = [{
-        'id': question.id,
-        'text': question.text,
-        'author': question.author,
-        'date': question.date.isoformat(),
-        'answer_text': question.answer_text,
-        'answered': question.answered,
-        'baustelle_id': question.baustelle_id,
-        'latitude': question.latitude,
-        'longitude': question.longitude,
-        'answer_date': question.answer_date.isoformat() if question.answer_date else None,  # Format answer_date
-    } for question in questions]
-    return jsonify(questions_data)
-
-
-@app.route('/answer_question/<int:question_id>', methods=['POST'])
-@login_required
-def answer_question(question_id):
-    # Explicitly allow user with ID 1 to access this route
-    if current_user.id != 1:
-        return jsonify({'error': 'Unauthorized'}), 403
-
-    data = request.get_json()
-    question = Question.query.get_or_404(question_id)
-    question.answer_text = data.get('answer_text')
-    question.answered = True
-    question.answer_date = datetime.utcnow()
-    db.session.commit()
-
-    return jsonify({
-        'message': 'Question answered successfully',
-        'question_id': question.id,
-    }), 200
-
-@app.route('/admin/neuebaustelle', methods=['GET', 'POST'])
-def neuebaustelle():
-    if request.method == 'POST':
-        # Handle form submission
-        name = request.form.get('name')
-        description = request.form.get('description')
-        # Assuming GIS data is sent as a string in form data (not a file), adjust if necessary
-        gis_data_str = request.form.get('gis_data')
-        gis_data = json.loads(gis_data_str) if gis_data_str else None
-
-        new_baustelle = Baustelle(name=name, description=description, gis_data=gis_data, author="Author Name")  # Adjust the author accordingly
-        db.session.add(new_baustelle)
-        db.session.commit()
-        print(f'New Baustelle created: {name}, ID: {new_baustelle.id}')
-        # Redirect to the baustellen page with the new Baustelle's ID, or return JSON with the ID for AJAX handling
-        # return redirect(url_for('baustellen', baustelle_id=new_baustelle.id))
-        return jsonify({'status': 'success', 'message': 'Baustelle created successfully.', 'baustelleId': new_baustelle.id})
-    else:
-        # Handle GET request to display the form
-        return render_template('admin/neuebaustelle.html')
-
-@app.route('/baustellen/<int:baustelle_id>', methods=['GET', 'POST'])
-def baustellen(baustelle_id):
-    # Initialize as False by default
-    is_admin = False
-    user_id = None
-    
-    if current_user.is_authenticated:
-        user_id = current_user.id  # Get the current user's ID
-        
-        # Check if the current user's ID is 1, and explicitly set as admin
-        if user_id == 1:
-            is_admin = True
-        else:
-            # For other users, use the value from the database
-            is_admin = current_user.is_admin
-    baustelle = Baustelle.query.get_or_404(baustelle_id)
-    if request.method == 'POST':
-        text = request.form['text']
-        question = Question(text=text, baustelle_id=baustelle_id)
-        db.session.add(question)
-        db.session.commit()
-        print(f'Question added to Baustelle {baustelle_id}')
-    questions = Question.query.filter_by(baustelle_id=baustelle_id).all()
-    return render_template('baustellen.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions)
-
-@app.route('/submit_question', methods=['POST'])
-def submit_question():
-    data = request.get_json()
-    new_question = Question(
-        text=data['text'],
-        author=data.get('author', 'Anonymous'),
-        baustelle_id=int(data['baustelle_id']),
-        latitude=data['latitude'],
-        longitude=data['longitude'],
-        date=datetime.utcnow(),
-    )
-    db.session.add(new_question)
-    db.session.commit()
-
-    return jsonify({
-        'id': new_question.id,
-        'text': new_question.text,
-        'author': new_question.author,
-        'baustelle_id': new_question.baustelle_id,
-        'date': new_question.date.isoformat(),
-        'latitude': new_question.latitude,
-        'longitude': new_question.longitude,
-    }), 201
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):
@@ -1213,9 +1102,6 @@ def download_images():
         return redirect(url_for("profil"))
 
 
-
-
-
 @app.route("/")
 def index():
     projects = Project.query.all()
@@ -1255,12 +1141,8 @@ def index():
         mapobject_count=mapobject_count,
         featured_projects=featured_projects,
         metaData=metaData,
-        current_user=current_user
     )
 
-@app.context_processor
-def inject_user():
-    return dict(current_user=current_user)
 
 @app.route("/logout")
 @login_required

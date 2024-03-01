@@ -1,6 +1,6 @@
 var CACHE_NAME = 'stimmungskompass-cache-v1';
 var urlsToCache = [
-    '/',
+    // '/',
     '/static/index.css',
     '/static/apple-touch-icon.png',
     // Add other resources you want to cache
@@ -11,7 +11,6 @@ self.addEventListener('install', function(event) {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(function(cache) {
-                console.log('Opened cache');
                 return cache.addAll(urlsToCache);
             })
     );

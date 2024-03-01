@@ -102,6 +102,36 @@ class WebsiteViews(db.Model):
             db.session.commit()
 
 
+class Baustelle(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(300), nullable=True)
+    gis_data = db.Column(db.JSON)  # Storing GeoJSON data
+    author = db.Column(db.String(100), nullable=True)  # Optional author name
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    questions = db.relationship('Question', backref='baustelle', lazy=True, cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f'<Baustelle {self.name}>'
+
+
+class Question(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(300), nullable=False)
+    author = db.Column(db.String(100), nullable=True)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    answer_text = db.Column(db.String(300), nullable=True)
+    answered = db.Column(db.Boolean, default=False)
+    baustelle_id = db.Column(db.Integer, db.ForeignKey('baustelle.id'), nullable=False)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    answer_date = db.Column(db.DateTime)  # New field for answer date
+
+
+
+    def __repr__(self):
+        return f'<Question {self.id}>'
+
 class Vote(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
