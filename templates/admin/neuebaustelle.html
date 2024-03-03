@@ -7,6 +7,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+<!-- Include Quill stylesheet -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Include Quill library -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<!-- Include Cropper.js -->
+<link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.js"></script>
+
 
 </head>
 
@@ -2559,6 +2569,16 @@ font-weight: bold;
     font-size: 18px;
     color: white;
 	}
+	
+	  /* Quill Editor background */
+    .ql-container {
+        background-color: white;
+    }
+
+    /* Quill Toolbar background */
+    .ql-toolbar {
+        background-color: white;
+    }
     </style>
 	
 <body>
@@ -2598,9 +2618,22 @@ In der Übersicht erhalten Sie einen Überblick über die Fragen und Beiträge d
     <div style="margin-bottom: 20px;">
         <input type="text" id="name" name="name" placeholder="Projekttitel" required class="form-input" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: none; cursor: pointer; width: 100%; box-sizing: border-box;">
     </div>
+	
+	<div style="margin-bottom: 20px;">
+    <label for="projectImage" style="margin-bottom: 10px; display: block; text-align: center;">Bild hinzufügen</label>
+<input type="file" id="imageInput" name="projectImage" accept="image/*">
+<img id="imagePreview" style="max-width: 100%; display: none;">
+</div>
+
+
     <div style="margin-bottom: 20px;">
-        <textarea id="description" name="description" placeholder="Projektbeschreibung" class="form-input" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: none; cursor: pointer; width: 100%; box-sizing: border-box;"></textarea>
+<!-- Quill Editor Container -->
+<div id="editor-container" style="height: 200px;"></div>
+<textarea name="description" id="description" style="display: none;"></textarea>
+
     </div>
+	    <label for="projectImage" style="margin-bottom: 10px; display: block; text-align: center;">GeoJSON hinzufügen</label>
+
     <div style="margin-bottom: 20px;">
         <input type="file" id="gis_data" name="gis_data[]" accept=".geojson" multiple required class="form-input" onchange="loadGeoJSON(event)" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: none; cursor: pointer; width: 100%; box-sizing: border-box;">
     </div>
@@ -2610,12 +2643,117 @@ In der Übersicht erhalten Sie einen Überblick über die Fragen und Beiträge d
     <div id="geojsonFilesList" style="margin-bottom: 20px;">
         <ul id="loadedFiles"></ul>
     </div>
-    <button type="button" onclick="submitForm()" class="register-button-m" style="margin-bottom: 20px;">Veröffentlichen</button>
+<button type="button" onclick="submitForm()" class="register-button-m" style="margin-bottom: 20px;">Veröffentlichen</button>
 </div>
 
 <div id="map"></div>
 
     <script>
+	
+document.addEventListener("DOMContentLoaded", function() {
+    var quill = new Quill('#editor-container', {
+        theme: 'snow'
+    });
+    var cropper;
+
+    document.getElementById('imageInput').addEventListener('change', function(event) {
+        var files = event.target.files;
+        if (files.length > 0) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+
+                if (cropper) {
+                    cropper.destroy(); // Destroy the previous cropper instance
+                }
+
+                cropper = new Cropper(imagePreview, {
+                    aspectRatio: 4 / 3,
+                    autoCropArea: 1,
+                    viewMode: 1,
+                });
+            };
+            reader.readAsDataURL(files[0]);
+        }
+    });
+
+window.submitForm = function() {
+    // Check if cropper is instantiated and has a cropped result
+    if (cropper && cropper.getCroppedCanvas()) {
+        cropper.getCroppedCanvas().toBlob(function(blob) {
+            console.log("Processed blob:", blob); // Debugging
+
+            var uniqueIdentifier = Date.now(); // Generate a unique identifier
+            var imageName = 'croppedImage_' + uniqueIdentifier + '.png'; // Append the unique identifier to the image name
+
+            var formData = new FormData();
+            formData.append('projectImage', blob, imageName);
+            formData.append('name', document.getElementById('name').value);
+            formData.append('description', quill.root.innerHTML);
+
+            // Submit FormData
+            fetch('/admin/neuebaustelle', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Server response:", data); // Debugging
+                // Additional logic to handle response, like redirecting or showing a success message
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }, 'image/png'); // Ensure the cropped image is saved as a PNG
+    } else {
+        // Handle the case where there is no image cropped or cropper is not initialized
+        console.error('No image has been cropped or Cropper is not initialized.');
+    }
+};
+
+});
+
+
+
+
+
+    // Ensure you're targeting the correct form (consider adding an ID to your form)
+    var form = document.querySelector('form');
+    form.onsubmit = function(e) {
+        e.preventDefault(); // Prevent the default form submission
+        
+        // Log the Quill editor content
+        var editorContent = quill.root.innerHTML; // Get the content from Quill editor
+        console.log("Quill editor content exported:", editorContent); // Log the content to the console
+        
+        // Set the content to the hidden textarea
+        document.getElementById('description').value = editorContent;
+
+        // Prepare FormData
+        var formData = new FormData(form);
+        formData.append('description', editorContent); // Ensure description is included
+
+        // Submit the form data
+        fetch('/admin/neuebaustelle', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Server response:", data); // Log server response
+            // Handle successful submission (e.g., redirect or display success message)
+        })
+        .catch(error => {
+            console.error('Error:', error); // Log any error
+            // Handle error (e.g., display error message)
+        });
+    };
+
+
+
+
 var map = L.map('map').setView([48.4102, 15.6022], 13);
 var currentDrawnLayer = null;
 var selectedToolButton = null;
@@ -3011,6 +3149,80 @@ function submitForm() {
         function closeOverlay() {
             document.getElementById('imageOverlay').style.display = 'none';
         }
+
+document.addEventListener('DOMContentLoaded', function() {
+    var quill = new Quill('#editor-container', {theme: 'snow'});
+    var existingImage = document.getElementById('existingImage') ? document.getElementById('existingImage').value : '';
+    var imageChanged = false;
+    var cropper;
+	
+    {% if edit_mode and baustelle %}
+    document.getElementById('name').value = "{{ baustelle.name }}";
+    quill.root.innerHTML = "{{ baustelle.description | safe }}";
+    if (existingImage) {
+        var imagePreview = document.getElementById('imagePreview');
+        imagePreview.src = "/static/baustellepics/" + existingImage;
+        imagePreview.style.display = 'block';
+    }
+    {% endif %}
+
+    document.getElementById('imageInput').addEventListener('change', function(event) {
+        var files = event.target.files;
+        if (files.length > 0) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                imageChanged = true;
+
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(imagePreview, {
+                    aspectRatio: 4 / 3,
+                    autoCropArea: 1,
+                    viewMode: 1,
+                });
+            };
+            reader.readAsDataURL(files[0]);
+        }
+    });
+
+	
+    window.submitForm = function() {
+        console.log("Quill description updated:", quill.root.innerHTML);
+        var formData = new FormData(document.getElementById("baustelleForm"));
+        formData.append("description", quill.root.innerHTML);
+
+        if (imageChanged && cropper) {
+            cropper.getCroppedCanvas().toBlob(function(blob) {
+                formData.append('projectImage', blob, 'croppedImage.png');
+                performFormSubmission(formData);
+            }, 'image/png');
+        } else {
+            performFormSubmission(formData);
+        }
+    };
+
+function performFormSubmission(formData) {
+        var submitUrl = '{{ url_for("update_baustelle", baustelle_id=baustelle.id) if edit_mode and baustelle else url_for("neuebaustelle") }}';
+        console.log("Submitting to URL:", submitUrl);
+
+        fetch(submitUrl, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+        }).then(response => {
+            if (!response.ok) throw new Error(`Failed submission: ${response.statusText}`);
+            return response.json();
+        }).then(data => {
+            console.log("Server response:", data);
+            window.location.href = `/baustellen/${data.baustelleId}`;
+        }).catch(error => {
+            console.error('Error during form submission:', error);
+        });
+    }
+});
+
 
     </script>
 </body>

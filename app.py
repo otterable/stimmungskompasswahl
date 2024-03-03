@@ -69,6 +69,7 @@ import pandas as pd
 import random
 import string
 import json
+import uuid
 import zipfile
 import pytz
 import io
@@ -177,50 +178,60 @@ def answer_question(question_id):
         'message': 'Question answered successfully',
         'question_id': question.id,
     }), 200
+    
 
 @app.route('/admin/neuebaustelle', methods=['GET', 'POST'])
 def neuebaustelle():
     if request.method == 'POST':
-        # Handle form submission
         name = request.form.get('name')
         description = request.form.get('description')
-        # Assuming GIS data is sent as a string in form data (not a file), adjust if necessary
         gis_data_str = request.form.get('gis_data')
         gis_data = json.loads(gis_data_str) if gis_data_str else None
 
-        new_baustelle = Baustelle(name=name, description=description, gis_data=gis_data, author="Author Name")  # Adjust the author accordingly
+        image = request.files.get('projectImage')
+        if image and image.filename:
+            ext = os.path.splitext(secure_filename(image.filename))[1]
+            # Generate a unique filename using uuid
+            random_filename = str(uuid.uuid4()) + ext
+            save_path = os.path.join(app.root_path, 'static', 'baustellepics')
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            filepath = os.path.join(save_path, random_filename)
+            image.save(filepath)
+            # Store just the filename, not the path, to avoid duplication issues
+            image_path = random_filename
+        else:
+            image_path = None
+
+        new_baustelle = Baustelle(name=name, description=description, gis_data=gis_data, author="Author Name", image=image_path)
         db.session.add(new_baustelle)
         db.session.commit()
-        print(f'New Baustelle created: {name}, ID: {new_baustelle.id}')
-        # Redirect to the baustellen page with the new Baustelle's ID, or return JSON with the ID for AJAX handling
-        # return redirect(url_for('baustellen', baustelle_id=new_baustelle.id))
+
         return jsonify({'status': 'success', 'message': 'Baustelle created successfully.', 'baustelleId': new_baustelle.id})
     else:
-        # Handle GET request to display the form
         return render_template('admin/neuebaustelle.html')
-
+        
 @app.route('/baustellen/<int:baustelle_id>', methods=['GET', 'POST'])
 def baustellen(baustelle_id):
-    # Initialize as False by default
     is_admin = False
     user_id = None
-    
+
     if current_user.is_authenticated:
-        user_id = current_user.id  # Get the current user's ID
-        
-        # Check if the current user's ID is 1, and explicitly set as admin
+        user_id = current_user.id
         if user_id == 1:
             is_admin = True
         else:
-            # For other users, use the value from the database
             is_admin = current_user.is_admin
+
     baustelle = Baustelle.query.get_or_404(baustelle_id)
+
     if request.method == 'POST':
         text = request.form['text']
         question = Question(text=text, baustelle_id=baustelle_id)
         db.session.add(question)
         db.session.commit()
         print(f'Question added to Baustelle {baustelle_id}')
+
     questions = Question.query.filter_by(baustelle_id=baustelle_id).all()
     return render_template('baustellen.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions)
 
@@ -3349,6 +3360,74 @@ def get_project_data(project_id):
 @app.route("/get_project_image/<filename>")
 def get_project_image(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+
+@app.route("/get_baustelle_data/<int:baustelle_id>")
+def get_baustelle_data(baustelle_id):
+    baustelle = Baustelle.query.get_or_404(baustelle_id)
+    # Ensure that only admin can edit
+    if not current_user.is_admin:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    return jsonify({
+        "name": baustelle.name,
+        "description": baustelle.description,
+        "image": baustelle.image,
+        "gis_data": baustelle.gis_data
+        # Add other fields as necessary
+    })
+
+@app.route("/update_baustelle/<int:baustelle_id>", methods=["POST"])
+@login_required
+def update_baustelle(baustelle_id):
+    print(f"Attempting to update Baustelle ID: {baustelle_id}, User: {current_user}, User ID: {current_user.id}")
+
+    if current_user.id == 1 or current_user.is_admin:
+        baustelle = Baustelle.query.get_or_404(baustelle_id)
+        
+        # Capture and debug the Quill description content
+        description_content = request.form['description']
+        print(f"Quill description updated: {description_content}")
+        
+        baustelle.name = request.form['name']
+        baustelle.description = description_content
+
+        image = request.files.get('projectImage')
+        if image and image.filename:
+            filename = secure_filename(image.filename)
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            image.save(filepath)
+            baustelle.image = filename
+            print(f"New image uploaded and processed: {filename}")
+        else:
+            print("No new image uploaded, keeping existing image.")
+
+        gis_data_str = request.form.get('gis_data')
+        if gis_data_str:
+            try:
+                baustelle.gis_data = json.loads(gis_data_str)
+                print("GIS data updated.")
+            except json.JSONDecodeError as e:
+                print(f"Error decoding GIS data: {e}")
+                return jsonify({"error": "Invalid GIS data format"}), 400
+
+        db.session.commit()
+        print(f"Baustelle {baustelle_id} updated successfully.")
+        return jsonify({"success": "Baustelle updated successfully", "baustelleId": baustelle_id})
+    else:
+        print("Access denied: User is not admin or User ID is not 1.")
+        return jsonify({"error": "Unauthorized"}), 403
+
+
+
+
+@app.route("/edit_baustelle/<int:baustelle_id>", methods=["GET"])
+@login_required
+def edit_baustelle(baustelle_id):
+    baustelle = Baustelle.query.get_or_404(baustelle_id)
+    # Additional checks and logic
+    return render_template("admin/neuebaustelle.html", baustelle=baustelle, edit_mode=True)
+
 
 
 @app.route("/update_project_data/<int:project_id>", methods=["POST"])

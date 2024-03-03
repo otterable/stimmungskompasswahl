@@ -110,6 +110,7 @@ class Baustelle(db.Model):
     author = db.Column(db.String(100), nullable=True)  # Optional author name
     date = db.Column(db.DateTime, default=datetime.utcnow)
     questions = db.relationship('Question', backref='baustelle', lazy=True, cascade="all, delete-orphan")
+    image = db.Column(db.String(300), nullable=True)  # Path to the image in static/baustellepics
 
     def __repr__(self):
         return f'<Baustelle {self.name}>'

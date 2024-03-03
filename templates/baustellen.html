@@ -6,6 +6,9 @@
     <title>{{ baustelle.name }}</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
  <style>
 .overlay-button {
 border-radius: 30px;
@@ -2643,16 +2646,24 @@ font-weight: bold;
 
 	
 <div class="sidebar" id="sidebar">
-      <h1>{{ baustelle.name }}</h1>
-    <p>{{ baustelle.description }}</p>
+    <h1 id="baustelle-title">{{ baustelle.name }}</h1>
+
+    <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+{% if baustelle.image %}
+    <img id="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%;">
+{% endif %}
+
+
+<a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="edit-button">Inhalte bearbeiten</a>
+
+
+
 	
-	<button id="show-markers-btn" class="register-button-m" style="background-color:#003056">Liste</button>
+    <button id="show-markers-btn" class="register-button-m" style="background-color:#003056">Liste</button>
 
-
-<div id="geojsonFilesList" style="margin-bottom: 20px;">
-    <ul id="loadedFiles"></ul>
-</div>
-
+    <div id="geojsonFilesList" style="margin-bottom: 20px;">
+        <ul id="loadedFiles"></ul>
+    </div>
 </div>
 
 <div id="map"></div>   
@@ -3249,37 +3260,35 @@ function formatQuestionListItem(question) {
 
 
 });
-
 function formatDate(utcDateString) {
     // Create a Date object from the UTC date string
-    let date = new Date(utcDateString);
+    let utcDate = new Date(utcDateString);
 
-    // Adjust for your timezone offset from UTC (+1 hour)
-    // You might need to adjust this if your timezone offset is different
-    let timezoneOffset = 1 * 60;
+    // Convert UTC date to local time
+    let localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
 
-    // Check if DST is in effect and adjust the timezoneOffset accordingly
-    if (isDST(date)) {
-        timezoneOffset += 60; // Adjusting for DST, add one hour
+    // Adjust for the +1 hour offset from UTC
+    let targetDate = new Date(localDate.getTime() + (1 * 60 * 60000)); // Adding 1 hour
+
+    // Check if DST is in effect for the targetDate and adjust if necessary
+    if (isDST(targetDate)) {
+        targetDate = new Date(targetDate.getTime() + (1 * 60 * 60000)); // Adjust by an additional hour for DST
     }
 
-    // Convert to local time by adding the timezone offset
-    date.setMinutes(date.getMinutes() + timezoneOffset);
-
     // Format the date and time
-    let hours = date.getUTCHours().toString().padStart(2, '0');
-    let minutes = date.getUTCMinutes().toString().padStart(2, '0');
-    let day = date.getUTCDate().toString().padStart(2, '0');
-    let month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    let hours = targetDate.getHours().toString().padStart(2, '0');
+    let minutes = targetDate.getMinutes().toString().padStart(2, '0');
+    let day = targetDate.getDate().toString().padStart(2, '0');
+    let month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
 
     return `${hours}:${minutes}, ${day}.${month}`;
 }
 
-// Determine if DST is in effect for a given date
+// Function to check if DST is in effect
 function isDST(date) {
-    let jan = new Date(date.getFullYear(), 0, 1).getTimezoneOffset();
-    let jul = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
-    return date.getTimezoneOffset() < Math.max(jan, jul);
+    let jan = new Date(date.getFullYear(), 0, 1);
+    let jul = new Date(date.getFullYear(), 6, 1);
+    return date.getTimezoneOffset() < Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
 }
 
 
@@ -3316,9 +3325,43 @@ Date.prototype.stdTimezoneOffset = function() {
 	
 	
 
+document.addEventListener("DOMContentLoaded", function() {
+    // Debugging Title Load
+    console.log("Title Loaded:", document.getElementById("baustelle-title").textContent);
 
+    // Debugging Quill Description Load
+    console.log("Quill Description Loaded:", document.getElementById("baustelle-description").innerHTML);
+
+    // Debugging Image Load
+    const image = document.getElementById("baustelle-image");
+    if (image) {
+        image.addEventListener("load", function() {
+            console.log("Image loaded successfully");
+        });
+        image.addEventListener("error", function() {
+            console.error("Error loading image");
+        });
+    } else {
+        console.log("No image found");
+    }
+});
 
     </script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editButton = document.querySelector('#edit-baustelle-button');
+    const editForm = document.querySelector('#edit-baustelle-form');
+
+    if (editButton) {
+        editButton.addEventListener('click', function() {
+            editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+});
+</script>
+
 
 
 </body>
