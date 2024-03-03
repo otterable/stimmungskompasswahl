@@ -2651,9 +2651,7 @@ In der Übersicht erhalten Sie einen Überblick über die Fragen und Beiträge d
     <script>
 	
 document.addEventListener("DOMContentLoaded", function() {
-    var quill = new Quill('#editor-container', {
-        theme: 'snow'
-    });
+   
     var cropper;
 
     document.getElementById('imageInput').addEventListener('change', function(event) {
@@ -3152,46 +3150,30 @@ function submitForm() {
 
 document.addEventListener('DOMContentLoaded', function() {
     var quill = new Quill('#editor-container', {theme: 'snow'});
-    var existingImage = document.getElementById('existingImage') ? document.getElementById('existingImage').value : '';
+    var existingImage = '{{ baustelle.image | safe }}'; // Ensure this value is correctly passed from Flask
     var imageChanged = false;
     var cropper;
-	
-    {% if edit_mode and baustelle %}
-    document.getElementById('name').value = "{{ baustelle.name }}";
-    quill.root.innerHTML = "{{ baustelle.description | safe }}";
+
+    // Initialize Cropper with existing image if in edit mode and an image exists
     if (existingImage) {
         var imagePreview = document.getElementById('imagePreview');
         imagePreview.src = "/static/baustellepics/" + existingImage;
         imagePreview.style.display = 'block';
+        // Initialize Cropper on the existing image
+        cropper = new Cropper(imagePreview, {
+            aspectRatio: 4 / 3,
+            autoCropArea: 1,
+            viewMode: 1,
+        });
     }
-    {% endif %}
 
-    document.getElementById('imageInput').addEventListener('change', function(event) {
-        var files = event.target.files;
-        if (files.length > 0) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var imagePreview = document.getElementById('imagePreview');
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
-                imageChanged = true;
 
-                if (cropper) cropper.destroy();
-                cropper = new Cropper(imagePreview, {
-                    aspectRatio: 4 / 3,
-                    autoCropArea: 1,
-                    viewMode: 1,
-                });
-            };
-            reader.readAsDataURL(files[0]);
-        }
-    });
+window.submitForm = function() {
+        var descriptionContent = quill.root.innerHTML;
+        console.log("Quill description updated:", descriptionContent);
 
-	
-    window.submitForm = function() {
-        console.log("Quill description updated:", quill.root.innerHTML);
         var formData = new FormData(document.getElementById("baustelleForm"));
-        formData.append("description", quill.root.innerHTML);
+        formData.append("description", descriptionContent);
 
         if (imageChanged && cropper) {
             cropper.getCroppedCanvas().toBlob(function(blob) {
@@ -3199,6 +3181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 performFormSubmission(formData);
             }, 'image/png');
         } else {
+            // No new image to crop or cropper not initialized
             performFormSubmission(formData);
         }
     };
