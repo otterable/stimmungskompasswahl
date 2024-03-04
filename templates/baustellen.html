@@ -3425,7 +3425,46 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
     </script>
-
+ <script>
+      // Toggle the navigation overlay
+      function toggleNavOverlay() {
+        var navOverlay = document.getElementById('nav-overlay');
+        if (navOverlay.style.display === 'block') {
+          navOverlay.style.display = 'none';
+        } else {
+          navOverlay.style.display = 'block';
+        }
+      }
+      // Close the navigation overlay when clicking on the overlay background or on a non-button element
+      document.getElementById('nav-overlay').addEventListener('click', function(event) {
+        // Close only if on mobile
+        if (window.innerWidth <= 1080 && !event.target.closest('button, a')) {
+          toggleNavOverlay();
+        }
+      });
+      // Event listener for hamburger button
+      document.getElementById('hamburger-button').addEventListener('click', toggleNavOverlay);
+      // Resize event listener
+      window.addEventListener('resize', function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        // Show on desktop, hide on mobile
+        if (window.innerWidth > 1080) {
+          navOverlay.style.display = 'block';
+        } else {
+          navOverlay.style.display = 'none';
+        }
+      });
+      // Set initial state of the nav-overlay based on device width
+      window.onload = function() {
+        var navOverlay = document.getElementById('nav-overlay');
+        // Show on desktop, hide on mobile
+        if (window.innerWidth > 1080) {
+          navOverlay.style.display = 'block';
+        } else {
+          navOverlay.style.display = 'none';
+        }
+      };
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
