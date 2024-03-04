@@ -93,7 +93,7 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(
     app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1
 )
-app.secret_key = "FREELANCER"
+app.secret_key = "maybeMangoOtters"
 oauth = OAuth(app)
 
 # Configure the database
@@ -124,8 +124,8 @@ ip_project_submissions = {}
 
 google = oauth.register(
     "google",
-    client_id="FREELANCER",
-    client_secret="FREELANCER",
+    client_id="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com",
+    client_secret="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",
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
