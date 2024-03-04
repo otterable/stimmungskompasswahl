@@ -125,8 +125,8 @@ ip_project_submissions = {}
 
 google = oauth.register(
     "google",
-    client_id="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com",
-    client_secret="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",
+    client_id="FREELANCER",
+    client_secret="FREELANCER",
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
@@ -3482,9 +3482,8 @@ def update_baustelle(baustelle_id):
 @login_required
 def edit_baustelle(baustelle_id):
     baustelle = Baustelle.query.get_or_404(baustelle_id)
-    # Ensure GIS data is correctly formatted as a JSON string
     gis_data_json = json.dumps(baustelle.gis_data) if baustelle.gis_data else 'null'
-    return render_template("admin/neuebaustelle.html", baustelle=baustelle, gis_data_json=gis_data_json, edit_mode=True)
+    return render_template("admin/neuebaustelle.html", baustelle=baustelle, gis_data_json=gis_data_json, edit_mode=True, baustelle_id=baustelle_id)
 
 
 

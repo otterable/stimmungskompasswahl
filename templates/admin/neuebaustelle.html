@@ -3207,6 +3207,9 @@ function captureCustomDescription() {
 
 document.addEventListener('DOMContentLoaded', function() {
     var quill = new Quill('#editor-container', {theme: 'snow'});
+    // Determine if the page is loaded in edit mode and get baustelle_id if available
+    var editMode = {{ edit_mode|tojson }};
+    var baustelleId = {{ baustelle_id|tojson|safe }};  
     var imageChanged = false;
     var cropper;
 
@@ -3286,25 +3289,23 @@ document.addEventListener('DOMContentLoaded', function() {
         var formData = new FormData(document.getElementById('baustelleForm'));
         formData.append("gis_data", JSON.stringify(combinedGeoJSON));
 
+
         if (imageChanged && cropper && cropper.getCroppedCanvas()) {
             cropper.getCroppedCanvas().toBlob(function(blob) {
                 formData.append('projectImage', blob, 'croppedImage.png');
-                performFormSubmission(formData);
+        performFormSubmission(formData, submitUrl);
             }, 'image/png');
         } else {
-            performFormSubmission(formData);
+        performFormSubmission(formData, submitUrl);
+		 var submitUrl = editMode ? `/update_baustelle/${baustelleId}` : '/admin/neuebaustelle';
+
         }
     };
 
 
-function performFormSubmission(formData) {
-    var submitUrl = '{{ url_for("neuebaustelle") }}'; // Adjust this line as needed based on your server-side setup
+ function performFormSubmission(formData, submitUrl) {
+ var submitUrl = editMode ? `/update_baustelle/${baustelleId}` : '/admin/neuebaustelle';
         console.log("Submitting to URL:", submitUrl);
-
-        if (!submitUrl) {
-            console.error('Submission URL not found or invalid.');
-            return;
-        }
 
         fetch(submitUrl, {
             method: 'POST',
