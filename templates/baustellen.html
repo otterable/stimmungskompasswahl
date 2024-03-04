@@ -2843,16 +2843,21 @@ function createIcon(fillColor) {
 var markersById = {};
 // Function to bind popups to GeoJSON objects
 function bindPopups(feature, layer) {
-    if (feature.properties) {
+    if (feature.properties && feature.properties.customDescription) {
+        // Display only the customDescription value without the title
+        var popupContent = `<div class='popup-content'>${feature.properties.customDescription}</div>`;
+    } else if (feature.properties) {
+        // If there's no customDescription, fallback to showing all properties
         var popupContent = "<div class='popup-content'>";
         for (var key in feature.properties) {
-            // Wrap each property in a div for better control over styling
             popupContent += `<div class='popup-row'><strong>${key}:</strong> ${feature.properties[key]}</div>`;
         }
         popupContent += "</div>";
-        layer.bindPopup(popupContent, {className: 'custom-popup'});
     }
+    layer.bindPopup(popupContent, {className: 'custom-popup'});
 }
+
+
 
 
 L.geoJSON(gisData, {
@@ -3477,6 +3482,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+
 </script>
 
 

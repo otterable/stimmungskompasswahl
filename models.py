@@ -133,6 +133,16 @@ class Question(db.Model):
     def __repr__(self):
         return f'<Question {self.id}>'
 
+
+class GeoJSONFeature(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    feature_id = db.Column(db.String(100), nullable=False)  # Unique ID of the feature within the GeoJSON data
+    description = db.Column(db.String(300), nullable=True)  # Custom description
+    baustelle_id = db.Column(db.Integer, db.ForeignKey('baustelle.id'), nullable=False)
+    baustelle = db.relationship('Baustelle', backref=db.backref('features', lazy=True))
+
+
+
 class Vote(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)

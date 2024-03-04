@@ -30,7 +30,8 @@ from models import (
     Report,
     WebsiteViews,
     Baustelle,
-    Question
+    Question,
+    GeoJSONFeature
 )
 from flask_login import (
     LoginManager,
@@ -197,8 +198,6 @@ def delete_baustelle(baustelle_id):
     return jsonify({'message': 'Baustelle successfully deleted'}), 200
 
 
-
-
 @app.route('/admin/neuebaustelle', methods=['GET', 'POST'])
 def neuebaustelle():
     if request.method == 'POST':
@@ -206,21 +205,12 @@ def neuebaustelle():
         description = request.form.get('description')
         gis_data_str = request.form.get('gis_data')
         gis_data = json.loads(gis_data_str) if gis_data_str else None
-
         image = request.files.get('projectImage')
+        image_path = None
         if image and image.filename:
-            ext = os.path.splitext(secure_filename(image.filename))[1]
-            # Generate a unique filename using uuid
-            random_filename = str(uuid.uuid4()) + ext
-            save_path = os.path.join(app.root_path, 'static', 'baustellepics')
-            if not os.path.exists(save_path):
-                os.makedirs(save_path)
-            filepath = os.path.join(save_path, random_filename)
-            image.save(filepath)
-            # Store just the filename, not the path, to avoid duplication issues
-            image_path = random_filename
-        else:
-            image_path = None
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.save(image_path)
 
         new_baustelle = Baustelle(name=name, description=description, gis_data=gis_data, author="Author Name", image=image_path)
         db.session.add(new_baustelle)
@@ -229,6 +219,7 @@ def neuebaustelle():
         return jsonify({'status': 'success', 'message': 'Baustelle created successfully.', 'baustelleId': new_baustelle.id})
     else:
         return render_template('admin/neuebaustelle.html')
+
         
 @app.route('/baustellen/<int:baustelle_id>', methods=['GET', 'POST'])
 def baustellen(baustelle_id):

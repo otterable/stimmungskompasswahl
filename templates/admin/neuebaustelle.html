@@ -2996,13 +2996,56 @@ function createPopupContent(properties) {
 
 // Revised onEachFeature function
 function onEachFeature(feature, layer) {
-            if (feature.properties) {
-                var popupContent = Object.keys(feature.properties).map(function(k) {
-                    return k + ': ' + feature.properties[k];
-                }).join('<br>');
-                layer.bindPopup(popupContent);
+    // Default popup content with GeoJSON properties
+    var defaultPopupContent = Object.keys(feature.properties).map(function(k) {
+        return `${k}: ${typeof feature.properties[k] === 'object' ? JSON.stringify(feature.properties[k]) : feature.properties[k]}`;
+    }).join('<br>');
+
+    // HTML for the interactive elements in the popup
+    var customPopupContent = `
+        <button id="showOptionsBtn">Show all geojson options</button>
+        <div id="geojsonOptions" style="display:none;">
+            ${defaultPopupContent}
+        </div>
+        <button id="showAltDescBtn">Show an alternative description</button>
+        <div id="altDesc" style="display:none;">
+<input type="hidden" id="formSubmitUrl" value="{{ url_for('neuebaustelle') }}">
+
+            <input type="text" id="altDescInput" placeholder="Write an alternative description here">
+<button id="submitAltDesc" onclick="captureCustomDescription()">Submit</button>
+        </div>
+    `;
+
+    layer.bindPopup(customPopupContent);
+
+    layer.on('popupopen', function(e) {
+        var popup = e.target.getPopup();
+        var content = popup.getContent();
+
+        var showOptionsBtn = L.DomUtil.get('showOptionsBtn');
+        var showAltDescBtn = L.DomUtil.get('showAltDescBtn');
+        var submitAltDescBtn = L.DomUtil.get('submitAltDesc');
+
+        L.DomEvent.on(showOptionsBtn, 'click', function() {
+            L.DomUtil.get('geojsonOptions').style.display = 'block';
+            L.DomUtil.get('altDesc').style.display = 'none';
+        });
+
+        L.DomEvent.on(showAltDescBtn, 'click', function() {
+            L.DomUtil.get('altDesc').style.display = 'block';
+            L.DomUtil.get('geojsonOptions').style.display = 'none';
+        });
+
+        L.DomEvent.on(submitAltDescBtn, 'click', function() {
+            var altDescInput = L.DomUtil.get('altDescInput').value;
+            if (altDescInput) {
+                popup.setContent(altDescInput);
+                popup.update();
             }
-        }
+        });
+    });
+}
+
 
  function addToList(name, layerId, isDrawnObject) {
             var list = document.getElementById('loadedFiles');
@@ -3148,6 +3191,20 @@ function submitForm() {
             document.getElementById('imageOverlay').style.display = 'none';
         }
 
+
+var customDescription = ""; // This will be updated by the captureCustomDescription function
+
+// Function to capture the custom description from the input field
+function captureCustomDescription() {
+    var inputElement = document.getElementById('altDescInput');
+    if (inputElement) {
+        customDescription = inputElement.value;
+        console.log("Captured custom description:", customDescription); // Debugging
+    } else {
+        console.error('Custom description input element not found.');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     var quill = new Quill('#editor-container', {theme: 'snow'});
     var imageChanged = false;
@@ -3204,66 +3261,68 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
+ window.submitForm = function() {
+        let combinedGeoJSON = {
+            type: "FeatureCollection",
+            features: []
+        };
 
-
-window.submitForm = function() {
-    let combinedGeoJSON = {
-        type: "FeatureCollection",
-        features: []
-    };
-
-    // Collect features from geojsonLayers
-    Object.values(geojsonLayers).forEach(layer => {
-        layer.eachLayer((featureLayer) => {
-            combinedGeoJSON.features.push(featureLayer.toGeoJSON());
+        // Use the globally captured customDescription for each GeoJSON feature
+        Object.values(geojsonLayers).forEach(layer => {
+            layer.eachLayer((featureLayer) => {
+                let feature = featureLayer.toGeoJSON();
+                feature.properties['customDescription'] = customDescription;
+                combinedGeoJSON.features.push(feature);
+            });
         });
-    });
 
-    // Collect features from drawnObjects
-    Object.values(drawnObjects).forEach(layer => {
-        combinedGeoJSON.features.push(layer.toGeoJSON());
-    });
+        Object.values(drawnObjects).forEach(layer => {
+            let feature = layer.toGeoJSON();
+            feature.properties['customDescription'] = customDescription;
+            combinedGeoJSON.features.push(feature);
+        });
 
-    // Ensure the description from the Quill editor is captured
-    document.getElementById('description').value = quill.root.innerHTML;
+        document.getElementById('description').value = quill.root.innerHTML;
+        var formData = new FormData(document.getElementById('baustelleForm'));
+        formData.append("gis_data", JSON.stringify(combinedGeoJSON));
 
-    var formData = new FormData(document.getElementById('baustelleForm'));
-
-    // Add the combined GeoJSON data to the FormData object
-    formData.append("gis_data", JSON.stringify(combinedGeoJSON));
-
-    // Handle the image data if an image has been changed
-    if (imageChanged && cropper && cropper.getCroppedCanvas()) {
-        cropper.getCroppedCanvas().toBlob(function(blob) {
-            formData.append('projectImage', blob, 'croppedImage.png');
+        if (imageChanged && cropper && cropper.getCroppedCanvas()) {
+            cropper.getCroppedCanvas().toBlob(function(blob) {
+                formData.append('projectImage', blob, 'croppedImage.png');
+                performFormSubmission(formData);
+            }, 'image/png');
+        } else {
             performFormSubmission(formData);
-        }, 'image/png');
-    } else {
-        // Perform form submission without image processing if no image change occurred
-        performFormSubmission(formData);
-    }
-};
+        }
+    };
 
 
 function performFormSubmission(formData) {
-    var submitUrl = '{{ url_for("update_baustelle", baustelle_id=baustelle.id) if edit_mode and baustelle else url_for("neuebaustelle") }}';
-    console.log("Submitting to URL:", submitUrl);
+    var submitUrl = '{{ url_for("neuebaustelle") }}'; // Adjust this line as needed based on your server-side setup
+        console.log("Submitting to URL:", submitUrl);
 
-    fetch(submitUrl, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include', // Ensure cookies are sent with the request if needed
-    }).then(response => {
-        if (!response.ok) throw new Error(`Failed submission: ${response.statusText}`);
-        return response.json();
-    }).then(data => {
-        console.log("Server response:", data);
-        // Redirect or perform actions based on the response data
-        window.location.href = `/baustellen/${data.baustelleId}`;
-    }).catch(error => {
-        console.error('Error during form submission:', error);
-    });
-}
+        if (!submitUrl) {
+            console.error('Submission URL not found or invalid.');
+            return;
+        }
+
+        fetch(submitUrl, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+        })
+        .then(response => {
+            if (!response.ok) throw new Error(`Failed submission: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            console.log("Server response:", data);
+            window.location.href = `/baustellen/${data.baustelleId}`;
+        })
+        .catch(error => {
+            console.error('Error during form submission:', error);
+        });
+    }
 });
 
 
