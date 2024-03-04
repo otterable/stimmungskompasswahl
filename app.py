@@ -163,22 +163,41 @@ def get_questions(baustelle_id):
 @app.route('/answer_question/<int:question_id>', methods=['POST'])
 @login_required
 def answer_question(question_id):
-    # Explicitly allow user with ID 1 to access this route
     if current_user.id != 1:
-        return jsonify({'error': 'Unauthorized'}), 403
+        return jsonify({'error': 'Unauthorized', 'success': False}), 403
 
     data = request.get_json()
+    if not data or 'answer_text' not in data:
+        return jsonify({'error': 'Missing answer text', 'success': False}), 400
+
     question = Question.query.get_or_404(question_id)
-    question.answer_text = data.get('answer_text')
+    question.answer_text = data['answer_text']
     question.answered = True
     question.answer_date = datetime.utcnow()
     db.session.commit()
 
-    return jsonify({
-        'message': 'Question answered successfully',
-        'question_id': question.id,
-    }), 200
-    
+    return jsonify({'message': 'Question answered successfully', 'success': True}), 200
+
+
+@app.route('/delete_question/<int:question_id>', methods=['DELETE'])
+@login_required  # Assuming you're using Flask-Login for user management
+def delete_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    db.session.delete(question)
+    db.session.commit()
+    return jsonify({'message': 'Question successfully deleted'}), 200
+
+
+@app.route('/delete_baustelle/<int:baustelle_id>', methods=['DELETE'])
+@login_required  # Assuming you're using Flask-Login for user management
+def delete_baustelle(baustelle_id):
+    baustelle = Baustelle.query.get_or_404(baustelle_id)
+    db.session.delete(baustelle)
+    db.session.commit()
+    return jsonify({'message': 'Baustelle successfully deleted'}), 200
+
+
+
 
 @app.route('/admin/neuebaustelle', methods=['GET', 'POST'])
 def neuebaustelle():
@@ -213,28 +232,45 @@ def neuebaustelle():
         
 @app.route('/baustellen/<int:baustelle_id>', methods=['GET', 'POST'])
 def baustellen(baustelle_id):
+    # Check user authentication and admin status
     is_admin = False
     user_id = None
-
     if current_user.is_authenticated:
         user_id = current_user.id
-        if user_id == 1:
-            is_admin = True
-        else:
-            is_admin = current_user.is_admin
+        is_admin = current_user.is_admin or user_id == 1
 
+    # Retrieve the specified Baustelle by its ID
     baustelle = Baustelle.query.get_or_404(baustelle_id)
 
+    # Handle POST request: Adding a new question to the Baustelle
     if request.method == 'POST':
-        text = request.form['text']
-        question = Question(text=text, baustelle_id=baustelle_id)
-        db.session.add(question)
-        db.session.commit()
-        print(f'Question added to Baustelle {baustelle_id}')
+        # Retrieve the question text from form data
+        text = request.form.get('text')
+        if text:
+            # Create a new Question instance and add it to the database
+            question = Question(text=text, baustelle_id=baustelle_id, author_id=current_user.id)  # Assuming each Question has an author
+            db.session.add(question)
+            db.session.commit()
+            flash('Ihre Frage wurde hinzugefügt.', 'success')
+        else:
+            flash('Die Frage darf nicht leer sein.', 'warning')
 
+        # Redirect back to the same Baustelle page to display the new question
+        return redirect(url_for('baustellen', baustelle_id=baustelle_id))
+
+    # For a GET request or after handling the POST request, render the Baustelle page
+    # Retrieve all questions associated with this Baustelle
     questions = Question.query.filter_by(baustelle_id=baustelle_id).all()
     return render_template('baustellen.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions)
 
+
+
+@app.context_processor
+def inject_newest_baustelle_id():
+    newest_baustelle = Baustelle.query.order_by(Baustelle.id.desc()).first()
+    newest_baustelle_id = newest_baustelle.id if newest_baustelle else None
+    return {'newest_baustelle_id': newest_baustelle_id}
+    
 @app.route('/submit_question', methods=['POST'])
 def submit_question():
     data = request.get_json()
@@ -2296,6 +2332,39 @@ def admintools():
 
         return redirect(url_for("admintools"))
 
+    if request.method == "POST":
+        if "answer_question" in request.form:
+            question_id = request.form.get("question_id")
+            answer_text = request.form.get("answer_text")
+            if question_id and answer_text:
+                question = Question.query.get(question_id)
+                if question:
+                    question.answer_text = answer_text
+                    question.answered = True
+                    question.answer_date = datetime.utcnow()  # Set the answer date to now
+                    db.session.commit()
+                    flash("Question answered successfully.", "success")
+                else:
+                    flash("Question not found.", "error")
+            else:
+                flash("Answer text is required.", "warning")
+            return redirect(url_for("admintools"))
+
+    # Load questions and other data for GET requests and for rendering after POST
+    questions = Question.query.all()
+    
+    print(f"Loaded {len(questions)} questions")  # Console debug log
+    
+    questions = Question.query.order_by(Question.date.desc()).all()  # Default: newest first
+    question_sort = request.args.get('question_sort', 'newest')
+    if question_sort == 'oldest':
+        questions = Question.query.order_by(Question.date).all()
+    elif question_sort == 'unanswered':
+        questions = Question.query.filter_by(answered=False).order_by(Question.date.desc()).all()
+    elif question_sort == 'answered':
+        questions = Question.query.filter_by(answered=True).order_by(Question.date.desc()).all()
+    
+    
     # GET request logic with pagination and sorting
     sort = request.args.get("sort", "score_desc")
     search_query = request.args.get("search", "")
@@ -2473,6 +2542,8 @@ def admintools():
         for project in paginated_projects.items
         if Report.query.filter_by(project_id=project.id).first()
     ]
+       
+    baustellen = Baustelle.query.all()  # Retrieve all baustellen from the database
     user_count = User.query.count()
     comment_count = Comment.query.count()
     project_count = Project.query.filter_by(is_mapobject=False).count()
@@ -2526,8 +2597,12 @@ def admintools():
         top_commented_projects=top_commented_projects,
         category_counts=category_counts,
         active_users=active_users,
+        questions=questions,
+        question_sort=question_sort,
+        baustellen=baustellen,  
         # metaData=metaData,
     )
+
 
 
 @app.route('/unmark_important/<int:projectId>', methods=['POST'])
@@ -3377,56 +3452,48 @@ def get_baustelle_data(baustelle_id):
         # Add other fields as necessary
     })
 
+
+
 @app.route("/update_baustelle/<int:baustelle_id>", methods=["POST"])
 @login_required
 def update_baustelle(baustelle_id):
-    print(f"Attempting to update Baustelle ID: {baustelle_id}, User: {current_user}, User ID: {current_user.id}")
+    # Check if current user is admin or has specific privileges
+    if not (current_user.is_admin or current_user.id == 1):
+        return jsonify({"error": "Unauthorized access."}), 403
 
-    if current_user.id == 1 or current_user.is_admin:
-        baustelle = Baustelle.query.get_or_404(baustelle_id)
-        
-        # Capture and debug the Quill description content
-        description_content = request.form['description']
-        print(f"Quill description updated: {description_content}")
-        
-        baustelle.name = request.form['name']
-        baustelle.description = description_content
+    baustelle = Baustelle.query.get_or_404(baustelle_id)
 
-        image = request.files.get('projectImage')
-        if image and image.filename:
-            filename = secure_filename(image.filename)
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            image.save(filepath)
-            baustelle.image = filename
-            print(f"New image uploaded and processed: {filename}")
-        else:
-            print("No new image uploaded, keeping existing image.")
+    # Update basic fields
+    baustelle.name = request.form.get('name', baustelle.name)
+    baustelle.description = request.form.get('description', baustelle.description)
 
-        gis_data_str = request.form.get('gis_data')
-        if gis_data_str:
-            try:
-                baustelle.gis_data = json.loads(gis_data_str)
-                print("GIS data updated.")
-            except json.JSONDecodeError as e:
-                print(f"Error decoding GIS data: {e}")
-                return jsonify({"error": "Invalid GIS data format"}), 400
+    # Handle image upload
+    image = request.files.get('projectImage')
+    if image and image.filename:
+        filename = secure_filename(image.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(filepath)
+        baustelle.image = filename
 
-        db.session.commit()
-        print(f"Baustelle {baustelle_id} updated successfully.")
-        return jsonify({"success": "Baustelle updated successfully", "baustelleId": baustelle_id})
-    else:
-        print("Access denied: User is not admin or User ID is not 1.")
-        return jsonify({"error": "Unauthorized"}), 403
+    # Update GIS data
+    gis_data_str = request.form.get('gis_data')
+    if gis_data_str:
+        try:
+            baustelle.gis_data = json.loads(gis_data_str)
+        except json.JSONDecodeError:
+            return jsonify({"error": "Invalid GIS data format."}), 400
 
-
+    db.session.commit()
+    return jsonify({"success": "Baustelle updated successfully.", "baustelleId": baustelle.id})
 
 
 @app.route("/edit_baustelle/<int:baustelle_id>", methods=["GET"])
 @login_required
 def edit_baustelle(baustelle_id):
     baustelle = Baustelle.query.get_or_404(baustelle_id)
-    # Additional checks and logic
-    return render_template("admin/neuebaustelle.html", baustelle=baustelle, edit_mode=True)
+    # Ensure GIS data is correctly formatted as a JSON string
+    gis_data_json = json.dumps(baustelle.gis_data) if baustelle.gis_data else 'null'
+    return render_template("admin/neuebaustelle.html", baustelle=baustelle, gis_data_json=gis_data_json, edit_mode=True)
 
 
 

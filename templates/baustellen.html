@@ -10,6 +10,34 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
  <style>
+ 
+ 
+  #sidebar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center; /* This centers the text for all text-based elements */
+    }
+ h2 {
+    display: block;
+    font-size: 1.5em;
+    margin-block-start: 0.2em;
+    margin-block-end: 0.2em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
+h1 {
+    display: block;
+    font-size: 1.75em;
+    margin-block-start: 0.3em;
+    margin-block-end: 0.3em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
 .overlay-button {
 border-radius: 30px;
 padding: 15px;
@@ -2593,23 +2621,26 @@ font-weight: bold;
 
 <div class="top-bar">
     <a href="/">
-    <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
     </a>  
     <button id="hamburger-button">&#9776;</button>
     <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
+	
             <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
+				 {% if newest_baustelle_id %}
+                <a href="/baustellen/{{ newest_baustelle_id }}">Bau</a>
+            {% endif %}
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
+            
             {% if current_user.is_authenticated %}
-            <span class="user-info" style="margin-top: 10px;">
-            Benutzer: {{ current_user.name }}
-            </span>
-            <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
+                <span class="user-info" style="margin-top: 10px;">Benutzer: {{ current_user.name }}</span>
+                <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
-            <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+                <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
             {% endif %}
         </div>
     </div>
@@ -2648,18 +2679,23 @@ font-weight: bold;
 <div class="sidebar" id="sidebar">
     <h1 id="baustelle-title">{{ baustelle.name }}</h1>
 
-    <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+
+{% if is_admin %}
+<a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m edit-button" style="margin-bottom: 10px; margin-top: 10px !important;">Inhalte bearbeiten</a>
+{% endif %}
+
+
 {% if baustelle.image %}
     <img id="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%;">
 {% endif %}
 
 
-<a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="edit-button">Inhalte bearbeiten</a>
-
-
-
 	
-    <button id="show-markers-btn" class="register-button-m" style="background-color:#003056">Liste</button>
+    <button id="show-markers-btn" class="register-button-m" style="background-color:#003056; margin-top: 10px !important; margin-bottom: 10px !important;">Liste</button>
+
+
+    <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+
 
     <div id="geojsonFilesList" style="margin-bottom: 20px;">
         <ul id="loadedFiles"></ul>
@@ -2669,7 +2705,7 @@ font-weight: bold;
 <div id="map"></div>   
 
 <script>
-var map = L.map('map').setView([48.4102, 15.6022], 13);
+var map = L.map('map').setView([52.2171449, 11.072179], 15);
 var currentDrawnLayer = null;
 var selectedToolButton = null;
 // Track the current base layer
@@ -2678,7 +2714,7 @@ var currentBaseLayer = 'Standardkarte'; // Default layer
 var horizontalOffset = 1125; // 1.0225 km on each side, total 2.25 km
 var verticalOffset = 594; // 0.59375 km on each side, total 1.02875 km
 // Define the boundaries
-var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
+var centerPoint = map.project([52.2171449, 11.072179], map.getZoom());
 var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
 var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
 var bounds = L.latLngBounds(southWest, northEast);
@@ -3224,29 +3260,62 @@ document.addEventListener("DOMContentLoaded", function() {
 	
 
 
-function renderQuestions(questions) {
-        const markersList = document.getElementById('markers-list');
-        markersList.innerHTML = '';
-        questions.forEach(question => {
-            const item = document.createElement('li');
-            item.innerHTML = formatQuestionListItem(question);
-            item.dataset.markerId = question.id.toString(); // Ensure markerId is stored as string if needed
 
-            item.addEventListener('click', function() {
-                console.log(`Question marker ID ${this.dataset.markerId} clicked inside markers-overlay, centering the map on question marker ID ${this.dataset.markerId} and opening its popup`);
-                centerMapOnMarker(this.dataset.markerId);
-            });
+document.addEventListener("DOMContentLoaded", function() {
+    const showMarkersBtn = document.getElementById('show-markers-btn');
+    const markersListOverlay = document.getElementById('markers-list-overlay');
 
-            markersList.appendChild(item);
-
-            const icon = createCustomIcon(question.answered);
-            const popupContent = `<div><strong>Frage:</strong> ${question.text}<br><small>Gefragt am: ${formatDate(new Date(question.date))}</small>${question.answered ? `<br><strong>Antwort:</strong> ${question.answer_text}<br><small>Geantwortet am: ${formatDate(new Date(question.answer_date))}</small>` : ''}</div>`;
-            const marker = L.marker([question.latitude, question.longitude], {icon: icon}).bindPopup(popupContent);
-            marker.addTo(map);
-
-            markersById[question.id.toString()] = marker; // Use toString() if your IDs are not already strings
-        });
+    // Function to toggle the markers list overlay and button text
+    function toggleMarkersListOverlay() {
+        if (window.innerWidth <= 1080) { // Check if the screen width is 1080px or less
+            if (markersListOverlay.style.display === 'block') {
+                markersListOverlay.style.display = 'none';
+                showMarkersBtn.innerText = 'Liste anzeigen';
+            } else {
+                markersListOverlay.style.display = 'block';
+                showMarkersBtn.innerText = 'Liste ausblenden';
+            }
+        }
     }
+
+    // Attach event listener to the "Liste" button
+    showMarkersBtn.addEventListener('click', toggleMarkersListOverlay);
+
+    // Event listener for the 'Schließen' button
+    document.getElementById('close-overlay-button').addEventListener('click', function() {
+        markersListOverlay.style.display = 'none';
+        showMarkersBtn.innerText = 'Liste anzeigen'; // Reset button text when overlay is closed
+    });
+	  });
+	
+function renderQuestions(questions) {
+    const markersList = document.getElementById('markers-list');
+    markersList.innerHTML = ''; // Clear existing list items
+    questions.forEach(question => {
+        const item = document.createElement('li');
+        item.innerHTML = formatQuestionListItem(question);
+        item.dataset.markerId = question.id.toString(); // Ensure markerId is stored as string if needed
+
+        item.addEventListener('click', function() {
+            console.log(`Question marker ID ${this.dataset.markerId} clicked inside markers-overlay, centering the map on question marker ID ${this.dataset.markerId} and opening its popup`);
+            centerMapOnMarker(this.dataset.markerId);
+
+            // Check if screen width is less than 1080px before toggling overlay
+            if (window.innerWidth < 1080) {
+                toggleMarkersListOverlay(); // Close the overlay and update the button text only if screen width is < 1080px
+            }
+        });
+
+        markersList.appendChild(item);
+
+        const icon = createCustomIcon(question.answered);
+        const popupContent = `<div><strong>Frage:</strong> ${question.text}<br><small>Gefragt am: ${formatDate(new Date(question.date))}</small>${question.answered ? `<br><strong>Antwort:</strong> ${question.answer_text}<br><small>Geantwortet am: ${formatDate(new Date(question.answer_date))}</small>` : ''}</div>`;
+        const marker = L.marker([question.latitude, question.longitude], {icon: icon}).bindPopup(popupContent);
+        marker.addTo(map);
+
+        markersById[question.id.toString()] = marker; // Use toString() if your IDs are not already strings
+    });
+}
 	
 function formatQuestionListItem(question) {
     // Format the question list item HTML with classes for styling
@@ -3275,13 +3344,19 @@ function formatDate(utcDateString) {
         targetDate = new Date(targetDate.getTime() + (1 * 60 * 60000)); // Adjust by an additional hour for DST
     }
 
-    // Format the date and time
-    let hours = targetDate.getHours().toString().padStart(2, '0');
-    let minutes = targetDate.getMinutes().toString().padStart(2, '0');
+    // Format the date
     let day = targetDate.getDate().toString().padStart(2, '0');
     let month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+    let year = targetDate.getFullYear();
 
-    return `${hours}:${minutes}, ${day}.${month}`;
+    return `${day}.${month}.${year}`;
+}
+
+// Function to check if DST is in effect
+function isDST(date) {
+    let jan = new Date(date.getFullYear(), 0, 1);
+    let jul = new Date(date.getFullYear(), 6, 1);
+    return date.getTimezoneOffset() < Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
 }
 
 // Function to check if DST is in effect
@@ -3311,17 +3386,20 @@ Date.prototype.stdTimezoneOffset = function() {
     }
 
 
-    map.on('click', function(e) {
-        const popupContent = `
-            <div id="question-form" style="text-align: center;">
-                <h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
-                <textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Ihre Frage hier..."></textarea><br>
-                <button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Veröffentlichen</button>
+map.on('click', function(e) {
+    const popupContent = `
+        <div id="question-form" style="text-align: center;">
+            <h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
+            <textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
+            <div style="display: flex; justify-content: center; margin-top: 10px;">
+                <button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Posten</button>
                 <button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px;">Abbrechen</button>
             </div>
-        `;
-        L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
-    });
+        </div>
+    `;
+    L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
+});
+
 	
 	
 

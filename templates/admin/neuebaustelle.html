@@ -3150,16 +3150,20 @@ function submitForm() {
 
 document.addEventListener('DOMContentLoaded', function() {
     var quill = new Quill('#editor-container', {theme: 'snow'});
-    var existingImage = '{{ baustelle.image | safe }}'; // Ensure this value is correctly passed from Flask
     var imageChanged = false;
     var cropper;
 
-    // Initialize Cropper with existing image if in edit mode and an image exists
+    // Assuming edit_mode and baustelle are defined and passed correctly from your Flask app
+    {% if edit_mode and baustelle %}
+    // Use the |tojson filter for proper JavaScript object notation and |safe to avoid escaping
+    document.getElementById('name').value = {{ baustelle.name | tojson | safe }};
+    quill.root.innerHTML = {{ baustelle.description | tojson | safe }};
+
+    var existingImage = {{ baustelle.image | tojson | safe }};
     if (existingImage) {
         var imagePreview = document.getElementById('imagePreview');
         imagePreview.src = "/static/baustellepics/" + existingImage;
         imagePreview.style.display = 'block';
-        // Initialize Cropper on the existing image
         cropper = new Cropper(imagePreview, {
             aspectRatio: 4 / 3,
             autoCropArea: 1,
@@ -3167,43 +3171,99 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Properly handle the loading of GeoJSON data
+    var gisData = {{ baustelle.gis_data | tojson | safe }};
+    if (gisData) {
+        L.geoJSON(gisData, {
+            // Define your styles and onEachFeature here if needed
+            // Example: onEachFeature: function(feature, layer) { layer.bindPopup(feature.properties.name); }
+        }).addTo(map);
+    }
+    {% endif %}
+
+    document.getElementById('imageInput').addEventListener('change', function(event) {
+        var files = event.target.files;
+        if (files.length > 0) {
+            imageChanged = true;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var imagePreview = document.getElementById('imagePreview');
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                if (cropper) {
+                    cropper.destroy();
+                }
+                cropper = new Cropper(imagePreview, {
+                    aspectRatio: 4 / 3,
+                    autoCropArea: 1,
+                    viewMode: 1,
+                });
+            };
+            reader.readAsDataURL(files[0]);
+        }
+    });
+
+
+
 
 window.submitForm = function() {
-        var descriptionContent = quill.root.innerHTML;
-        console.log("Quill description updated:", descriptionContent);
-
-        var formData = new FormData(document.getElementById("baustelleForm"));
-        formData.append("description", descriptionContent);
-
-        if (imageChanged && cropper) {
-            cropper.getCroppedCanvas().toBlob(function(blob) {
-                formData.append('projectImage', blob, 'croppedImage.png');
-                performFormSubmission(formData);
-            }, 'image/png');
-        } else {
-            // No new image to crop or cropper not initialized
-            performFormSubmission(formData);
-        }
+    let combinedGeoJSON = {
+        type: "FeatureCollection",
+        features: []
     };
 
-function performFormSubmission(formData) {
-        var submitUrl = '{{ url_for("update_baustelle", baustelle_id=baustelle.id) if edit_mode and baustelle else url_for("neuebaustelle") }}';
-        console.log("Submitting to URL:", submitUrl);
-
-        fetch(submitUrl, {
-            method: 'POST',
-            body: formData,
-            credentials: 'include',
-        }).then(response => {
-            if (!response.ok) throw new Error(`Failed submission: ${response.statusText}`);
-            return response.json();
-        }).then(data => {
-            console.log("Server response:", data);
-            window.location.href = `/baustellen/${data.baustelleId}`;
-        }).catch(error => {
-            console.error('Error during form submission:', error);
+    // Collect features from geojsonLayers
+    Object.values(geojsonLayers).forEach(layer => {
+        layer.eachLayer((featureLayer) => {
+            combinedGeoJSON.features.push(featureLayer.toGeoJSON());
         });
+    });
+
+    // Collect features from drawnObjects
+    Object.values(drawnObjects).forEach(layer => {
+        combinedGeoJSON.features.push(layer.toGeoJSON());
+    });
+
+    // Ensure the description from the Quill editor is captured
+    document.getElementById('description').value = quill.root.innerHTML;
+
+    var formData = new FormData(document.getElementById('baustelleForm'));
+
+    // Add the combined GeoJSON data to the FormData object
+    formData.append("gis_data", JSON.stringify(combinedGeoJSON));
+
+    // Handle the image data if an image has been changed
+    if (imageChanged && cropper && cropper.getCroppedCanvas()) {
+        cropper.getCroppedCanvas().toBlob(function(blob) {
+            formData.append('projectImage', blob, 'croppedImage.png');
+            performFormSubmission(formData);
+        }, 'image/png');
+    } else {
+        // Perform form submission without image processing if no image change occurred
+        performFormSubmission(formData);
     }
+};
+
+
+function performFormSubmission(formData) {
+    var submitUrl = '{{ url_for("update_baustelle", baustelle_id=baustelle.id) if edit_mode and baustelle else url_for("neuebaustelle") }}';
+    console.log("Submitting to URL:", submitUrl);
+
+    fetch(submitUrl, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', // Ensure cookies are sent with the request if needed
+    }).then(response => {
+        if (!response.ok) throw new Error(`Failed submission: ${response.statusText}`);
+        return response.json();
+    }).then(data => {
+        console.log("Server response:", data);
+        // Redirect or perform actions based on the response data
+        window.location.href = `/baustellen/${data.baustelleId}`;
+    }).catch(error => {
+        console.error('Error during form submission:', error);
+    });
+}
 });
 
 

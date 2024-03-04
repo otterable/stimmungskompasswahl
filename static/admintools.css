@@ -25,7 +25,7 @@
 	/* Text color to match nav-overlay links */
 	border: none;
 	/* Remove borders */
-	padding: 20px;
+	padding: 10px;
 	/* Padding similar to nav-overlay links */
 	font-size: 24px;
 	/* Font size similar to nav-overlay links */
@@ -39,7 +39,7 @@
 	/* Smooth transition for hover effect */
 	cursor: pointer;
 	/* Cursor on hover */
-	margin-bottom: 10px;
+	margin-bottom: 0px !important;
 	/* Space between buttons */
 }
 
