@@ -22,6 +22,19 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    image_file = db.Column(db.String(20), nullable=True)  # New attribute for image file name
+    views = db.Column(db.Integer, default=0)  # New attribute to track views
+
+    def __repr__(self):
+        return f"Post('{self.title}', '{self.date_posted}')"
+        
 class ProjectView(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
@@ -107,6 +120,7 @@ class Baustelle(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(300), nullable=True)
     gis_data = db.Column(db.JSON)  # Storing GeoJSON data
+    gisfile = db.Column(db.String(20), nullable=True)  # Storing GeoJSON data
     author = db.Column(db.String(100), nullable=True)  # Optional author name
     date = db.Column(db.DateTime, default=datetime.utcnow)
     questions = db.relationship('Question', backref='baustelle', lazy=True, cascade="all, delete-orphan")
@@ -128,10 +142,23 @@ class Question(db.Model):
     longitude = db.Column(db.Float)
     answer_date = db.Column(db.DateTime)  # New field for answer date
 
-
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "author": self.author,
+            "date": self.date,
+            "answer_text": self.answer_text,
+            "answered": self.answered,
+            "baustelle_id": self.baustelle_id,
+            "longitude": self.longitude,
+            "latitude": self.latitude,
+            "answer_date": self.answer_date
+        }
 
     def __repr__(self):
         return f'<Question {self.id}>'
+
 
 
 class GeoJSONFeature(db.Model):

@@ -28,12 +28,13 @@
       <button id="hamburger-button">&#9776;</button>
       <div id="nav-overlay" class="nav-overlay">
          <div id="nav-links">
-		 {% if newest_baustelle_id %}
-                <a href="/baustellen/{{ newest_baustelle_id }}">Feedback</a>
-            {% endif %}
-            <a href="/karte">Karte</a>
+		 <a href="/karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
             <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
+				 {% if newest_baustelle_id %}
+                <a href="/baustellen/{{ newest_baustelle_id }}">Bau</a>
+            {% endif %}
+			<a href="/blog">Blog</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
            
@@ -305,6 +306,24 @@
           </form>
         </div>
         <div class="stat-box2">
+          <h2>Projektdaten exportieren (.xlsx / .csv)</h2>
+          <form id="exportForm" method="POST" action="{{ url_for('export_questions') }}">
+            <div class="filter-options">
+              <!-- Category Selection -->
+              <div>
+                <label for="category">Wählen Sie eine Kategorie:</label>
+                <select id="category" name="category">
+                  <option value="">Alle Kategorien</option>
+                  <!-- Populate with actual categories -->
+                </select>
+                <button type="submit" class="register-button">.xlsx exportieren</button>
+              </div>
+            </div>
+            <!-- Date Filters -->
+            <!-- Submit Button -->
+          </form>
+        </div>
+        <div class="stat-box2">
           <h2>Alle Beiträge löschen</h2>
           <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
           <form method="POST" action="{{ url_for('delete_all_projects') }}">
@@ -314,9 +333,7 @@
       </div>
     </div>
     <div id="projectProposalsSection" style="display: none;">
-	
-	
-		
+
       <h2>Es gibt <span id="num-projects" style="color: #003056;">{{ project_count }} Projektvorschläge.</span>
       </h2>
       <div style="margin-bottom:-5px; margin-top: -20px;">
@@ -450,9 +467,7 @@
 
 		
     <div id="questionsSection" style="display: none;">
-   {% include 'partials/question_list_section.html' %}
-
-        console.log("Debug: Loaded {{ questions|length }} questions.");
+      {% include 'partials/question_list_section.html' %}
 	
     </div>
 		   	  

@@ -19,6 +19,96 @@
         transition: width 0.3s ease;
       }
 	  
+	  
+	  .btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block; /* Ensure alignment and proper sizing */
+    text-align: center;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+strong {
+    color: #002a4d; /* Sets the text color for all <strong> elements */
+}
+
+
+.post-content a {
+    color: #002a4d; /* Sets the link color */
+    font-weight: bold; /* Makes the link text bold */
+    text-decoration: none; /* Optional: Removes underline from links */
+}
+
+.post-content a:hover {
+    text-decoration: underline; /* Optional: Adds underline on hover for better UX */
+}
+
+
+.edit-button {
+    background-color: #ff5c00; /* Bearbeiten button color */
+		border-radius: 30px;
+
+    color: white;
+}
+
+.delete-button {
+    background-color: #9a031e; /* Löschen button color */
+		border-radius: 30px;
+
+    color: white;
+}
+
+.create-post-button {
+    background-color: #007bff; /* Example: Bootstrap primary blue */
+    color: white;
+	border-radius: 30px;
+    margin-bottom: 20px; /* Adjust spacing as needed */
+	  text-decoration: none;
+}
+
+	  .edit-button:hover, .delete-button:hover, .create-post-button:hover {
+    transform: scale(1.05); /* Slightly expands the button */
+}
+	  
+	  
+	  
+	  
+	  
+    .post {
+        margin-bottom: 2rem;
+    }
+    .post-title {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .post-date {
+        text-align: left;
+        color: #666;
+        margin-top: -0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .post-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .form-container {
+        margin-top: 20px;
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	  .nav-link { /* Replace .nav-link with your actual selector */
   background-color: #003056;
   color: white;
@@ -180,7 +270,49 @@
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         border-radius: 30px;
         box-sizing: border-box;
+		align-content: center;
       }
+
+.center-wrapper h1 {
+    margin-bottom: 15px; /* Adjust as necessary to create space between the heading and the button */
+}
+
+.horse-noise {
+	    text-align: center; /* Ensures content is centered */
+
+	  align-items: center; /* Center-align children horizontally */
+    justify-content: center; /* Optional, if you want to vertically center the contents */
+}
+.center-wrapper {
+    text-align: center; /* Ensures content is centered */
+    padding: 20px; /* Adds padding inside the wrapper for spacing */
+    display: flex; /* Use flex to control the direction and spacing of children */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center-align children horizontally */
+    justify-content: center; /* Optional, if you want to vertically center the contents */
+}
+.center-wrapper p {
+    font-size: 18px; /* Keeps the font size as previously defined */
+    color: #000; /* Maintains the lighter text color for subtlety */
+    max-width: 80%; /* Continues to limit the width for readability */
+    margin: 20px auto; /* Keeps the vertical space around the text */
+    text-align: center; /* Ensures the text is centered */
+    font-weight: bold; /* Makes the text bold */
+}
+
+
+
+.form-container2 {
+    display: inline-block; /* Adjusts width to fit content and allows for centering */
+    margin: 10px auto; /* Top and bottom margins with auto horizontal margins */
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 30px;
+    box-sizing: border-box;
+    text-align: center; /* Center the text inside the container */
+}
+
 
       .input-field {
         margin-bottom: 30px;
@@ -222,33 +354,58 @@
         /* Smooth transition for background color */
       }
 
-      .publish-button {
-        width: 100%;
-        /* Full width */
-        padding: 20px 0;
-        /* Vertical padding */
-        font-size: 20px;
-        /* Font size */
-        background-color: #2874A6;
-        /* Background color */
-        color: white;
-        /* Text color */
-        border-radius: 30px;
-        /* Border radius */
-        border: none;
-        /* No border by default */
-        cursor: pointer;
-        /* Pointer cursor on hover */
-        transition: width transform 0.3s ease;
-        /* Smooth transition for transform and border */
-      }
+   .publish-button {
+  width: 100%;
+  padding: 20px 0;
+  font-size: 20px;
+  background-color: #2874A6;
+  color: white;
+  border-radius: 30px;
+  border: 2px solid transparent; /* Ensure border size is accounted for in the box model */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+ h1, h2, h3 {
+        color: #003056;
+    }
 
-      .publish-button:hover {
-        transform: scale(1.005);
-        /* Scale up on hover */
-        border: 2px solid black;
-        /* Thin black border on hover */
-      }
+
+.post-title h2 {
+    color: #003056; /* Ensures title is the specified blue */
+    margin-bottom: 0; /* Reduces space below the title */
+}
+
+.post-date {
+    font-weight: bold; /* Makes date text bold */
+    color: black; /* Ensures date text is black */
+    margin-top: 5px; /* Reduces gap between date and title */
+}
+
+.post-content {
+    margin-bottom: 20px; /* Adds space below the description if needed */
+}
+
+.form-container2 h1 {
+    text-align: center; /* Centers the title within its container */
+}
+
+/* Ensure your existing .form-container2 styling does not conflict */
+.form-container2 {
+    text-align: center; /* Centers content horizontally */
+    /* Add other styling as needed */
+}
+
+
+.publish-button:hover {
+  background-color: darken(#2874A6, 10%); /* Slightly darken the button color on hover */
+  transform: scale(1.02); /* Scale the button for visual feedback */
+  border-color: black; /* Change border color on hover */
+}
+
+.form-group {
+    margin-bottom: 20px; /* Adjust the value as needed */
+}
+
 
 
       .project img {
@@ -313,6 +470,29 @@
       /* Hover effect for buttons inside links in the top bar */
 
 
+.register-button {
+	background-color: #003056;
+	/* Example color */
+	color: white;
+	border: none;
+	border-radius: 10px;
+	font-weight: bold !important;
+	padding: 5px 10px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 14px;
+	margin: 10px 0;
+	cursor: pointer;
+	box-sizing: border-box;
+	/* Include padding in width */
+}
+
+.register-button:hover {
+
+	transform: scale(1.00);
+	/* Scale up on hover */
+}
 
       /* Hover effect for links in the top bar */
       .top-bar a:not(:has(button)):hover::after {
