@@ -201,7 +201,13 @@ def delete_baustelle(baustelle_id):
 
 
 @app.route('/admin/neuebaustelle', methods=['GET', 'POST'])
+@login_required
 def neuebaustelle():
+    # Check if the user is the admin
+    if current_user.id != 1:
+        flash("You are not authorized to access this page.", "danger")
+        return redirect(url_for("index"))
+    
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description')
@@ -218,7 +224,7 @@ def neuebaustelle():
         if image and image.filename:
             filename = secure_filename(image.filename)
             imagename = filename
-            image_path = os.path.join(app.config['BAUSTELLE_IMAGE_FOLDER'],filename)
+            image_path = os.path.join(app.config['BAUSTELLE_IMAGE_FOLDER'], filename)
             app.logger.debug(image_path)
             image.save(image_path)
 
@@ -226,9 +232,10 @@ def neuebaustelle():
         db.session.add(new_baustelle)
         db.session.commit()
 
-        return jsonify({'status': 'success', 'message': 'Baustelle created successfully.','gisfile':gisfiles, 'baustelleId': new_baustelle.id})
+        return jsonify({'status': 'success', 'message': 'Baustelle created successfully.', 'gisfile': gisfiles, 'baustelleId': new_baustelle.id})
     else:
         return render_template('neuebaustelle.html')
+
 def allowed_file(filename):
     # Implement your file validation logic here
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -844,6 +851,32 @@ def edit_post(post_id):
     return render_template('admin/edit_post.html', title='Edit Post', form=form, post=post, legend='Edit Post')
     
 
+
+@app.route("/admin/options", methods=["GET", "POST"])
+@login_required  # Ensure only authenticated users can access this route
+def admin_options():
+    # Check if the user is the admin
+    if current_user.id != 1:
+        flash("You are not authorized to access this page.", "danger")
+        return redirect(url_for("index"))
+    
+    # Check for OTP verification
+    if "admin_verified" not in session or not session["admin_verified"]:
+        # Generate OTP
+        otp = randint(100000, 999999)
+        # Use Twilio to send the OTP to the admin's phone number
+        client = Client(os.environ["TWILIO_ACCOUNT_SID"], os.environ["TWILIO_AUTH_TOKEN"])
+        message = client.messages.create(
+            body=f"Stimmungskompass: Um sich bei den Admin-Optionen anzumelden, verwenden Sie OTP: {otp}",
+            from_=os.environ["TWILIO_PHONE_NUMBER"],
+            to=current_user.phone_number,
+        )
+        session["admin_otp"] = otp
+        return redirect(url_for("verify_admin_otp"))
+    
+    # If the user is verified, render the admin/options page
+    return render_template("admin/options.html")
+    
 @app.route('/delete_post/<int:post_id>', methods=['POST'])
 @login_required
 def delete_post(post_id):
@@ -936,6 +969,7 @@ def export_csv():
 
     return response
 @app.route("/export_questions", methods=["GET", "POST"])
+@login_required
 def export_questions():
     try:
         questions = Question.query.all()
@@ -1327,36 +1361,45 @@ def get_unique_categories():
 @app.route("/login/google/authorized")
 def authorized():
     token = oauth.google.authorize_access_token()
-
     nonce = session.pop("google_auth_nonce", None)
     user_info = oauth.google.parse_id_token(token, nonce=nonce)
 
     existing_user = User.query.filter_by(phone_number=user_info.get("email")).first()
 
     if not existing_user:
-        # Convert UTC time to desired timezone
-        tz = pytz.timezone(
-            "Europe/Berlin"
-        )  # Replace 'Europe/Berlin' with your desired timezone
-        account_creation_time = (
-            datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(tz)
-        )
-
-        new_user = User(
-            phone_number=user_info.get("email"),
-            name=user_info.get("name", "Unknown"),
-            account_creation=account_creation_time,
-            is_googleaccount=True,
-            is_admin=False,
-            password_hash="google_oauth",  # Set a default value
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        login_user(new_user)
+        # Temporarily store user information in the session
+        session['temp_user_info'] = {
+            "email": user_info.get("email"),
+            "name": user_info.get("name", "Unknown"),
+            "account_creation": datetime.utcnow(),
+            "is_googleaccount": True,
+            "is_admin": False,
+        }
+        # Redirect to GDPR consent confirmation page
+        return redirect(url_for('confirm_registration'))
     else:
         login_user(existing_user)
+        return redirect(url_for("index"))
 
-    return redirect(url_for("index"))
+
+@app.route('/confirm_registration', methods=['GET', 'POST'])
+def confirm_registration():
+    if request.method == 'POST':
+        if 'gdprConsent' in request.form:
+            temp_user_info = session.pop('temp_user_info', {})
+            new_user = User(
+                phone_number=temp_user_info.get("email"),
+                name=temp_user_info.get("name"),
+                account_creation=temp_user_info.get("account_creation"),
+                is_googleaccount=temp_user_info.get("is_googleaccount"),
+                is_admin=temp_user_info.get("is_admin"),
+                password_hash="google_oauth",  # Consider a secure approach
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            login_user(new_user)
+            return redirect(url_for("index"))
+    return render_template('confirm_registration.html')
 
 
 # Create the database tables before the first request
@@ -2909,7 +2952,7 @@ def verify_admin_otp():
         if "admin_otp" in session and str(session["admin_otp"]) == entered_otp:
             session["admin_verified"] = True
             flash("OTP Verified. Access granted to admin tools.", "success")
-            return redirect(url_for("admintools"))
+            return redirect(url_for("admin_options"))
         else:
             flash("Invalid OTP. Please try again.", "danger")
     metaData=g.metaData
@@ -3662,29 +3705,26 @@ def get_baustelle_data(baustelle_id):
     })
 
 
-
 @app.route("/update_baustelle/<int:baustelle_id>", methods=["POST"])
 @login_required
 def update_baustelle(baustelle_id):
-    # Check if current user is admin or has specific privileges
     if not (current_user.is_admin or current_user.id == 1):
         return jsonify({"error": "Unauthorized access."}), 403
 
     baustelle = Baustelle.query.get_or_404(baustelle_id)
 
-    # Update basic fields
     baustelle.name = request.form.get('name', baustelle.name)
     baustelle.description = request.form.get('description', baustelle.description)
 
     # Handle image upload
     image = request.files.get('projectImage')
-    if image and image.filename:
+    if image and allowed_file(image.filename):  # Make sure the file is allowed
         filename = secure_filename(image.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        filepath = os.path.join(app.config['BAUSTELLE_IMAGE_FOLDER'], filename)  # Ensure this path is correct
         image.save(filepath)
-        baustelle.image = filename
+        baustelle.image_file = filename  # Adjusted to 'image_file' to match assumed attribute name
 
-    # Update GIS data
+    # Update GIS data if provided
     gis_data_str = request.form.get('gis_data')
     if gis_data_str:
         try:
@@ -3694,6 +3734,8 @@ def update_baustelle(baustelle_id):
 
     db.session.commit()
     return jsonify({"success": "Baustelle updated successfully.", "baustelleId": baustelle.id})
+
+
 
 @app.route("/edit_baustelle/<int:baustelle_id>", methods=["GET"])
 @login_required

@@ -3015,7 +3015,7 @@
     <div id="map"></div>
     <script>
     // var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
-      var map = L.map('map').setView([48.4102, 15.6022], 15);
+      var map = L.map('map').setView([48.40868923524383, 15.611355395082073], 17);
       var currentDrawnLayer = null;
       var selectedToolButton = null;
       // Track the current base layer
@@ -3058,17 +3058,9 @@
       ];
       var boundary = L.latLngBounds(innerBounds);
       // Create a polygon with a hole (inverted polygon)
-      var invertedPolygon = L.polygon([outerBounds, innerBounds], {
-        color: 'grey',
-        fillColor: 'grey',
-        fillOpacity: 0.5
-      }).addTo(map);
+
       // Draw the boundary rectangle
-      L.rectangle(bounds, {
-        color: "#808080",
-        weight: 2,
-        fill: false
-      }).addTo(map);
+
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         minZoom: 13,
         attribution: '| © OpenStreetMap contributors'

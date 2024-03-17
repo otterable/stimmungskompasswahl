@@ -16,7 +16,14 @@
 			<a href="/blog">Blog</a>
             <a href="/ueber">Über</a>
             <a href="/profil">Profil</a>
-           
+
+  <!-- Existing links -->
+  {% if current_user.is_authenticated and current_user.id == 1 %}
+    <!-- This link is only visible to the admin -->
+    <a href="/admin/options">Admin</a>
+  {% endif %}
+  <!-- Remaining links and logic -->
+
             {% if current_user.is_authenticated %}
                 <span class="user-info" style="margin-top: 10px;">Benutzer: {{ current_user.name }}</span>
                 <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>

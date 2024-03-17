@@ -1,4 +1,4 @@
-<div class="logo-container" onclick="redirectToIndex()">
+  <div class="logo-container" onclick="redirectToIndex()">
     <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
   </div>
   <div class="container">
@@ -13,13 +13,16 @@
           <label for="name">Benutzername</label>
           <input type="text" id="name" name="name" required maxlength="100">
         </div>
+        <div class="checkbox-section">
+          <input type="checkbox" id="gdprConsent" name="gdprConsent" required>
+          <label for="gdprConsent">Ich stimme der <a href="http://stimmungskompass.ermine.at/privacy#gdpr-section" target="_blank">Datenschutzerklärung</a> zu und erkenne diese an.</label>
+        </div>
         <p class="informative-text">Außer Ihrem Benutzernamen wird nichts öffentlich angezeigt.</p>
         <p class="informative-text">Sie können Ihre Daten jederzeit in Ihren Profileinstellungen ansehen.</p>
-        <button type="submit" class="register-button" style="font-weight: bold;">Register</button>
+        <button type="submit" class="register-button" style="font-weight: bold;">Registrieren</button>
       </form>
     </div>
     <div class="cover-section">
       <img src="{{ url_for('serve_image', filename='login_titleimage.png') }}" alt="Cover Image" class="cover-image">
     </div>
   </div>
-</body>
