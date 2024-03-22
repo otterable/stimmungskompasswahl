@@ -31,18 +31,27 @@
 </div>
 <!-- Overlay for displaying the list of markers -->
 <div id="markers-list-overlay" class="markers-sidebar">
-   <div class="scrollable-content">
-      <!-- All your filters and the list go here -->
-      <div id="category-filter"></div>
-      <div id="sort-filter"></div>
-      <div id="full-project-filter"></div>
-      <ul id="markers-list" style="margin-bottom:20px;">
-         <!-- Marker items will be added here dynamically -->
-      </ul>
-      <button id="show-more-markers" onclick="loadMoreMarkers()" style="display: none;">Mehr anzeigen</button>
-   </div>
-   <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-f" style="margin-top: 10px !important;">Schließen</button>
+    <!-- Fixed top section for filters -->
+    <div class="header-navigation">
+        <div id="category-filter"></div>
+        <div id="sort-filter"></div>
+        <div id="full-project-filter"></div>
+    </div>
+
+    <!-- Scrollable list section -->
+    <div class="scrollable-list">
+        <ul id="markers-list" style="margin-bottom:20px;">
+            <!-- Marker items will be added here dynamically -->
+        </ul>
+    </div>
+
+    <!-- Always visible footer section -->
+    <div class="footer-navigation">
+        <button id="show-more-markers" class="register-button-cl" onclick="loadMoreMarkers()" style="display: none;">Mehr anzeigen</button>
+        <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-cl">Schließen</button>
+    </div>
 </div>
+
 <!-- Marker Placing Overlay -->
 <div id="marker-overlay">
    <div id="overlay-content">

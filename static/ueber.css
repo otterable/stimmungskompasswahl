@@ -1,7 +1,6 @@
       body {
         font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
-        background-color: #f5f1e4;
         color: black;
         background-image: url('background2.png');
         background-position: center;
@@ -265,7 +264,7 @@ strong {
       .form-container {
         margin: 40px auto;
         width: 60%;
-        background-color: #fff;
+        background-color: #f5f1e4;
         padding: 40px;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         border-radius: 30px;
@@ -305,7 +304,7 @@ strong {
 .form-container2 {
     display: inline-block; /* Adjusts width to fit content and allows for centering */
     margin: 10px auto; /* Top and bottom margins with auto horizontal margins */
-    background-color: #fff;
+    background-color: #f5f1e4;
     padding: 10px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 30px;
@@ -689,7 +688,7 @@ strong {
       }
 
       .info-text-field {
-        background-color: #F4F4F8;
+        background-color: #e5e2d5;
         /* Light grey background */
         width: 100%;
         /* Full width */

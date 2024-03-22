@@ -1560,7 +1560,7 @@ function addToImportantProjects(project) {
   projectElement.className = 'project-thumbnail';
   projectElement.innerHTML = `
   <h3><strong>${project.name}</strong></h3>
-  <p class="project-date"> Gepostet am: <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong></p>
+  <p class="project-date"> <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong></p>
   <!-- Add other project details as needed -->
 `;
 
@@ -1630,7 +1630,7 @@ function addToImportantProjects(project) {
   <h3>
       <strong>${project.name}</strong>
   </h3>
-  <p class="project-date"> Gepostet am: <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong>
+  <p class="project-date"> <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong>
   </p>
   <div class="voting-bar">
       ${project.upvotes > 0 ? `<div class="upvotes" style="width: ${project.upvote_percentage}%;"><span>${project.upvotes} 👍 (${project.upvote_percentage}%)</span></div>` : ''}

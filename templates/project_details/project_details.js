@@ -63,10 +63,10 @@ if (data.success) {
     let button = document.getElementById('bookmark-button');
     if (data.bookmarked) {
         //console.log(`Project_details.html: Logged in as user ID ${currentUserId}. You have bookmarked this project. Transforming the Bookmark button to "Bookmarked".`);
-        button.innerText = 'Bookmarked ✨';
+        button.innerText = 'Bookmarked';
     } else {
         //console.log(`Project_details.html: Bookmarked button clicked, removing the bookmark of project ID ${projectId} for user ${currentUserId}.`);
-        button.innerText = 'Bookmark ⭐';
+        button.innerText = 'Bookmark';
     }
 } else {}
 })
@@ -442,8 +442,8 @@ fetch(`/vote/${projectId}/${voteType}`, {
         const upvotePercentage = data.upvote_percentage.toFixed(1);
         const downvotePercentage = data.downvote_percentage.toFixed(1);
 
-    document.getElementById('upvote-count').innerHTML = `Gefällt: <strong style="font-weight: bold;">${upvoteCount}</strong> (${upvotePercentage}%)`;
-document.getElementById('downvote-count').innerHTML = `Gefällt nicht: <strong style="font-weight: bold;">${downvoteCount}</strong> (${downvotePercentage}%)`;
+    document.getElementById('upvote-count').innerHTML = `Gefällt: <strong style="font-weight: bold;">${upvoteCount}</strong> `;
+document.getElementById('downvote-count').innerHTML = `Gefällt nicht: <strong style="font-weight: bold;">${downvoteCount}</strong> `;
 
         upvoteElement.style.width = `${upvotePercentage}%`;
         downvoteElement.style.width = `${downvotePercentage}%`;
@@ -505,3 +505,5 @@ document.getElementById('downvote-count').innerHTML = `Gefällt nicht: <strong s
             alert('Web share not supported. Copy the URL to share.');
         }
     });
+	
+	

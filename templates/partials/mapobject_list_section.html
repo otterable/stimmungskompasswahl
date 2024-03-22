@@ -6,7 +6,7 @@
         <div class="project-description" style="font-weight:bold;">{{ project.descriptionwhy|safe }}</div>
         <p class="project-category">Kategorie: <strong>{{ project.category }}</strong>
         </p>
-        <p class="project-date">Gepostet am: {{ project.date.strftime('%d.%m.%Y') }}</p>
+        <p class="project-date">{{ project.date.strftime('%d.%m.%Y') }}</p>
         <!-- Admin actions for each project -->
         <form method="POST" action="{{ url_for('admintools') }}">
            <input type="hidden" name="project_id" value="{{ project.id }}">

@@ -138,7 +138,7 @@ google = oauth.register(
 def before_request():
     g.metaData = {
         'og_url': 'https://www.stimmungskompass.at/',
-        'og_title': 'Stimmungskompass - Eine Plattform zur Bürgerbeteiligung',
+        'og_title': 'Stimmungskompass - Österreichische Plattform für partizipative Planung.',
         'og_description': 'Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!',
         'og_image': 'https://www.stimmungskompass.at/static/facebook_card.png'
     }
@@ -933,7 +933,7 @@ def inject_meta_data():
     return {
         'metaData': {
             'og_url': 'https://www.stimmungskompass.at/',
-            'og_title': 'Stimmungskompass - Eine Plattform zur Bürgerbeteiligung',
+            'og_title': 'Stimmungskompass - Österreichische Plattform für partizipative Planung.' ,
             'og_description': 'Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!',
             'og_image': 'https://www.stimmungskompass.at/static/facebook_card.png'
         }
@@ -1896,14 +1896,26 @@ def favicon():
 
 @app.route("/karte")
 def karte():
-    # Fetch your projects data from the database or any source
     ip_address = request.remote_addr
     WebsiteViews.add_view(ip_address)
-    projects = (
-        get_projects()
-    )  # This is a placeholder for your actual function to fetch projects
+    projects = Project.query.all()  # Adjust according to your project fetching logic
+    for project in projects:
+        project.upvoted_by_user = False
+        project.downvoted_by_user = False
+        if current_user.is_authenticated:
+            user_vote = Vote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
+            if user_vote:
+                if user_vote.upvote:
+                    project.upvoted_by_user = True
+                elif user_vote.downvote:
+                    project.downvoted_by_user = True
+    # Convert projects to dictionaries to include the new fields
+    projects_data = [project.to_dict() for project in projects]
+    for project_data, project in zip(projects_data, projects):
+        project_data['upvoted_by_user'] = project.upvoted_by_user
+        project_data['downvoted_by_user'] = project.downvoted_by_user
     metaData = g.metaData
-    return render_template("karte/index.html", projects=projects, metaData=metaData)
+    return render_template("karte/index.html", projects=projects_data, metaData=metaData)
 
 
 @app.route("/request_otp", methods=["POST"])
@@ -3122,51 +3134,66 @@ def downvote(project_id):
 @login_required
 def vote(project_id, vote_type):
     project = Project.query.get_or_404(project_id)
+    existing_vote = Vote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
 
-    # Check for existing votes by the user for this project
-    existing_vote = Vote.query.filter_by(
-        user_id=current_user.id, project_id=project.id
-    ).first()
-
+    vote_action = ""
     if existing_vote:
-        db.session.delete(existing_vote)
+        if ((vote_type == "upvote" and existing_vote.upvote) or (vote_type == "downvote" and existing_vote.downvote)):
+            # Remove existing vote if same type is clicked again
+            db.session.delete(existing_vote)
+            vote_action = "removed"
+        else:
+            # Change vote type if different button is clicked
+            existing_vote.upvote = (vote_type == "upvote")
+            existing_vote.downvote = (vote_type == "downvote")
+            vote_action = "changed"
+    else:
+        # Add new vote
+        new_vote = Vote(user_id=current_user.id, project_id=project.id, upvote=(vote_type == "upvote"), downvote=(vote_type == "downvote"))
+        db.session.add(new_vote)
+        vote_action = "added"
 
-    new_vote = Vote(user_id=current_user.id, project_id=project.id)
-    if vote_type == "upvote":
-        new_vote.upvote = True
-        new_vote.downvote = False
-        app.logger.debug(
-            f"Upvote received for project {project_id} by user {current_user.id}"
-        )
-    elif vote_type == "downvote":
-        new_vote.downvote = True
-        new_vote.upvote = False
-        app.logger.debug(
-            f"Downvote received for project {project_id} by user {current_user.id}"
-        )
-
-    db.session.add(new_vote)
     db.session.commit()
 
-    # Re-fetch the project to get updated vote counts
+    # Re-fetch the project to update vote counts
     project = Project.query.get_or_404(project_id)
-    upvote_count = sum(vote.upvote for vote in project.votes)
-    downvote_count = sum(vote.downvote for vote in project.votes)
+    upvote_count = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+    downvote_count = Vote.query.filter_by(project_id=project.id, downvote=True).count()
     total_votes = upvote_count + downvote_count
     upvote_percentage = (upvote_count / total_votes * 100) if total_votes > 0 else 0
     downvote_percentage = (downvote_count / total_votes * 100) if total_votes > 0 else 0
 
-    # Return updated vote data
-    return jsonify(
-        {
-            "success": True,
-            "message": "Vote recorded",
-            "upvote_count": upvote_count,
-            "downvote_count": downvote_count,
-            "upvote_percentage": upvote_percentage,
-            "downvote_percentage": downvote_percentage,
-        }
-    )
+    return jsonify({
+        "success": True,
+        "vote_action": vote_action,
+        "upvote_count": upvote_count,
+        "downvote_count": downvote_count,
+        "upvote_percentage": upvote_percentage,
+        "downvote_percentage": downvote_percentage
+    })
+
+
+@app.route('/get_projects_with_vote_status')
+@login_required
+def get_projects_with_vote_status():
+    projects = Project.query.all()
+    projects_data = []
+    for project in projects:
+        project_dict = project.to_dict()
+        # Check the user's vote for this project
+        vote = Vote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
+        if vote:
+            if vote.upvote:
+                project_dict['user_vote'] = 'upvote'
+                print(f"Upvote loaded: User ID {current_user.id} has previously upvoted project ID {project.id}, turning the circle button of upvote to color #4caf50")
+            elif vote.downvote:
+                project_dict['user_vote'] = 'downvote'
+                print(f"Downvote loaded: User ID {current_user.id} has previously downvoted project ID {project.id}, turning the circle button of downvote to color #9a031e")
+        else:
+            project_dict['user_vote'] = None
+        projects_data.append(project_dict)
+    
+    return jsonify(projects_data)
 
 
 @app.route("/comment/<int:project_id>", methods=["POST"])

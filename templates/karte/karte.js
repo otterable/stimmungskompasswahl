@@ -610,7 +610,7 @@ function addMarkersToOverlay(markers) {
         // Create the button
         const filterButton = document.createElement('button');
         filterButton.id = 'full-project-filter-button';
-        filterButton.className = 'register-button-f'; // Use your desired class
+        filterButton.className = 'register-button-cl'; // Use your desired class
         filterButton.textContent = 'Nur Projektvorschläge anzeigen';
         // Event listener for the button
         filterButton.addEventListener('click', updateMarkerVisibility);
@@ -741,40 +741,79 @@ function addMarkers(projects) {
                 // For Notizens, show simple description
                 popupContent = `
          											<div style="text-align: center;">${project.descriptionwhy}</div>`;
-            } else {
-                // For Projektvorschläges, show detailed popup with voting details
-                var votingDetailsHtml = `
+} else {
+    // For Projektvorschläges, show detailed popup with voting details
+var upvoteButtonStyle = project.upvoted_by_user ? 'background-color: #4caf50;' : '';
+var downvoteButtonStyle = project.downvoted_by_user ? 'background-color: #9a031e;' : '';
+var votingDetailsHtml = `
                             
-         											<div style="text-align: center; margin-bottom: 1px; font-size: 14px; font-weight: bold;">
-         												<span onclick="vote(${project.id}, 'upvote')" class="vote-button" style="cursor: pointer;">👍</span>: 
-         												<span id="upvote-count-${project.id}">${project.upvotes}</span>,
-                                
-         												<span onclick="vote(${project.id}, 'downvote')" class="vote-button"  style="cursor: pointer;">👎</span>: 
-         												<span id="downvote-count-${project.id}">${project.downvotes}</span>
-         											</div>
+         											
                         `;
-                var votingBarHtml = `
-                            
-         											<div class="voting-bar" style="margin-top: 1px;">
-         												<div class="upvotes" style="width: ${upvotePercentage}%;"></div>
-         												<div class="downvotes" style="width: ${downvotePercentage}%;"></div>
-         											</div>
-                        `;
-                popupContent = `
-                            
-         											<div style="text-align: center;">
-         												<b>${project.name}</b>
-         												<br>
-         													<img src="/static/usersubmissions/${project.image_file}" style="width:300px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
-                                ${votingDetailsHtml}
-                                ${votingBarHtml}
-                                
-         														<a href="/project_details/${project.id}" target="_blank" class="button-hover-effect" style="font-size: 14px; font-weight: bold; color:white !important;">
-                                    Details anzeigen
-                                </a>
-         													</div>
-                        `;
-            }
+    var votingBarHtml = `
+        <div class="voting-bar" style="margin-top: 1px;">
+            <div class="upvotes" style="width: ${upvotePercentage}%;"></div>
+            <div class="downvotes" style="width: ${downvotePercentage}%;"></div>
+        </div>
+    `;
+var upvoteButtonStyle = `
+  background-color: #4caf50 !important;
+  color: white !important;
+  padding: 10px !important;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
+`;
+
+var detailsButtonStyle = `
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  color: white !important;
+  text-decoration: none;
+  background-color: #007bff;
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
+  height: 40px; /* Match the height of vote buttons */
+  line-height: 20px; /* Adjust the line height to vertically center the text */
+  border-radius: 4px; /* Optional: to match the button style */
+`;
+
+var votingButtonsHeight = '40px'; // This should be the same height as your upvote/downvote buttons
+
+
+var downvoteButtonStyle = `
+  background-color: #9A031E !important;
+  color: white !important;
+  padding: 10px !important;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
+`;
+
+var popupContent = `
+    <div style="text-align: center; z-index:1000 !important">
+        <b>${project.name}</b>
+        <br>
+        <img src="/static/usersubmissions/${project.image_file}" style="width:500px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
+        ${votingDetailsHtml}
+        ${votingBarHtml}
+        <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
+            <button onmouseover="this.style.backgroundColor='#66c46a'" onmouseout="this.style.backgroundColor='#4caf50'" onclick="vote(${project.id}, 'upvote')" id="upvote-button-${project.id}" class="vote-button circle-btn upvote" style="${upvoteButtonStyle}">👍</button>
+            <span id="upvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.upvotes}</span>
+            <a href="/project_details/${project.id}" target="_blank" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" class="button-hover-effect" style="font-size: 14px; font-weight: bold; color:white !important; text-decoration: none; background-color: #1a1a1a; border-radius: 30px; display: flex; flex-grow: 1; justify-content: center; align-items: center; padding: 10px; margin: 0 10px; transition: transform 0.3s ease, background-color 0.3s ease;">
+                Details
+            </a>
+            <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
+            <button onmouseover="this.style.backgroundColor='#cc5045'" onmouseout="this.style.backgroundColor='#9A031E'" onclick="vote(${project.id}, 'downvote')" id="downvote-button-${project.id}" class="vote-button circle-btn downvote" style="${downvoteButtonStyle}">👎</button>
+        </div>
+    </div>
+`;
+
+
+}
+
             var marker = L.marker(latLng, {
                 icon: createIcon(24, 2, fillColor, isFeatured),
                 category: project.category,
@@ -800,6 +839,60 @@ function addMarkers(projects) {
         }
     });
 }
+function updatePopupContent(projectId, data) {
+    // Retrieve the popup for the project
+    var popup = markersById[projectId].getPopup();
+    var popupContentDiv = document.createElement('div');
+    popupContentDiv.innerHTML = popup.getContent();
+
+    // Update original counters
+    var originalUpvoteCountElement = popupContentDiv.querySelector(`#upvote-count-${projectId}`);
+    var originalDownvoteCountElement = popupContentDiv.querySelector(`#downvote-count-${projectId}`);
+    if (originalUpvoteCountElement) originalUpvoteCountElement.innerText = data.upvote_count;
+    if (originalDownvoteCountElement) originalDownvoteCountElement.innerText = data.downvote_count;
+
+    // Assuming new counters have specific IDs or classes that distinguish them from the original counters
+    // Update new counters - Ensure these selectors correctly match your new counter elements
+    var newUpvoteCountElement = popupContentDiv.querySelector(`#new-upvote-count-${projectId}`);
+    var newDownvoteCountElement = popupContentDiv.querySelector(`#new-downvote-count-${projectId}`);
+    if (newUpvoteCountElement) newUpvoteCountElement.innerText = data.upvote_count;
+    if (newDownvoteCountElement) newDownvoteCountElement.innerText = data.downvote_count;
+
+    // Update the popup content
+    popup.setContent(popupContentDiv.innerHTML);
+
+    // Optionally, re-open the popup to refresh the content
+    markersById[projectId].bindPopup(popup).openPopup();
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/get_projects_with_vote_status')
+        .then(response => response.json())
+        .then(projects => {
+            projects.forEach(project => {
+                // Correctly select the project's vote buttons using actual IDs in your HTML
+                const upvoteButton = document.querySelector(`#upvote-button-${project.id}`);
+                const downvoteButton = document.querySelector(`#downvote-button-${project.id}`);
+
+                if (upvoteButton && project.user_vote === 'upvote') {
+                    upvoteButton.classList.add('voted-upvote');
+                    console.log(`Upvote loaded: User ID ${project.user_id} has previously upvoted project ID ${project.id}, turning the circle button of upvote to color #4caf50.`);
+                } else if (downvoteButton && project.user_vote === 'downvote') {
+                    downvoteButton.classList.add('voted-downvote');
+                    console.log(`Downvote loaded: User ID ${project.user_id} has previously downvoted project ID ${project.id}, turning the circle button of downvote to color #9a031e.`);
+                }
+
+                // Logging to console if vote buttons found and user has voted
+                if ((upvoteButton || downvoteButton) && project.user_vote) {
+                    console.log(`Vote loaded: User ID ${project.user_id} has previously ${project.user_vote}d project ID ${project.id}, adjusting the circle button color.`);
+                }
+            });
+        })
+        .catch(error => console.error('Error loading project votes:', error));
+});
+
 
 function setInitialVoteBarStyles(projectId) {
     document.querySelectorAll('.voting-bar').forEach(votingBar => {
@@ -864,40 +957,40 @@ function updateVotingUI(projectId, data) {
             openPopup = layer.getPopup();
         }
     });
-    // Proceed if an open popup is found
-    if (openPopup) {
-        // Extract and parse the popup content
-        const popupContent = openPopup.getContent();
+	
+	
+ if (markersById[projectId] && markersById[projectId].getPopup().isOpen()) {
+        // Directly access the popup's content DOM
+        const popup = markersById[projectId].getPopup();
+        const popupContent = popup.getContent();
         const parser = new DOMParser();
-        const popupDoc = parser.parseFromString(popupContent, 'text/html');
-        // Update the voting counts and percentages
-        const upvoteCountElement = popupDoc.getElementById(`upvote-count-${projectId}`);
-        const downvoteCountElement = popupDoc.getElementById(`downvote-count-${projectId}`);
-        const upvotePercentage = data.upvote_percentage.toFixed(1);
-        const downvotePercentage = data.downvote_percentage.toFixed(1);
-        if (upvoteCountElement) upvoteCountElement.innerText = `${data.upvote_count}`;
-        if (downvoteCountElement) downvoteCountElement.innerText = `${data.downvote_count}`;
-        // Update voting bars widths and adjust border-radius
-        const upvotesBar = popupDoc.querySelector(`.upvotes`);
-        const downvotesBar = popupDoc.querySelector(`.downvotes`);
+        const popupDom = parser.parseFromString(popupContent, 'text/html');
+
+        // Update upvote and downvote counts
+        const upvoteCountElement = popupDom.getElementById(`upvote-count-${projectId}`);
+        const downvoteCountElement = popupDom.getElementById(`downvote-count-${projectId}`);
+        if (upvoteCountElement) upvoteCountElement.textContent = data.upvote_count;
+        if (downvoteCountElement) downvoteCountElement.textContent = data.downvote_count;
+
+        // Update the voting bars based on percentages
+        const upvotesBar = popupDom.querySelector('.upvotes');
+        const downvotesBar = popupDom.querySelector('.downvotes');
         if (upvotesBar && downvotesBar) {
+            const upvotePercentage = data.upvote_percentage.toFixed(1);
+            const downvotePercentage = data.downvote_percentage.toFixed(1);
             upvotesBar.style.width = `${upvotePercentage}%`;
             downvotesBar.style.width = `${downvotePercentage}%`;
-            if (data.upvote_count > 0 && data.downvote_count > 0) {
-                upvotesBar.style.borderRadius = '30px 0 0 30px';
-                downvotesBar.style.borderRadius = '0 30px 30px 0';
-            } else if (data.upvote_count > 0 && data.downvote_count === 0) {
-                upvotesBar.style.borderRadius = '30px';
-                downvotesBar.style.borderRadius = '0';
-            } else if (data.upvote_count === 0 && data.downvote_count > 0) {
-                downvotesBar.style.borderRadius = '30px';
-                upvotesBar.style.borderRadius = '0';
-            }
+
+            // Adjust the border-radius based on the presence of votes
+            upvotesBar.style.borderRadius = data.upvote_count > 0 && data.downvote_count > 0 ? '30px 0 0 30px' : '30px';
+            downvotesBar.style.borderRadius = data.upvote_count > 0 && data.downvote_count > 0 ? '0 30px 30px 0' : '30px';
         }
-        // Update popup content with the modified HTML
-        openPopup.setContent(popupDoc.documentElement.innerHTML);
+
+        // Serialize the updated DOM and set it as the new popup content
+        popup.setContent(new XMLSerializer().serializeToString(popupDom.documentElement));
     }
-    setInitialVoteBarStyles(projectId); // Call this at the end of the function
+    // Reapply the initial vote bar styles to ensure the UI is correctly updated
+    setInitialVoteBarStyles(projectId);
 }
 
 function adjustBorderRadius(upvoteElement, downvoteElement, upvoteCount, downvoteCount) {
@@ -938,7 +1031,6 @@ function loadMoreMarkers() {
     // Check if there are more markers to show
     if (displayedMarkersCount < allMarkers.length) {
         showMoreBtn.style.display = 'block'; // Show the "Show More" button
-        showMoreBtn.classList.add('register-button-f');
     } else {
         showMoreBtn.style.display = 'none'; // Hide the button if no more markers
     }

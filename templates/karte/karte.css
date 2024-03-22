@@ -9,6 +9,43 @@ cursor: pointer;
 transition: background-color 0.3s ease;
 /* Smooth transition for background color */
 }
+
+.circle-btn {
+    border-radius: 50%;
+    width: 40px; /* Adjust based on your preference */
+    height: 40px; /* Adjust to keep the button circular */
+    border: none;
+    outline: none;
+    font-size: 20px; /* Adjust based on your preference */
+    margin-right: 5px; /* Optional: adds space between the buttons */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transition for hover effect and color change */
+}
+
+.circle-btn:hover {
+    transform: scale(1.2); /* Makes the button larger on hover */
+}
+
+.circle-btn.upvote:active {
+    background-color: #4caf50; /* Changes the background color of upvote button when pressed */
+}
+
+.circle-btn.downvote:active {
+    background-color: #9a031e; /* Changes the background color of downvote button when pressed */
+}
+
+.voted-upvote {
+    background-color: #4caf50 !important;
+}
+
+.voted-downvote {
+    background-color: #9a031e !important;
+}
+
+
+
 #marker-overlay {
 display: none;
 position: fixed;
@@ -56,31 +93,32 @@ background: white;
 border-radius: 30px;
 margin-top: 7.5px !important;
 z-index: 1500 !important;
-overflow: auto; /* Enables scrolling if content is larger than the overlay */
+    overflow-y: auto !important;
 transform: none;
 }
 #markers-list-overlay {
 position: absolute; /* Changed from fixed to absolute */
-top: calc(9vh + 9px); /* Estimate based on viewport height and gap */
-left: 15px;
-right: 15px;
+top: 40px; /* Estimate based on viewport height and gap */
 word-wrap: break-word; /* Break long words to prevent horizontal overflow */
-bottom: 15px; /* 15px away from the bottom */
+bottom: 50px; /* 15px away from the bottom */
 width: auto; /* Allow width to adjust to left and right margins */
 min-width: calc(100% - 30px); /* Ensure it takes at least the width minus margins */
 height: auto; /* Adjust height automatically */
 padding: 20px;
 box-sizing: border-box; /* Include padding in width/height */
 display: none;
+left: 0;
+        background-color: #f5f1e4;
+
 flex-direction: column;
 justify-content: center; /* Vertically center content */
 align-items: center; /* Horizontally center content */
-background: white;
 border-radius: 30px;
 margin-top: 7.5px !important;
 z-index: 1500 !important;
 overflow: auto; /* Enables scrolling if content is larger than the overlay */
 }
+
 .leaflet-control-layers-toggle {
 display: none !important;
 }
@@ -253,6 +291,8 @@ text-align: center;
 margin: 10px 0;
 /* Optional: adjust top and bottom margin as needed */
 }
+
+
 }
 #category-filter,
 #sort-filter {
@@ -291,16 +331,7 @@ padding-bottom: 20px;
 display: none !important;
 }
 /* Add this to your CSS file or within a tag in your HTML */
-.button-hover-effect {
-display: inline-block;
-background-color: #111111;
-padding: 5px 7px;
-text-decoration: none;
-border-radius: 30px;
-margin-top: 10px;
-margin-bottom: 10px;
-transition: transform 0.3s ease, background-color 0.3s ease;
-}
+
 .button-hover-effect:hover {
 transform: scale(1.005);
 background-color: #111111;
@@ -417,23 +448,7 @@ width: calc(100% - 300px);
 left: 15px;
 right: calc(30% + 15px);
 }
-.markers-sidebar {
-position: absolute;
-top: 95px;
-/* Increased from 15px to 95px to accommodate the top bar's height */
-left: 15px;
-bottom: 15px;
-/* Adjusted bottom position */
-width: 20%;
-background: white;
-border-radius: 30px !important;
-overflow-y: auto;
-z-index: 10030 !important;
-padding: 20px;
-border-right: 1px solid #ccc;
-display: none;
-/* Initially hidden */
-}
+
 #sidebar {
 position: absolute;
 width: calc(30% - 15px);
@@ -532,6 +547,17 @@ border-radius: 30px;
 /* Add rounded corners to the object list */
 }
 /* Custom Scrollbar CSS End */
+@media only screen and (min-width: 1080px) {
+
+.leaflet-popup-content {
+word-wrap: break-word; /* Break long words to prevent horizontal overflow */
+color: #000000 !important;
+width: 500px !important;
+}
+}
+
+
+
 /* Media Query for Mobile Devices */
 @media only screen and (max-width: 1080px) {
 .button-container .register-button-m,
@@ -570,14 +596,7 @@ font-size: 18px;
 /* Adjust the font size as needed */
 }
 }
-#close-overlay-button {
-width: 100%;
-/* Stretch to fill the container */
-box-sizing: border-box;
-/* Include padding and border in the width */
-display: block;
-/* Display as a block element */
-}
+
 /* Media Query for Devices Between 1080px and 1400px */
 @media only screen and (min-width: 1081px) and (max-width: 1500px) {
 .button-container .register-button-m,
@@ -754,12 +773,31 @@ width: auto !important;
 .leaflet-popup-content {
 word-wrap: break-word; /* Break long words to prevent horizontal overflow */
 color: #000000 !important;
+width: 500px;
+}
+.leaflet-popup-content img {
+width: 100%;
+/* Adjust the image width to fit the popup */
+height: auto;
+/* Maintain aspect ratio */
+max-width: 500px;
+/* Maximum width of the image */
 }
 .leaflet-popup-tip {
 display: block;
 /* Optional: hides the tip arrow for a cleaner look */
 background-color: #f5f1e4 !important;
 }
+
+.leaflet-popup .leaflet-popup-tip-container {
+width: 540px;
+/* Align the tip container with the popup width */
+margin-left: -270px;
+/* Half of the width to center it */
+left: 50%;
+/* Center the tip container */
+}
+
 .leaflet-popup-close-button {
 display: none;
 /* Optional: hides the tip arrow for a cleaner look */
@@ -770,7 +808,7 @@ display: none;
 @media (max-width: 1080px) {
 .leaflet-popup-content {
 word-wrap: break-word; /* Break long words to prevent horizontal overflow */
-width: 200px;
+width: 300px;
 /* Adjust the width as needed for smaller screens */
 }
 .leaflet-popup-content img {
@@ -778,13 +816,13 @@ width: 100%;
 /* Adjust the image width to fit the popup */
 height: auto;
 /* Maintain aspect ratio */
-max-width: 200px;
+max-width: 300px;
 /* Maximum width of the image */
 }
 .leaflet-popup .leaflet-popup-tip-container {
-width: 200px;
+width: 340px;
 /* Align the tip container with the popup width */
-margin-left: -100px;
+margin-left: -170px;
 /* Half of the width to center it */
 left: 50%;
 /* Center the tip container */
@@ -1318,7 +1356,7 @@ font-size: 18px !important;
 /* Define light mode colors */
 --counter-pill-bg-color: #f3f4f8;
 --counter-pill-text-color: black;
---background-color: #ffffff;
+--background-color: #f5f1e4fff;
 /* Light mode background */
 --text-color: black;
 /* Light mode text */
@@ -1839,7 +1877,7 @@ img:hover {}
 .form-container {
 margin: 40px auto;
 width: 60%;
-background-color: #fff;
+background-color: #f5f1e4;
 padding: 40px;
 box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 border-radius: 30px;
@@ -2220,7 +2258,7 @@ background-color: #02569d;
 background-color: #2874A6;
 }
 .info-text-field {
-background-color: #F4F4F8;
+background-color: #e5e2d5;
 /* Light grey background */
 width: 100%;
 /* Full width */
@@ -2259,13 +2297,183 @@ select,
 #benefit-editor {
 margin-bottom: 0px !important;
 }
-/* Media Query for Desktop Sizes Between 768px and 1445px */
-@media (min-width: 768px) and (max-width: 1445px) {
-.markers-sidebar {
-width: 35%;
-/* Adjusted width to 35% */
+
+
+
+
+
+
+
+
+
+
+
+/* Base styling for .markers-sidebar */
+
+
+/* Desktop specific styles */
+@media only screen and (min-width: 769px) {
+    .markers-sidebar {
+        display: block; /* Ensure sidebar is visible */
+        position: absolute;
+        top: 95px;
+        left: 15px;
+        bottom: 15px;
+        width: 20%;
+        border-radius: 30px;
+        overflow-y: auto;
+        padding: 20px;
+    }
+	.markers-sidebar {
+    background: #f5f1e4 !important;
+    border-radius: 30px !important;
+    z-index: 10030 !important;
+    padding-left: 20px;
+	    padding-right: 20px;
+	    padding-bottom: 0px !important;
+
+    display: none; /* Initially hidden, shown via JavaScript */
+    overflow-y: auto;
+    box-sizing: border-box; /* Includes padding in width and height */
 }
 }
+
+
+    /* Adjust width for medium-sized screens */
+    @media (min-width: 768px) and (max-width: 1445px) {
+        .markers-sidebar {
+            width: 35%; /* Adjusted width to 35% for medium screens */
+        }
+    }
+}
+
+
+
+/* Styles for fixed top section and scrollable list */
+
+.scrollable-list {
+    overflow-y: auto !important;
+    height: calc(100% - 60px); /* Adjust height to leave space for the footer */
+}
+
+/* Ensure the footer is always visible at the bottom */
+/* Base styling for the footer navigation */
+.footer-navigation {
+    display: flex;
+    justify-content: center; /* Center items horizontally */
+    align-items: center; /* Align items vertically in the middle */
+    position: sticky;
+    bottom: 0;
+    background: inherit; /* Match the sidebar background */
+    padding-top: 10px;
+    padding-bottom: 20px;
+    border-top: 0px solid #ccc; /* Optional visual separation */
+    width: 100%;
+    box-sizing: border-box; /* Include padding in width */
+}
+
+/* Styling for buttons within .footer-navigation */
+.register-button-cl {
+    border-radius: 20px;
+    padding: 5px 10px;
+    background-color: #003056; /* Example button background color */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+    margin: 5px; /* Space between buttons */
+    text-align: center;
+    text-decoration: none;
+    display: flex; /* Use flex to center text within button */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    flex: 1; /* Flex-grow to fill available space */
+    font-size: 16px; /* Set font size to 16px */
+}
+
+/* Adjust hover effect for .register-button-cl */
+.register-button-cl:hover {
+filter: brightness(110%);
+}
+
+/* Base styling for .markers-sidebar */
+
+.scrollable-list {
+    -webkit-overflow-scrolling: touch; /* Improve scrolling on iOS devices */
+}
+
+
+
+/* Media query for mobile and handling single vs. multiple buttons */
+@media only screen and (max-width: 768px) {
+    .footer-navigation {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #003056; /* Background color for mobile footer */
+        padding: 10px 0; /* Adjust padding as needed */
+        z-index: 1005; /* Ensure visibility above other elements */
+        flex-direction: row; /* Ensure buttons are in a row */
+    }
+
+    .footer-navigation.one-button {
+        justify-content: center; /* Center a single button */
+    }
+
+    .footer-navigation.two-buttons {
+        justify-content: space-between; /* Space out two buttons */
+    }
+
+    body {
+        padding-bottom: 60px; /* Adjust this value to avoid content being hidden by the footer */
+    }
+}
+
+/* Ensures links within the footer navigation behave similarly to buttons */
+.footer-navigation a {
+    padding: 10px 15px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: flex; /* Use flex to align text */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    flex: 1; /* Flex-grow to fill available space */
+}
+
+.footer-navigation a:hover {
+    background-color: #234770; /* Hover effect */
+}
+
+
+.header-navigation {
+    position: sticky;
+	    padding-top: 20px !important;
+ align-items: center; /* Center content horizontally */
+    justify-content: center; /* Center content vertically */
+    top: 0;
+    background: inherit; /* Match the sidebar background */
+    padding: 0px 0;
+	padding-bottom: 10px !important;
+	background-color: #f5f1e4;
+	z-index: 1006;
+    border-top: 0px solid #ccc; /* Visual separation from the list */
+}
+
+.header-navigation > * {
+    margin: 0 auto; /* Center elements horizontally */
+    display: flex;
+    justify-content: center; /* Center content of elements */
+    width: 100%; /* Take full width to center content */
+}
+
+
+
+
+
 @media only screen and (max-width: 1445px) {
 .top-bar a button {
 transition: width 0.3s ease;

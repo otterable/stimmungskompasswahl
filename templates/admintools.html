@@ -80,7 +80,7 @@
     <button id="hamburger-button-filter">&#9776; Menu</button>
     <div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
       <div class="stats-container">
-        <div class="stat-box" style="background-color: #fff3c3 !important">
+        <div class="stat-box" style="background-color: #f5f1e43c3 !important">
           <h2>Top 5 Meistgesehene Projekte</h2>
           <ul> {% for project in top_viewed_projects %} {% if project.view_count > 0 %} <li>
               <h3>
@@ -306,16 +306,12 @@
           </form>
         </div>
         <div class="stat-box2">
-          <h2>Projektdaten exportieren (.xlsx / .csv)</h2>
+          <h2>Fragen und Antworten exportieren (.xlsx / .csv)</h2>
           <form id="exportForm" method="POST" action="{{ url_for('export_questions') }}">
             <div class="filter-options">
               <!-- Category Selection -->
               <div>
-                <label for="category">Wählen Sie eine Kategorie:</label>
-                <select id="category" name="category">
-                  <option value="">Alle Kategorien</option>
-                  <!-- Populate with actual categories -->
-                </select>
+             
                 <button type="submit" class="register-button">.xlsx exportieren</button>
               </div>
             </div>
@@ -338,9 +334,9 @@
       </h2>
       <div style="margin-bottom:-5px; margin-top: -20px;">
         <label for="search" style="font-weight: bold;">Suchen nach Namen:</label>
-        <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()" placeholder="Suchen..." style="margin-top:20px; margin-bottom:10px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+        <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()" placeholder="Suchen..." style="margin-top:20px; margin-bottom:10px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
         <label for="sort" style="font-weight: bold;">Sortieren nach:</label>
-        <select id="sort" onchange="submitForm()" style="border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer; margin-bottom: 20px;">
+        <select id="sort" onchange="submitForm()" style="border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer; margin-bottom: 20px;">
           <option value="score_desc" {% if sort == 'score_desc' %}selected{% endif %}>Höchste Bewertung zuerst</option>
           <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Neuester Beitrag</option>
           <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Ältester Beitrag</option>
@@ -359,7 +355,7 @@
         <h2>Es gibt <span id="num-mapobjects" style="color: #003056;">{{ mapobject_count }} Notizen.</span>
         </h2>
         <label for="searchMapObject" style="font-weight: bold;">Suchen nach Notizen:</label>
-        <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()" style="margin-bottom: 0px;  border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+        <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()" style="margin-bottom: 0px;  border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
       </div>
       <div class="delete-map-objects-by-date">
         <h2>Löschen von Kartenobjekten nach Datum</h2>
@@ -375,9 +371,9 @@
       </h2>
       <div class="comment-search-container">
         <label for="searchComment" style="font-weight: bold;">Kommentare suchen:</label>
-        <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+        <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
         <label for="searchCommentByUserId" style="font-weight: bold;">Nach Benutzer-ID suchen:</label>
-        <input type="text" id="searchCommentByUserId" placeholder="Nach Benutzer-ID suchen" onkeyup="searchCommentsByUserId()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+        <input type="text" id="searchCommentByUserId" placeholder="Nach Benutzer-ID suchen" onkeyup="searchCommentsByUserId()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
       </div> {% with paginated_comments=paginated_comments %} {% include 'partials/comments_section.html' %} {% endwith %}
     </div>
     <div id="importantProjectsSection" style="display: none;">
@@ -388,12 +384,12 @@
           <h3>
             <strong>{{ project.name }}</strong>
           </h3>
-          <p class="project-date"> Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>, Ansichten: <strong>{{ project.view_count }}</strong>
+          <p class="project-date"> <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>, Ansichten: <strong>{{ project.view_count }}</strong>
           </p>
           <div class="voting-bar"> {% if project.upvotes > 0 %} <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
-              <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+              <span>{{ project.upvotes }} 👍 </span>
             </div> {% endif %} {% if project.downvotes > 0 %} <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
-              <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+              <span>{{ project.downvotes }} 👎 </span>
             </div> {% endif %} </div>
           <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
             <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
@@ -413,12 +409,12 @@
           <h3>
             <strong>{{ project.name }}</strong>
           </h3>
-          <p class="project-date"> Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>, Ansichten: <strong>{{ project.view_count }}</strong>
+          <p class="project-date"> <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>, Ansichten: <strong>{{ project.view_count }}</strong>
           </p>
           <div class="voting-bar"> {% if project.upvotes > 0 %} <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
-              <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+              <span>{{ project.upvotes }} 👍 </span>
             </div> {% endif %} {% if project.downvotes > 0 %} <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
-              <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+              <span>{{ project.downvotes }} 👎 </span>
             </div> {% endif %} </div>
           <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
             <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
@@ -439,7 +435,7 @@
           <h3>
             <strong>{{ project.name }}</strong>
           </h3>
-          <p class="project-date"> Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>, Ansichten: <strong>{{ project.view_count }}</strong>
+          <p class="project-date"> <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>, Ansichten: <strong>{{ project.view_count }}</strong>
           </p>
           <div class="voting-bar"> {% if project.upvotes > 0 %} <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
               <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
@@ -2134,7 +2130,7 @@ function addToImportantProjects(project) {
     projectElement.className = 'project-thumbnail';
     projectElement.innerHTML = `
         <h3><strong>${project.name}</strong></h3>
-        <p class="project-date"> Gepostet am: <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong></p>
+        <p class="project-date"> <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong></p>
         <!-- Add other project details as needed -->
     `;
 
@@ -2202,7 +2198,7 @@ function addToImportantProjects(project) {
         <h3>
             <strong>${project.name}</strong>
         </h3>
-        <p class="project-date"> Gepostet am: <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong>
+        <p class="project-date"> <strong>${project.date}</strong>, Ansichten: <strong>${project.view_count}</strong>
         </p>
         <div class="voting-bar">
             ${project.upvotes > 0 ? `<div class="upvotes" style="width: ${project.upvote_percentage}%;"><span>${project.upvotes} 👍 (${project.upvote_percentage}%)</span></div>` : ''}

@@ -3,7 +3,7 @@ body {
 
   background-color: #f5f1e4;
   color: black;
-  background-image: url('background2.png');
+  background-image: url('background2.png') !important;
   /* Updated path */
   background-position: center;
   background-repeat: no-repeat;
@@ -37,17 +37,6 @@ body {
   /* Adjust the bottom margin */
   font-weight: normal;
   /* Adjust the font weight */
-}
-
-@media only screen and (max-width: 1445px) {
-  .top-bar a button {
-    transition: width 0.3s ease;
-    /* Transition for the transform property */
-    border-radius: 30px;
-    /* If you want to keep the border-radius */
-    padding: 7px;
-    /* Add any other button-specific styles here */
-  }
 }
 
 .upvotes-info strong,
@@ -105,7 +94,7 @@ img {
   text-align: left !important;
   /* Align the form-container content to the left */
 
-  background-color: #fff;
+  background-color: #f5f1e4 !important;
   padding: 40px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   border-radius: 30px;
@@ -245,12 +234,12 @@ input[type="file"] {
 /* Hiding arrows on screens less than 1080px wide */
 @media only screen and (max-width: 1080px) {
   .arrow-desktop {
-    display: none;
+    display: none !important;
     /* Hide desktop arrows on mobile */
   }
 
   .arrow-mobile {
-    display: block;
+    display: none !important;
     /* Show mobile arrows */
   }
 }
@@ -259,12 +248,14 @@ input[type="file"] {
 .arrow-mobile-left,
 .arrow-mobile-right {
   position: fixed;
+      display: none !important;
+
   /* Fixed positioning relative to the viewport */
   top: 50%;
   /* Center vertically */
-  width: 60px;
+  width: 40px;
   /* Width of the arrow */
-  height: 60px;
+  height: 40px;
   /* Height of the arrow */
   z-index: 1000;
   /* Ensure it's above other elements */
@@ -315,6 +306,10 @@ input[type="file"] {
 
 /* Arrow styling */
 @media screen and (min-width: 1080px) {
+
+.navigation-left, .navigation-right {
+	display:none;
+}
 
   .arrow-left,
   .arrow-right {
@@ -539,57 +534,57 @@ input[type="file"] {
 
 
 .report-button {
-  background-color: #111111;
-  color: white;
-  padding: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #111111 !important;
+  color: white !important;
+  padding: 10px !important;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
 }
 
 .report-button:hover {
 
-  background-color: #222222;
+  background-color: #222222 !important;;
   /* Lighter shade of green */
-  transform: scale(1.005);
+  transform: scale(1.000) !important;;
 }
 
 .bookmark-button {
-  background-color: #003056;
-  color: white;
-  padding: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #003056 !important;
+  color: white !important;
+  padding: 10px !important;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
 }
 
 .bookmark-button:hover {
 
-  background-color: #234770;
+  background-color: #234770 !important;
   /* Lighter shade of green */
-  transform: scale(1.005);
+  transform: scale(1.000) !important;
 }
 
 .upvote-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #4caf50 !important;
+  color: white !important;
+  padding: 10px !important;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
 }
 
 .upvote-button:hover {
-  background-color: #66c46a;
+  background-color: #66c46a !important;
   /* Lighter shade of green */
-  transform: scale(1.005);
+  transform: scale(1.000) !important;
 }
 
 .downvote-button {
-  background-color: #9A031E;
-  color: white;
-  padding: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #9A031E !important;
+  color: white !important;
+  padding: 10px !important;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
 }
 
 .downvote-button:hover {
-  background-color: #cc5045;
+  background-color: #cc5045 !important;
   /* Lighter shade of red */
-  transform: scale(1.005);
+  transform: scale(1.000) !important;
 }
 
 
@@ -607,13 +602,13 @@ input[type="file"] {
 }
 
 .comment-button {
-  background-color: #003056;
-  color: white;
-  padding: 10px;
-  display: block;
-  margin: 20px auto;
-  font-weight: bold;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  background-color: #003056 !important;
+  color: white !important;
+  padding: 10px !important;
+  display: block !important;
+  margin: 20px auto!important;
+  font-weight: bold !important;
+  transition: background-color 0.3s ease, transform 0.3s ease !important;
 }
 
 .share-button {
@@ -628,14 +623,14 @@ input[type="file"] {
 .share-button:hover {
   background-color: #306db8;
   /* Lighter shade of red */
-  transform: scale(1.005);
+  transform: scale(1.000);
 }
 
 
 .comment-button:hover {
-  background-color: #00427a;
+  background-color: #00427a !important;
   /* Lighter shade of blue */
-  transform: scale(1.005);
+  transform: scale(1.000) !important;
 }
 
 .publish-button {
@@ -660,7 +655,7 @@ input[type="file"] {
 }
 
 .publish-button:hover {
-  transform: scale(1.005);
+  transform: scale(1.000);
   /* Scale up on hover */
   border: 2px solid black;
   /* Thin black border on hover */
@@ -778,6 +773,7 @@ input[type="file"] {
 .form-container h2.centered-title,
 .form-container p.centered-title {
   margin: 2px 0;
+  font-size: 15px;
   /* Adjust the top and bottom margin as needed */
   text-align: center;
   /* Center align text */
@@ -785,14 +781,102 @@ input[type="file"] {
 
 /* Default style for .centered-title (for mobile devices) */
 .centered-title {
+	color: #003056;
     margin-top: -10px;
 }
+
+
+@media only screen and (max-width: 1080px) {
+    .voting-buttons-container {
+        justify-content: space-between; /* Space out buttons evenly */
+        width: 100%; /* Ensure the container spans the full width */
+    }
+
+    .voting-buttons-container .button {
+        flex-grow: 1; /* Allow buttons to grow and fill the container */
+        margin: 0 5px; /* Add a small margin between buttons for spacing */
+    }
+
+    /* First and last child selector to remove margin on the edges for a full-width effect */
+    .voting-buttons-container .button:first-child {
+        margin-left: 0;
+		margin-right: 0;
+    }
+
+    .voting-buttons-container .button:last-child {
+		        margin-left: 0;
+
+        margin-right: 0;
+    }
+
+    /* Adjust the .form-container padding to ensure consistency */
+ 
+}
+
+
+
+
+@media only screen and (max-width: 1080px) {
+    /* Styles for the footer navigation */
+    .footer-navigation {
+        display: flex;
+        justify-content: center; /* Center items by default */
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #003056; /* Dark blue to match the top bar */
+        color: white;
+        text-align: center;
+        font-size: 18px;
+        z-index: 1005; /* Ensure it's above most other elements */
+    }
+
+
+ body {
+        padding-bottom: 43px !important; /* Adjust this value based on the footer's height */
+    }
+	
+.footer-navigation a {
+        padding: 10px 15px;
+        flex-grow: 1; /* Allow each link to fill the space */
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }
+
+    .footer-navigation a:hover {
+        background-color: #234770; /* Lighter shade for hover effect */
+    }
+
+    .navigation-left {
+        border-right: 2px solid #f5f1e4; /* Light border to visually separate buttons */
+    }
+
+    /* Specific adjustment for when both links are present */
+    .footer-navigation.two-links a {
+        width: 50%;
+    }
+
+    /* Adjustment for when only one link is present */
+    .footer-navigation.one-link a {
+        max-width: 50%; /* Limit width of the button */
+        margin: 0 auto; /* Center the button */
+    }
+}
+
 
 /* Media query for desktop devices */
 @media only screen and (min-width: 1081px) {
     .centered-title {
         margin-top: -20px;
     }
+	
+	h2.centered-title {
+	font-size: 24px !important;
+}
+
 }
 
 .form-container .author-text {
@@ -930,9 +1014,10 @@ input[type="file"] {
 }
 
 .section-title {
-  border-bottom: 2px solid #003056;
+	  border-bottom: 2px solid #003056;
+
   /* Solid line of 2px */
-  padding-bottom: 5px;
+  padding-bottom: 0px;
   /* Space between the text and the line */
 }
 
@@ -1073,7 +1158,7 @@ input[type="file"] {
 }
 
 .info-box:hover {
-  transform: scale(1.005);
+  transform: scale(1.000);
 }
 
 .info-box-icon {
@@ -1126,7 +1211,7 @@ input[type="file"] {
   /* Adds a 20px margin below each comment */
 
   .info-text-field {
-    background-color: #F4F4F8;
+    background-color: #e5e2d5;
     /* Light grey background */
     width: 100%;
     /* Full width */
@@ -1165,9 +1250,9 @@ input[type="file"] {
 
   @media only screen and (max-width: 1445px) {
     .top-bar a button {
-      transition: width 0.3s ease;
+      transition: width 0.3s ease !important;
       border-radius: 30px;
-      padding: 7px;
+      padding: 7px !important;
     }
   }
 }
@@ -1179,8 +1264,25 @@ input[type="file"] {
 
 @media only screen and (max-width: 1080px) {
   body {
-    font-size: 14px;
+    font-size: 12px !important;
     /* Smaller font size */
+  }
+   .top-bar a button {
+    font-size: 16px !important;
+      padding: 7px !important;
+    }
+  .form-container h2 {
+	  	  font-size: 20px !important;
+  }
+  
+  
+  p {
+	  font-size: 16px !important;
+  }
+  
+    .downvote-button, .upvote-button, .bookmark-button, .report-button, .comment-button {
+    font-size: 14px !important; /* Decreases font size to 14px on mobile devices */
+	padding: 7px !important;
   }
 
   #nav-links .user-info {
@@ -1202,10 +1304,18 @@ input[type="file"] {
   }
 
   .form-container {
-    width: 90%;
+	  margin-top: 0px !important;
+	  	  margin-bottom: 0px !important;
+
+	  border-radius: 0px !important;
+    width: 100% !important;
     /* Full width with some margin */
-    padding: 20px;
+    padding: 20px !important;
     /* Smaller padding */
+  }
+  
+  .bottom-bar {
+	  margin-top: 0px !important;
   }
 
   .publish-button {
@@ -1250,7 +1360,7 @@ input[type="file"] {
     /* Hide horizontal overflow */
     transition: 0.5s;
     /* Smooth transition for opening/closing */
-    z-index: 1002;
+    z-index: 10100 !important;
     /* High z-index to ensure it's on top */
   }
 
@@ -1262,12 +1372,28 @@ input[type="file"] {
     pointer-events: none;
   }
 
+
+
+
   /* Mobile Devices */
   @media only screen and (max-width: 1080px) {
     #hamburger-button {
       display: block;
       /* Show the button on mobile */
     }
+	 .vote-button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+    }
+	
+	    .voting-buttons-container .button {
+        flex-grow: 1; /* Allow buttons to grow and fill the container */
+        margin: 0 5px; /* Add a small margin between buttons for spacing */
+        padding: 10px 0 !important; /* Increase vertical padding for higher buttons */
+    }
+	
 
     .top-bar a .logo {
       margin-left: auto;
@@ -1288,6 +1414,17 @@ input[type="file"] {
       /* Larger clickable area */
       font-size: 24px;
       /* Larger font size */
+    }
+	
+	    .details-button-container {
+        display: flex;
+        justify-content: center;
+        width: 100%; /* Take all available space */
+        margin: 10px 0; /* Add some margin to the top and bottom */
+    }
+    .details-button {
+        /* Adjustments to make the button take all remaining space */
+        flex-grow: 1;
     }
   }
 

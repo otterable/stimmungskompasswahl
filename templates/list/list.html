@@ -97,19 +97,19 @@
             <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">
                 <h2>{{ project.name }}</h2>
                 <p class="project-date">
-                    Gepostet am: <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+                    <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
                     Ansichten: <strong>{{ project.view_count }}</strong>
                 </p>
                 <!-- Voting Bar -->
                 <div class="voting-bar">
                     {% if project.upvotes > 0 %}
                     <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
-                        <span>{{ project.upvotes }} 👍 ({{ project.upvote_percentage|round(1) }}%)</span>
+                        <span>{{ project.upvotes }} 👍</span>
                     </div>
                     {% endif %}
                     {% if project.downvotes > 0 %}
                     <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
-                        <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
+                        <span>{{ project.downvotes }} 👎</span>
                     </div>
                     {% endif %}
                 </div>

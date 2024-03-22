@@ -1,4 +1,29 @@
 <script>console.log("Is Authenticated: {{ current_user.is_authenticated }}");</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Stimmungskompass, Plattform für partizipative Planung",
+  "url": "https://www.stimmungskompass.at/",
+  "description": "Stimmungskompass - Österreichische Plattform für partizipative Planung. Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!",
+  "image": "https://www.stimmungskompass.at/static/facebook_card.png",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Stimmungskompass, Plattform für partizipative Planung",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.stimmungskompass.at/static/logo.png" // Replace with your actual logo URL
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.stimmungskompass.at/"
+  }
+}
+</script>
+
+
+
 <div class="top-bar">
     <a href="/">
         <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">

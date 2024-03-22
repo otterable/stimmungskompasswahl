@@ -1,8 +1,8 @@
 <div class="user-search-container" style="margin-bottom: 20px; margin-top:-20px;">
   <label for="searchUserByName" style="font-weight: bold;">Sortieren nach Name:</label>
-  <input type="text" id="searchUserByName" placeholder="Sortieren nach Name" onkeyup="searchUsers()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+  <input type="text" id="searchUserByName" placeholder="Sortieren nach Name" onkeyup="searchUsers()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
   <label for="searchUserById" style="font-weight: bold;">Sortieren nach ID:</label>
-  <input type="text" id="searchUserById" placeholder="Sortieren nach ID" onkeyup="searchUsers()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #ffffff; border: 1px solid #ccc; outline: none; cursor: pointer;">
+  <input type="text" id="searchUserById" placeholder="Sortieren nach ID" onkeyup="searchUsers()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
 </div>
 <div class="project-list" id="user-list-container">
   {% if paginated_users.items %} {% for user in paginated_users.items %} 

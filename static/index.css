@@ -359,7 +359,7 @@ img {
 .form-container {
   margin: 40px auto;
   width: 60%;
-  background-color: #fff;
+  background-color: #f5f1e4;
   padding: 40px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   border-radius: 30px;
@@ -452,24 +452,26 @@ input[type="file"] {
 
 
 /* Base styles for project thumbnails */
-.project-thumbnail {
-  background-color: rgba(40, 116, 166, 0.3);
-  border-radius: 30px;
-  margin: 10px;
-  padding: 10px;
-  display: flex;
-  /* Changed to flex to better control the layout */
-  flex-direction: column;
-  /* Stack items vertically */
-  align-items: center;
-  /* Center items horizontally */
-  box-sizing: border-box;
-  position: relative;
-  overflow: visible;
-       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-
-    transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
+   .project-thumbnail {
+     background-color: #e5e2d5;
+     border-radius: 30px;
+     margin: 10px;
+     padding: 10px;
+     display: flex;
+     /* Changed to flex to better control the layout */
+     flex-direction: column;
+     /* Stack items vertically */
+     align-items: center;
+     /* Center items horizontally */
+     box-sizing: border-box;
+     transition: width 0.3s ease;
+     position: relative;
+     overflow: visible;
+     /* Ensure the content is not clipped */
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+   transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
     will-change: auto; /* Default state, only specify if needed for performance */
+    /* Removed transform scale to prevent blurriness */
 }
 
 /* Hover effect for project thumbnails */
@@ -543,14 +545,17 @@ input[type="file"] {
 
 
 
-.voting-bar {
-  width: 90%;
-  height: 20px;
-  background-color: #ddd;
-  border-radius: 30px !important;
-  margin-top: 0px;
-  display: flex;
-}
+   .voting-bar {
+     width: 90%;
+     height: 30px;
+     background-color: #ddd;
+     border-radius: 30px !important;
+     margin-top: 0px;
+	 font-weight: bold;
+	 font-size: 16px !important;
+     display: flex;
+	 
+   }
 
 .upvotes {
   height: 100%;
@@ -581,7 +586,6 @@ input[type="file"] {
   transform: translate(-50%, -50%);
   color: white;
   /* Choose a contrasting color */
-  font-size: 12px;
   /* Adjust the font size */
   white-space: nowrap;
   pointer-events: none;
@@ -794,7 +798,7 @@ input[type="file"] {
 }
 
 .info-text-field {
-  background-color: #F4F4F8;
+  background-color: #e5e2d5;
   /* Light grey background */
   width: 100%;
   /* Full width */

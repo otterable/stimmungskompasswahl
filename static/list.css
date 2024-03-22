@@ -447,10 +447,12 @@
 
    .voting-bar {
      width: 90%;
-     height: 20px;
+     height: 30px;
      background-color: #ddd;
      border-radius: 30px !important;
      margin-top: 0px;
+	 font-weight: bold;
+	 font-size: 30px !important;
      display: flex;
    }
 
@@ -458,6 +460,7 @@
      height: 100%;
      background-color: #4caf50;
      border-radius: 30px;
+
      transition: width 0.3s ease;
    }
 
@@ -480,10 +483,11 @@
      position: absolute;
      top: 50%;
      left: 50%;
+	 	 	 font-size: 16px !important;
+
      transform: translate(-50%, -50%);
      color: white;
      /* Choose a contrasting color */
-     font-size: 12px;
      /* Adjust the font size */
      white-space: nowrap;
      pointer-events: none;
@@ -712,7 +716,7 @@
    }
 
    .info-text-field {
-     background-color: #F4F4F8;
+     background-color: #e5e2d5;
      /* Light grey background */
      width: 100%;
      /* Full width */
@@ -751,7 +755,7 @@
 
    /* Base styles for project thumbnails */
    .project-thumbnail {
-     background-color: #f9f8f5;
+     background-color: #e5e2d5;
      border-radius: 30px;
      margin: 10px;
      padding: 10px;
