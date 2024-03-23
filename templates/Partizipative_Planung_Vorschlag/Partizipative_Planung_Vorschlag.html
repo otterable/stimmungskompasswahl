@@ -1,15 +1,15 @@
 
 
-<!-- Previous Project Arrow for Desktop --> {% if prev_project_id %} <a href="{{ url_for('project_details', project_id=prev_project_id) }}" class="arrow-desktop">
+<!-- Previous Project Arrow for Desktop --> {% if prev_project_id %} <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=prev_project_id) }}" class="arrow-desktop">
     <img src="{{ url_for('serve_image', filename='arrowleft.png') }}" alt="Previous" class="arrow-left">
 </a> {% endif %}
-<!-- Next Project Arrow for Desktop --> {% if next_project_id %} <a href="{{ url_for('project_details', project_id=next_project_id) }}" class="arrow-desktop">
+<!-- Next Project Arrow for Desktop --> {% if next_project_id %} <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=next_project_id) }}" class="arrow-desktop">
   <img src="{{ url_for('serve_image', filename='arrowright.png') }}" alt="Next" class="arrow-right">
 </a> {% endif %}
-<!-- Previous Project Arrow for Mobile --> {% if prev_project_id %} <a href="{{ url_for('project_details', project_id=prev_project_id) }}" class="arrow-mobile-left">
+<!-- Previous Project Arrow for Mobile --> {% if prev_project_id %} <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=prev_project_id) }}" class="arrow-mobile-left">
   <img src="{{ url_for('serve_image', filename='arrowcircle-left.png') }}" alt="Previous">
 </a> {% endif %}
-<!-- Next Project Arrow for Mobile --> {% if next_project_id %} <a href="{{ url_for('project_details', project_id=next_project_id) }}" class="arrow-mobile-right">
+<!-- Next Project Arrow for Mobile --> {% if next_project_id %} <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=next_project_id) }}" class="arrow-mobile-right">
   <img src="{{ url_for('serve_image', filename='arrowcircle-right.png') }}" alt="Next">
 </a> {% endif %} <div class="form-container">
   <h2 class="centered-title">{{ project.name }}</h2>
@@ -21,7 +21,7 @@
   </p> {% if not is_mapobject %} <div class="project-details">
     <div class="left-column">
       <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
-      <div style="text-align: center;"> {% if current_user.is_authenticated %} {% set user_is_author = current_user.id|string == project.author|string %} {% set user_is_admin = current_user.is_admin %} {% if user_is_author or user_is_admin %} <a href="{{ url_for('neuerbeitrag', project_id=project.id) }}" class="comment-button" style="border-radius: 30px; display: block; margin-bottom: 20px; margin-top: 12px; text-align: center; text-decoration: none;">Bearbeiten</a> {% endif %} {% endif %} </div>
+      <div style="text-align: center;"> {% if current_user.is_authenticated %} {% set user_is_author = current_user.id|string == project.author|string %} {% set user_is_admin = current_user.is_admin %} {% if user_is_author or user_is_admin %} <a href="{{ url_for('Partizipative_Planung_Neuer_Projekt', project_id=project.id) }}" class="comment-button" style="border-radius: 30px; display: block; margin-bottom: 20px; margin-top: 12px; text-align: center; text-decoration: none;">Bearbeiten</a> {% endif %} {% endif %} </div>
       <div class="voting-bar" style="margin-top: 10px">
         <div class="upvotes" style="width: {{ upvote_percentage }}%;"></div>
         <div class="downvotes" style="width: {{ downvote_percentage }}%;"></div>
@@ -86,13 +86,13 @@
 {% if prev_project_id or next_project_id %}
 <div class="footer-navigation">
     {% if prev_project_id %}
-    <a href="{{ url_for('project_details', project_id=prev_project_id) }}" class="navigation-left">
+    <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=prev_project_id) }}" class="navigation-left">
         Vorheriges Projekt
 
     </a>
     {% endif %}
     {% if next_project_id %}
-    <a href="{{ url_for('project_details', project_id=next_project_id) }}" class="navigation-right">
+    <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=next_project_id) }}" class="navigation-right">
         Nächstes Projekt
     </a>
     {% endif %}

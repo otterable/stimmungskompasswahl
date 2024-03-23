@@ -6,7 +6,7 @@
         <div class="project-description" style="font-weight:bold;">{{ comment.text }}</div>
         <div class="comment-details" style="margin-bottom: -5px;">
            <p style="margin-bottom: -10px;"> Projekt: <strong>
-              <a href="{{ url_for('project_details', project_id=comment.project_id) }}">
+              <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=comment.project_id) }}">
               {{ comment.project_name }}
               </a>
               </strong>

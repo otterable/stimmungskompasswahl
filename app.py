@@ -243,8 +243,11 @@ ALLOWED_EXTENSIONS = {'geojson'}
 
 
         
-@app.route('/baustellen/<int:baustelle_id>', methods=['GET', 'POST'])
-def baustellen(baustelle_id):
+@app.route('/Partizipative_Planung_Fragen_Baustelle/<int:baustelle_id>', methods=['GET', 'POST'])
+def Partizipative_Planung_Fragen_Baustelle(baustelle_id):
+    ip_address = request.remote_addr
+    metaData=g.metaData
+    WebsiteViews.add_view(ip_address)
     # Check user authentication and admin status
     is_admin = False
     user_id = None
@@ -272,12 +275,12 @@ def baustellen(baustelle_id):
             flash('Die Frage darf nicht leer sein.', 'warning')
 
         # Redirect back to the same Baustelle page to display the new question
-        return redirect(url_for('baustellen', baustelle_id=baustelle_id))
+        return redirect(url_for('Partizipative_Planung_Fragen_Baustelle', baustelle_id=baustelle_id))
 
     # For a GET request or after handling the POST request, render the Baustelle page
     # Retrieve all questions associated with this Baustelle
     questions = Question.query.filter_by(baustelle_id=baustelle_id).all()
-    return render_template('baustellen.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions,gisfile=gisfile, gis_data=gis_data)
+    return render_template('Partizipative_Planung_Fragen_Baustelle.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions,gisfile=gisfile, gis_data=gis_data, metaData=g.metaData)
 
 
 
@@ -617,7 +620,7 @@ def get_engaged_projects():
 
     project_list = []
     for project in projects:
-        project_details = {
+        Partizipative_Planung_Vorschlag = {
             "id": project.id,
             "name": project.name,
             "category": project.category,  # Include the category here
@@ -628,7 +631,7 @@ def get_engaged_projects():
             "bookmarks": len(Bookmark.query.filter_by(project_id=project.id).all()),
             "reports": project.p_reports,
         }
-        project_list.append(project_details)
+        project_list.append(Partizipative_Planung_Vorschlag)
 
     return jsonify(project_list)
 
@@ -1894,8 +1897,8 @@ def favicon():
     return url_for("static", filename="favicon.ico")
 
 
-@app.route("/karte")
-def karte():
+@app.route("/Partizipative_Planung_Karte")
+def Partizipative_Planung_Karte():
     ip_address = request.remote_addr
     WebsiteViews.add_view(ip_address)
     projects = Project.query.all()  # Adjust according to your project fetching logic
@@ -1915,7 +1918,7 @@ def karte():
         project_data['upvoted_by_user'] = project.upvoted_by_user
         project_data['downvoted_by_user'] = project.downvoted_by_user
     metaData = g.metaData
-    return render_template("karte/index.html", projects=projects_data, metaData=metaData)
+    return render_template("Partizipative_Planung_Karte/index.html", projects=projects_data, metaData=metaData)
 
 
 @app.route("/request_otp", methods=["POST"])
@@ -1961,10 +1964,10 @@ def reset_password():
     return render_template("reset_password.html", metaData=metaData)
 
 
-@app.route("/neuerbeitrag")
-def neuerbeitrag():
+@app.route("/Partizipative_Planung_Neuer_Projekt")
+def Partizipative_Planung_Neuer_Projekt():
     metaData=g.metaData
-    return render_template("neuerbeitrag/index.html", metaData=metaData)
+    return render_template("Partizipative_Planung_Neuer_Projekt/index.html", metaData=metaData)
 
 
 @app.route("/submit_project", methods=["GET", "POST"])
@@ -2028,11 +2031,11 @@ def submit_project():
             submissions.append(datetime.now())
             ip_project_submissions[ip_address] = submissions
 
-            return redirect(url_for("project_details", project_id=new_project.id))
+            return redirect(url_for("Partizipative_Planung_Vorschlag", project_id=new_project.id))
         else:
             return redirect(url_for("submit_project"))
     metaData=g.metaData
-    return render_template("neuerbeitrag/index.html", metaData=metaData)
+    return render_template("Partizipative_Planung_Neuer_Projekt/index.html", metaData=metaData)
 
 @app.route('/robots.txt')
 def robots_txt():
@@ -2135,8 +2138,8 @@ def remove_bookmark(project_id):
     return jsonify(success=True, message="Bookmark removed successfully.")
 
 
-@app.route("/project_details/<int:project_id>", methods=["GET", "POST"])
-def project_details(project_id):
+@app.route("/Partizipative_Planung_Vorschlag/<int:project_id>", methods=["GET", "POST"])
+def Partizipative_Planung_Vorschlag(project_id):
     try:
         project = Project.query.get(project_id)
         comments = Comment.query.filter_by(project_id=project_id).all()
@@ -2204,21 +2207,21 @@ def project_details(project_id):
                 flash(
                     "Kommentare müssen zwischen 20 und 500 Zeichen lang sein.", "error"
                 )
-                return redirect(url_for("project_details", project_id=project_id))
+                return redirect(url_for("Partizipative_Planung_Vorschlag", project_id=project_id))
 
             if not can_user_post_comment(current_user.id):
                 flash(
                     "Kommentarlimit erreicht. Bitte warten Sie, bevor Sie einen weiteren Kommentar posten.",
                     "error",
                 )
-                return redirect(url_for("project_details", project_id=project_id))
+                return redirect(url_for("Partizipative_Planung_Vorschlag", project_id=project_id))
 
             new_comment = Comment(
                 text=comment_text, user_id=current_user.id, project_id=project_id
             )
             db.session.add(new_comment)
             db.session.commit()
-            return redirect(url_for("project_details", project_id=project_id))
+            return redirect(url_for("Partizipative_Planung_Vorschlag", project_id=project_id))
 
 
         
@@ -2247,14 +2250,14 @@ def project_details(project_id):
         next_project_id = next_project.id if next_project else None
 
         if prev_project:
-            print(f"Previous project_details page with is_mapobject=false found, it is page number {prev_project.id}")
+            print(f"Previous Partizipative_Planung_Vorschlag page with is_mapobject=false found, it is page number {prev_project.id}")
         else:
-            print("Previous project_details page with is_mapobject=false does not exist, hiding the arrowleft.")
+            print("Previous Partizipative_Planung_Vorschlag page with is_mapobject=false does not exist, hiding the arrowleft.")
 
         if next_project:
-            print(f"Next project_details page with is_mapobject=false found, it is page number {next_project.id}")
+            print(f"Next Partizipative_Planung_Vorschlag page with is_mapobject=false found, it is page number {next_project.id}")
         else:
-            print("Next project_details page with is_mapobject=false does not exist, hiding the arrowright.")
+            print("Next Partizipative_Planung_Vorschlag page with is_mapobject=false does not exist, hiding the arrowright.")
 
 
         project_author = User.query.get(project.author)
@@ -2277,13 +2280,13 @@ def project_details(project_id):
             cleaned_text = pattern.sub('', text)
             return cleaned_text
         
-        g.metaData['og_url']="https://stimmungskompass.ermine.at/project_details/"+str(project_id)
+        g.metaData['og_url']="https://stimmungskompass.ermine.at/Partizipative_Planung_Vorschlag/"+str(project_id)
         g.metaData['og_description']=remove_p_tags(project.descriptionwhy)
         g.metaData['og_image']="https://stimmungskompass.ermine.at/static/usersubmissions/" + project.image_file
         g.metaData['og_title']=project.name
         metaData=g.metaData
         return render_template(
-            "project_details/index.html",
+            "Partizipative_Planung_Vorschlag/index.html",
             project=project,
             prev_project_id=prev_project_id,
             next_project_id=next_project_id,
@@ -2301,7 +2304,7 @@ def project_details(project_id):
             metaData=metaData
         )
     except Exception as e:
-        app.logger.error("Error in project_details route: %s", str(e))
+        app.logger.error("Error in Partizipative_Planung_Vorschlag route: %s", str(e))
         return str(e)  # Or redirect to a generic error page
 
 
@@ -2804,7 +2807,7 @@ def admintools():
         if Report.query.filter_by(project_id=project.id).first()
     ]
        
-    baustellen = Baustelle.query.all()  # Retrieve all baustellen from the database
+    Partizipative_Planung_Fragen_Baustelle = Baustelle.query.all()  # Retrieve all Partizipative_Planung_Fragen_Baustelle from the database
     user_count = User.query.count()
     comment_count = Comment.query.count()
     project_count = Project.query.filter_by(is_mapobject=False).count()
@@ -2860,7 +2863,7 @@ def admintools():
         active_users=active_users,
         questions=questions,
         question_sort=question_sort,
-        baustellen=baustellen,  
+        Partizipative_Planung_Fragen_Baustelle=Partizipative_Planung_Fragen_Baustelle,  
         answered_questions_count = answered_questions_count,
         unanswered_questions_count = unanswered_questions_count
 
@@ -2921,7 +2924,7 @@ def mark_featured(project_id):
         "success": True,
         "project_id": project.id,
         "is_featured": project.is_featured,
-        "project_details": {
+        "Partizipative_Planung_Vorschlag": {
             "name": project.name,
             "date": project.date.strftime('%Y-%m-%d'),  # Adjust the date format as per your requirements
             "view_count": project.view_count,
@@ -3446,21 +3449,30 @@ def erfolge():
     return render_template("erfolge.html", metaData=metaData)
 
 
-@app.route("/ueber")
-def ueber():
+@app.route("/Partizipative_Planung")
+def Partizipative_Planung():
     ip_address = request.remote_addr
     metaData=g.metaData
     WebsiteViews.add_view(ip_address)
     # Additional logic can be added here if needed
-    return render_template("ueber/index.html", metaData=metaData)
+    return render_template("Partizipative_Planung/index.html", metaData=metaData)
 
-@app.route("/privacy")
-def privacy():
+
+@app.route("/Ueber_Partizipative_Planung")
+def Ueber_Partizipative_Planung():
+    ip_address = request.remote_addr
+    metaData=g.metaData
+    WebsiteViews.add_view(ip_address)
+    # Additional logic can be added here if needed
+    return render_template("Ueber_Partizipative_Planung/index.html", metaData=metaData)
+
+@app.route("/GDPR_DSGVO_Impressum")
+def GDPR_DSGVO_Impressum():
     ip_address = request.remote_addr
     WebsiteViews.add_view(ip_address)
     metaData=g.metaData
     # Additional logic can be added here if needed
-    return render_template("privacy/index.html", metaData=metaData)
+    return render_template("GDPR_DSGVO_Impressum/index.html", metaData=metaData)
 
 
 @app.route("/delete_project/<int:project_id>", methods=["POST"])

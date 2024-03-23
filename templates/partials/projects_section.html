@@ -19,7 +19,7 @@
            </div>
            {% endif %} 
         </div>
-        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+        <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" target="_blank">
         <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
         </a>
         <div class="project-description">{{ project.descriptionwhy|safe }}</div>

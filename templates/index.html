@@ -32,20 +32,20 @@
     <img alt="Index Title Image" class="index-image lazyload" data-src="{{ url_for('serve_image', filename='index_titleimage_big.webp') }}" style="max-width: 100%; height: auto;">
     <div class="cover-text-container">
         <h1>Verschönern Sie Ihre Stadt!</h1>
-        <p>Tragen Sie zu einer höheren Lebensqualität bei!</p>
+        <h2>Tragen Sie zu einer höheren Lebensqualität bei!</h2>
     </div>
 </div>
 <div class="info-box-container">
     <!-- Box 1 -->
     <div class="info-box box-red" onclick="redirectToStimmungskarte()" style="cursor: pointer; margin: 10px">
         <img src="{{ url_for('serve_image', filename='index_icon_map.png', width=50) }}" alt="Map Icon" class="info-box-icon">
-        <p class="info-box-title">Karte</p>
+        <h3 class="info-box-title">Karte</h3>
         <p class="info-box-undertitle">Posten Sie neue Notizen und sehen Sie sich andere Beiträge an, die andere Leute gepostet haben!</p>
     </div>
     <!-- Box 2 -->
     <div class="info-box box-blue" onclick="redirectToneuerbeitrag()" style="cursor: pointer; margin: 10px">
         <img alt="Public Icon" class="info-box-icon" src="{{ url_for('serve_image', filename='index_icon_public.png') }}">
-        <p class="info-box-title">Machen Sie einen Vorschlag!</p>
+        <h3 class="info-box-title">Machen Sie einen Vorschlag!</h3>
         <p class="info-box-undertitle">Teilen Sie Ihrer Stadt mit, welche Veränderungen oder Verbesserungen Sie sich wünschen!</p>
         <p class="info-box-undertitle">Aktuelle Projektvorschläge: {{ project_count }}</p>
         <p class="info-box-undertitle">Aktuelle Notizen: {{ mapobject_count }}</p>
@@ -53,25 +53,25 @@
     <!-- Box 3 -->
     <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
         <img alt="List Icon" class="info-box-icon" src="{{ url_for('serve_image', filename='index_icon_list.png') }}">
-        <p class="info-box-title">Aktuelle Projektvorschläge</p>
+        <h3 class="info-box-title">Aktuelle Projektvorschläge</h3>
         <p class="info-box-undertitle">Stimmen Sie über Projektvorschläge ab und verhelfen Sie ihnen zum Erfolg!</p>
     </div>
 </div>
 <!-- Info text field with wrapped text container -->
 <div class="info-text-field">
     <div class="info-text-container">
-	<h1 style="font-size:28px">Der Stimmungskompass ist eine Plattform für partizipative Planung.</h1>
+	<h1 class="h1-cs">Der Stimmungskompass ist eine Plattform für partizipative Planung.</h1>
         <p class="info-text-undertitle">Helfen Sie der Stadt bei Entscheidungen, die das öffentliche Leben betreffen. Teilen Sie Ihre Ideen und stimmen Sie über die Projektvorschläge anderer ab tragen Sie zur Verbesserung der Lebensqualität bei.</p>
     </div>
 </div>
 <!-- Featured Projects Section -->
 <div class="projects-header">
-    <h1>Ausgewählte Projekte:</h1>
-    <p>Sehen Sie sich die Projektvorschläge an, die von der Stadt als interessant ausgewählt wurden.</p>
+    <h2>Ausgewählte Projekte:</h2>
+    <p class="p-projectsheader">Sehen Sie sich die Projektvorschläge an, die von der Stadt als interessant ausgewählt wurden.</p>
 </div>
 <div class="project-list">
     {% if featured_projects %} {% for project in featured_projects %} 
-    <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="window.location.href='{{ url_for('project_details', project_id=project.id) }}'">
+    <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="window.location.href='{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}'">
         <h2>{{ project.name }}</h2>
         <p class="project-date">{{ project.date.strftime('%d.%m.%Y') }}</p>
         <!-- Voting Bar -->
@@ -117,7 +117,36 @@
 }
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.project-thumbnail').forEach(projectThumbnail => {
+        const upvotesElement = projectThumbnail.querySelector('.upvotes');
+        const downvotesElement = projectThumbnail.querySelector('.downvotes');
 
+        let upvotes = 0, downvotes = 0;
+
+        if (upvotesElement) {
+            upvotes = parseInt(upvotesElement.textContent.match(/\d+/) ? upvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        if (downvotesElement) {
+            downvotes = parseInt(downvotesElement.textContent.match(/\d+/) ? downvotesElement.textContent.match(/\d+/)[0] : "0");
+        }
+
+        // Adjust border-radius based on votes
+        if (upvotes > 0 && downvotes > 0) {
+            upvotesElement.style.borderTopLeftRadius = '30px';
+            upvotesElement.style.borderBottomLeftRadius = '30px';
+            downvotesElement.style.borderTopRightRadius = '30px';
+            downvotesElement.style.borderBottomRightRadius = '30px';
+        } else if (upvotes > 0 && downvotes === 0) {
+            upvotesElement.style.borderRadius = '30px';
+        } else if (downvotes > 0 && upvotes === 0) {
+            downvotesElement.style.borderRadius = '30px';
+        }
+    });
+});
+</script>
 <!-- This div extends the background color -->
 {% endblock %}
 

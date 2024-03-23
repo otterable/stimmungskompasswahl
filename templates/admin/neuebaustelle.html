@@ -2577,10 +2577,10 @@
             <button id="hamburger-button">&#9776;</button>
             <div id="nav-overlay" class="nav-overlay">
                 <div id="nav-links">
-                    <a href="/karte">Karte</a>
+                    <a href="/Partizipative_Planung_Karte">Karte</a>
                     <a href="/list">Projektvorschläge</a>
-                    <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
-                    <a href="/ueber">Über</a>
+                    <a href="/Partizipative_Planung_Neuer_Projekt">Vorschlag hinzufügen</a>
+                    <a href="/Ueber_Partizipative_Planung">Über</a>
                     <a href="/profil">Profil</a>
                     {% if current_user.is_authenticated %}
                     <span class="user-info" style="margin-top: 10px;">
@@ -3173,7 +3173,7 @@
                     console.log(data.message);
                     if(data.status === 'success' && data.baustelleId) {
                         alert("Baustelle successfully published!");
-                        window.location.href = `/baustellen/${data.baustelleId}`;
+                        window.location.href = `/Partizipative_Planung_Fragen_Baustelle/${data.baustelleId}`;
                     } else {
                         alert("Failed to publish Baustelle. Please try again.");
                         console.error('Redirect failed. Baustelle ID is undefined.');
@@ -3324,7 +3324,7 @@
                     })
                     .then(data => {
                         console.log("Server response:", data);
-                        window.location.href = `/baustellen/${data.baustelleId}`;
+                        window.location.href = `/Partizipative_Planung_Fragen_Baustelle/${data.baustelleId}`;
                     })
                     .catch(error => {
                         console.error('Error during form submission:', error);

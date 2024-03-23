@@ -1,13 +1,13 @@
 <!-- templates/partials/baustellen_list_section.html -->
-<h2 id="baustellen-count">Baustellen: {{ baustellen|length }}</h2>
+<h2 id="Partizipative_Planung_Fragen_Baustelle-count">Baustellen: {{ Partizipative_Planung_Fragen_Baustelle|length }}</h2>
 
-<div class="stats-container2" id="baustellen-list-container">
-    {% for baustelle in baustellen %}
+<div class="stats-container2" id="Partizipative_Planung_Fragen_Baustelle-list-container">
+    {% for baustelle in Partizipative_Planung_Fragen_Baustelle %}
     <div class="stat-box2" id="baustelle-{{ baustelle.id }}">
         <div><strong>Name:</strong> {{ baustelle.name }}</div>
         <div><strong>Beschreibung:</strong> {{ baustelle.description }}</div>
         <div><strong>Erstellt am:</strong> {{ baustelle.date.strftime('%d.%m.%Y %H:%M:%S') }}</div>
-        <div><a href="/baustellen/{{ baustelle.id }}" class="btn btn-primary register-button">Anzeigen</a></div>
+        <div><a href="/Partizipative_Planung_Fragen_Baustelle/{{ baustelle.id }}" class="btn btn-primary register-button">Anzeigen</a></div>
         <button type="button" class="btn btn-danger delete-baustelle register-button" onclick="confirmDeleteBaustelle({{ baustelle.id }})" style="margin-top: 3px;">Löschen</button>
     </div>
     {% else %}

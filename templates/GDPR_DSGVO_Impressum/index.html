@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head_section %}
-<link rel="stylesheet" href="{{ url_for('serve_image', filename='ueber.css') }}">
+<link rel="stylesheet" href="{{ url_for('serve_image', filename='Ueber_Partizipative_Planung.css') }}">
 <title>Open Data - Stimmungskompass</title>
 
 {% endblock %}
@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-{% include 'privacy/privacy.html' %}
+{% include 'GDPR_DSGVO_Impressum/GDPR_DSGVO_Impressum.html' %}
 {% endblock %}
 
 {% block footer %}
@@ -20,6 +20,6 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'privacy/privacy.js' %}
+{% include 'GDPR_DSGVO_Impressum/GDPR_DSGVO_Impressum.js' %}
 {% endblock %}
 

@@ -28,14 +28,14 @@
       <button id="hamburger-button">&#9776;</button>
       <div id="nav-overlay" class="nav-overlay">
          <div id="nav-links">
-		 <a href="/karte">Karte</a>
+		 <a href="/Partizipative_Planung_Karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
-            <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
+            <a href="/Partizipative_Planung_Neuer_Projekt">Vorschlag hinzufügen</a>
 				 {% if newest_baustelle_id %}
-                <a href="/baustellen/{{ newest_baustelle_id }}">Bau</a>
+                <a href="/Partizipative_Planung_Fragen_Baustelle/{{ newest_baustelle_id }}">Bau</a>
             {% endif %}
 			<a href="/blog">Blog</a>
-            <a href="/ueber">Über</a>
+            <a href="/Ueber_Partizipative_Planung">Über</a>
             <a href="/profil">Profil</a>
            
             {% if current_user.is_authenticated %}
@@ -84,7 +84,7 @@
           <h2>Top 5 Meistgesehene Projekte</h2>
           <ul> {% for project in top_viewed_projects %} {% if project.view_count > 0 %} <li>
               <h3>
-                <a href="{{ url_for('project_details', project_id=project.id) }}">
+                <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}">
                   <strong>{{ project.name }}</strong>
                 </a> mit <strong>{{ project.view_count }}</strong> Aufrufen
               </h3>
@@ -94,7 +94,7 @@
           <h2>Top 5 Bewertete Projekte</h2>
           <ul> {% for project in top_rated_projects %} <li>
               <h3>
-                <a href="{{ url_for('project_details',project_id=project.id) }}">
+                <a href="{{ url_for('Partizipative_Planung_Vorschlag',project_id=project.id) }}">
                   <strong>{{ project.name }}</strong>
                 </a> mit <strong>{{ project.upvote_count }}</strong> Stimmen
               </h3>
@@ -104,7 +104,7 @@
           <h2>Top 5 Kommentierte Projekte</h2>
           <ul> {% for project in top_commented_projects %} <li>
               <h3>
-                <a href="{{ url_for('project_details', project_id=project.id) }}">
+                <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}">
                   <strong>{{ project.name }}</strong>
                 </a> mit <strong>{{ project.comments_count }}</strong> Kommentaren
               </h3>
@@ -391,14 +391,14 @@
             </div> {% endif %} {% if project.downvotes > 0 %} <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
               <span>{{ project.downvotes }} 👎 </span>
             </div> {% endif %} </div>
-          <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+          <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" target="_blank">
             <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
           </a>
           <div class="project-description">{{ project.descriptionwhy|safe }}</div>
           <form method="POST" action="{{ url_for('admintools') }}">
             <input type="hidden" name="project_id" value="{{ project.id }}">
 <button type="button" class="register-button" name="unmark_important" data-project-id="{{ project.id }}">Von "Wichtig" entfernen</button>
-            <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
+            <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
           </form>
         </div> {% else %} <p>Keine Projektvorschläge gefunden.</p> {% endfor %} </div>
       <!-- Featured Projects Section -->
@@ -416,14 +416,14 @@
             </div> {% endif %} {% if project.downvotes > 0 %} <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
               <span>{{ project.downvotes }} 👎 </span>
             </div> {% endif %} </div>
-          <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+          <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" target="_blank">
             <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
           </a>
           <div class="project-description">{{ project.descriptionwhy|safe }}</div>
           <form method="POST" action="{{ url_for('admintools') }}">
             <input type="hidden" name="project_id" value="{{ project.id }}">
 <button type="button" class="register-button" name="unmark_featured" data-project-id="{{ project.id }}">Von "Ausgewählt" entferen</button>
-            <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
+            <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
           </form>
         </div> {% else %} <p>Keine Projekte gefunden.</p> {% endfor %} </div>
     </div>
@@ -442,7 +442,7 @@
             </div> {% endif %} {% if project.downvotes > 0 %} <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
               <span>{{ project.downvotes }} 👎 ({{ project.downvote_percentage|round(1) }}%)</span>
             </div> {% endif %} </div>
-          <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+          <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" target="_blank">
             <img src="{{ url_for('static', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
           </a>
           <div class="project-description">{{ project.descriptionwhy|safe }}</div>
@@ -451,7 +451,7 @@
             <input type="hidden" name="project_id" value="{{ project.id }}">
             <button type="submit" class="register-button" name="remove_reports">Remove Reports</button>
           </form>
-          <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
+          <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
         </div> {% else %} <p>Keine gemeldeten Projektvorschläge gefunden.</p> {% endfor %} </div>
     </div>
 	
@@ -1126,7 +1126,7 @@ function updateCommentCountDisplay() {
           row.innerHTML = `
         
 																													<td>
-																														<a href="/project_details/${project.id}">${project.name}</a>
+																														<a href="/Partizipative_Planung_Vorschlag/${project.id}">${project.name}</a>
 																													</td>
 																													<td>
 																														<strong>${project.upvotes}</strong>
@@ -2204,14 +2204,14 @@ function addToImportantProjects(project) {
             ${project.upvotes > 0 ? `<div class="upvotes" style="width: ${project.upvote_percentage}%;"><span>${project.upvotes} 👍 (${project.upvote_percentage}%)</span></div>` : ''}
             ${project.downvotes > 0 ? `<div class="downvotes" style="width: ${project.downvote_percentage}%;"><span>${project.downvotes} 👎 (${project.downvote_percentage}%)</span></div>` : ''}
         </div>
-        <a href="/project_details/${project.id}" target="_blank">
+        <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank">
             <img src="/static/usersubmissions/${project.image_file}" alt="${project.name}" class="project-image">
         </a>
         <div class="project-description">${project.descriptionwhy}</div>
         <form method="POST" action="/admintools">
             <input type="hidden" name="project_id" value="${project.id}">
             <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
-            <a href="/project_details/${project.id}" class="register-button" target="_blank">Anzeigen</a>
+            <a href="/Partizipative_Planung_Vorschlag/${project.id}" class="register-button" target="_blank">Anzeigen</a>
         </form>
     `;
 
@@ -2493,7 +2493,7 @@ function confirmDeleteBaustelle(baustelleId) {
         })
         .then(data => {
             document.getElementById(`baustelle-${baustelleId}`).remove();
-            // Update the baustellen count
+            // Update the Partizipative_Planung_Fragen_Baustelle count
             updateBaustellenCount();
             alert('Baustelle erfolgreich gelöscht.');
         })
@@ -2505,10 +2505,10 @@ function confirmDeleteBaustelle(baustelleId) {
 }
 
 function updateBaustellenCount() {
-    const baustellenContainer = document.getElementById('baustellen-list-container');
-    const baustellen = baustellenContainer.querySelectorAll('.stat-box2');
-    const debugCountElement = document.getElementById('baustellen-count');
-    debugCountElement.innerHTML = `Baustellen: ${baustellen.length}`;
+    const baustellenContainer = document.getElementById('Partizipative_Planung_Fragen_Baustelle-list-container');
+    const Partizipative_Planung_Fragen_Baustelle = baustellenContainer.querySelectorAll('.stat-box2');
+    const debugCountElement = document.getElementById('Partizipative_Planung_Fragen_Baustelle-count');
+    debugCountElement.innerHTML = `Baustellen: ${Partizipative_Planung_Fragen_Baustelle.length}`;
 }
 </script>
 

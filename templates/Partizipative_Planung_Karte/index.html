@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-
 {% block  head_section %}
-<title> Stimmungskompass </title>
+<title>Karte | Stimmungskompass - Österreichische Plattform für partizipative Planung.</title>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="static/spamFilter.js"></script>
@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block styles %} 
-{% include 'karte/karte.css' %}
+{% include 'Partizipative_Planung_Karte/Partizipative_Planung_Karte.css' %}
 {% endblock %}
 
 {% block header %} 
@@ -27,11 +27,11 @@
 {% endblock %}
 
 {% block content %}
-{% include 'karte/karte.html' %}
+{% include 'Partizipative_Planung_Karte/Partizipative_Planung_Karte.html' %}
 {% endblock %}
 
 {% block scripts %}
-{% include 'karte/karte.js' %}
+{% include 'Partizipative_Planung_Karte/Partizipative_Planung_Karte.js' %}
 {% endblock %}
 
 

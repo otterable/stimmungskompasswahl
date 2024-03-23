@@ -20,7 +20,7 @@
             </div>
             {% endif %} 
          </div>
-         <a href="{{ url_for('project_details', project_id=project.id) }}">
+         <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}">
          <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
          </a>
          <button onclick="removeBookmark(event, {{ project.id }})" class="register-button" style="font-weight: bold; display: inline-block; width: auto; padding: 5px 10px;">Lesezeichen entfernen</button>

@@ -91,7 +91,7 @@ function closeOverlay() {
     document.getElementById('overlay').style.display = 'none';
 }
 function openProjectDetails(projectId) {
-    window.location.href = '/project_details/' + projectId;
+    window.location.href = '/Partizipative_Planung_Vorschlag/' + projectId;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -121,11 +121,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function redirectToNeuerbeitrag() {
-        window.location.href = '/neuerbeitrag';
+        window.location.href = '/Partizipative_Planung_Neuer_Projekt';
     }
 
     function redirectToneuerbeitrag() {
-        window.location.href = '/neuerbeitrag';
+        window.location.href = '/Partizipative_Planung_Neuer_Projekt';
     }
 
     // Display success message alert, if any

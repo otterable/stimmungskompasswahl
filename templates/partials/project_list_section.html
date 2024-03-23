@@ -20,7 +20,7 @@
            </div>
            {% endif %} 
         </div>
-        <a href="{{ url_for('project_details', project_id=project.id) }}" target="_blank">
+        <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" target="_blank">
         <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}" class="project-image">
         </a>
         <div class="project-description">{{ project.descriptionwhy|safe }}</div>
@@ -30,7 +30,7 @@
            <button type="button" onclick="deleteProject(event, {{ project.id }});" class="register-button" style="font-weight: bold;">Löschen</button>
            <button type="button" onclick="markProjectImportant({{ project.id }}, event);" class="register-button">Als "Wichtig" markieren</button>
            <button type="button" onclick="markProjectFeatured({{ project.id }}, event);" class="register-button">Als "Ausgewählt" markieren</button>
-           <a href="{{ url_for('project_details', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
+           <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
         </form>
      </div>
      {% endif %} {% endfor %}

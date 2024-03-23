@@ -2,12 +2,12 @@
 
 {% block head_section %}
     <title>Project Detail</title>
-    <link rel="stylesheet" href="{{ url_for('serve_image', filename='project_details.css') }}">
+    <link rel="stylesheet" href="{{ url_for('serve_image', filename='Partizipative_Planung_Vorschlag.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-    <link rel="stylesheet" href="{{ url_for('serve_image', filename='project_details.css') }}">
+    <link rel="stylesheet" href="{{ url_for('serve_image', filename='Partizipative_Planung_Vorschlag.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.3/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="{{ url_for('serve_image', filename='neuerbeitrag.css') }}">
+    <link rel="stylesheet" href="{{ url_for('serve_image', filename='Partizipative_Planung_Neuer_Projekt.css') }}">
 
 {% endblock %}
 
@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block content %}
-{% include 'project_details/project_details.html' %}
+{% include 'Partizipative_Planung_Vorschlag/Partizipative_Planung_Vorschlag.html' %}
 {% endblock %}
 
 {% block footer %}
@@ -24,6 +24,6 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'project_details/project_details.js' %}
+{% include 'Partizipative_Planung_Vorschlag/Partizipative_Planung_Vorschlag.js' %}
 {% endblock %}
 

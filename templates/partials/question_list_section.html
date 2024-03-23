@@ -24,7 +24,7 @@
         <div><strong>Frage:</strong> {{ question.text }}</div>
         <div><strong>Author:</strong> {{ question.author }}</div>
         <div><strong>Am:</strong> {{ question.date.strftime('%d.%m.%Y %H:%M:%S') }}</div>
-        <div><strong>Baustelle:</strong> <a href="/baustellen/{{ question.baustelle_id }}" style="font-weight: bold;">{{ question.baustelle_id }}</a></div>
+        <div><strong>Baustelle:</strong> <a href="/Partizipative_Planung_Fragen_Baustelle/{{ question.baustelle_id }}" style="font-weight: bold;">{{ question.baustelle_id }}</a></div>
         {% if question.answered %}
             <div><strong>Antwort:</strong> {{ question.answer_text }}</div>
             <div><strong>Am:</strong> {{ question.answer_date.strftime('%d.%m.%Y %H:%M:%S') }}</div>

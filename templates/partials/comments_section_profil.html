@@ -20,7 +20,7 @@
         <h3 style="font-style: italic; font-weight: bold;">"{{ comment.text }}"</h3>
         <!-- Project Name -->
         <p class="project-date"> <strong>{{ comment.timestamp.strftime('%d.%m.%Y') }}</strong>, Projekt: <strong>
-           <a href="{{ url_for('project_details', project_id=comment.project_id) }}">{{ project_name }}</a>
+           <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=comment.project_id) }}">{{ project_name }}</a>
            </strong>
         </p>
         <!-- Löschen Button for Comment -->

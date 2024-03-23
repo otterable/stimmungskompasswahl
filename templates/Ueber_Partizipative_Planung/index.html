@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block head_section %}
-    <title>Open Data - Stimmungskompass</title>
-    <link rel="stylesheet" href="{{ url_for('serve_image', filename='ueber.css') }}">
+    <title>Über | Stimmungskompass - Österreichische Plattform für partizipative Planung.</title>
+    <link rel="stylesheet" href="{{ url_for('serve_image', filename='Ueber_Partizipative_Planung.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 {% endblock %}
 
@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block content %}
-{% include 'ueber/ueber.html' %}
+{% include 'Ueber_Partizipative_Planung/Ueber_Partizipative_Planung.html' %}
 {% endblock %}
 
 {% block footer %}
@@ -19,6 +19,6 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'ueber/ueber.js' %}
+{% include 'Ueber_Partizipative_Planung/Ueber_Partizipative_Planung.js' %}
 {% endblock %}
 

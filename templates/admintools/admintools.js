@@ -603,7 +603,7 @@ function loadEngagedProjects() {
           row.innerHTML = `
   
                                                 <td>
-                                                  <a href="/project_details/${project.id}">${project.name}</a>
+                                                  <a href="/Partizipative_Planung_Vorschlag/${project.id}">${project.name}</a>
                                                 </td>
                                                 <td>
                                                   <strong>${project.upvotes}</strong>
@@ -1636,14 +1636,14 @@ function addToImportantProjects(project) {
       ${project.upvotes > 0 ? `<div class="upvotes" style="width: ${project.upvote_percentage}%;"><span>${project.upvotes} 👍 (${project.upvote_percentage}%)</span></div>` : ''}
       ${project.downvotes > 0 ? `<div class="downvotes" style="width: ${project.downvote_percentage}%;"><span>${project.downvotes} 👎 (${project.downvote_percentage}%)</span></div>` : ''}
   </div>
-  <a href="/project_details/${project.id}" target="_blank">
+  <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank">
       <img src="/static/usersubmissions/${project.image_file}" alt="${project.name}" class="project-image">
   </a>
   <div class="project-description">${project.descriptionwhy}</div>
   <form method="POST" action="/admintools">
       <input type="hidden" name="project_id" value="${project.id}">
       <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
-      <a href="/project_details/${project.id}" class="register-button" target="_blank">Anzeigen</a>
+      <a href="/Partizipative_Planung_Vorschlag/${project.id}" class="register-button" target="_blank">Anzeigen</a>
   </form>
 `;
 

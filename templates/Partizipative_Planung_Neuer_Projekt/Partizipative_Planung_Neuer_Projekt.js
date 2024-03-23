@@ -62,7 +62,7 @@ var icon = new L.Icon({
 
 // Add event listener for map click
 var marker;
-// Existing map click event handler in neuerbeitrag.html
+// Existing map click event handler in Partizipative_Planung_Neuer_Projekt.html
 // Define the coordinates for the boundary
 var bounds = L.latLngBounds([
     L.latLng([48.405, 15.597]), // Southwest corner of the boundary
@@ -73,7 +73,7 @@ console.log("Bounds set to SW: [48.405, 15.597], NE: [48.415, 15.607]");
 
 // Initialize the map
 
-// Define the boundaries using the method from karte.html
+// Define the boundaries using the method from Partizipative_Planung_Karte.html
 var horizontalOffset = 1125; // Adjust as per your requirement
 var verticalOffset = 594; // Adjust as per your requirement
 var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const projectID = urlParams.get('project_id');
 
     if (projectID) {
-        console.log("Project_details.html: Entered editing mode, replacing the page title.");
+        console.log("Partizipative_Planung_Vorschlag.html: Entered editing mode, replacing the page title.");
         fetch(`/get_project_data/${projectID}`)
             .then(response => response.json())
             .then(data => {
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         mapContainer.style.display = 'none';
                         geolocInput.required = false;
-                        console.log(`Project_details.html: is_global for project ${projectID} set to false after 'no-location-btn' clicked.`);
+                        console.log(`Partizipative_Planung_Vorschlag.html: is_global for project ${projectID} set to false after 'no-location-btn' clicked.`);
                     }
                 });
             })
@@ -386,7 +386,7 @@ function toggleOverlay() {
 
 // JavaScript function to handle redirection to Stimmungskarte
 function redirectToStimmungskarte() {
-    window.location.href = '/karte';
+    window.location.href = '/Partizipative_Planung_Karte';
 }
 
 // JavaScript function to handle redirection to Suggest an Idea
@@ -396,7 +396,7 @@ function redirectToList() {
 
 // JavaScript function to handle redirection to List of Current Suggestions
 function redirectToneuerbeitrag() {
-    window.location.href = '/neuerbeitrag';
+    window.location.href = '/Partizipative_Planung_Neuer_Projekt';
 }
 
 function toggleMenu() {
@@ -608,12 +608,12 @@ function redirectToStimmungskarte() {
 
 // JavaScript function to handle redirection to Suggest an Idea
 function redirectToNeuerbeitrag() {
-    window.location.href = '/neuerbeitrag';
+    window.location.href = '/Partizipative_Planung_Neuer_Projekt';
 }
 
 // JavaScript function to handle redirection to List of Current Suggestions
 function redirectToneuerbeitrag() {
-    window.location.href = '/neuerbeitrag';
+    window.location.href = '/Partizipative_Planung_Neuer_Projekt';
 }
 // Show an alert if a success message is present
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -775,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const projectID = urlParams.get('project_id');
 
     if (projectID) {
-        console.log(`Project_details.html: Project ID ${projectID} loaded, when the object is updated, the user will be redirected to project_details/${projectID}.`);
+        console.log(`Partizipative_Planung_Vorschlag.html: Project ID ${projectID} loaded, when the object is updated, the user will be redirected to Partizipative_Planung_Vorschlag/${projectID}.`);
         setupEditingMode(projectID);
 
 
@@ -793,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(projectData => {
                 if (projectData.is_global) {
-                    console.log(`Project_details.html: Project ${projectID} has is_global=true. If you select a point on the map, it will be overwritten to is_global=false when submitted.`);
+                    console.log(`Partizipative_Planung_Vorschlag.html: Project ${projectID} has is_global=true. If you select a point on the map, it will be overwritten to is_global=false when submitted.`);
                 }
                 // Fill in the form fields
                 document.getElementById('title').value = projectData.name;
@@ -861,7 +861,7 @@ function setupEditingMode(projectID) {
 }
 
 function handleUpdateProject(projectID) {
-    console.log(`Project_details.html: Editing project ${projectID}`);
+    console.log(`Partizipative_Planung_Vorschlag.html: Editing project ${projectID}`);
     // Get HTML content from Quill editors
     var descriptionContent = descriptionEditor.root.innerHTML;
     var benefitContent = benefitEditor.root.innerHTML;
@@ -877,9 +877,9 @@ function handleUpdateProject(projectID) {
     if (marker) {
         const currentGeoloc = `${marker.getLatLng().lat},${marker.getLatLng().lng}`;
         formData.set('geoloc', currentGeoloc);
-        console.log(`Project_details.html: Geoloc ${currentGeoloc} loaded. If the geoloc is not updated, it will be saved when the contents are updated.`);
+        console.log(`Partizipative_Planung_Vorschlag.html: Geoloc ${currentGeoloc} loaded. If the geoloc is not updated, it will be saved when the contents are updated.`);
     } else {
-        console.log(`Project_details.html: Project ${projectID} loaded with is_global=true. Geoloc has not been selected. is_global=true will be maintained.`);
+        console.log(`Partizipative_Planung_Vorschlag.html: Project ${projectID} loaded with is_global=true. Geoloc has not been selected. is_global=true will be maintained.`);
     }
 
 
@@ -924,8 +924,8 @@ function sendUpdateRequest(projectID, formData) {
         .then(response => {
             if (response.ok) {
                 console.log(`Project ${projectID} updated successfully.`);
-                console.log(`Project_details.html: Updating database of project ${projectID}, geoloc ${formData.get('geoloc')} has been kept`);
-                window.location.href = `/project_details/${projectID}`; // Redirect to the project details page
+                console.log(`Partizipative_Planung_Vorschlag.html: Updating database of project ${projectID}, geoloc ${formData.get('geoloc')} has been kept`);
+                window.location.href = `/Partizipative_Planung_Vorschlag/${projectID}`; // Redirect to the project details page
             } else {
                 throw new Error('Failed to update project.');
             }
@@ -940,7 +940,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const projectID = urlParams.get('project_id');
 
     if (projectID) {
-        console.log("Project_details.html: Entered editing mode, replacing the page title.");
+        console.log("Partizipative_Planung_Vorschlag.html: Entered editing mode, replacing the page title.");
         fetch(`/get_project_data/${projectID}`)
             .then(response => response.json())
             .then(data => {
@@ -950,7 +950,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let isGlobal = data.is_global === true || data.is_global === 'true';
 
                 if (isGlobal) {
-                    console.log(`Project_details.html: Project ${projectID} has is_global=true.`);
+                    console.log(`Partizipative_Planung_Vorschlag.html: Project ${projectID} has is_global=true.`);
                 }
 
                 // Handle "no-location-btn" button click
@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 noLocationBtn.addEventListener('click', function() {
                     if (isGlobal) {
                         isGlobal = true; // Change is_global to false
-                        console.log(`Project_details.html: is_global for project ${projectID} set to true after 'no-location-btn' clicked.`);
+                        console.log(`Partizipative_Planung_Vorschlag.html: is_global for project ${projectID} set to true after 'no-location-btn' clicked.`);
                     }
                 });
             })

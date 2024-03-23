@@ -43,7 +43,7 @@ function toggleOverlay() {
 }
 // JavaScript function to handle redirection to Stimmungskarte
 function redirectToStimmungskarte() {
-    window.location.href = '/karte';
+    window.location.href = '/Partizipative_Planung_Karte';
 }
 // JavaScript function to handle redirection to Suggest an Idea
 function redirectToList() {
@@ -51,7 +51,7 @@ function redirectToList() {
 }
 // JavaScript function to handle redirection to List of Current Suggestions
 function redirectToneuerbeitrag() {
-    window.location.href = '/neuerbeitrag';
+    window.location.href = '/Partizipative_Planung_Neuer_Projekt';
 }
 
 function toggleMenu() {

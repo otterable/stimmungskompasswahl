@@ -93,7 +93,7 @@ img {
 @font-face {
   font-family: 'MaisonNeue';
  
-  font-weight: 600; /* Demi is often considered semi-bold or 600 weight */
+  font-weight: 500; /* Demi is often considered semi-bold or 500 weight */
   font-display: swap;
 }
 
@@ -126,7 +126,7 @@ img {
 
 .demi-text {
   font-family: 'MaisonNeue';
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .light-text {
@@ -151,7 +151,6 @@ body {
 }
 
 .project-description {
-  font-style: italic;
   /* Make text italic */
   padding: 10px;
   /* Optional: Add some padding for better presentation */
@@ -182,6 +181,34 @@ body {
      background: #555;
      /* Darker shade of grey on hover */
    }
+
+
+
+
+
+
+
+
+
+
+
+
+	 
+.info-text-undertitle, .info-box-undertitle, .project-thumbnail p, .project-thumbnail h2 {
+		   margin: 3px !important;
+		   	    justify-content: center !important; /* Centers items vertically */
+align-text: center !important;
+		       font-style: none !important;
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -396,7 +423,7 @@ input[type="file"] {
 
 .button {
   border-radius: 30px;
-  padding: 15px;
+  padding: 10px;
   background-color: white;
   font-weight: bold;
   color: black;
@@ -460,8 +487,9 @@ input[type="file"] {
      display: flex;
      /* Changed to flex to better control the layout */
      flex-direction: column;
+	 align-text: center !important;
      /* Stack items vertically */
-     align-items: center;
+     align-items: center !important;
      /* Center items horizontally */
      box-sizing: border-box;
      transition: width 0.3s ease;
@@ -493,7 +521,7 @@ input[type="file"] {
 }
 
 /* Text style inside project thumbnails */
-.project-thumbnail h2,
+.project-thumbnail h3,
 .project-thumbnail p {
   margin: 0;
   padding: 5px 0;
@@ -519,28 +547,6 @@ input[type="file"] {
 }
 
 
-@media only screen and (max-width: 1080px) {
-  .project-thumbnail h1 {
-    font-size: 24px;
-    /* Adjust as needed for h1 */
-  }
-
-  .project-thumbnail h2 {
-    font-size: 22px;
-    /* Adjust as needed for h2 */
-  }
-
-  .project-thumbnail h3 {
-    font-size: 20px;
-    /* Adjust as needed for h3 */
-  }
-
-  .project-thumbnail p {
-    font-size: 18px;
-    /* Adjust as needed for paragraph text */
-  }
-}
-
 
 
 
@@ -560,14 +566,12 @@ input[type="file"] {
 .upvotes {
   height: 100%;
   background-color: #4caf50;
-  border-radius: 30px !important;
   transition: width 0.3s ease;
 }
 
 .downvotes {
   height: 100%;
   background-color: #9A031E;
-  border-radius: 30px !important;
   transition: width 0.3s ease;
 }
 
@@ -613,9 +617,7 @@ input[type="file"] {
   margin-right: 8px;
   color: #003056;
   /* Specific color for the undertitle */
-  font-style: italic;
   /* Optional: make it italic */
-  font-size: 16px;
   /* Set font size to 18 pixels for mobile screens */
 
 }
@@ -632,7 +634,7 @@ input[type="file"] {
 }
 
 /* Medium screens (between 1024px and 1199px) */
-@media (min-width: 1080px) and (max-width: 1445px) {
+@media (min-width: 768px) and (max-width: 1445px) {
   .project-thumbnail {
     width: calc(50% - 20px);
     /* Two items per row */
@@ -642,7 +644,7 @@ input[type="file"] {
 }
 
 /* Mobile screens (less than 1024px) */
-@media (max-width: 1088px) {
+@media (max-width: 1080px) {
   .project-thumbnail {
     width: calc(100% - 20px);
     /* Full width */
@@ -694,28 +696,30 @@ input[type="file"] {
 
 .cover-text-container {
   position: absolute;
-  top: 70%;
+  top: 60%;
+      color: #003056; /* Text color */
+padding-top: 20px;
+padding-bottom: 20px;
+margin-bottom: 0px !important;
+padding-left: 30px;
+padding-right: 30px;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: #f5f1e4;
   /* Black background with 70% opacity */
-  padding: 25px;
-  border-radius: 80px;
+  border-radius: 200px;
   text-align: center;
 }
 
 .cover-text-container h1,
-.cover-text-container p {
-    filter: url(#text-border-filter); /* Apply the SVG filter */
-    color: white; /* Text color */
+.cover-text-container h2 {
+    color: #003056; /* Text color */
 }
 
 
 .cover-text-container h1 {
-  font-size: 40px;
-  color: white;
+    color: #003056; /* Text color */
   margin: 0;
-  padding-bottom: 10px;
  
 }
 
@@ -726,9 +730,8 @@ input[type="file"] {
 }
 
 
-.cover-text-container p {
-  font-size: 30px;
-  color: white;
+.cover-text-container h2 {
+    color: #003056; /* Text color */
   margin: 0;
  
 }
@@ -781,9 +784,12 @@ input[type="file"] {
 
 .info-box-undertitle {
   color: white;
-  font-size: 16px;
+  font-size: 18px;
 }
 
+.info-text-container p {
+  font-size: 18px;
+}
 /* Specific colors for each box */
 .box-red {
   background-color: #06467c;
@@ -815,7 +821,7 @@ input[type="file"] {
 }
 
 .info-text-container {
-  width: 50%;
+  width: 80%;
   /* Width of the text container */
   display: flex;
   flex-direction: column;
@@ -824,13 +830,11 @@ input[type="file"] {
 }
 
 .info-text-title {
-  font-size: 30px;
   color: black;
   margin-bottom: 10px;
 }
 
 .info-text-undertitle {
-  font-size: 20px !important;
   color: black;
   margin-top: 10px;
 }
@@ -874,9 +878,17 @@ input[type="file"] {
 
   .info-box-title {
     color: white;
-    font-size: 24px;
+font-size: 5vw;
+	font-weight: bold;
     margin: 10px 0;
   }
+  
+  .info-box-undertitle {
+  color: white;
+
+  font-size: 16px;
+}
+
   
 
   .top-bar {
@@ -1101,18 +1113,54 @@ input[type="file"] {
     .info-box-container {
       flex-direction: column;
       align-items: center;
+	  	  margin-top: 0px !important;
+margin: 0px !important;
+  padding: 0px;
+background-color: #06467c !important;
     }
+
+.
+.index-image {
+	margin-bottom: 0px !important;
+margin: 0px !important;
+border: 0px !important;
+min-height: 350px !important;
+padding: 0px !important;
+background-color: #06467c !important;
+
+
+}
+
 
 
     .info-box {
-      width: 80%;
+      width: 100%;
       /* Adjust width to fit mobile screens */
-      margin-bottom: 20px;
+	  margin: 0px !important;
+	  border-radius: 0px;
+	  margin-top: 0px !important;
+      margin-bottom: 0px;
       /* Add some space between the boxes */
     }
   }
 
-  @media only screen and (max-width: 1080px) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media only screen and (max-width: 1080px) and (min-width: 768px) {
 
     html,
     body {
@@ -1136,48 +1184,210 @@ input[type="file"] {
       /* Ensure it's above other elements */
     }
 
-    .cover-text-container h1 {
-      margin-top: 45px;
-      font-size: 5.5vw;
-      /* Increase font size for smaller screens */
-    }
+	 
+	.info-box-container, .info-text-field, .projects-header {
+		padding-left: 10px !important;
+		padding-right: 10px !important;
+	}
+	 
+	 	.projects-header p, .info-box-title p, .info-text-title p, .info-box-container p, .cover-text-container h2, p, .projects-header p, project-description p, .info-text-undertitle p, .info-text-undertitle, ..p-projectsheader, .p-projectsheader p  {
+	   font-size: 1.5vw !important;
+	   			   font-weight: 400 !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 .cover-text-container h2 {
+		 display:none;
+	 }
+	 .cover-text-container h1 {
+		   font-size: 3vw !important;
+		   margin: 0px !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 .project-thumbnail h2 {
+	margin: 0px !important;
+	 }
+	
+	.projects-header h1, .info-box-title h3, .info-text-title h3, .info-box-container h3, .h1-cs, .h1-cs h1, .projects-header h2 {
+	   font-size: 3vw !important;
+	   margin-bottom: 2vw !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 
+.info-text-undertitle, .info-box-undertitle {
+		   margin: 0px !important;
+		       font-style: none !important;
+}
+	 
 
-    .cover-text-container p {
-      font-size: 4vw;
-      /* Increase font size for smaller screens */
-    }
-
-    .cover-text-container {
-      background-color: rgba(0, 0, 0, 0.0) !important;
-      /* Black background with 70% opacity */
-      top: 60%;
-      width: 90%;
-      /* Set the width to 90% of the parent container */
-
-    }
-  }
-
-
-
-
-
-  .cover-text-container {
-    background-color: rgba(0, 0, 0, 0.4);
-  min-height: 150px; /* Adjust based on your content */
-    top: 50%;
-    width: 90%;
-    /* Set the width to 90% of the parent container */
-
-  }
+.cover-text-container {
+  display: flex !important; /* This activates Flexbox layout */
+  flex-direction: column !important; /* Stacks items vertically */
+  justify-content: center !important; /* Centers items vertically */
+  align-items: center !important; /* Centers items horizontally */
+  padding: 10px !important;
+  font-weight: bold;
+  width: 70% !important; /* Set the width to 90% of the parent container */
+}
 }
 
-.info-text-title,
-.info-text-undertitle {
-  font-size: 2.5vw;
-  /* Adjust as needed */
+
+
+@media only screen and (max-width: 768px) and (min-width: 500px) {
+
+    html,
+    body {
+      max-width: 100vw;
+      /* Prevent horizontal overflow */
+      overflow-x: hidden;
+      /* Hide horizontal scrollbar */
+	  
+	  margin-top: constant(safe-area-inset-top); /* Respect the safe area */
+            margin-top: env(safe-area-inset-top); /* Respect the safe area */
+    }
+
+    .hamburger-menu {
+      position: absolute;
+      /* Adjust to absolute positioning */
+      right: 10px;
+      /* Align to the right with some space */
+      top: 10px;
+      /* Align to the top with some space */
+      z-index: 1000;
+      /* Ensure it's above other elements */
+    }
+
+	 
+	.info-box-container, .info-text-field, .projects-header {
+		padding-left: 10px !important;
+		padding-right: 10px !important;
+	}
+	 
+	 	.projects-header p, .info-box-title p, .info-text-title p, .info-box-container p, .cover-text-container h2, p, .projects-header p, project-description p, .info-text-undertitle p, .info-text-undertitle, .p-projectsheader, .p-projectsheader p  {
+	   font-size: 2.5vw !important;
+	   			   font-weight: 400 !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 .cover-text-container h2 {
+		 display:none;
+	 }
+	 .cover-text-container h1 {
+		   font-size: 4vw !important;
+		   margin: 0px !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 .project-thumbnail h2 {
+	margin: 0px !important;
+	 }
+	
+	.projects-header h1, .info-box-title h3, .info-text-title h3, .info-box-container h3, .h1-cs, .h1-cs h1, .projects-header h2 {
+	   font-size: 4vw !important;
+	   margin-bottom: 1.5vw !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 
+.info-text-undertitle, .info-box-undertitle {
+		   margin: 0px !important;
+		       font-style: none !important;
+}
+	 
+
+.cover-text-container {
+  display: flex !important; /* This activates Flexbox layout */
+  flex-direction: column !important; /* Stacks items vertically */
+  justify-content: center !important; /* Centers items vertically */
+  align-items: center !important; /* Centers items horizontally */
+  padding: 10px !important;
+  font-weight: bold;
+  width: 70% !important; /* Set the width to 90% of the parent container */
+}
 }
 
-@media only screen and (max-width: 1080px) {
+  @media only screen and (max-width: 500px) {
+
+    html,
+    body {
+      max-width: 100vw;
+      /* Prevent horizontal overflow */
+      overflow-x: hidden;
+      /* Hide horizontal scrollbar */
+	  
+	  margin-top: constant(safe-area-inset-top); /* Respect the safe area */
+            margin-top: env(safe-area-inset-top); /* Respect the safe area */
+    }
+
+    .hamburger-menu {
+      position: absolute;
+      /* Adjust to absolute positioning */
+      right: 10px;
+      /* Align to the right with some space */
+      top: 10px;
+      /* Align to the top with some space */
+      z-index: 1000;
+      /* Ensure it's above other elements */
+    }
+
+	 
+	.info-box-container, .info-text-field, .projects-header {
+		padding-left: 10px !important;
+		padding-right: 10px !important;
+	}
+	 
+	 	.projects-header p, .info-box-title p, .info-text-title p, .info-box-container p, .cover-text-container h2, p, .projects-header p, project-description p, .info-text-undertitle p, .info-text-undertitle, .p-projectsheader, .p-projectsheader p   {
+	   font-size: 3.5vw !important;
+	   			   font-weight: 400 !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 .cover-text-container h2 {
+		 display:none;
+	 }
+	 .cover-text-container h1 {
+		   font-size: 5vw !important;
+		   margin: 0px !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 	 .project-thumbnail h2 {
+	margin: 0px !important;
+	 }
+	
+	.projects-header h1, .info-box-title h3, .info-text-title h3, .info-box-container h3, .h1-cs, .h1-cs h1, .projects-header h2 {
+	   font-size: 5vw !important;
+	   margin-bottom: 2vw !important;
+	    justify-content: center !important; /* Centers items vertically */
+	 }
+	 
+	 
+.info-text-undertitle, .info-box-undertitle {
+		   margin: 0px !important;
+		       font-style: none !important;
+}
+	 
+
+.cover-text-container {
+  display: flex !important; /* This activates Flexbox layout */
+  flex-direction: column !important; /* Stacks items vertically */
+  justify-content: center !important; /* Centers items vertically */
+  align-items: center !important; /* Centers items horizontally */
+  padding: 10px !important;
+  font-weight: bold;
+  width: 70% !important; /* Set the width to 90% of the parent container */
+}
+}
+
+
+
+
+
+
+
+@media only screen and (max-width: 768px) {
 
   html,
   body {
@@ -1204,7 +1414,6 @@ input[type="file"] {
   }
 
   .info-text-undertitle {
-    font-size: 16px !important;
     /* Larger size for smaller screens */
   }
 }
@@ -1235,7 +1444,9 @@ input[type="file"] {
     /* Allow the height to adjust based on content */
   }
 
+
   .info-text-container {
+	  
     width: 80%;
     /* Reduce the width for tablets */
   }
@@ -1268,7 +1479,7 @@ input[type="file"] {
   }
 
   .info-text-container {
-    width: 90%;
+    width: 95%;
     /* Reduce the width further for mobile */
   }
 }

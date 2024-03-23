@@ -1,5 +1,5 @@
 function toggleReport(projectId) {
-    //console.log(`Project_details.html: ${document.getElementById('report-button').innerText === 'Spam gemeldet 🛑' ? 'Removing report for' : 'Reporting'} project ID ${projectId} for user ${currentUserId}.`);
+    //console.log(`Partizipative_Planung_Vorschlag.html: ${document.getElementById('report-button').innerText === 'Spam gemeldet 🛑' ? 'Removing report for' : 'Reporting'} project ID ${projectId} for user ${currentUserId}.`);
 
     fetch(`/report/${projectId}`, {
         method: 'POST',
@@ -12,16 +12,16 @@ function toggleReport(projectId) {
     .then(data => {
         let button = document.getElementById('report-button');
         if (data.reported) {
-            //console.log(`Project_details.html: Logged in as user ID ${currentUserId}. You have reported this project. Transforming the Report button to "Spam gemeldet 🛑".`);
+            //console.log(`Partizipative_Planung_Vorschlag.html: Logged in as user ID ${currentUserId}. You have reported this project. Transforming the Report button to "Spam gemeldet 🛑".`);
             button.innerText = 'Spam gemeldet 🛑';
         } else {
-            //console.log(`Project_details.html: Report button clicked, removing the report of project ID ${projectId} for user ${currentUserId}.`);
+            //console.log(`Partizipative_Planung_Vorschlag.html: Report button clicked, removing the report of project ID ${projectId} for user ${currentUserId}.`);
             button.innerText = 'Spam melden ⚠️';
         }
     })
     .catch(error => {});
 }
-//console.log("Project_details.html: Logged in as user ID {{ current_user.id if current_user.is_authenticated else 'Anonymous' }}. {% if is_bookmarked %}You have already bookmarked this project. Transforming the Bookmark button to 'Bookmarked'.{% else %}This project is not bookmarked by you.{% endif %}");
+//console.log("Partizipative_Planung_Vorschlag.html: Logged in as user ID {{ current_user.id if current_user.is_authenticated else 'Anonymous' }}. {% if is_bookmarked %}You have already bookmarked this project. Transforming the Bookmark button to 'Bookmarked'.{% else %}This project is not bookmarked by you.{% endif %}");
 
 var currentUserId = {{ currentUserId | tojson }};
 
@@ -48,7 +48,7 @@ function bookmarkProject(projectId) {
 }
 
 function toggleBookmark(projectId) {
-//console.log(`Project_details.html: ${document.getElementById('bookmark-button').innerText === 'Bookmarked' ? 'Removing' : 'Adding'} bookmark for project ID ${projectId} for user ${currentUserId}.`);
+//console.log(`Partizipative_Planung_Vorschlag.html: ${document.getElementById('bookmark-button').innerText === 'Bookmarked' ? 'Removing' : 'Adding'} bookmark for project ID ${projectId} for user ${currentUserId}.`);
 
 fetch(`/bookmark/${projectId}`, {
 method: 'POST',
@@ -62,10 +62,10 @@ headers: {
 if (data.success) {
     let button = document.getElementById('bookmark-button');
     if (data.bookmarked) {
-        //console.log(`Project_details.html: Logged in as user ID ${currentUserId}. You have bookmarked this project. Transforming the Bookmark button to "Bookmarked".`);
+        //console.log(`Partizipative_Planung_Vorschlag.html: Logged in as user ID ${currentUserId}. You have bookmarked this project. Transforming the Bookmark button to "Bookmarked".`);
         button.innerText = 'Bookmarked';
     } else {
-        //console.log(`Project_details.html: Bookmarked button clicked, removing the bookmark of project ID ${projectId} for user ${currentUserId}.`);
+        //console.log(`Partizipative_Planung_Vorschlag.html: Bookmarked button clicked, removing the bookmark of project ID ${projectId} for user ${currentUserId}.`);
         button.innerText = 'Bookmark';
     }
 } else {}
@@ -87,13 +87,13 @@ function initClickableEdges() {
 
         leftEdge.addEventListener('click', function() {
             {% if prev_project_id %}
-                window.location.href = "{{ url_for('project_details', project_id=prev_project_id) }}";
+                window.location.href = "{{ url_for('Partizipative_Planung_Vorschlag', project_id=prev_project_id) }}";
             {% endif %}
         });
 
         rightEdge.addEventListener('click', function() {
             {% if next_project_id %}
-                window.location.href = "{{ url_for('project_details', project_id=next_project_id) }}";
+                window.location.href = "{{ url_for('Partizipative_Planung_Vorschlag', project_id=next_project_id) }}";
             {% endif %}
         });
     } else {
@@ -112,7 +112,7 @@ window.onresize = initClickableEdges; // Re-initialize if screen size changes
     //console.log("Is Admin:", isAdmin);
 
     if (isAuthor || isAdmin) {
-        //console.log("Project_details.html: Project created by ID {{ project.author }}. User is logged in as ID {{ current_user.id }}. Showing the editing button - Condition Met (Author/Admin)");
+        //console.log("Partizipative_Planung_Vorschlag.html: Project created by ID {{ project.author }}. User is logged in as ID {{ current_user.id }}. Showing the editing button - Condition Met (Author/Admin)");
     } else {
         //console.log("Condition not met - User is neither the author nor an admin");
     }
@@ -290,7 +290,7 @@ if (overlay.style.display === "none") {
 
     // JavaScript function to handle redirection to Stimmungskarte
     function redirectToStimmungskarte() {
-        window.location.href = '/karte';
+        window.location.href = '/Partizipative_Planung_Karte';
     }
 
     // JavaScript function to handle redirection to Suggest an Idea
@@ -300,7 +300,7 @@ if (overlay.style.display === "none") {
 
     // JavaScript function to handle redirection to List of Current Suggestions
     function redirectToneuerbeitrag() {
-        window.location.href = '/neuerbeitrag';
+        window.location.href = '/Partizipative_Planung_Neuer_Projekt';
     }
     
 function toggleMenu() {

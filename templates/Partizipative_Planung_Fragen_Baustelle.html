@@ -1,11 +1,11 @@
-<!-- templates/baustellen.html -->
+<!-- templates/Partizipative_Planung_Fragen_Baustelle.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <meta charset="UTF-8">
-    <title>{{ baustelle.name }}</title>
+    <title>{{ baustelle.name }} | Stimmungskompass - Österreichische Plattform für partizipative Planung.</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -3096,14 +3096,14 @@ filter: brightness(110%);
       <button id="hamburger-button">&#9776;</button>
       <div id="nav-overlay" class="nav-overlay">
         <div id="nav-links">
-            <a href="/karte">Karte</a>
+            <a href="/Partizipative_Planung_Karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
-            <a href="/neuerbeitrag">Vorschlag hinzufügen</a>
+            <a href="/Partizipative_Planung_Neuer_Projekt">Vorschlag hinzufügen</a>
 				 {% if newest_baustelle_id %}
-                <a href="/baustellen/{{ newest_baustelle_id }}">Bau</a>
+                <a href="/Partizipative_Planung_Fragen_Baustelle/{{ newest_baustelle_id }}">Bau</a>
             {% endif %}
 			<a href="/blog">Blog</a>
-            <a href="/ueber">Über</a>
+            <a href="/Ueber_Partizipative_Planung">Über</a>
             <a href="/profil">Profil</a>
            
             {% if current_user.is_authenticated %}
