@@ -513,35 +513,58 @@ function addMarkersToOverlay(markers) {
         return filteredMarkers.slice(startIndex, endIndex);
     }
 
-    function renderPage(page) {
-        currentPage = parseInt(page);
-        const paginatedMarkers = paginateMarkers(page, markersPerPage);
-        const list = document.getElementById('markers-list');
-        list.innerHTML = '';
-        if (paginatedMarkers.length === 0) {
-            const noMarkersMessage = document.createElement('p');
-            noMarkersMessage.textContent = "Keine Beiträge gefunden!";
-            noMarkersMessage.style.textAlign = 'center';
-            list.appendChild(noMarkersMessage);
-        } else {
-            paginatedMarkers.forEach(marker => {
-                const listItem = document.createElement('li');
-                const displayText = marker.is_mapobject ? marker.descriptionwhy : marker.name;
-                const link = document.createElement('a');
-                link.href = "#";
-                link.style.color = categoryColors[marker.category] || 'black';
-                link.style.fontWeight = marker.is_mapobject ? 'normal' : 'bold';
-                link.style.textDecoration = 'none';
-                link.innerHTML = displayText;
-                link.onclick = function() {
-                    centerMapOnMarker(marker.id);
-                    return false;
-                };
-                listItem.appendChild(link);
-                list.appendChild(listItem);
-            });
-        }
+function renderPage(page) {
+    currentPage = parseInt(page);
+    const paginatedMarkers = paginateMarkers(page, markersPerPage);
+    const list = document.getElementById('markers-list');
+    list.innerHTML = '';
+    if (paginatedMarkers.length === 0) {
+        const noMarkersMessage = document.createElement('p');
+        noMarkersMessage.textContent = "Keine Beiträge gefunden!";
+        noMarkersMessage.style.textAlign = 'center';
+        list.appendChild(noMarkersMessage);
+    } else {
+        paginatedMarkers.forEach(marker => {
+    const listItem = document.createElement('li');
+
+    // Create and format the date text
+    const dateText = document.createElement('span');
+    dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    dateText.style.color = 'grey';
+    dateText.style.display = 'block'; // Ensures the date is on its own line
+
+    // Create and format the prefix and category
+    const prefixAndCategory = document.createElement('span');
+    let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
+    // Use inline styles to enforce color
+    prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
+    prefixAndCategory.style.display = 'block'; // Ensures the prefix and category are on their own line
+
+    // Create and format the display text
+    const displayText = document.createElement('span');
+    displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
+    displayText.style.color = 'black'; // All text black as requested
+
+    // Combine them into a single link element
+    const link = document.createElement('a');
+    link.href = "#";
+    link.style.textDecoration = 'none';
+    link.appendChild(dateText);
+    link.appendChild(prefixAndCategory);
+    link.appendChild(displayText);
+    link.onclick = function() {
+        centerMapOnMarker(marker.id);
+        return false;
+    };
+
+    listItem.appendChild(link);
+    list.appendChild(listItem);
+});
+
     }
+}
+
+
     window.addEventListener('resize', function() {
         renderPage(currentPage);
     });
@@ -733,15 +756,24 @@ function addMarkers(projects) {
             var fillColor = getCategoryColor(project.category);
             var isFeatured = project.is_featured; // Check if the project is featured
             var popupContent;
+
+            // Format date
+            var formattedDate = new Date(project.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
             // Calculate vote percentages
             var totalVotes = project.upvotes + project.downvotes;
             var upvotePercentage = totalVotes > 0 ? ((project.upvotes / totalVotes) * 100).toFixed(1) : 0;
             var downvotePercentage = totalVotes > 0 ? ((project.downvotes / totalVotes) * 100).toFixed(1) : 0;
+
             if (project.is_mapobject) {
-                // For Notizens, show simple description
+                // For Notizens, show simple description with date and category
                 popupContent = `
-         											<div style="text-align: center;">${project.descriptionwhy}</div>`;
-} else {
+                    <div style="text-align: center;">
+                        <span style="color: grey;">${formattedDate}</span><br>
+                        <strong style="color: ${categoryColors[project.category] || 'black'};">${project.category}</strong><br>
+                        ${project.descriptionwhy}
+                    </div>`;
+            } else {
     // For Projektvorschläges, show detailed popup with voting details
 var upvoteButtonStyle = project.upvoted_by_user ? 'background-color: #4caf50;' : '';
 var downvoteButtonStyle = project.downvoted_by_user ? 'background-color: #9a031e;' : '';
@@ -794,6 +826,8 @@ var downvoteButtonStyle = `
 
 var popupContent = `
     <div style="text-align: center; z-index:1000 !important">
+	  <span style="color: grey;">${formattedDate}</span><br>
+                        <strong style="color: ${categoryColors[project.category] || 'black'};">${project.category}</strong><br>
         <b>${project.name}</b>
         <br>
         <img src="/static/usersubmissions/${project.image_file}" style="width:500px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
@@ -808,7 +842,11 @@ var popupContent = `
             <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
             <button onmouseover="this.style.backgroundColor='#cc5045'" onmouseout="this.style.backgroundColor='#9A031E'" onclick="vote(${project.id}, 'downvote')" id="downvote-button-${project.id}" class="vote-button circle-btn downvote" style="${downvoteButtonStyle}">👎</button>
         </div>
+			                        ${project.descriptionwhy}
+
     </div>
+
+	
 `;
 
 
@@ -1107,7 +1145,7 @@ function centerMapOnMarker(markerId) {
         // Open the popup after a short delay to allow the map to finish moving
         setTimeout(function() {
             marker.openPopup();
-        }, 300); // 300 milliseconds delay
+        }, 400); // 300 milliseconds delay
 
         // Close the markers list overlay on mobile and tablet, and update button text
         if (window.innerWidth <= 1080) {
@@ -1477,3 +1515,4 @@ document.getElementById('video-overlay-2').addEventListener('click', function(ev
         closeVideoOverlay('youtube-iframe-2', 'video-overlay-2');
     }
 });
+

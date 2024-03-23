@@ -215,9 +215,39 @@ input[type="file"] {
   border: none;
 }
 
+@media only screen and (max-width: 1080px) {
+#hamburger-button, #close-overlay-btn {
+  display: block; /* Show the button on mobile */
+  font-size: 30px; /* Icon size */
+  color: white; /* Icon color */
+  background: none; /* No background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  margin: 0 auto; /* Center button */
+  padding: 0; /* Remove padding */
+}
+}
+
+#hamburger-button, #close-overlay-btn {
+  display: none; /* Show the button on mobile */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
+
 .button {
   border-radius: 30px;
-  padding: 15px;
+  padding: 10px;
   background-color: white;
   font-weight: bold;
   color: black;
@@ -937,21 +967,22 @@ border-radius: 0px;
       margin-right: auto;
     }
 
-    #nav-links {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-    }
-
-    #nav-links a {
-      padding: 20px;
-      /* Larger clickable area */
-      font-size: 24px;
-      /* Larger font size */
-    }
+  #nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+	background-color: #003056;
   }
+
+  #nav-links a {
+    padding: 15px !important;
+	
+    /* Larger clickable area */
+    /* Larger font size */
+  }
+}
 
 
 @media only screen and (max-width: 1080px) {
@@ -960,7 +991,6 @@ border-radius: 0px;
   }
 
   .top-bar a {
-    font-size: 20px; /* Larger font size for top bar links */
   }
 
   .form-container label,
@@ -975,7 +1005,6 @@ border-radius: 0px;
 
   .button,
   .publish-button {
-    font-size: 20px; /* Larger font size for buttons */
   }
 
   #nav-links a {
@@ -1072,21 +1101,6 @@ border-radius: 0px;
       align-self: center;
       /* Explicitly center the button vertically */
     }
-
-
-    #nav-links {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-
-      #nav-links a {
-        padding: 20px;
-        /* Padding for each link */
-        font-size: 24px;
-        /* Font size for links */
-      }
     }
 
     

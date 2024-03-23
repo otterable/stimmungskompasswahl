@@ -965,3 +965,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error fetching project data:', error));
     }
 });
+
+document.getElementById('close-overlay-btn').addEventListener('click', function() {
+    document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+});

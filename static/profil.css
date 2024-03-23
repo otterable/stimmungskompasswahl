@@ -3,6 +3,33 @@
 	/* Hide by default */
 }
 
+
+
+#hamburger-button, #close-overlay-btn {
+  display: block; /* Show the button on mobile */
+  font-size: 30px; /* Icon size */
+  color: white; /* Icon color */
+  background: none; /* No background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  margin: 0 auto; /* Center button */
+  padding: 0; /* Remove padding */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
+
+
 #filter-overlay .c-button {
 	background-color: transparent;
 	/* Same as nav-overlay links */

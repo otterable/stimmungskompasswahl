@@ -1,12 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
+
+
+
+@media only screen and (max-width: 1080px) {
+#hamburger-button, #close-overlay-btn {
+  display: block; /* Show the button on mobile */
+  font-size: 30px; /* Icon size */
+  color: white; /* Icon color */
+  background: none; /* No background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  margin: 0 auto; /* Center button */
+  padding: 0; /* Remove padding */
+}
+}
+
+#hamburger-button, #close-overlay-btn {
+  display: none; /* Show the button on mobile */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
+
       body {
         font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
         background-color: #f5f1e4;
         color: black;
-        background-image: url('background2.png');
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
@@ -261,6 +306,8 @@ strong {
         .features-list li {
           padding-left: 15px;
         }
+		
+
       }
 
 
@@ -297,7 +344,7 @@ strong {
 .center-wrapper p {
     font-size: 18px; /* Keeps the font size as previously defined */
     color: #000; /* Maintains the lighter text color for subtlety */
-    max-width: 80%; /* Continues to limit the width for readability */
+    max-width: 95%; /* Continues to limit the width for readability */
     margin: 20px auto; /* Keeps the vertical space around the text */
     text-align: center; /* Ensures the text is centered */
     font-weight: bold; /* Makes the text bold */
@@ -347,7 +394,7 @@ strong {
 
       .button {
         border-radius: 30px;
-        padding: 15px;
+        padding: 10px;
         background-color: white;
         font-weight: bold;
         color: black;
@@ -745,6 +792,68 @@ strong {
         /* Hidden by default */
       }
 
+
+
+
+
+
+
+
+
+@media only screen and (max-width: 1080px) and (min-width: 768px) {
+
+.center-wrapper h1 {
+	   font-size: 3.5vw !important;
+}
+
+.post-title h2 {
+font-size: 3.2vw !important;
+}
+
+.post h2 {
+font-size: 3.2vw !important;
+}
+
+.post h3 {
+font-size: 3vw !important;
+}
+
+.center-wrapper p, p {
+	   font-size: 2.2vw !important;
+}
+}
+
+
+
+
+
+@media only screen and (max-width: 768px) {
+
+.center-wrapper h1 {
+	   font-size: 5vw !important;
+}
+.
+.post-title h2 {
+font-size: 4.5vw !important;
+}
+
+.post h2 {
+font-size: 4.5vw !important;
+}
+
+
+.post h3 {
+font-size: 4vw !important;
+}
+
+.center-wrapper p {
+	   font-size: 4vw !important;
+}
+}
+
+
+
+
       @media only screen and (max-width: 1080px) {
 
         html,
@@ -754,6 +863,7 @@ strong {
           overflow-x: hidden;
           /* Hide horizontal scrollbar */
         }
+
 
         #nav-links .user-info {
           display: block;
@@ -804,10 +914,11 @@ strong {
         }
 
         .form-container {
-          width: 90%;
+          width: 100%;
           /* Full width with some margin */
           padding: 20px;
-          /* Smaller padding */
+			border-radius: 0px;
+			margin-top: 0px;
         }
 
         .publish-button {
@@ -912,22 +1023,23 @@ strong {
           }
 
 
+  #nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+	background-color: #003056;
+  }
 
-          #nav-links {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-          }
-
-          #nav-links a {
-            padding: 20px;
-            /* Larger clickable area */
-            font-size: 24px;
-            /* Larger font size */
-          }
-        }
+  #nav-links a {
+    padding: 15px !important;
+	
+    /* Larger clickable area */
+    font-size: 20px;
+    /* Larger font size */
+  }
+}
 
         /* Mobile Devices */
         @media only screen and (max-width: 1080px) {
@@ -1000,21 +1112,6 @@ strong {
             align-self: center;
             /* Explicitly center the button vertically */
           }
-
-
-          #nav-links {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-
-            #nav-links a {
-              padding: 20px;
-              /* Padding for each link */
-              font-size: 24px;
-              /* Font size for links */
-            }
           }
 		  </style>
 
@@ -1030,11 +1127,6 @@ strong {
 </div>
 
 
-<style>
-      body {
-        background-image: url('background2.png') !important;
-		}
-		</style>
 
 {% for post in posts %}
 <div class="form-container">
@@ -1060,6 +1152,78 @@ strong {
             {% endif %}
         </div>
 </div>
+
+<script>
+// Toggle the navigation overlay when the hamburger button is clicked
+document.getElementById('hamburger-button').addEventListener('click', function() {
+    var navOverlay = document.getElementById('nav-overlay');
+    navOverlay.classList.toggle('nav-overlay-active');
+});
+// Close the navigation overlay when clicking on the overlay background or on a non-button element
+document.getElementById('nav-overlay').addEventListener('click', function(event) {
+    // Close only if the clicked element is not a button or a link
+    if (!event.target.closest('button, a')) {
+    closeNavOverlay();
+    }
+});
+// Function to close the navigation overlay
+function closeNavOverlay() {
+    var navOverlay = document.getElementById('nav-overlay');
+    navOverlay.classList.remove('nav-overlay-active');
+}
+// Prevent closing when clicking on buttons (delegation)
+document.getElementById('nav-links').addEventListener('click', function(event) {
+    if (event.target.tagName === 'BUTTON' || event.target.tagName === 'A') {
+    event.stopPropagation();
+    }
+});
+// Resize event listener
+window.addEventListener('resize', function() {
+    // Check if the window width is greater than the threshold for mobile view
+    if (window.innerWidth > 1080) {
+    // Make sure the nav-overlay is displayed
+    document.getElementById('nav-overlay').classList.add('nav-overlay-active');
+    } else {
+    // For mobile view, revert back to the default behavior
+    document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+    }
+});
+// Call the function on page load to set the initial state
+function toggleOverlay() {
+    var overlay = document.getElementById("category-choices");
+    if (overlay.style.display === "none") {
+    overlay.style.display = "flex";
+    } else {
+    overlay.style.display = "none";
+    }
+}
+// JavaScript function to handle redirection to Stimmungskarte
+function redirectToStimmungskarte() {
+    window.location.href = '/Partizipative_Planung_Karte';
+}
+// JavaScript function to handle redirection to Suggest an Idea
+function redirectToList() {
+    window.location.href = '/list';
+}
+// JavaScript function to handle redirection to List of Current Suggestions
+function redirectToneuerbeitrag() {
+    window.location.href = '/Partizipative_Planung_Neuer_Projekt';
+}
+
+function toggleMenu() {
+    var x = document.getElementById("nav-links");
+    if (x.style.display === "block") {
+    x.style.display = "none";
+    } else {
+    x.style.display = "block";
+    }
+}
+
+document.getElementById('close-overlay-btn').addEventListener('click', function() {
+    document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+});
+
+</script>
 {% endfor %}
 
 {% endblock %}

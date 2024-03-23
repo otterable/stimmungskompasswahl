@@ -506,4 +506,7 @@ document.getElementById('downvote-count').innerHTML = `Gefällt nicht: <strong s
         }
     });
 	
+	document.getElementById('close-overlay-btn').addEventListener('click', function() {
+    document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+});
 	

@@ -1075,9 +1075,10 @@
        position: fixed;
        width: 100%;
        height: 100%;
+	   color: #003056 !important;
        top: 0;
        left: 0;
-       background-color: rgba(0, 0, 0, 0.9);
+       background-color: #f5f1e4;
        overflow-x: hidden;
        /* Hide horizontal overflow */
        transition: 0.5s;
@@ -1139,17 +1140,40 @@
         max-width: 400px; /* Limit the maximum width */
         margin: auto; /* Center the form */
         border-radius: 30px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
 
+#hamburger-button, #close-overlay-btn {
+  display: block; /* Show the button on mobile */
+  font-size: 30px; /* Icon size */
+  color: white; /* Icon color */
+  background: none; /* No background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  margin: 0 auto; /* Center button */
+  padding: 0; /* Remove padding */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
 
        #filter-form-mobile .filter-button {
          padding: 15px 15px;
          background-color: #003056;
          /* Adjust the color as needed */
-         color: white;
+         color: #f5f1e4;
          border: none;
+		 font-weight: bold;
          border-radius: 30px;
          font-size: 16px;
          cursor: pointer;
@@ -1226,6 +1250,7 @@
          display: block;
          font-weight: bold;
          font-size: 30px;
+		 color: #003056;
          /* Increased font size for clarity */
          margin-bottom: 5px;
          /* Space between label and field */
@@ -1244,21 +1269,23 @@
          /* Enable vertical scrolling if needed */
        }
 
-       #nav-links {
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-         justify-content: center;
-         height: 100%;
-       }
+  #nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+	background-color: #003056;
+  }
 
-       #nav-links a {
-         padding: 20px;
-         /* Larger clickable area */
-         font-size: 24px;
-         /* Larger font size */
-       }
-     }
+  #nav-links a {
+    padding: 15px !important;
+	
+    /* Larger clickable area */
+    font-size: 20px;
+    /* Larger font size */
+  }
+}
 
      /* Mobile Devices */
      @media only screen and (max-width: 1080px) {
@@ -1320,18 +1347,6 @@
          /* Explicitly center the button vertically */
        }
 
-       #nav-links {
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-         justify-content: center;
-         height: 100%;
 
-         #nav-links a {
-           padding: 20px;
-           /* Padding for each link */
-           font-size: 24px;
-           /* Font size for links */
-         }
-       }
+       
      }

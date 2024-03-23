@@ -129,3 +129,8 @@ navigator.serviceWorker.register('/service-worker.js')
 }
 
 console.log("Is Authenticated: {{ current_user.is_authenticated }}");
+
+
+document.getElementById('close-overlay-btn').addEventListener('click', function() {
+    document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+});
