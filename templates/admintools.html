@@ -13,6 +13,8 @@
       }
     </script>
   </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -21,14 +23,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='admintools.css') }}">
   <body>
-    <div class="top-bar">
-      <a href="/">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-      </a>
-      <button id="hamburger-button">&#9776;</button>
-      <div id="nav-overlay" class="nav-overlay">
-         <div id="nav-links">
-		 <a href="/Partizipative_Planung_Karte">Karte</a>
+<div class="top-bar">
+    <a href="/">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
+    <div id="nav-overlay" class="nav-overlay">
+
+        <div id="nav-links">
+     <button id="close-overlay-btn" class="hamburger-button">&times;</button>
+
+            <a href="/Partizipative_Planung_Karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
             <a href="/Partizipative_Planung_Neuer_Projekt">Vorschlag hinzufügen</a>
 				 {% if newest_baustelle_id %}
@@ -37,16 +42,24 @@
 			<a href="/blog">Blog</a>
             <a href="/Ueber_Partizipative_Planung">Über</a>
             <a href="/profil">Profil</a>
-           
+
+  <!-- Existing links -->
+  {% if current_user.is_authenticated and current_user.id == 1 %}
+    <!-- This link is only visible to the admin -->
+    <a href="/admin/options">Admin</a>
+  {% endif %}
+  <!-- Remaining links and logic -->
+
             {% if current_user.is_authenticated %}
-                <span class="user-info" style="margin-top: 10px;">Admin: {{ current_user.name }}</span>
+                <span class="user-info" style="margin-top: 10px;">Benutzer: {{ current_user.name }}</span>
                 <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
                 <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
             {% endif %}
         </div>
-      </div>
     </div>
+</div>
+
     </div>
     <!-- Update the buttons in the filter-bar div -->
     <div class="filter-bar">
@@ -267,9 +280,17 @@
       </div>
     </div>
     <div id="exportSection" style="display: none;">
+		<div class="my-statistics centered-text">
+        <div class="marker-limit-info">
+      <h3 style="font-weight:bold;">Datenexport</span>
+      </h2>
+	  </div>
+	  	  </div>
+	
+	
       <div class="stats-container">
         <div class="stat-box2">
-          <h2>Projektdaten exportieren (.xlsx / .csv)</h2>
+          <h2>Projektdaten exportieren</h2>
           <form id="exportForm" method="POST" action="{{ url_for('export_projects') }}">
             <div class="filter-options">
               <!-- Category Selection -->
@@ -294,7 +315,7 @@
           </form>
         </div>
         <div class="stat-box2">
-          <h2>Alle Daten herunterladen (.json/.geojson)</h2>
+          <h2>Alle Daten herunterladen</h2>
           <p>Die .json enthält alle Daten außer persönlichen Benutzerdaten.</p>
           <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">.json exportieren</a>
           <form action="{{ url_for('export_gis') }}" method="get" style="margin-bottom:10px">
@@ -306,7 +327,7 @@
           </form>
         </div>
         <div class="stat-box2">
-          <h2>Fragen und Antworten exportieren (.xlsx / .csv)</h2>
+          <h2>Fragen und Antworten exportieren</h2>
           <form id="exportForm" method="POST" action="{{ url_for('export_questions') }}">
             <div class="filter-options">
               <!-- Category Selection -->
@@ -329,9 +350,13 @@
       </div>
     </div>
     <div id="projectProposalsSection" style="display: none;">
-
-      <h2>Es gibt <span id="num-projects" style="color: #003056;">{{ project_count }} Projektvorschläge.</span>
+	<div class="my-statistics centered-text">
+        <div class="marker-limit-info">
+<h3 style="font-weight:bold;">Es gibt <span id="num-projects">{{ project_count }} Projektvorschläge</span> von <span id="user-count">{{ users_with_projektvorschlage }} Benutzer</span>.</h3>
       </h2>
+	  </div>
+	  	  </div>
+
       <div style="margin-bottom:-5px; margin-top: -20px;">
         <label for="search" style="font-weight: bold;">Suchen nach Namen:</label>
         <input type="text" id="search" value="{{ search_query }}" onkeyup="submitForm()" placeholder="Suchen..." style="margin-top:20px; margin-bottom:10px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
@@ -352,8 +377,14 @@
     <div id="notesSection" style="display: none;">
       <!-- Notizens Search Input -->
       <div class="map-object-search-container">
-        <h2>Es gibt <span id="num-mapobjects" style="color: #003056;">{{ mapobject_count }} Notizen.</span>
-        </h2>
+	  <div class="my-statistics centered-text">
+        <div class="marker-limit-info">
+		            <h3 style="font-weight:bold;">Es gibt <span id="num-mapobjects">{{ mapobject_count }} Notizen.</span>
+
+<h3 style="font-weight:bold; display:none;">Es gibt <span id="num-mapobjects">{{ mapobject_count }} Notizen</span> von <span id="mapobject-user-count">{{ unique_mapobject_users_count }} Benutzer</span>, davon <span id="num-mapobjects-without-registration">{{ mapobjects_without_registration_count }} ohne Anmeldung</span>.</h3>
+        </h3>
+		  </div>
+	  	  </div>
         <label for="searchMapObject" style="font-weight: bold;">Suchen nach Notizen:</label>
         <input type="text" id="searchMapObject" placeholder="Notizen suchen" onkeyup="searchMapObjects()" style="margin-bottom: 0px;  border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
       </div>
@@ -367,8 +398,12 @@
       </div> {% with paginated_map_objects=paginated_map_objects %} {% include 'partials/mapobject_list_section.html' %} {% endwith %}
     </div>
     <div id="commentsSection" style="display: none;">
-      <h2>Es gibt <span id="num-comments" style="color: #003056;">{{ comment_count }} Kommentare.</span>
-      </h2>
+		  <div class="my-statistics centered-text">
+        <div class="marker-limit-info">
+<h3 style="font-weight:bold;">Es gibt <span id="num-comments">{{ comment_count }} Kommentare</span> von <span id="comment-user-count">{{ unique_comment_users_count }} Benutzer</span>.</h3>
+      </h3>
+	    </div>
+	  	  </div>
       <div class="comment-search-container">
         <label for="searchComment" style="font-weight: bold;">Kommentare suchen:</label>
         <input type="text" id="searchComment" placeholder="Kommentare suchen" onkeyup="searchComments()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
@@ -378,7 +413,11 @@
     </div>
     <div id="importantProjectsSection" style="display: none;">
       <!-- Important Projects Section -->
-      <h2>Wichtige <span style="color: #003056;">Projektvorschläge</span> (Nur auf dieser Seite sichtbar) </h2>
+	  	<div class="my-statistics centered-text">
+        <div class="marker-limit-info">
+     <h3 style="font-weight:bold;">Wichtige Projektvorschläge</span> (Nur auf dieser Seite sichtbar) </h3>
+	 </div>
+	 </div>
  <div id="important-projects-list" class="project-list">
  {% for project in important_projects %} <div class="project-thumbnail">
           <h3>
@@ -468,8 +507,12 @@
     </div>
 		   	  
     <div id="usersSection" style="display: none;">
-      <h2>Es gibt <span id="num-map-objects" style="color: #003056;">{{ user_count }} Benutzer.</span>
-      </h2>
+			  <div class="my-statistics centered-text">
+        <div class="marker-limit-info">
+       <h3 style="font-weight:bold;">Es gibt <span id="num-map-objects">{{ user_count }} Benutzer.</span>
+      </h3>
+	  </div>
+	  </div>
       <div class="project-list"> {% with paginated_users=paginated_users %} {% include 'partials/user_list_section.html' %} {% endwith %} </div>
     </div>
     <!-- Section for Deleting All Projects -->

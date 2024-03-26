@@ -19,15 +19,14 @@
   <button id="hamburger-button-filter">&#9776; Menu</button>
   <div class="my-projects centered-text"> {% if current_user.is_authenticated %} <div id="projectProposalsSection" style="display: none;">
       <div class="info-text-field3-c">
-        <div class="my-statistics centered-text">
-          <!-- Marker Limit Info Display -->
+<div class="my-statistics centered-text">
           <div class="marker-limit-info">
-            <h3 style="font-weight:bold;">Sie haben <span class="highlight">{{ user_statistics.num_projects }}</span>
-              <span class="highlight-word">Projektvorschläge</span> und <span class="highlight">{{ user_statistics.num_comments }}</span>
-              <span class="highlight-word">Kommentare</span> gepostet.
-            </h3> {% if user_statistics.most_viewed_project %} <h3 style="font-weight:bold;">Ihr am häufigsten angesehenes Projekt ist: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_viewed_project.id) }}">{{ user_statistics.most_viewed_project.name }}</a>, mit <span class="highlight">{{ user_statistics.most_viewed_project.view_count }}</span> Ansichten. </h3> {% else %} <p>Sie haben keine Projekte.</p> {% endif %} {% if user_statistics.most_successful_project %} <h3 style="font-weight:bold;">Ihr am höchsten bewertetes Projekt ist: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_successful_project.id) }}">{{ user_statistics.most_successful_project.name }}</a>, mit <span class="highlight">{{ user_statistics.most_successful_project.upvotes }}</span> positiven Bewertungen. </h3> {% else %} <p>Ihre Projekte wurden noch nicht bewertet.</p> {% endif %}
-          </div>
-        </div>
+    <h3 style="font-weight:bold;">Projektvorschläge: <span class="highlight">{{ user_statistics.num_projects }}</span></h3>
+    <h3 style="font-weight:bold;">Meistgesehenes Projekt: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_viewed_project.id) }}">{{ user_statistics.most_viewed_project.name }}</a> (<span class="highlight">{{ user_statistics.most_viewed_project.view_count }}</span> Ansichten)</h3>
+    <h3 style="font-weight:bold;">Höchstbewertetes Projekt: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_successful_project.id) }}">{{ user_statistics.most_successful_project.name }}</a> (<span class="highlight">{{ user_statistics.most_successful_project.upvotes }}</span> positive Bewertungen)</h3>
+  </div>
+</div>
+
         <div id="projects-container"> {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %} {% include 'partials/projects_section.html' %} {% endwith %} </div>
       </div>
     </div>

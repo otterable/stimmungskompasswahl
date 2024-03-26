@@ -1,6 +1,10 @@
 <!-- templates/partials/baustellen_list_section.html -->
-<h2 id="Partizipative_Planung_Fragen_Baustelle-count">Baustellen: {{ Partizipative_Planung_Fragen_Baustelle|length }}</h2>
 
+	<div class="my-statistics centered-text">
+        <div class="marker-limit-info">
+      <h3 style="font-weight:bold;" id="Partizipative_Planung_Fragen_Baustelle-count">Baustellen: {{ Partizipative_Planung_Fragen_Baustelle|length }}</h3>
+</div>
+</div>
 <div class="stats-container2" id="Partizipative_Planung_Fragen_Baustelle-list-container">
     {% for baustelle in Partizipative_Planung_Fragen_Baustelle %}
     <div class="stat-box2" id="baustelle-{{ baustelle.id }}">

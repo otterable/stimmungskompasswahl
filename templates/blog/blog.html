@@ -1122,7 +1122,7 @@ font-size: 4vw !important;
     <p>Hier können Sie Neuigkeiten über den Fortschritt unserer Projekte und alle Updates bezüglich des Stimmungskompasses lesen.</p>
     {% if current_user.is_authenticated and current_user.id == 1 %}
     <!-- Visible only to admin -->
-    <button onclick="location.href='{{ url_for('create_post') }}'" class="btn create-post-button">Neuen Blogpost erstellen</button>
+    <button onclick="location.href='{{ url_for('createpost') }}'" class="btn create-post-button">Neuen Blogpost erstellen</button>
     {% endif %}
 </div>
 

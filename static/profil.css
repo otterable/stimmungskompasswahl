@@ -83,19 +83,19 @@
 .marker-limit-info {
 	font-weight: bold !important;
 	/* Make all text bold */
-	color: #000000;
+	color: #fff;
 	/* Set text color to black */
-	background-color: none;
+	background-color: #02569d;
 	/* Light background color */
 	padding: 10px;
-	border-radius: 5px;
+	border-radius: 30px;
 }
 
 
 .marker-limit-info .highlight,
 .marker-limit-info a,
 .marker-limit-info span.highlight-word {
-	color: #003056;
+	color: #d9d4c7;
 	/* Blue color for specific elements */
 }
 
@@ -1147,6 +1147,34 @@ nav[aria-label="Page navigation"] {
 
 @media only screen and (max-width: 1080px) {
 
+
+.info-text-field3-c {
+	background-color: #none;
+	/* Light grey background */
+
+	padding: 0px;
+	box-sizing: border-box;
+	/* Include padding in width calculation */
+}
+
+.marker-limit-info {
+	font-weight: bold !important;
+	/* Make all text bold */
+	color: #fff;
+	/* Set text color to black */
+	background-color: #06467c;
+	/* Light background color */
+	padding: 10px;
+	border-radius: 0px;
+}
+
+
+.marker-limit-info .highlight,
+.marker-limit-info a,
+.marker-limit-info span.highlight-word {
+	color: #d9d4c7;
+	/* Blue color for specific elements */
+}
 	html,
 	body {
 		max-width: 100vw;
@@ -1299,17 +1327,17 @@ nav[aria-label="Page navigation"] {
 			/* Adjust logo position */
 			margin-right: auto;
 		}
-
-		#nav-links {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			height: 100%;
-		}
+#nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+	background-color: #003056;
+  }
 
 		#nav-links a {
-			padding: 20px;
+			padding: 15px;
 			/* Larger clickable area */
 			font-size: 24px;
 			/* Larger font size */
@@ -1417,7 +1445,7 @@ nav[aria-label="Page navigation"] {
 			height: 100%;
 			top: 0;
 			left: 0;
-			background-color: rgba(0, 0, 0, 0.9);
+	background-color: #003056;
 			overflow-x: hidden;
 			/* Hide horizontal overflow */
 			transition: 0.5s;
@@ -1569,3 +1597,48 @@ nav[aria-label="Page navigation"] {
 		#content-container a:focus {
 			text-decoration: none !important;
 		}
+		
+	}
+}
+@media only screen and (max-width: 1080px) {
+#close-overlay-btn {
+  display: block; /* Show the button on mobile */
+  font-size: 30px; /* Icon size */
+  color: white; /* Icon color */
+  background: none; /* No background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  margin: 0 auto; /* Center button */
+  padding: 0; /* Remove padding */
+}
+}
+
+#hamburger-button, #close-overlay-btn {
+  display: none; /* Show the button on mobile */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}

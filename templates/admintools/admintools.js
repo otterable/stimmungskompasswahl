@@ -1793,3 +1793,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 fetch('/log_view').then(response => response.json()).then(data => {}).catch();
+
+	document.getElementById('close-overlay-btn').addEventListener('click', function() {
+    document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
+});

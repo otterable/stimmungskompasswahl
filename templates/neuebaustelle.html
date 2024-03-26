@@ -1887,7 +1887,7 @@
       }
       .button {
       border-radius: 30px;
-      padding: 15px;
+      padding: 10px;
       background-color: white;
       font-weight: bold;
       color: black;
@@ -2562,14 +2562,17 @@
       }
    </style>
    <body>
-      <div class="top-bar">
-         <a href="/">
-         <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
-         </a>  
-         <button id="hamburger-button">&#9776;</button>
-         <div id="nav-overlay" class="nav-overlay">
-            <div id="nav-links">
-                 <a href="/Partizipative_Planung_Karte">Karte</a>
+<div class="top-bar">
+    <a href="/">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
+    </a>  
+    <button id="hamburger-button">&#9776;</button>
+    <div id="nav-overlay" class="nav-overlay">
+
+        <div id="nav-links">
+     <button id="close-overlay-btn" class="hamburger-button">&times;</button>
+
+            <a href="/Partizipative_Planung_Karte">Karte</a>
             <a href="/list">Projektvorschläge</a>
             <a href="/Partizipative_Planung_Neuer_Projekt">Vorschlag hinzufügen</a>
 				 {% if newest_baustelle_id %}
@@ -2578,16 +2581,24 @@
 			<a href="/blog">Blog</a>
             <a href="/Ueber_Partizipative_Planung">Über</a>
             <a href="/profil">Profil</a>
-           
+
+  <!-- Existing links -->
+  {% if current_user.is_authenticated and current_user.id == 1 %}
+    <!-- This link is only visible to the admin -->
+    <a href="/admin/options">Admin</a>
+  {% endif %}
+  <!-- Remaining links and logic -->
+
             {% if current_user.is_authenticated %}
                 <span class="user-info" style="margin-top: 10px;">Benutzer: {{ current_user.name }}</span>
                 <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
             {% else %}
                 <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
             {% endif %}
-            </div>
-         </div>
-      </div>
+        </div>
+    </div>
+</div>
+
       <div class="sidebar" id="sidebar">
          <h2 style="margin-bottom: 20px; text-align: center;">Neue Karte erstellen</h2>
          <h3 style="margin-bottom: 20px; text-align: center;">Erfassen Sie die Meinungen der Bürgerinnen und Bürger zu neuen Bauprojekten.</h3>

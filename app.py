@@ -903,9 +903,9 @@ def blog():
         print("User is not admin.")
     return render_template('blog/blog.html', posts=posts)
 
-@app.route('/admin/create_post', methods=['GET', 'POST'])
+@app.route('/admin/createpost', methods=['GET', 'POST'])
 @login_required
-def create_post():
+def createpost():
     if current_user.id != 1:  # Checking if the current user is the admin
         flash('You are not authorized to view this page.', 'danger')
         return redirect(url_for('index'))
@@ -928,7 +928,7 @@ def create_post():
         flash('Post created successfully!', 'success')
         return redirect(url_for('blog'))
 
-    return render_template('admin/create_post.html', form=form)
+    return render_template('admin/createpost.html', form=form)
 
 
 @app.context_processor
@@ -2813,6 +2813,13 @@ def admintools():
     project_count = Project.query.filter_by(is_mapobject=False).count()
     mapobject_count = Project.query.filter_by(is_mapobject=True).count()
     bookmark_count = Bookmark.query.count()
+    users_with_projektvorschlage = Project.query.with_entities(Project.author).distinct().count()
+    unique_comment_users_count = db.session.query(Comment.user_id).distinct().count()
+    mapobjects_without_registration_count = Project.query.filter_by(is_mapobject=True, author='0').count()
+    unique_mapobject_users_count = db.session.query(func.count(func.distinct(Project.author))).filter(Project.is_mapobject==True, Project.author!='0').scalar()
+
+
+
     # Check if it's an AJAX request
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         request_type = request.args.get("request_type")
@@ -2865,9 +2872,12 @@ def admintools():
         question_sort=question_sort,
         Partizipative_Planung_Fragen_Baustelle=Partizipative_Planung_Fragen_Baustelle,  
         answered_questions_count = answered_questions_count,
-        unanswered_questions_count = unanswered_questions_count
-
-        # metaData=metaData,
+        unanswered_questions_count = unanswered_questions_count,
+        users_with_projektvorschlage=users_with_projektvorschlage,
+        unique_comment_users_count=unique_comment_users_count,
+        unique_mapobject_users_count=unique_mapobject_users_count,
+        mapobjects_without_registration_count=mapobjects_without_registration_count,
+        metaData=g.metaData
     )
 
 
