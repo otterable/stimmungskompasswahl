@@ -91,7 +91,7 @@
             <p>Klicken Sie auf einen Vorschlag, nähere Informationen zu sehen.</p>
             {% endif %}
         </div>
-        <div class="project-list">
+        <div class="stats-container">
             {% if projects %}
             {% for project in projects %}
             <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">

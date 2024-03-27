@@ -110,7 +110,7 @@
 	justify-content: center;
 }
 
-.stats-container2 {
+.stats-container {
 	margin-top: 15px;
 	display: flex;
 	flex-wrap: wrap;
@@ -118,7 +118,7 @@
 }
 
 .stat-box {
-	background-color: #f5f5f5;
+	background-color: #e5e2d5;
 	/* Example background color */
 	margin: 5px;
 	padding: 5px;
@@ -131,7 +131,7 @@
 
 
 .stat-box3 {
-	background-color: #f5f5f5;
+	background-color: #e5e2d5;
 	/* Example background color */
 	margin: 5px;
 	padding: 5px;
@@ -141,8 +141,8 @@
 	/* For desktop */
 }
 
-.stat-box2 {
-	background-color: #f5f5f5;
+.project-thumbnail {
+	background-color: #e5e2d5;
 	/* Example background color */
 	margin: 5px;
 	padding: 10px;
@@ -175,7 +175,7 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 	margin-top: 0px;
 	}
 
-	.stat-box2 {
+	.project-thumbnail {
 		flex-basis: 100% !important;
 		/* For mobile */
 		max-width: 100% !important;
@@ -355,29 +355,60 @@ img:hover {
 	/* Darker shade for hover effect */
 }
 
+.answer-question-form {
+    width: 100%; /* Ensure form takes full width */
+    margin: 0; /* Adjust as needed */
+    padding: 0; /* Adjust as needed */
+    display: block; /* Form takes the full width of its parent */
+}
+
 .register-button {
-	background-color: #003056;
-	/* Example color */
-	color: white;
-	border: none;
-	border-radius: 10px;
-	font-weight: bold !important;
-	padding: 5px 10px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 14px;
-	margin: 10px 0;
-	cursor: pointer;
-	box-sizing: border-box;
-	/* Include padding in width */
+    display: block; /* Each button takes the full width */
+    width: calc(100% - 20px); /* Adjust width based on padding */
+    padding: 10px 15px;
+    background-color: #003056;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer;
+    margin: 5px 0; /* Adjust top and bottom margins as needed */
+    transition: background-color 0.3s;
 }
 
-.register-button:hover {
-
-	transform: scale(1.00);
-	/* Scale up on hover */
+.register-button, .register-button-link {
+    display: inline-block !important; /* Ensures the element is only as wide as its content */
+    padding: 10px 15px; /* Padding around the text */
+    background-color: #003056; /* Button background color */
+    color: white; /* Button text color */
+    text-align: center; /* Center-aligns the text inside the button */
+    font-size: 14px; /* Text size inside the button */
+    font-weight: bold; /* Makes the text bold */
+	width: auto !important;
+    border: none; /* Removes the border */
+    border-radius: 10px; /* Rounds the corners of the button */
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer; /* Changes the cursor to a pointer to indicate it's clickable */
+    margin: 5px; /* Adds margin around the button */
+    transition: background-color 0.3s; /* Animates the background color change on hover */
+    line-height: 1.5; /* Adjusts the line height */
+    font-family: inherit; /* Inherits the font family from the parent */
+    vertical-align: middle; /* Aligns the button vertically */
+    box-sizing: border-box !important; /* Includes padding and border in the element's size */
 }
+
+.register-button:hover, .register-button-link:hover {
+    background-color: #004680; /* Changes the background color on hover */
+}
+
+.register-button:active, .register-button-link:active {
+    transform: translateY(1px); /* Moves the button down slightly to simulate a press */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow to simulate depth */
+}
+
 
 .register-button2 {
 	background-color: #003056;
@@ -926,7 +957,7 @@ nav[aria-label="Page navigation"] {
 	margin-top: 10px;
 }
 
-.project-list#user-list-container {
+.stats-container#user-list-container {
 	width: 100%;
 	/* Full width */
 	display: flex;
@@ -941,7 +972,7 @@ nav[aria-label="Page navigation"] {
 
 /* Base styles for user thumbnails */
 .user-thumbnail {
-	background-color: #f5f5f5;
+	background-color: #e5e2d5;
 	/* Example background color */
 	margin: 5px;
 	padding: 10px;
@@ -1008,27 +1039,18 @@ nav[aria-label="Page navigation"] {
 
 /* Base styles for project thumbnails */
 .project-thumbnail {
-	background-color: #f9f8f5;
-	border-radius: 30px;
-	margin: 10px;
-	padding: 10px;
-	display: flex;
-	/* Changed to flex to better control the layout */
-	flex-direction: column;
-	/* Stack items vertically */
-	align-items: center;
-	/* Center items horizontally */
-	box-sizing: border-box;
-	transition: width 0.3s ease;
-	position: relative;
-	overflow: visible;
-	/* Ensure the content is not clipped */
-
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
-    will-change: auto; /* Default state, only specify if needed for performance */
-    /* Removed transform scale to prevent blurriness */
+    background-color: #e5e2d5;
+    border-radius: 30px;
+    margin: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    position: relative;
+    overflow: visible;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
+
 
 .user-info {
 	color: white;
@@ -1140,7 +1162,7 @@ ul {
 }
 
 .comment-thumbnail {
-	background-color: #f9f8f5;
+	background-color: #e5e2d5;
 	/* Similar background color */
 	border-radius: 10px;
 	/* Rounded corners */
@@ -1227,7 +1249,7 @@ ul {
 	/* Add some space above the pagination */
 }
 
-.project-list {
+.stats-container {
 	display: flex;
 	/* Use flexbox for layout */
 	flex-wrap: wrap;
@@ -1852,11 +1874,15 @@ a:hover {
 }
 }
 
-
 .full-width-textarea {
-    width: 100%; /* Make textarea take up 100% of its parent's width */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    margin-bottom: 10px; /* Optional: adds some space below the textarea */
+    width: calc(100% - 20px); /* Subtract the total horizontal padding to fit container width */
+    height: auto; /* Let it naturally adjust its height */
+    padding: 10px; /* Optional: Adds some padding inside the textarea */
+    margin-top: 10px; /* Space from the previous content */
+    box-sizing: border-box; /* Includes padding and border in the element's size */
+    border-radius: 5px; /* Optional: Matches your design */
+    border: 1px solid #ccc; /* Light border as per your design */
+    resize: vertical; /* Allows vertical resizing only */
 }
 
 

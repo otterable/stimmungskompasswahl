@@ -1,6 +1,6 @@
 <div class="my-projects centered-text">
   {% if paginated_projects and paginated_projects.items %} 
-  <div class="project-list" id="project-list-container">
+  <div class="stats-container" id="stats-container-container">
      {% for project in paginated_projects.items %} {% if not project.is_mapobject %}
      <!-- Check if project is not a Notizen -->
      <div class="project-thumbnail" id="project-{{ project.id }}">

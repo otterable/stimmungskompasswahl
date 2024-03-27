@@ -287,7 +287,7 @@ function deleteComment(event, commentId) {
         .then(data => {
             if (data.success) {
                 // Remove the comment from the DOM
-                document.querySelector(`.stat-box2[data-comment-id="${commentId}"]`).remove();
+                document.querySelector(`.project-thumbnail[data-comment-id="${commentId}"]`).remove();
 
                 // Update the number of comments displayed in the comments section
                 updateNumComments();

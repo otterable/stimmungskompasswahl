@@ -92,8 +92,8 @@ function updatePaginationContent(url, sectionType) {
       newContent.innerHTML = html;
       let oldContainer, newContainer;
       if (sectionType === 'project') {
-          oldContainer = document.getElementById('project-list-container');
-          newContainer = newContent.querySelector('#project-list-container');
+          oldContainer = document.getElementById('stats-container-container');
+          newContainer = newContent.querySelector('#stats-container-container');
       } else if (sectionType === 'map_object') {
           oldContainer = document.getElementById('map-object-list-container');
           newContainer = newContent.querySelector('#map-object-list-container');
@@ -214,8 +214,8 @@ function searchAndSortProjects() {
   }).then(response => response.text()).then(html => {
       const newContent = document.createElement('div');
       newContent.innerHTML = html;
-      const oldProjectContainer = document.getElementById('project-list-container');
-      let newProjectContainer = newContent.querySelector('#project-list-container');
+      const oldProjectContainer = document.getElementById('stats-container-container');
+      let newProjectContainer = newContent.querySelector('#stats-container-container');
       // Handle 'No results found' scenario
       if (!newProjectContainer) {
           newProjectContainer = document.createElement('div');
@@ -1640,11 +1640,11 @@ function addToImportantProjects(project) {
       <img src="/static/usersubmissions/${project.image_file}" alt="${project.name}" class="project-image">
   </a>
   <div class="project-description">${project.descriptionwhy}</div>
-  <form method="POST" action="/admintools">
-      <input type="hidden" name="project_id" value="${project.id}">
-      <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
-      <a href="/Partizipative_Planung_Vorschlag/${project.id}" class="register-button" target="_blank">Anzeigen</a>
-  </form>
+<form method="POST" action="/admintools">
+    <input type="hidden" name="project_id" value="${project.id}">
+    <button type="submit" class="register-button" name="unmark_important">Von "Wichtig" entfernen</button>
+    <a href="/Partizipative_Planung_Vorschlag/${project.id}" class="register-button register-button-link" target="_blank">Anzeigen</a>
+</form>
 `;
 
   // Append the new project element to the list
@@ -1720,7 +1720,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add a project to the DOM
 function addProjectToDOM(project) {
-  $('#project-list').append(`
+  $('#stats-container').append(`
   <div id="project-${project.id}">
       <h3>${project.name}</h3>
       <!-- Other project details -->

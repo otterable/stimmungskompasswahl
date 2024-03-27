@@ -1,8 +1,8 @@
 <div class="my-projects centered-text">
   {% if paginated_map_objects and paginated_map_objects.items %} 
-  <div class="stats-container2" id="map-object-list-container">
+  <div class="stats-container" id="map-object-list-container">
      {% for project in paginated_map_objects.items %} {% if project.is_mapobject %} 
-     <div class="stat-box2" id="map-object-{{ project.id }}">
+     <div class="project-thumbnail" id="map-object-{{ project.id }}">
         <div class="project-description" style="font-weight:bold;">{{ project.descriptionwhy|safe }}</div>
         <p class="project-category">Kategorie: <strong>{{ project.category }}</strong>
         </p>

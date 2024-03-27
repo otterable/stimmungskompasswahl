@@ -5,9 +5,9 @@
       <h3 style="font-weight:bold;" id="Partizipative_Planung_Fragen_Baustelle-count">Baustellen: {{ Partizipative_Planung_Fragen_Baustelle|length }}</h3>
 </div>
 </div>
-<div class="stats-container2" id="Partizipative_Planung_Fragen_Baustelle-list-container">
+<div class="stats-container" id="Partizipative_Planung_Fragen_Baustelle-list-container">
     {% for baustelle in Partizipative_Planung_Fragen_Baustelle %}
-    <div class="stat-box2" id="baustelle-{{ baustelle.id }}">
+    <div class="project-thumbnail" id="baustelle-{{ baustelle.id }}">
         <div><strong>Name:</strong> {{ baustelle.name }}</div>
         <div><strong>Beschreibung:</strong> {{ baustelle.description }}</div>
         <div><strong>Erstellt am:</strong> {{ baustelle.date.strftime('%d.%m.%Y %H:%M:%S') }}</div>

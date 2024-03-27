@@ -2,7 +2,7 @@
   {% if paginated_comments and paginated_comments.items %} 
   <div class="comment-list" id="comment-list-container">
      {% for comment in paginated_comments.items %} <!-- Inside your comments loop -->
-     <div class="stat-box2" id="comment-{{ comment.id }}">
+     <div class="project-thumbnail" id="comment-{{ comment.id }}">
         <div class="project-description" style="font-weight:bold;">{{ comment.text }}</div>
         <div class="comment-details" style="margin-bottom: -5px;">
            <p style="margin-bottom: -10px;"> Projekt: <strong>

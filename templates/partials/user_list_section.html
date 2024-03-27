@@ -4,9 +4,9 @@
   <label for="searchUserById" style="font-weight: bold;">Sortieren nach ID:</label>
   <input type="text" id="searchUserById" placeholder="Sortieren nach ID" onkeyup="searchUsers()" style="margin-top:20px; border-radius: 20px; font-size: 16px; padding: 10px; background-color: #f5f1e4fff; border: 1px solid #ccc; outline: none; cursor: pointer;">
 </div>
-<div class="project-list" id="user-list-container">
+<div class="stats-container" id="user-list-container">
   {% if paginated_users.items %} {% for user in paginated_users.items %} 
-  <div class="user-thumbnail">
+  <div class="project-thumbnail">
      <h3>
         <strong>{{ user.name }} (ID: {{ user.id }})</strong>
      </h3>

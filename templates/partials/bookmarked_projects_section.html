@@ -1,7 +1,7 @@
 <!-- bookmarked_projects_section.html -->
 <div class="bookmarked-projects centered-text">
    <h2>Sie haben <span id="num-bookmarks" style="color: #003056;">{{ bookmarked_projects|length }} Lesezeichen</span> gespeichert. </h2>
-   <div class="project-list">
+   <div class="stats-container">
       {% if bookmarked_projects %} {% for project in bookmarked_projects %} 
       <div class="project-thumbnail" id="project-thumbnail-{{ project.id }}">
          <h3>

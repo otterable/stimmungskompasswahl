@@ -315,7 +315,7 @@
 	
 	
       <div class="stats-container">
-        <div class="stat-box2">
+        <div class="project-thumbnail">
           <h2>Projektdaten exportieren</h2>
           <form id="exportForm" method="POST" action="{{ url_for('export_projects') }}">
             <div class="filter-options">
@@ -340,7 +340,7 @@
             <button type="submit" class="register-button">.csv exportieren</button>
           </form>
         </div>
-        <div class="stat-box2">
+        <div class="project-thumbnail">
           <h2>Alle Daten herunterladen</h2>
           <p>Die .json enthält alle Daten außer persönlichen Benutzerdaten.</p>
           <a href="{{ url_for('download_data') }}" class="register-button" style="font-weight: bold;">.json exportieren</a>
@@ -352,7 +352,7 @@
             <button type="submit" class="register-button">.geojson exportieren</button>
           </form>
         </div>
-        <div class="stat-box2">
+        <div class="project-thumbnail">
           <h2>Fragen und Antworten exportieren</h2>
           <form id="exportForm" method="POST" action="{{ url_for('export_questions') }}">
             <div class="filter-options">
@@ -366,7 +366,7 @@
             <!-- Submit Button -->
           </form>
         </div>
-        <div class="stat-box2">
+        <div class="project-thumbnail">
           <h2>Alle Beiträge löschen</h2>
           <p>Achtung: Dadurch werden alle Beiträge dauerhaft aus der Datenbank gelöscht.</p>
           <form method="POST" action="{{ url_for('delete_all_projects') }}">
@@ -444,7 +444,7 @@
      <h3 style="font-weight:bold;">Wichtige Projektvorschläge</span> (Nur auf dieser Seite sichtbar) </h3>
 	 </div>
 	 </div>
- <div id="important-projects-list" class="project-list">
+ <div id="important-projects-list" class="stats-container">
  {% for project in important_projects %} <div class="project-thumbnail">
           <h3>
             <strong>{{ project.name }}</strong>
@@ -469,7 +469,7 @@
       <!-- Featured Projects Section -->
       <h2>Ausgewählte <span style="color: #003056;">Projektvorschläge</span>
       </h2>
-    <div id="featured-projects-list" class="project-list">
+    <div id="featured-projects-list" class="stats-container">
  {% for project in featured_projects %} <div class="project-thumbnail">
           <h3>
             <strong>{{ project.name }}</strong>
@@ -496,7 +496,7 @@
       <!-- Reported Projects Section -->
       <h2>Gemeldete <span style="color: #003056;">Projektvorschläge</span>
       </h2>
-      <div class="project-list"> {% for project in reported_projects %} <div class="project-thumbnail">
+      <div class="stats-container"> {% for project in reported_projects %} <div class="project-thumbnail">
           <h3>
             <strong>{{ project.name }}</strong>
           </h3>
@@ -539,7 +539,7 @@
       </h3>
 	  </div>
 	  </div>
-      <div class="project-list"> {% with paginated_users=paginated_users %} {% include 'partials/user_list_section.html' %} {% endwith %} </div>
+      <div class="stats-container"> {% with paginated_users=paginated_users %} {% include 'partials/user_list_section.html' %} {% endwith %} </div>
     </div>
     <!-- Section for Deleting All Projects -->
   </body>
@@ -638,8 +638,8 @@
         newContent.innerHTML = html;
         let oldContainer, newContainer;
         if (sectionType === 'project') {
-          oldContainer = document.getElementById('project-list-container');
-          newContainer = newContent.querySelector('#project-list-container');
+          oldContainer = document.getElementById('stats-container-container');
+          newContainer = newContent.querySelector('#stats-container-container');
         } else if (sectionType === 'map_object') {
           oldContainer = document.getElementById('map-object-list-container');
           newContainer = newContent.querySelector('#map-object-list-container');
@@ -761,8 +761,8 @@
       }).then(response => response.text()).then(html => {
         const newContent = document.createElement('div');
         newContent.innerHTML = html;
-        const oldProjectContainer = document.getElementById('project-list-container');
-        let newProjectContainer = newContent.querySelector('#project-list-container');
+        const oldProjectContainer = document.getElementById('stats-container-container');
+        let newProjectContainer = newContent.querySelector('#stats-container-container');
         // Handle 'No results found' scenario
         if (!newProjectContainer) {
           newProjectContainer = document.createElement('div');
@@ -2338,7 +2338,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to add a project to the DOM
 function addProjectToDOM(project) {
-    $('#project-list').append(`
+    $('#stats-container').append(`
         <div id="project-${project.id}">
             <h3>${project.name}</h3>
             <!-- Other project details -->
@@ -2516,7 +2516,7 @@ function updateQuestionsCount() {
     const debugCountElement = document.getElementById('questions-count');
     if (debugCountElement) {
         // Assuming you have a way to get the updated count, for demonstration assuming it's through an API or stored in JS variable
-        const updatedCount = document.querySelectorAll('.stat-box2').length;
+        const updatedCount = document.querySelectorAll('.project-thumbnail').length;
         debugCountElement.innerText = `Debug: XD ${updatedCount} questions.`;
     } else {
         console.error("Failed to find the count element.");
@@ -2560,7 +2560,7 @@ function confirmDeleteBaustelle(baustelleId) {
 
 function updateBaustellenCount() {
     const baustellenContainer = document.getElementById('Partizipative_Planung_Fragen_Baustelle-list-container');
-    const Partizipative_Planung_Fragen_Baustelle = baustellenContainer.querySelectorAll('.stat-box2');
+    const Partizipative_Planung_Fragen_Baustelle = baustellenContainer.querySelectorAll('.project-thumbnail');
     const debugCountElement = document.getElementById('Partizipative_Planung_Fragen_Baustelle-count');
     debugCountElement.innerHTML = `Baustellen: ${Partizipative_Planung_Fragen_Baustelle.length}`;
 }

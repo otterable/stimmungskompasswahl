@@ -22,9 +22,9 @@
 <p>
 </p>
 
-<div class="stats-container2" id="question-list-container">
+<div class="stats-container" id="question-list-container">
     {% for question in questions %}
-    <div class="stat-box2" id="question-{{ question.id }}">
+    <div class="project-thumbnail" id="question-{{ question.id }}">
         <div><strong>Frage:</strong> {{ question.text }}</div>
         <div style="display:none;"><strong>Author:</strong> {{ question.author }}</div>
         <div><strong>Am:</strong> {{ question.date.strftime('%d.%m.%Y %H:%M') }}</div>
@@ -37,8 +37,7 @@
             <form method="POST" class="answer-question-form" data-question-id="{{ question.id }}">
                 <input type="hidden" name="question_id" value="{{ question.id }}">
 <textarea name="answer_text" rows="10" placeholder="Guten Tag..." class="full-width-textarea"></textarea>
-                <div><button type="button" class="btn btn-primary submit-answer register-button">Antworten</button>
-				</div>
+               <button type="button" class="btn btn-primary submit-answer register-button">Antworten</button>
             </form>
         {% endif %}
         <!-- "Löschen" button outside the if-else block -->
