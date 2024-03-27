@@ -1,0 +1,105 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.596978148632386,
+                    48.406628217526446
+                ]
+            },
+            "properties": {
+                "id": 1,
+                "name": "Alten Spielplatz erneuen",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Der alte Spielplatz im Stadtpark ist schon etwas heruntergekommen. Es w\u00e4re sinnvoll, einige Installationen zu erneuern (z.B. Schaukeln, Karusell) oder \u00fcberhaupt die eine oder andere neue Attraktion zu errichten - die Kinder w\u00fcrden sich freuen.</p>",
+                "public_benefit": "<p>Ein besserer Spielplatz in der Stadt f\u00fcr unsere Kinder.</p>",
+                "image_file": "cropped-1705410546636.jpg",
+                "geoloc": "48.406628217526446,15.596978148632386",
+                "date": "2024-01-12 18:34:02",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "view_count": 9,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.599952179923742,
+                    48.4114002197786
+                ]
+            },
+            "properties": {
+                "id": 2,
+                "name": "Mehr Markttage bitte",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Der Bauernmarkt hat bekanntlich nur am Samstagvormittag offen. Einige w\u00fcnschen sich aber auch einen oder vielleicht sogar mehrere zus\u00e4tzliche Tage zum Einkaufen am Markt. Auch die \u00d6ffnungszeiten k\u00f6nnen \u00fcberdenkt werden. Das erweiterete Angebot wird auch bestimmt gut angenommen werden.</p>",
+                "public_benefit": "<p>Mehr M\u00f6glichkeiten, Obst, Gem\u00fcse und andere Schmankeln regional einzukaufen.</p>",
+                "image_file": "cropped-1709048072818.jpg",
+                "geoloc": "48.4114002197786,15.599952179923742",
+                "date": "2024-01-12 18:41:24",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "view_count": 17,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.604708562841669,
+                    48.40926337335804
+                ]
+            },
+            "properties": {
+                "id": 8,
+                "name": "Bahnhofsvorplatz unsicher",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Am Bahnhofsvorplatz sind h\u00e4ufig, vor allem am Abend, Betrunkene und verhaltensauff\u00e4llige Leute unterwegs. Ich f\u00fchle dort nicht immer sicher. Vielleicht braucht es mehr Sicherheitspersonal oder ein Alkoholverbot rund um den Bahnhof.</p>",
+                "public_benefit": "<p>Der Bahnhof soll sicherer und auch ein angenehmerer Ort zum Warten werden. Gerade am Abend ist es oft nicht angenehm dort.</p>",
+                "image_file": "cropped-45653384914373200164.jpg",
+                "geoloc": "48.40926337335804,15.604708562841669",
+                "date": "2024-01-12 19:30:35",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "view_count": 6,
+                "is_featured": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.596143375203608,
+                    48.40761986672636
+                ]
+            },
+            "properties": {
+                "id": 80,
+                "name": "Wir brauchen mehr Z\u00fcge",
+                "category": "\u00d6ffentliche Pl\u00e4tze",
+                "descriptionwhy": "<p>Eine treffende Beschreibung</p>",
+                "public_benefit": "<p>Eine treffende Beschreibung!</p>",
+                "image_file": "cropped-1706628678299.jpg",
+                "geoloc": "48.40761986672636,15.596143375203608",
+                "date": "2024-01-22 14:01:33",
+                "author": "1",
+                "is_important": false,
+                "p_reports": 0,
+                "view_count": 6,
+                "is_featured": false
+            }
+        }
+    ]
+}

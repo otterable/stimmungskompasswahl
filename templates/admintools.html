@@ -173,6 +173,9 @@
       <div class="stats-container">
         <div class="stat-box">
           <div class="chart-container">
+		  
+
+
             <h2>Kategorieanteil</h2>
             <div style="margin-bottom: 10px;">
               <span id="mostUsedCategoryText"></span>
@@ -186,6 +189,8 @@
             </div>
             <canvas id="projectCategoryChart"></canvas>
           </div>
+		  
+		  
         </div>
         <div class="stat-box">
           <h2>Engagierte Projektvorschläge</h2>
@@ -219,23 +224,42 @@
             <canvas id="mapObjectChart"></canvas>
           </div>
         </div>
-        <div class="stat-box">
-          <h2>Neue Beiträge</h2>
-          <div>
-            <label for="startDate">Startdatum:</label>
-            <input type="date" id="startDate">
-            <label for="endDate">Enddatum:</label>
-            <input type="date" id="endDate">
-            <div>
-              <label for="excludeMapObjects">Nur Projektvorschläge</label>
-              <input type="checkbox" id="excludeMapObjects">
-              <label for="includeMapObjects">Nur Notizen</label>
-              <input type="checkbox" id="includeMapObjects">
-              <button id="updateChart">Update</button>
-            </div>
-          </div>
-          <canvas id="submissionChart"></canvas>
-        </div>
+		
+				        <div class="stat-box">
+						          <h2>Beantwortete Fragen</h2>
+
+						
+<select id="baustelleFilter" onchange="updateQuestionsStats();">
+    <option value="all" selected>Alles</option>
+    {% for baustelle_id in baustelle_ids %}
+        <option value="{{ baustelle_id }}">{{ baustelle_id }}</option>
+    {% endfor %}
+</select>
+
+<p id="answeredPercentage"><strong>{{ "%.0f"|format(answered_percentage) }} %</strong> der Fragen wurden beantwortet.</p>
+
+<canvas id="questionChart"></canvas>
+
+				  </div>
+				  
+<div class="stat-box">
+  <h2>Neue Beiträge</h2>
+  <div>
+    <label for="startDate">Startdatum:</label>
+    <input type="date" id="startDate" value="{{ oldestDate }}">
+    <label for="endDate">Enddatum:</label>
+    <input type="date" id="endDate" value="{{ newestDate }}">
+    <div>
+      <label for="excludeMapObjects">Nur Projektvorschläge</label>
+      <input type="checkbox" id="excludeMapObjects">
+      <label for="includeMapObjects">Nur Notizen</label>
+      <input type="checkbox" id="includeMapObjects">
+      <button id="updateChart" onclick="updateChart(document.getElementById('startDate').value, document.getElementById('endDate').value, document.getElementById('includeMapObjects').checked, document.getElementById('excludeMapObjects').checked)">Update</button>
+    </div>
+  </div>
+  <canvas id="submissionChart"></canvas>
+</div>
+
         <div class="stat-box">
           <h2>Projektinteraktion</h2>
           <div>
@@ -247,6 +271,8 @@
           </div>
           <canvas id="activityChart"></canvas>
         </div>
+		
+
         <div class="stat-box">
           <h2>Projektansichten</h2>
           <div style="margin-top:57px">
@@ -1442,108 +1468,92 @@ function updateCommentCountDisplay() {
     let activityChart = null; // Reference to the 'Activity over time' chart
     let viewsChart = null;
 
-    function generateDateLabels(startDate, endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const labels = [];
-      for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
-        labels.push(`${('0' + date.getDate()).slice(-2)}.${('0' + (date.getMonth() + 1)).slice(-2)}.${date.getFullYear()}`);
-      }
-      return labels;
-    }
+  function generateDateLabels(startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const labels = [];
+  for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+    labels.push(`${('0' + date.getDate()).slice(-2)}.${('0' + (date.getMonth() + 1)).slice(-2)}.${date.getFullYear()}`);
+  }
+  return labels;
+}
 
-    function updateChart(startDate, endDate, includeMapObjects, excludeMapObjects) {
-      let urlParams = `start=${startDate}&end=${endDate}`;
-      if (includeMapObjects) {
-        urlParams += '&includeMapObjects=true';
-      } else if (excludeMapObjects) {
-        urlParams += '&excludeMapObjects=true';
-      }
-      const url = `/project_submission_stats?${urlParams}`;
-      console.log(`Fetching data with URL: ${url}`);
-      fetch(url).then(response => response.json()).then(data => {
-        console.log("Received data:", data);
-        const ctx = document.getElementById('submissionChart').getContext('2d');
-        const categories = Object.keys(data);
-        if (categories.length === 0) {
-          console.log("No data available for the selected date range");
-          return;
-        }
-        categories.forEach(category => console.log(category, data[category]));
-        const labels = generateDateLabels(startDate, endDate);
-        console.log("Labels for chart:", labels);
-        const categoryColors = {
-          'Öffentliche Plätze': '#ff5c00',
-          'Transport': '#133873',
-          'Gesundheit': '#9a031e',
-          'Umwelt': '#4caf50',
-          'Bildung': '#eab003',
-          'Andere': '#212121',
-          'Sport': '#3d4f53',
-          'Kultur': '#431307',
-          'Verwaltung': '#653993'
-        };
-        const datasets = categories.map(category => {
-          const categoryData = labels.map(label => {
-            const [day, month, year] = label.split('.');
-            const formattedDate = `${year}-${month}-${day}`;
-            return data[category][formattedDate] || 0;
-          });
-          console.log(`Data for category ${category}:`, categoryData);
-          return {
-            label: category,
-            data: categoryData,
-            backgroundColor: categoryColors[category] + '66',
-            borderColor: categoryColors[category],
-            borderWidth: 3
-          };
-        });
-        if (submissionChart) {
-          submissionChart.destroy();
-        }
-        submissionChart = new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels: labels,
-            datasets: datasets.map(dataset => ({
-              ...dataset,
-              fill: false
-            }))
-          },
-          options: {
-            scales: {
-              y: {
-                beginAtZero: true
-              }
-            },
-            plugins: {
-              legend: {
-                labels: {
-                  font: {
-                    weight: 'bold',
-                    size: 14,
-                    color: 'black'
-                  }
-                }
-              }
-            },
-            title: {
-              display: false,
-              text: 'Your Chart Title Here', // Change as per requirement
+function updateChart(startDate, endDate, includeMapObjects, excludeMapObjects) {
+  let urlParams = `start=${startDate}&end=${endDate}`;
+  if (includeMapObjects) {
+    urlParams += '&includeMapObjects=true';
+  } else if (excludeMapObjects) {
+    urlParams += '&excludeMapObjects=true';
+  }
+  const url = `/project_submission_stats?${urlParams}`;
+  fetch(url).then(response => response.json()).then(data => {
+    const ctx = document.getElementById('submissionChart').getContext('2d');
+    const categories = Object.keys(data);
+    if (categories.length === 0) {
+      console.log("No data available for the selected date range");
+      return;
+    }
+    const labels = generateDateLabels(startDate, endDate);
+    const categoryColors = {
+      'Öffentliche Plätze': '#ff5c00',
+      'Transport': '#133873',
+      'Gesundheit': '#9a031e',
+      'Umwelt': '#4caf50',
+      'Bildung': '#eab003',
+      'Andere': '#212121',
+      'Sport': '#3d4f53',
+      'Kultur': '#431307',
+      'Verwaltung': '#653993'
+    };
+    const datasets = categories.map(category => {
+      const categoryData = labels.map(label => {
+        const [day, month, year] = label.split('.');
+        const formattedDate = `${year}-${month}-${day}`;
+        return data[category][formattedDate] || 0;
+      });
+      return {
+        label: category,
+        data: categoryData,
+        backgroundColor: categoryColors[category] + '66',
+        borderColor: categoryColors[category],
+        borderWidth: 3
+      };
+    });
+    if (submissionChart) {
+      submissionChart.destroy();
+    }
+    submissionChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: datasets.map(dataset => ({
+          ...dataset,
+          fill: false
+        }))
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
               font: {
                 weight: 'bold',
-                size: 16,
+                size: 14,
                 color: 'black'
               }
             }
           }
-        });
-        console.log("Submission Chart configuration:", submissionChart.config); // Updated from myChart to submissionChart
-      }).catch(error => {
-        console.error('Error fetching data:', error);
-        console.log("Failed to Update due to error in data fetching.");
-      });
-    }
+        }
+      }
+    });
+  }).catch(error => {
+    console.error('Error fetching data:', error);
+  });
+}
     document.getElementById('updateChart').addEventListener('click', () => {
       const startDate = document.getElementById('startDate').value;
       const endDate = document.getElementById('endDate').value;
@@ -1781,33 +1791,34 @@ function updateCommentCountDisplay() {
         console.error('Error fetching views data:', error);
       });
     }
-    window.onload = function() {
-      // Initialize 'Submissions over time' chart
-      const initialEndDateSubmission = new Date();
-      const initialStartDateSubmission = new Date(initialEndDateSubmission);
-      initialStartDateSubmission.setDate(initialEndDateSubmission.getDate() - 7);
-      document.getElementById('startDate').value = initialStartDateSubmission.toISOString().split('T')[0];
-      document.getElementById('endDate').value = initialEndDateSubmission.toISOString().split('T')[0];
-      updateChart(initialStartDateSubmission.toISOString().split('T')[0], initialEndDateSubmission.toISOString().split('T')[0], false, false);
-      // Initialize 'Activity over time' chart
-      const initialEndDateActivity = new Date();
-      const initialStartDateActivity = new Date(initialEndDateActivity);
-      initialStartDateActivity.setDate(initialEndDateActivity.getDate() - 7);
-      document.getElementById('activityStartDate').value = initialStartDateActivity.toISOString().split('T')[0];
-      document.getElementById('activityEndDate').value = initialEndDateActivity.toISOString().split('T')[0];
-      updateActivityChart(initialStartDateActivity.toISOString().split('T')[0], initialEndDateActivity.toISOString().split('T')[0]);
-      // Initialize 'Views over time' chart
-      const initialEndDateViews = new Date();
-      const initialStartDateViews = new Date(initialEndDateViews);
-      initialStartDateViews.setDate(initialEndDateViews.getDate() - 7);
-      document.getElementById('viewsStartDate').value = initialStartDateViews.toISOString().split('T')[0];
-      document.getElementById('viewsEndDate').value = initialEndDateViews.toISOString().split('T')[0];
-      updateViewsChart(initialStartDateViews.toISOString().split('T')[0], initialEndDateViews.toISOString().split('T')[0]);
-      // Initialize 'Unique Viewers over time' chart
-      document.getElementById('start-date').value = initialStartDateSubmission.toISOString().split('T')[0];
-      document.getElementById('end-date').value = initialEndDateSubmission.toISOString().split('T')[0];
-      fetchDataForRange();
-    };
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize 'Submissions over time' chart
+  const initialEndDateSubmission = new Date();
+  let initialStartDateSubmission = new Date('{{ getEarliestSubmissionDate }}');
+  document.getElementById('startDate').value = initialStartDateSubmission.toISOString().split('T')[0];
+  document.getElementById('endDate').value = initialEndDateSubmission.toISOString().split('T')[0];
+  updateChart(initialStartDateSubmission.toISOString().split('T')[0], initialEndDateSubmission.toISOString().split('T')[0], false, false);
+
+  // Initialize 'Activity over time' chart
+  const initialEndDateActivity = new Date();
+  let initialStartDateActivity = new Date('{{ getEarliestInteractionDate }}');
+  document.getElementById('activityStartDate').value = initialStartDateActivity.toISOString().split('T')[0];
+  document.getElementById('activityEndDate').value = initialEndDateActivity.toISOString().split('T')[0];
+  updateActivityChart(initialStartDateActivity.toISOString().split('T')[0], initialEndDateActivity.toISOString().split('T')[0]);
+
+  // Initialize 'Views over time' chart
+  const initialEndDateViews = new Date();
+  let initialStartDateViews = new Date('{{ getEarliestProjectViewDate }}');
+  document.getElementById('viewsStartDate').value = initialStartDateViews.toISOString().split('T')[0];
+  document.getElementById('viewsEndDate').value = initialEndDateViews.toISOString().split('T')[0];
+  updateViewsChart(initialStartDateViews.toISOString().split('T')[0], initialEndDateViews.toISOString().split('T')[0]);
+
+  // Initialize 'Unique Viewers over time' chart
+  let initialStartDateUniqueViews = new Date('{{ getEarliestWebsiteViewDate }}');
+  document.getElementById('start-date').value = initialStartDateUniqueViews.toISOString().split('T')[0];
+  document.getElementById('end-date').value = initialEndDateSubmission.toISOString().split('T')[0]; // This should probably reference 'initialEndDateSubmission' directly if it's intentional
+  fetchDataForRange();
+});
     document.addEventListener("DOMContentLoaded", function() {
       fetch('/get_unique_viewers_data').then(response => response.json()).then(data => {
         const formattedLabels = data.labels.map(label => {
@@ -2555,6 +2566,134 @@ function updateBaustellenCount() {
 }
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('questionChart').getContext('2d');
+    const data = {
+        labels: ['Beantwortet', 'Unbeantwortet'],
+        datasets: [{
+            data: [{{ questions_stats.answered }}, {{ questions_stats.unanswered }}],
+            backgroundColor: ['#021c4c', '#e82b10'],
+            borderColor: ['#021c4c', '#e82b10'],
+            borderWidth: 1
+        }]
+    };
+    const options = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: {
+                        size: 14,
+                        weight: 'bold',
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+                        const percentage = ((context.parsed / total) * 100).toFixed(0); // Show percentage without decimal
+                        label += `${context.parsed} (${percentage}%)`;
+                        return label;
+                    }
+                }
+            },
+            datalabels: {
+                color: '#fff',
+                font: {
+                    weight: 'bold',
+                    size: 16,
+                },
+                formatter: (value, context) => {
+                    return value; // Just show the value inside the chart
+                }
+            }
+        },
+        animation: {
+            animateScale: true,
+            animateRotate: true
+        }
+    };
+
+    const questionChart = new Chart(ctx, {
+        type: 'pie',
+        data: data,
+        options: options,
+        plugins: [ChartDataLabels]
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize global variable to hold our chart instance
+    window.questionChart = null; // This will later store our chart instance
+
+    // Set the default option to "Alles" on page load
+    document.getElementById('baustelleFilter').value = 'all';
+
+    // Load initial chart and stats for "Alles"
+    updateQuestionsStats(); // This will fetch and display the stats for all Baustellen
+});
+
+// Function to fetch data based on selected Baustelle and update chart and stats
+function updateQuestionsStats() {
+    const baustelleId = document.getElementById('baustelleFilter').value;
+    let url = baustelleId === 'all' ? `/get_questions_stats_for_all_baustelles` : `/get_questions_stats_by_baustelle?baustelle_id=${baustelleId}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('answeredPercentage').innerHTML = `<strong>${data.answered_percentage.toFixed(0)} %</strong> der Fragen wurden beantwortet.`;
+            
+            const ctx = document.getElementById('questionChart').getContext('2d');
+            if (window.questionChart !== null) {
+                window.questionChart.destroy();
+            }
+
+            window.questionChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Beantwortet', 'Unbeantwortet'],
+                    datasets: [{
+                        data: [data.answered, data.unanswered],
+                        backgroundColor: ['#021c4c', '#e82b10'],
+                        borderColor: ['#ffffff', '#ffffff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed;
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+}
+
+</script>
+
+
+	
   <script>
     fetch('/log_view').then(response => response.json()).then(data => console.debug(data.message)).catch(console.error);
   </script>

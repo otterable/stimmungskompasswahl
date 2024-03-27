@@ -2817,8 +2817,22 @@ def admintools():
     unique_comment_users_count = db.session.query(Comment.user_id).distinct().count()
     mapobjects_without_registration_count = Project.query.filter_by(is_mapobject=True, author='0').count()
     unique_mapobject_users_count = db.session.query(func.count(func.distinct(Project.author))).filter(Project.is_mapobject==True, Project.author!='0').scalar()
+    total_questions = Question.query.count()
+    answered_questions = Question.query.filter(Question.answered == True).count()
+    unanswered_questions = total_questions - answered_questions
+    
+    questions_stats = {
+        "answered": answered_questions,
+        "unanswered": unanswered_questions,
+    }
 
-
+    if total_questions > 0:
+        answered_percentage = (answered_questions / total_questions) * 100
+    else:
+        answered_percentage = 0
+        
+    baustelle_ids = [b.id for b in Baustelle.query.order_by(Baustelle.id.desc()).all()]
+    newest_baustelle_id = baustelle_ids[0] if baustelle_ids else None
 
     # Check if it's an AJAX request
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -2844,7 +2858,29 @@ def admintools():
                 "partials/user_list_section.html", paginated_users=paginated_users, metaData=metaData,
             )
     # Normal request
-    
+    def get_earliest_date(*queries):
+        dates = [query.scalar() for query in queries if query.scalar() is not None]
+        return min(dates) if dates else datetime.now()
+
+    # Use the helper function to find the earliest dates
+    earliest_post_date = get_earliest_date(db.session.query(func.min(Post.date_posted)))
+    earliest_interaction_date = get_earliest_date(
+        db.session.query(func.min(Vote.timestamp)),
+        db.session.query(func.min(Comment.timestamp)),
+        db.session.query(func.min(Report.timestamp)),
+        db.session.query(func.min(Bookmark.timestamp))
+    )
+    earliest_project_view_date = get_earliest_date(db.session.query(func.min(Project.date)))
+    earliest_website_view_date = get_earliest_date(db.session.query(func.min(WebsiteViews.view_date)))
+
+    # Convert the dates to strings for JavaScript
+    date_str_format = "%Y-%m-%d"
+    earliest_post_date_str = earliest_post_date.strftime(date_str_format)
+    earliest_interaction_date_str = earliest_interaction_date.strftime(date_str_format)
+    earliest_project_view_date_str = earliest_project_view_date.strftime(date_str_format)
+    earliest_website_view_date_str = earliest_website_view_date.strftime(date_str_format)
+
+
     return render_template(
         "admintools.html",
         paginated_projects=paginated_projects,
@@ -2877,9 +2913,44 @@ def admintools():
         unique_comment_users_count=unique_comment_users_count,
         unique_mapobject_users_count=unique_mapobject_users_count,
         mapobjects_without_registration_count=mapobjects_without_registration_count,
+        questions_stats=questions_stats,
+        answered_percentage=answered_percentage,
+        baustelle_ids=baustelle_ids, newest_baustelle_id=newest_baustelle_id,
+        getEarliestSubmissionDate=earliest_post_date_str,
+        getEarliestInteractionDate=earliest_interaction_date_str,
+        getEarliestProjectViewDate=earliest_project_view_date_str,
+        getEarliestWebsiteViewDate=earliest_website_view_date_str,
         metaData=g.metaData
     )
 
+
+@app.route("/get_questions_stats_by_baustelle", methods=["GET"])
+def get_questions_stats_by_baustelle():
+    baustelle_id = request.args.get('baustelle_id', type=int)
+    answered_questions = Question.query.filter_by(baustelle_id=baustelle_id, answered=True).count()
+    unanswered_questions = Question.query.filter_by(baustelle_id=baustelle_id, answered=False).count()
+    total_questions = answered_questions + unanswered_questions
+    answered_percentage = (answered_questions / total_questions * 100) if total_questions > 0 else 0
+
+    return jsonify({
+        'answered': answered_questions,
+        'unanswered': unanswered_questions,
+        'answered_percentage': answered_percentage
+    })
+
+@app.route('/get_questions_stats_for_all_baustelles')
+def get_questions_stats_for_all_baustelles():
+    total_questions = Question.query.count()
+    answered_questions = Question.query.filter(Question.answered == True).count()
+    unanswered_questions = total_questions - answered_questions
+    
+    answered_percentage = (answered_questions / total_questions * 100) if total_questions > 0 else 0
+    
+    return jsonify({
+        'answered': answered_questions,
+        'unanswered': unanswered_questions,
+        'answered_percentage': answered_percentage
+    })
 
 
 @app.route('/unmark_important/<int:projectId>', methods=['POST'])
