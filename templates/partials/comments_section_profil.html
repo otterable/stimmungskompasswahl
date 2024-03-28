@@ -12,7 +12,9 @@
   }
 </style>
 <div class="my-comments centered-text">
-  <h2>Sie haben <span style="color: #003056;">{{ user_statistics.num_comments }} Kommentar(e)</span> gepostet. </h2>
+<div class="marker-limit-info">
+  <h3 style="font-weight:bold;">Sie haben <span class="highlight">{{ user_statistics.num_comments }} Kommentar(e)</span> gepostet. </h3>
+  </div>
   <div class="stats-container">
      {% if comment_pagination and comment_pagination.items %} {% for comment, project_name in comment_pagination.items %} 
      <div class="project-thumbnail" data-comment-id="{{ comment.id }}">

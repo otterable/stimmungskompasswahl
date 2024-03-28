@@ -1,6 +1,5 @@
 body {
-  font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
-
+font-family: 'Roboto';
   background-color: #f5f1e4;
   color: black;
   background-image: url('background2.png') !important;
@@ -852,16 +851,17 @@ input[type="file"] {
 @media only screen and (max-width: 1080px) {
     /* Styles for the footer navigation */
     .footer-navigation {
-        display: flex;
-        justify-content: center; /* Center items by default */
         position: fixed;
         bottom: 0;
-        width: 100%;
-        background-color: #003056; /* Dark blue to match the top bar */
-        color: white;
-        text-align: center;
-        font-size: 18px;
-        z-index: 1005; /* Ensure it's above most other elements */
+		        display: flex !important; /* Ensure the footer is displayed */
+width: 100%; /* Full width */
+        text-align: center; /* Center-align the content */
+        left: 0;
+        right: 0;
+        background-color: #003056; /* Background color for mobile footer */
+        padding: 10px 0; /* Adjust padding as needed */
+        z-index: 1005; /* Ensure visibility above other elements */
+        flex-direction: row; /* Ensure buttons are in a row */
     }
 
 
@@ -926,7 +926,6 @@ input[type="file"] {
 }
 
 .text-section p {
-  font-family: 'Open Sans', sans-serif;
   /* Change to your preferred font */
   font-weight: normal !important;
   /* Ensure the font weight is normal */
@@ -972,7 +971,6 @@ input[type="file"] {
 }
 
 .text-content {
-  font-family: 'Open Sans', sans-serif;
   /* Change to your preferred font */
   font-weight: normal !important;
   /* Ensure the font weight is normal */
@@ -1501,7 +1499,7 @@ input[type="file"] {
     padding: 15px !important;
 	
     /* Larger clickable area */
-    font-size: 20px;
+    font-size: 22px;
     /* Larger font size */
   }
 }

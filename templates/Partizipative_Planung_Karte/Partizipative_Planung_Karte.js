@@ -842,7 +842,6 @@ var popupContent = `
             <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
             <button onmouseover="this.style.backgroundColor='#cc5045'" onmouseout="this.style.backgroundColor='#9A031E'" onclick="vote(${project.id}, 'downvote')" id="downvote-button-${project.id}" class="vote-button circle-btn downvote" style="${downvoteButtonStyle}">👎</button>
         </div>
-			                        ${project.descriptionwhy}
 
     </div>
 

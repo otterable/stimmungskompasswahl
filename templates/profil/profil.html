@@ -45,13 +45,13 @@
       <div class="info-text-field2">
         <div class="centered-text">
           <div class="stats-container">
-            <div class="stat-box"> {% if current_user.is_authenticated %} <p>Ihr Benutzername ist: <span style="color: #003056; font-weight: bold;">{{ current_user.name }}</span>
+            <div class="project-thumbnail"> {% if current_user.is_authenticated %} <p>Ihr Benutzername ist: <span style="color: #003056; font-weight: bold;">{{ current_user.name }}</span>
               </p> {% if not current_user.is_googleaccount %} <p>Die verknüpfte Handynummer lautet: <span style="color: #003056;font-weight: bold;">{{ current_user.phone_number }}</span>. </p>
               <p>Hier klicken, um das Passwort zurückzusetzen: <a href="{{ url_for('password_recovery') }}" style="color: #003056; font-weight: bold;">Reset</a>. </p> {% else %} <p>Das verknüpfte Google-Konto ist: <span style="color: #003056; font-weight: bold;">{{ current_user.phone_number }}</span>. </p> {% endif %} <p>Das Konto wurde erstellt am: <span style="color: #003056; font-weight: bold;">{{ current_user.account_creation.strftime('%d.%m.%Y %H:%M') }}</span>. </p> {% endif %}
             </div> {% else %} <div class="login-prompt centered-text">
               <p>Sie müssen angemeldet sein, um die Details zu sehen.</p>
             </div> {% endif %}
-            <!-- My Account Section --> {% if is_authenticated %} <div class="stat-box">
+            <!-- My Account Section --> {% if is_authenticated %} <div class="project-thumbnail">
               <!-- Download My Data Section -->
               <strong>
                 <p>Meine Daten herunterladen:</p>
@@ -64,16 +64,19 @@
             </div>
           </div> {% endif %}
         </div>
-      </div>
+      </div
+	  
       <a id="download-link" href="#" style="display: none;"></a>
     </div>
+	  </div>
+
+	      <div class="info-text-field3-c">
+
     <div id="notesSection" style="display: none;">
-      <div class="info-text-field2-c">
-        <div id="map-objects-container"> {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %} {% include 'partials/map_objects_section.html' %} {% endwith %} </div>
-      </div>
-    </div>
+        {% with project_page=project_pagination.page, map_object_page=map_object_pagination.page, comment_page=comment_pagination.page %} {% include 'partials/map_objects_section.html' %} {% endwith %} </div>
   </div>
-  
+    </div>
+
   {% if not current_user.is_authenticated %} <script>
       window.location.href = "{{ url_for('login', next=url_for('profil')) }}";
   </script> {% endif %}

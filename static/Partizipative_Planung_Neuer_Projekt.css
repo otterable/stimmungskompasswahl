@@ -977,9 +977,10 @@ border-radius: 0px;
   }
 
   #nav-links a {
-    padding: 15px !important;
+    padding: 15px;
 	
     /* Larger clickable area */
+    font-size: 22px;
     /* Larger font size */
   }
 }

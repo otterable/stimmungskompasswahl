@@ -1,5 +1,5 @@
    body {
-     font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+	font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
      background-color: #f5f1e4;
      color: black;
@@ -1259,7 +1259,7 @@
     padding: 15px !important;
 	
     /* Larger clickable area */
-    font-size: 20px;
+    font-size: 22px;
     /* Larger font size */
   }
 }

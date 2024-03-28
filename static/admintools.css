@@ -628,22 +628,31 @@ nav[aria-label="Page navigation"] {
 	transform: scale(1.00);
 	/* Scale up slightly on hover */
 }
+   .voting-bar {
+     width: 90%;
+     height: 30px;
+     background-color: #ddd;
+     border-radius: 30px !important;
+     margin-top: 0px;
+	 font-weight: bold;
+	 font-size: 16px !important;
+     display: flex;	 
+   }
 
-.voting-bar {
-	width: 90%;
-	height: 20px;
-	background-color: #ddd;
-	border-radius: 30px !important;
-	margin-top: 0px;
-	display: flex;
-}
+
 
 .upvotes {
-	height: 100%;
-	background-color: #4caf50;
-	border-radius: 30px;
-	transition: width 0.3s ease;
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
 }
+
+.downvotes {
+  height: 100%;
+  background-color: #9A031E;
+  transition: width 0.3s ease;
+}
+
 
 
 .page-container {
@@ -674,6 +683,7 @@ nav[aria-label="Page navigation"] {
 	transition: width 0.3s ease;
 }
 
+
 .upvotes,
 .downvotes {
 	/* Existing styles */
@@ -689,12 +699,12 @@ nav[aria-label="Page navigation"] {
 	transform: translate(-50%, -50%);
 	color: white;
 	/* Choose a contrasting color */
-	font-size: 12px;
 	/* Adjust the font size */
 	white-space: nowrap;
 	pointer-events: none;
 	/* Prevents blocking click events */
 }
+
 
 
 .export-section {
@@ -1046,6 +1056,7 @@ nav[aria-label="Page navigation"] {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+	align-items: center;
     position: relative;
     overflow: visible;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -1690,7 +1701,7 @@ a:hover {
 	#nav-links a {
 		padding: 20px;
 		/* Larger clickable area */
-		font-size: 24px;
+		font-size: 22px;
 		/* Larger font size */
 	}
 }
@@ -1762,12 +1773,6 @@ a:hover {
 		justify-content: center;
 		height: 100%;
 
-		#nav-links a {
-			padding: 20px;
-			/* Padding for each link */
-			font-size: 24px;
-			/* Font size for links */
-		}
 	}
 }
 
