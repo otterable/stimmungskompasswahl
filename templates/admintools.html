@@ -203,14 +203,14 @@
             <option value="500">Über 500 Ansichten</option>
             <option value="1000">Über 1000 Ansichten</option>
           </select>
-          <button id="showEngagedProjectsList">Projektliste anzeigen</button>
+          <button id="showEngagedProjectsList" style="display:none !important;">Projektliste anzeigen</button>
           <canvas id="engagedProjectsChart"></canvas>
         </div>
         <div class="stat-box">
           <div class="chart-container">
             <h2>Länge der Beiträge</h2>
-            <span id="averageDescriptionLengthText" class="average-description-length">Durchschnittliche Länge: 999</span>
-            <div>
+            <span id="averageDescriptionLengthText">Durchschnittliche Länge: 999</span>
+            <div style="margin-top:10px !important;">
               <button class="description-length-toggle active" data-filter="all">Alles</button>
               <button class="description-length-toggle" data-filter="true">Nur Notizen</button>
               <button class="description-length-toggle" data-filter="false">Nur Projektvorschläge</button>
@@ -225,21 +225,23 @@
           </div>
         </div>
 		
-				        <div class="stat-box">
+				        <div class="stat-box">          <div class="chart-container">
+
 						          <h2>Beantwortete Fragen</h2>
 
 						
+
+
+<p id="answeredPercentage"><strong>{{ "%.0f"|format(answered_percentage) }} %</strong> der Fragen wurden beantwortet.</p>
+
 <select id="baustelleFilter" onchange="updateQuestionsStats();">
     <option value="all" selected>Alles</option>
     {% for baustelle_id in baustelle_ids %}
         <option value="{{ baustelle_id }}">{{ baustelle_id }}</option>
     {% endfor %}
 </select>
-
-<p id="answeredPercentage"><strong>{{ "%.0f"|format(answered_percentage) }} %</strong> der Fragen wurden beantwortet.</p>
-
 <canvas id="questionChart"></canvas>
-
+</div>
 				  </div>
 				  
 <div class="stat-box">
@@ -275,13 +277,11 @@
 
         <div class="stat-box">
           <h2>Projektansichten</h2>
-          <div style="margin-top:57px">
             <label for="viewsStartDate">Startdatum:</label>
             <input type="date" id="viewsStartDate">
             <label for="viewsEndDate">Enddatum:</label>
             <input type="date" id="viewsEndDate">
             <button id="updateViewsChart">Update</button>
-          </div>
           <canvas id="viewsChart"></canvas>
         </div>
         <div class="stat-box">
@@ -490,7 +490,7 @@
 <button type="button" class="register-button" name="unmark_featured" data-project-id="{{ project.id }}">Von "Ausgewählt" entferen</button>
             <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
           </form>
-        </div> {% else %} <p>Keine Projekte gefunden.</p> {% endfor %} </div>
+        </div> {% else %} <h3>Keine Projekte gefunden.</h3> {% endfor %} </div>
     </div>
     <div id="reportedProjectsSection" style="display: none;">
       <!-- Reported Projects Section -->
@@ -517,7 +517,7 @@
             <button type="submit" class="register-button" name="remove_reports">Remove Reports</button>
           </form>
           <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
-        </div> {% else %} <p>Keine gemeldeten Projektvorschläge gefunden.</p> {% endfor %} </div>
+        </div> {% else %} <h3>Keine gemeldeten Projektvorschläge gefunden.</h3> {% endfor %} </div>
     </div>
 	
 	

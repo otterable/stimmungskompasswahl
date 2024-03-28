@@ -140,7 +140,7 @@ img {
 
 
 body {
-  font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  font-family: 'Roboto';
 
   background-color: #f5f1e4;
   color: black;
@@ -502,7 +502,7 @@ input[type="file"] {
 }
 
 .project-thumbnail p {
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Roboto';
   /* Change to your preferred font */
   position: relative;
   bottom: auto;

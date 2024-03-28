@@ -269,7 +269,7 @@ overflow: hidden;
 /* Prevent scrolling */
 box-sizing: border-box;
 /* Include padding and border in the element's total width and height */
-font-family: 'Roboto', sans-serif !important;
+font-family: 'Roboto' !important;
 background-color: var(--background-color);
 /* Apply background color */
 color: var(--text-color);
@@ -849,7 +849,7 @@ margin-bottom: -25px;
 /* Adjust this value as needed to reduce gap */
 font-size: 15px;
 /* Set font size to 15px */
-font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+font-family: 'Roboto';
 /* Set font family to Roboto */
 }
 #shape-note::-webkit-input-placeholder {
@@ -1271,7 +1271,7 @@ margin-right: 50px;
 text-align: center;
 }
 #popup-text .ql-font-serif {
-font-family: 'Times New Roman', serif;
+font-family: 'Roboto';
 }
 #popup-text .ql-align-right {
 text-align: right;

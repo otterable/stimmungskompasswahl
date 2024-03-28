@@ -141,14 +141,7 @@
 	/* For desktop */
 }
 
-.project-thumbnail {
-	background-color: #e5e2d5;
-	/* Example background color */
-	margin: 5px;
-	padding: 10px;
-	border-radius: 10px;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
+
 
 
 @media (min-width: 1080px) and (max-width: 1445px) {
@@ -175,15 +168,6 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 	margin-top: 0px;
 	}
 
-	.project-thumbnail {
-		flex-basis: 100% !important;
-		/* For mobile */
-		max-width: 100% !important;
-border-radius: 0px;
-margin: 0px;
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-
-	}
 	
 	.user-thumbnail {
 			flex-basis: 100% !important;
@@ -208,7 +192,7 @@ padding-right: 0px !important;
 
 
 body {
-	font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+	font-family: 'Roboto';
 
 	background-color: #f5f1e4;
 	color: black;
@@ -455,8 +439,10 @@ h3 {
 	box-sizing: border-box;
 	/* Include padding in width calculation */
 	align-items: center;
-	/* This ensures vertical alignment */
-}
+position: fixed; /* This makes the bar stay at the top */
+	 z-index: 1050;
+	 top: 0;
+	 }
 
 .top-bar a .logo {
 	max-width: auto;
@@ -1046,23 +1032,6 @@ nav[aria-label="Page navigation"] {
 	}
 }
 
-
-/* Base styles for project thumbnails */
-.project-thumbnail {
-    background-color: #e5e2d5;
-    border-radius: 30px;
-    margin: 10px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-	align-items: center;
-    position: relative;
-    overflow: visible;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-
 .user-info {
 	color: white;
 	/* Set the text color to match other links */
@@ -1077,82 +1046,15 @@ nav[aria-label="Page navigation"] {
 
 }
 
-/* Hover effect for project thumbnails */
-   .project-thumbnail:hover {
-     transform: scale(1.005);
-     transition: width 0.3s ease;
-	     box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Example shadow */
-
-   }
-/* Image style within project thumbnails */
-.project-thumbnail img {
-	width: 90%;
-	margin-top: 20px;
-	height: 400px;
-	/* Fixed height for images */
-	object-fit: cover;
-	border-radius: 30px;
-}
-
-/* Text style inside project thumbnails */
-.project-thumbnail h2,
-.project-thumbnail p {
-	margin: 0;
-	padding: 5px 0;
-	width: 90%;
-	/* Adjust the width to match the image */
-	text-align: center;
-	/* Center the text */
-}
-
-.project-thumbnail p {
-	font-family: 'Open Sans', sans-serif;
-	/* Change to your preferred font */
-	position: relative;
-	bottom: auto;
-	overflow: visible;
-	text-align: center;
-	width: 100%;
-	display: block;
-	font-weight: normal;
-	/* Ensure the font weight is normal */
-}
 
 
-/* Desktop screens (larger than 1200px) */
-@media (min-width: 1445px) {
-	.project-thumbnail {
-		width: calc(33.333% - 20px);
-		/* Three items per row */
-		height: auto;
-		/* Height adjusts based on content */
-	}
-}
 
-/* Medium screens (between 1024px and 1199px) */
-@media (min-width: 1080px) and (max-width: 1445px) {
-	.project-thumbnail {
-		width: calc(50% - 20px);
-		/* Two items per row */
-		height: auto;
-		/* Height adjusts based on content */
-	}
-}
 
-/* Mobile screens (less than 1024px) */
-@media (max-width: 1088px) {
-	.project-thumbnail {
-		width: calc(100% - 20px);
-		/* Full width */
-		height: auto;
-		/* Height adjusts based on content */
-	}
 
-	.project-thumbnail img {
-		height: auto;
-		/* Adjust image height for mobile */
-	}
-}
+
+
+
+
 
 .comment-list {
 	display: flex;
@@ -1925,3 +1827,108 @@ margin-bottom: 20px;
 }
 }
 
+
+
+
+
+
+
+
+
+
+.project-thumbnail {
+     background-color: #e5e2d5;
+     border-radius: 30px;
+     margin: 10px;
+     padding: 10px;
+     display: flex;
+     /* Changed to flex to better control the layout */
+     flex-direction: column;
+     /* Stack items vertically */
+     align-items: center;
+     /* Center items horizontally */
+     box-sizing: border-box;
+     transition: width 0.3s ease;
+     position: relative;
+     overflow: visible;
+     /* Ensure the content is not clipped */
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+   transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
+    will-change: auto; /* Default state, only specify if needed for performance */
+    /* Removed transform scale to prevent blurriness */
+}
+
+
+   /* Hover effect for project thumbnails */
+   .project-thumbnail:hover {
+     transform: scale(1.005);
+     transition: width 0.3s ease;
+	     box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Example shadow */
+
+   }
+
+   /* Image style within project thumbnails */
+   .project-thumbnail img {
+     width: 90%;
+     margin-top: 20px;
+     height: 400px;
+     /* Fixed height for images */
+     object-fit: cover;
+     border-radius: 30px;
+   }
+
+   /* Text style inside project thumbnails */
+   .project-thumbnail h2,
+   .project-thumbnail p {
+     margin: 0;
+     padding: 5px 0;
+     width: 100%;
+     /* Adjust the width to match the image */
+     text-align: center !important;
+     /* Center the text */
+   }
+
+   /* Remove absolute positioning from the description */
+   .project-thumbnail p {
+     position: relative;
+     /* Changed from absolute to relative */
+     bottom: auto;
+     /* Remove bottom positioning */
+     overflow: visible;
+     /* Ensure text is not clipped */
+   }
+
+   /* Desktop screens (larger than 1200px) */
+   @media (min-width: 1445px) {
+     .project-thumbnail {
+       width: calc(33.333% - 20px);
+       /* Three items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
+
+   /* Medium screens (between 1024px and 1199px) */
+   @media (min-width: 1080px) and (max-width: 1445px) {
+     .project-thumbnail {
+       width: calc(50% - 20px);
+       /* Two items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
+
+   /* Mobile screens (less than 1024px) */
+   @media (max-width: 1088px) {
+     .project-thumbnail {
+       width: calc(100% - 20px);
+       /* Full width */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+
+     .project-thumbnail img {
+       height: auto;
+       /* Adjust image height for mobile */
+     }
+   }

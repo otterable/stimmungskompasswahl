@@ -1,5 +1,5 @@
    body {
-	font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+	font-family: 'Roboto';
 
      background-color: #f5f1e4;
      color: black;
@@ -283,6 +283,7 @@
      width: 100%;
      /* Full width of the screen */
      display: flex;
+
      justify-content: space-between;
      align-items: center;
      padding: 20px 20px;
@@ -290,6 +291,8 @@
      box-sizing: border-box;
      /* Include padding in width calculation */
      align-items: center;
+	 position: fixed; /* This makes the bar stay at the top */
+	 z-index: 1050;
      /* This ensures vertical alignment */
    }
 
@@ -754,6 +757,23 @@
    }
 
    /* Base styles for project thumbnails */
+  
+
+
+
+   .user-info {
+     color: white;
+     /* Set the text color to match other links */
+     margin-right: 20px;
+     /* Right margin for spacing */
+     font-size: 18px;
+     /* Font size similar to other links */
+     font-weight: bold;
+     /* Bold text */
+     align-self: center;
+     /* Align vertically within the flex container */
+   }
+   
    .project-thumbnail {
      background-color: #e5e2d5;
      border-radius: 30px;
@@ -776,20 +796,6 @@
     /* Removed transform scale to prevent blurriness */
 }
 
-
-
-   .user-info {
-     color: white;
-     /* Set the text color to match other links */
-     margin-right: 20px;
-     /* Right margin for spacing */
-     font-size: 18px;
-     /* Font size similar to other links */
-     font-weight: bold;
-     /* Bold text */
-     align-self: center;
-     /* Align vertically within the flex container */
-   }
 
    /* Hover effect for project thumbnails */
    .project-thumbnail:hover {

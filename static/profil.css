@@ -3,6 +3,53 @@
 	/* Hide by default */
 }
 
+.register-button {
+    display: block; /* Each button takes the full width */
+    width: calc(100% - 20px); /* Adjust width based on padding */
+    padding: 10px 15px;
+    background-color: #003056;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer;
+    margin: 5px 0; /* Adjust top and bottom margins as needed */
+    transition: background-color 0.3s;
+}
+
+.register-button, .register-button-link {
+    display: inline-block !important; /* Ensures the element is only as wide as its content */
+    padding: 10px 15px; /* Padding around the text */
+    background-color: #003056; /* Button background color */
+    color: white; /* Button text color */
+    text-align: center; /* Center-aligns the text inside the button */
+    font-size: 14px; /* Text size inside the button */
+    font-weight: bold; /* Makes the text bold */
+	width: auto !important;
+    border: none; /* Removes the border */
+    border-radius: 10px; /* Rounds the corners of the button */
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer; /* Changes the cursor to a pointer to indicate it's clickable */
+    margin: 5px; /* Adds margin around the button */
+    transition: background-color 0.3s; /* Animates the background color change on hover */
+    line-height: 1.5; /* Adjusts the line height */
+    font-family: inherit; /* Inherits the font family from the parent */
+    vertical-align: middle; /* Aligns the button vertically */
+    box-sizing: border-box !important; /* Includes padding and border in the element's size */
+}
+
+.register-button:hover, .register-button-link:hover {
+    background-color: #004680; /* Changes the background color on hover */
+}
+
+.register-button:active, .register-button-link:active {
+    transform: translateY(1px); /* Moves the button down slightly to simulate a press */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow to simulate depth */
+}
+
 
 
 #hamburger-button, #close-overlay-btn {
@@ -199,19 +246,6 @@ h3 {
 	/* For desktop */
 }
 
-.project-thumbnail {
-    background-color: #e5e2d5;
-    border-radius: 30px;
-    margin: 10px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-	align-items: center;
-    position: relative;
-    overflow: visible;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
 
 @media (min-width: 1080px) and (max-width: 1445px) {
 	.stat-box {
@@ -229,7 +263,7 @@ h3 {
 
 
 body {
-	font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+	font-family: 'Roboto';
   height: 100%; /* Ensure the root elements span the full height */
 
 	background-color: #f5f1e4;
@@ -276,21 +310,7 @@ body {
 }
 
 
-.register-button {
-	background-color: #003056;
-	color: white;
-	border: none;
-	border-radius: 10px;
-	font-weight: bold !important;
-	padding: 5px 10px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 14px;
-	margin: 10px 0;
-	cursor: pointer;
-	box-sizing: border-box;
-}
+
 
 img {
 	border-radius: 30px;
@@ -413,82 +433,112 @@ input[type="file"] {
 }
 
 
-/* Base styles for project thumbnails */
+
+
+
+
+
+
+
+
 .project-thumbnail {
-    background-color: #e5e2d5;
-    border-radius: 30px;
-    margin: 10px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-	align-items: center;
-    position: relative;
-    overflow: visible;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+     background-color: #e5e2d5;
+     border-radius: 30px;
+     margin: 10px;
+     padding: 10px;
+     display: flex;
+     /* Changed to flex to better control the layout */
+     flex-direction: column;
+     /* Stack items vertically */
+     align-items: center;
+     /* Center items horizontally */
+     box-sizing: border-box;
+     transition: width 0.3s ease;
+     position: relative;
+     overflow: visible;
+     /* Ensure the content is not clipped */
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+   transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
+    will-change: auto; /* Default state, only specify if needed for performance */
+    /* Removed transform scale to prevent blurriness */
 }
 
-/* Hover effect for project thumbnails */
+
+   /* Hover effect for project thumbnails */
    .project-thumbnail:hover {
      transform: scale(1.005);
      transition: width 0.3s ease;
 	     box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Example shadow */
 
    }
-/* Image style within project thumbnails */
-.project-thumbnail img {
-	width: 90%;
-	margin-top: 20px;
-	height: 400px;
-	/* Fixed height for images */
-	object-fit: cover;
-	border-radius: 30px;
-}
 
-/* Text style inside project thumbnails */
-.project-thumbnail h2,
-.project-thumbnail p {
-	margin: 0;
-	padding: 5px 0;
-	width: 90%;
-	/* Adjust the width to match the image */
-	text-align: center;
-	/* Center the text */
-}
+   /* Image style within project thumbnails */
+   .project-thumbnail img {
+     width: 90%;
+     margin-top: 20px;
+     height: 400px;
+     /* Fixed height for images */
+     object-fit: cover;
+     border-radius: 30px;
+   }
 
+   /* Text style inside project thumbnails */
+   .project-thumbnail h2,
+   .project-thumbnail p {
+     margin: 0;
+     padding: 5px 0;
+     width: 100%;
+     /* Adjust the width to match the image */
+     text-align: center !important;
+     /* Center the text */
+   }
 
-@media only screen and (max-width: 1080px) {
-	.project-thumbnail h1 {
-		font-size: 24px;
-		/* Adjust as needed for h1 */
-	}
+   /* Remove absolute positioning from the description */
+   .project-thumbnail p {
+     position: relative;
+     /* Changed from absolute to relative */
+     bottom: auto;
+     /* Remove bottom positioning */
+     overflow: visible;
+     /* Ensure text is not clipped */
+   }
 
-	#nav-links .user-info {
-		display: block;
-		/* Make it a block element */
-		width: 100%;
-		/* Full width */
-		text-align: center;
-		/* Center text horizontally */
-		margin: 10px 0;
-		/* Optional: adjust top and bottom margin as needed */
-	}
+   /* Desktop screens (larger than 1200px) */
+   @media (min-width: 1445px) {
+     .project-thumbnail {
+       width: calc(33.333% - 20px);
+       /* Three items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
 
-	.project-thumbnail h2 {
-		font-size: 22px;
-		/* Adjust as needed for h2 */
-	}
+   /* Medium screens (between 1024px and 1199px) */
+   @media (min-width: 1080px) and (max-width: 1445px) {
+     .project-thumbnail {
+       width: calc(50% - 20px);
+       /* Two items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
 
-	.project-thumbnail h3 {
-		font-size: 20px;
-		/* Adjust as needed for h3 */
-	}
+   /* Mobile screens (less than 1024px) */
+   @media (max-width: 1088px) {
+     .project-thumbnail {
+       width: calc(100% - 20px);
+       /* Full width */
+       height: auto;
+       /* Height adjusts based on content */
+     }
 
-	.project-thumbnail p {
-		font-size: 18px;
-		/* Adjust as needed for paragraph text */
-	}
-}
+     .project-thumbnail img {
+       height: auto;
+       /* Adjust image height for mobile */
+     }
+   }
+   
+   
 
 
    .voting-bar {
@@ -578,42 +628,6 @@ input[type="file"] {
 }
 
 
-/* Desktop screens (larger than 1200px) */
-@media (min-width: 1445px) {
-	.project-thumbnail {
-		width: calc(33.333% - 20px);
-		/* Three items per row */
-		height: auto;
-		/* Height adjusts based on content */
-	}
-}
-
-/* Medium screens (between 1024px and 1199px) */
-@media (min-width: 1080px) and (max-width: 1445px) {
-	.project-thumbnail {
-		width: calc(50% - 20px);
-		/* Two items per row */
-		height: auto;
-		/* Height adjusts based on content */
-	}
-
-
-}
-
-/* Mobile screens (less than 1024px) */
-@media (max-width: 1088px) {
-	.project-thumbnail {
-		width: calc(100% - 20px);
-		/* Full width */
-		height: auto;
-		/* Height adjusts based on content */
-	}
-
-	.project-thumbnail img {
-		height: auto;
-		/* Adjust image height for mobile */
-	}
-}
 
 .stats-container {
 	text-align: center;
@@ -650,8 +664,10 @@ input[type="file"] {
 	box-sizing: border-box;
 	/* Include padding in width calculation */
 	align-items: center;
-	/* This ensures vertical alignment */
-}
+position: fixed; /* This makes the bar stay at the top */
+	 z-index: 1050;
+	 top: 0;
+	 }
 
 .top-bar a .logo {
 	max-width: auto;
@@ -1338,11 +1354,15 @@ nav[aria-label="Page navigation"] {
 
 		html,
 		body {
-			max-width: 100vw;
-			/* Prevent horizontal overflow */
-			overflow-x: hidden;
-			/* Hide horizontal scrollbar */
-		}
+	font-family: 'Roboto';
+
+     background-color: #f5f1e4;
+     color: black;
+     margin: 0;
+     /* Remove default margin */
+     padding: 0;
+     /* Remove default padding */
+   }
 
 		.button,
 		.register-button {

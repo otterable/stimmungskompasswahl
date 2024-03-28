@@ -1,3 +1,28 @@
+ ::-webkit-scrollbar {
+     width: 12px;
+     /* Adjust the width of the scrollbar */
+   }
+
+   /* Styling the track of the scrollbar */
+   ::-webkit-scrollbar-track {
+     background: #f5f1e4;
+     /* Light grey track */
+     border-radius: 10px;
+     /* Round corners of the track */
+   }
+
+   /* Styling the thumb of the scrollbar */
+   ::-webkit-scrollbar-thumb {
+     background: #9b9b9b;
+     /* Black thumb */
+   }
+
+   /* Hover effect on the thumb of the scrollbar */
+   ::-webkit-scrollbar-thumb:hover {
+     background: #555;
+     /* Darker shade of grey on hover */
+   }
+
 
 body {
 font-family: 'Roboto';
@@ -15,6 +40,14 @@ align-items: center;
 height: 100vh;
 }
 
+
+a {
+color: #003056;
+font-weight: bold;
+}
+.edge {
+	margin: 20px;
+}
 .logo-container {
 background-color: #003056;
 /* Dark blue background */
@@ -256,9 +289,7 @@ box-sizing: border-box;
 }
 
 @media screen and (max-width: 480px) {
-body {
-    font-size: 14px;
-}
+
 
 .logo-container {
     width: auto;

@@ -1,9 +1,8 @@
 body {
-font-family: 'Roboto';
+  font-family: 'Roboto';
   background-color: #f5f1e4;
   color: black;
-  background-image: url('background2.png') !important;
-  /* Updated path */
+  background-image: url('background2.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -742,8 +741,10 @@ input[type="file"] {
   box-sizing: border-box;
   /* Include padding in width calculation */
   align-items: center;
-  /* This ensures vertical alignment */
-}
+position: fixed; /* This makes the bar stay at the top */
+	 z-index: 1050;
+	 top: 0;
+	 }
 
 .top-bar a .logo {
   max-width: auto;
@@ -1469,7 +1470,7 @@ width: 100%; /* Full width */
     }
 
     .top-bar a .logo {
-      max-width: 350px;
+      max-width: 270px;
       /* Adjust logo size */
       max-height: 350px;
       /* Adjust height automatically */

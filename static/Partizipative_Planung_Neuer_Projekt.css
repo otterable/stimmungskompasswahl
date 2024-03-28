@@ -3,7 +3,7 @@
 }
 
 body {
-  font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  font-family: 'Roboto';
 
   color: black;
   margin: 0;
@@ -178,7 +178,7 @@ img {
 
 
 .form-container {
-  margin: 40px auto;
+  margin: 120px auto;
   width: 60%;
      background-color: #f5f1e4;
   padding: 40px;
@@ -499,8 +499,9 @@ input[type="file"] {
   box-sizing: border-box;
   /* Include padding in width calculation */
   align-items: center;
-  /* This ensures vertical alignment */
-}
+position: fixed; /* This makes the bar stay at the top */
+	 top: 0;
+	 }
 
 .top-bar a .logo {
   max-width: auto;
@@ -860,7 +861,9 @@ input[type="file"] {
 
   .form-container {
     width: 100%;
-    /* Full width with some margin */
+	margin-top: 60px !important;
+
+padding: 30px;
 margin: 0px;
 margin-bottom: 0px !important;
 border-radius: 0px;
@@ -919,7 +922,7 @@ border-radius: 0px;
   .nav-overlay-active .main-content {
     pointer-events: none;
   }
-
+}
   /* Mobile Devices */
   @media only screen and (max-width: 1080px) {
 
@@ -1075,6 +1078,7 @@ border-radius: 0px;
       align-items: center;
       /* Vertically center items */
       padding: 10px 15px;
+	  z-index: 1050:
       /* Consistent padding */
     }
 

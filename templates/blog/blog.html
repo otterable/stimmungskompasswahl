@@ -48,7 +48,7 @@
 }
 
       body {
-        font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+        font-family: 'Roboto';
 
         background-color: #f5f1e4;
         color: black;
@@ -486,8 +486,10 @@ strong {
         box-sizing: border-box;
         /* Include padding in width calculation */
         align-items: center;
-        /* This ensures vertical alignment */
-      }
+position: fixed; /* This makes the bar stay at the top */
+	 z-index: 1050;
+	 top: 0;
+	 }
 
       .top-bar a .logo {
         max-width: auto;
@@ -520,28 +522,52 @@ strong {
       /* Hover effect for buttons inside links in the top bar */
 
 
+
 .register-button {
-	background-color: #003056;
-	/* Example color */
-	color: white;
-	border: none;
-	border-radius: 10px;
-	font-weight: bold !important;
-	padding: 5px 10px;
-	text-align: center;
-	text-decoration: none;
-	display: inline-block;
-	font-size: 14px;
-	margin: 10px 0;
-	cursor: pointer;
-	box-sizing: border-box;
-	/* Include padding in width */
+    display: block; /* Each button takes the full width */
+    width: calc(100% - 20px); /* Adjust width based on padding */
+    padding: 10px 15px;
+    background-color: #003056;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer;
+    margin: 5px 0; /* Adjust top and bottom margins as needed */
+    transition: background-color 0.3s;
 }
 
-.register-button:hover {
+.register-button, .register-button-link {
+    display: inline-block !important; /* Ensures the element is only as wide as its content */
+    padding: 10px 15px; /* Padding around the text */
+    background-color: #003056; /* Button background color */
+    color: white; /* Button text color */
+    text-align: center; /* Center-aligns the text inside the button */
+    font-size: 14px; /* Text size inside the button */
+    font-weight: bold; /* Makes the text bold */
+	width: auto !important;
+    border: none; /* Removes the border */
+    border-radius: 10px; /* Rounds the corners of the button */
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer; /* Changes the cursor to a pointer to indicate it's clickable */
+    margin: 5px; /* Adds margin around the button */
+    transition: background-color 0.3s; /* Animates the background color change on hover */
+    line-height: 1.5; /* Adjusts the line height */
+    font-family: inherit; /* Inherits the font family from the parent */
+    vertical-align: middle; /* Aligns the button vertically */
+    box-sizing: border-box !important; /* Includes padding and border in the element's size */
+}
 
-	transform: scale(1.00);
-	/* Scale up on hover */
+.register-button:hover, .register-button-link:hover {
+    background-color: #004680; /* Changes the background color on hover */
+}
+
+.register-button:active, .register-button-link:active {
+    transform: translateY(1px); /* Moves the button down slightly to simulate a press */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow to simulate depth */
 }
 
       /* Hover effect for links in the top bar */
@@ -1122,7 +1148,7 @@ font-size: 4vw !important;
     <p>Hier können Sie Neuigkeiten über den Fortschritt unserer Projekte und alle Updates bezüglich des Stimmungskompasses lesen.</p>
     {% if current_user.is_authenticated and current_user.id == 1 %}
     <!-- Visible only to admin -->
-    <button onclick="location.href='{{ url_for('createpost') }}'" class="btn create-post-button">Neuen Blogpost erstellen</button>
+    <button onclick="location.href='{{ url_for('createpost') }}'" class="btn register-button">Neuen Blogpost erstellen</button>
     {% endif %}
 </div>
 
