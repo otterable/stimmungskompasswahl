@@ -739,25 +739,26 @@ nav[aria-label="Page navigation"] {
 	/* Andere styling as needed, such as font size, color, etc. */
 }
 
-
 .filter-bar {
-	background-color: #111111;
-	/* Existing background color */
-	height: 80px;
-	/* Existing height */
-	width: 100%;
-	/* Full width */
-	display: flex;
-	justify-content: center;
-	/* Center content horizontally */
-	align-items: center;
-	/* Center content vertically */
-	padding: 0 20px;
-	/* Existing padding */
-	box-sizing: border-box;
-	flex-wrap: nowrap;
-	/* Existing no-wrap */
-}
+     background-color: #111111;
+     /* Existing background color */
+     height: 80px;
+	 margin-top:80px;
+     /* Existing height */
+     width: 100%;
+     /* Full width */
+     display: flex;
+     justify-content: center;
+     /* Center content horizontally */
+     align-items: center;
+     /* Center content vertically */
+     padding: 0 20px;
+     /* Existing padding */
+     box-sizing: border-box;
+     flex-wrap: nowrap;
+     /* Existing no-wrap */
+   }
+
 
 #filter-form {
 	display: flex;
@@ -1437,17 +1438,19 @@ a:hover {
 			/* Show the button on mobile */
 		}
 
-		#hamburger-button-filter {
-			display: block;
-			/* Show the button on mobile */
-			width: 100%;
-			/* Make it span the entire width of the screen */
-			text-align: center;
-			/* Center the icon/text inside the button */
-			padding: 10px 0;
-			/* Adjust padding as needed for better touch area */
+#hamburger-button-filter {
+         display: block;
+         /* Show the button on mobile */
+         width: 100%;
+		 	   margin-top: 70px !important;
 
-		}
+         /* Make it span the entire width of the screen */
+         text-align: center;
+         /* Center the icon/text inside the button */
+         padding: 10px 0;
+         /* Adjust padding as needed for better touch area */
+
+       }
 
 		.top-bar a .logo {
 			margin-left: auto;
@@ -1589,6 +1592,8 @@ a:hover {
 	/* Additional styles for filter overlay to prevent overflow */
 	#filter-overlay {
 		overflow-y: auto;
+			z-index: 2050;
+
 		/* Enable vertical scrolling if needed */
 	}
 
@@ -1598,14 +1603,16 @@ a:hover {
     align-items: center;
     justify-content: center;
     height: 100%;
+	z-index: 2050;
 	background-color: #003056;
   }
-	#nav-links a {
-		padding: 20px;
-		/* Larger clickable area */
-		font-size: 22px;
-		/* Larger font size */
-	}
+  #nav-links a {
+    padding: 15px !important;
+	
+    /* Larger clickable area */
+    font-size: 22px;
+    /* Larger font size */
+  }
 }
 
 /* Mobile Devices */

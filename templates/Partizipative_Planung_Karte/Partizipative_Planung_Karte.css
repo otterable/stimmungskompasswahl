@@ -2437,17 +2437,16 @@ filter: brightness(110%);
 /* Media query for mobile and handling single vs. multiple buttons */
 @media only screen and (max-width: 768px) {
     .footer-navigation {
-        position: fixed;
+        display: flex; /* Ensure the footer is displayed */
+        position: fixed; /* Fix it to the bottom */
         bottom: 0;
-		        display: flex !important; /* Ensure the footer is displayed */
-width: 100%; /* Full width */
-        text-align: center; /* Center-align the content */
         left: 0;
-        right: 0;
-        background-color: #003056; /* Background color for mobile footer */
-        padding: 10px 0; /* Adjust padding as needed */
-        z-index: 1005; /* Ensure visibility above other elements */
-        flex-direction: row; /* Ensure buttons are in a row */
+        width: 100%; /* Full width */
+        background-color: #003056; /* Background color */
+        padding: 10px 0; /* Some padding */
+        justify-content: center; /* Center the content */
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.2); /* Optional: add shadow for better visibility */
+        z-index: 1000; /* Make sure it's above other content */
     }
 
     .footer-navigation.one-button {

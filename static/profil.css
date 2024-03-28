@@ -780,23 +780,24 @@ nav[aria-label="Page navigation"] {
 
 
 .filter-bar {
-	background-color: #111111;
-	/* Existing background color */
-	height: 80px;
-	/* Existing height */
-	width: 100%;
-	/* Full width */
-	display: flex;
-	justify-content: center;
-	/* Center content horizontally */
-	align-items: center;
-	/* Center content vertically */
-	padding: 0 20px;
-	/* Existing padding */
-	box-sizing: border-box;
-	flex-wrap: nowrap;
-	/* Existing no-wrap */
-}
+     background-color: #111111;
+     /* Existing background color */
+     height: 80px;
+	 margin-top:80px;
+     /* Existing height */
+     width: 100%;
+     /* Full width */
+     display: flex;
+     justify-content: center;
+     /* Center content horizontally */
+     align-items: center;
+     /* Center content vertically */
+     padding: 0 20px;
+     /* Existing padding */
+     box-sizing: border-box;
+     flex-wrap: nowrap;
+     /* Existing no-wrap */
+   }
 
 #filter-form {
 	display: flex;
@@ -1434,17 +1435,19 @@ nav[aria-label="Page navigation"] {
 			/* Explicitly center the button vertically */
 		}
 
-		#hamburger-button-filter {
-			display: block;
-			/* Show the button on mobile */
-			width: 100%;
-			/* Make it span the entire width of the screen */
-			text-align: center;
-			/* Center the icon/text inside the button */
-			padding: 10px 0;
-			/* Adjust padding as needed for better touch area */
+#hamburger-button-filter {
+         display: block;
+         /* Show the button on mobile */
+         width: 100%;
+		 	   margin-top: 70px !important;
 
-		}
+         /* Make it span the entire width of the screen */
+         text-align: center;
+         /* Center the icon/text inside the button */
+         padding: 10px 0;
+         /* Adjust padding as needed for better touch area */
+
+       }
 
 		#filter-overlay {
 			display: none;

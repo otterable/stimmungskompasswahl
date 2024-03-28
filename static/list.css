@@ -155,11 +155,12 @@
    .video-overlay {
      position: fixed;
      top: 0;
-     left: 50%;
+	 left: 0;
+     left: 50% !important;
      transform: translateX(-50%);
      width: 100vw;
      height: 100vh;
-     background: rgba(0, 0, 0, 0.8);
+	 background-color: #003056;
      display: flex;
      justify-content: center;
      align-items: center;
@@ -534,6 +535,7 @@
      background-color: #111111;
      /* Existing background color */
      height: 80px;
+	 margin-top:80px;
      /* Existing height */
      width: 100%;
      /* Full width */
@@ -1121,6 +1123,8 @@
          display: block;
          /* Show the button on mobile */
          width: 100%;
+		 	   margin-top: 70px !important;
+
          /* Make it span the entire width of the screen */
          text-align: center;
          /* Center the icon/text inside the button */
