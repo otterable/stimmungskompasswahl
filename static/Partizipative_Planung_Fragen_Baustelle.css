@@ -149,11 +149,7 @@ display: block;
       }
 
       /* Mobile Styles */
-      @media (max-width: 768px) {
-	  
-	  .baustelle-image {
-	  display: none;
-	  }
+
 	  
 #overlay-content {
 position: absolute;

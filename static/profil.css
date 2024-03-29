@@ -65,7 +65,12 @@ display:none;
   top: 20px; /* Distance from the top */
 }
 
-
+.project-description p {
+		text-align: center !important;
+}
+p {
+	text-align: center !important;
+}
 #filter-overlay .c-button {
 	background-color: transparent;
 	/* Same as nav-overlay links */
@@ -434,7 +439,7 @@ input[type="file"] {
    .project-thumbnail p {
      margin: 0;
      padding: 5px 0;
-     width: 90%;
+     width: 100%;
      /* Adjust the width to match the image */
      text-align: center;
      /* Center the text */

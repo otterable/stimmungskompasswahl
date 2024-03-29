@@ -31,24 +31,29 @@
 
 
 html, body {
-  min-height: 100%; /* Ensure at least full viewport height */
+  min-height: 100%; /* Ensure full viewport height coverage */
+  width: 100%; /* Ensure full viewport width coverage */
   margin: 0;
   padding: 0;
-    display: flex; /* Use flexbox for body to enable centering */
-
-    justify-content: center; /* Center content horizontally */
-  align-items: center; /* Center content vertically */
-}
-
-body {
-  font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
   background-color: #f5f1e4;
   color: black;
-  /* Uncomment and update the URL path to your actual background image if you decide to use one */
+  background-image: url('background2.png'); /* Example background image URL */
   background-position: center center;
   background-repeat: no-repeat;
-  background-attachment: fixed; /* This can help ensure the background is fixed in viewport */
-  background-size: cover !important; /* Use !important to ensure it overrides other styles */
+  background-size: cover; /* Cover the entire page without stretching */
+  background-attachment: fixed;
+  /* Adjust for safe area on devices with screen cutouts */
+  padding-top: constant(safe-area-inset-top); /* Deprecated method but necessary for older iOS versions */
+  padding-top: env(safe-area-inset-top); /* For iOS 11.0 and later */
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+    font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+
 }
 
 .form-section h3, .checkbox-section p {
