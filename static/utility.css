@@ -30,30 +30,46 @@
    }
 
 
-html, body {
-  min-height: 100%; /* Ensure full viewport height coverage */
-  width: 100%; /* Ensure full viewport width coverage */
+html {
+  height: 100%; /* Ensure full height */
+  width: 100%; /* Ensure full width */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100%;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column; /* Stack children vertically */
-  justify-content: center; /* Center content vertically */
-  align-items: center; /* Center content horizontally */
-  background-color: #f5f1e4;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   color: black;
-  background-image: url('background2.png'); /* Example background image URL */
+  /* Prevent scrolling on the body directly */
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed; /* Use fixed to cover the viewport */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover; /* Cover the entire page without stretching */
-  background-attachment: fixed;
-  /* Adjust for safe area on devices with screen cutouts */
-  padding-top: constant(safe-area-inset-top); /* Deprecated method but necessary for older iOS versions */
-  padding-top: env(safe-area-inset-top); /* For iOS 11.0 and later */
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-    font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+  z-index: -1; /* Ensure it's behind content */
+}
 
+.content {
+  /* Ensure content respects the safe area */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  z-index: 1; /* Ensure content is above the background */
+  overflow-y: auto; /* Enable scrolling within content if needed */
+  max-height: 100vh; /* Limit content height to viewport */
 }
 
 .form-section h3, .checkbox-section p {
