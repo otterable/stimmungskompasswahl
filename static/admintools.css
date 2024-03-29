@@ -124,9 +124,9 @@
 	padding: 5px;
 	border-radius: 30px;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-	flex-basis: calc(30% - 10px);
+	flex-basis: calc(30% - 0px);
 	/* For desktop */
-	max-width: calc(30% - 10px);
+	max-width: calc(30% - 0px);
 }
 
 
@@ -189,10 +189,44 @@ padding-right: 0px !important;
 		/* For mobile */
 	}
 }
+@media (max-width: 1080px) {
+
+.projects-header-2 {
+display:none;
+}
+}
+
+   	/* Universal */
+      .projects-header {
+	   padding: 0 20px;
+   }
+
+  @media (min-width: 1080px) {
+	   .projects-header {
+margin-top: 180px;
+   }
+  }
+ @media (max-width: 1080px) {
+	   .projects-header {
+
+margin-top: 20px;
+   }
+  }
+  
+  
+
+/* Style for filter-button on desktop */
+   .filter-bar {
+   	 position: fixed;
+	 top: 0;
+	 z-index: 1050;
+}
+
 
 
 body {
-	font-family: 'Roboto';
+	font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+
 
 	background-color: #f5f1e4;
 	color: black;
@@ -1278,15 +1312,7 @@ a:hover {
 }
 
 
-#hamburger-button {
-	display: none;
-	/* Hidden by default */
-}
 
-#hamburger-button-filter {
-	display: none;
-	/* Hidden by default */
-}
 
 @media only screen and (max-width: 1080px) {
 
@@ -1344,36 +1370,7 @@ a:hover {
 		/* Add space between button and preceding elements */
 	}
 
-	/* Hamburger Menu Button */
-	#hamburger-button {
-		display: none;
-		/* Hidden by default */
-		font-size: 30px;
-		/* Icon size */
-		color: white;
-		/* Icon color */
-		background: none;
-		/* No background */
-		border: none;
-		/* No border */
-		cursor: pointer;
-		/* Pointer cursor */
-	}
-
-	#hamburger-button-filter {
-		display: none;
-		/* Hidden by default */
-		font-size: 20px;
-		/* Icon size */
-		color: white;
-		/* Icon color */
-		background-color: #111111;
-		/* No background */
-		border: none;
-		/* No border */
-		cursor: pointer;
-		/* Pointer cursor */
-	}
+	
 
 	/* Navigation Overlay */
 	.nav-overlay {
@@ -1433,24 +1430,9 @@ a:hover {
 			/* Hide horizontal scrollbar */
 		}
 
-		#hamburger-button {
-			display: block;
-			/* Show the button on mobile */
-		}
+	
 
-#hamburger-button-filter {
-         display: block;
-         /* Show the button on mobile */
-         width: 100%;
-		 	   margin-top: 70px !important;
 
-         /* Make it span the entire width of the screen */
-         text-align: center;
-         /* Center the icon/text inside the button */
-         padding: 10px 0;
-         /* Adjust padding as needed for better touch area */
-
-       }
 
 		.top-bar a .logo {
 			margin-left: auto;
@@ -1657,23 +1639,6 @@ a:hover {
 		/* Adjust height automatically */
 	}
 
-	#hamburger-button {
-		display: block;
-		/* Show the button on mobile */
-		margin: 0;
-		/* Remove any margin */
-		align-self: center;
-		/* Explicitly center the button vertically */
-	}
-
-	#hamburger-button-filter {
-		display: block;
-		/* Show the button on mobile */
-		margin: 0;
-		/* Remove any margin */
-		align-self: center;
-		/* Explicitly center the button vertically */
-	}
 
 	#nav-links {
 		display: flex;
@@ -1699,29 +1664,7 @@ a:hover {
 }
 }
 
-#hamburger-button, #close-overlay-btn {
-  display: none; /* Show the button on mobile */
-}
 
-@media only screen and (max-width: 1080px) {
-  #hamburger-button, #close-overlay-btn {
-    display: block; /* Ensure it's displayed on smaller screens */
-    align-self: center; /* Center it in the nav bar */
-  }
-}
-
-#close-overlay-btn {
-  font-size: 30px; /* Match the size of the hamburger icon */
-  position: absolute; /* Positioning it inside the overlay */
-  top: 20px; /* Distance from the top */
-}
-
-@media only screen and (max-width: 1080px) {
-  #hamburger-button, #close-overlay-btn {
-    display: block; /* Ensure it's displayed on smaller screens */
-    align-self: center; /* Center it in the nav bar */
-  }
-}
 
 #close-overlay-btn {
   font-size: 30px; /* Match the size of the hamburger icon */
@@ -1731,62 +1674,14 @@ a:hover {
 
 
 
-.marker-limit-info {
-	font-weight: bold !important;
-	/* Make all text bold */
-	margin: 20px;
-
-	color: #fff;
-	/* Set text color to black */
-	background-color: #02569d;
-	/* Light background color */
-	padding: 10px;
-	border-radius: 30px;
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
 }
 
 
-.marker-limit-info .highlight,
-.marker-limit-info a,
-.marker-limit-info span.highlight-word {
-	color: #d9d4c7;
-	/* Blue color for specific elements */
-}
 
-.marker-limit-info a:hover {
-	text-decoration: underline;
-	/* Underline on hover */
-}
-
-/* Responsive Design */
-@media (max-width: 1080px) {
-
-	.marker-limit-info,
-	.my-statistics h2 {
-		font-size: 1em;
-		/* Slightly smaller font size for mobile */
-	}
-}
-
-
-@media (max-width: 768px) {
-
-	.marker-limit-info,
-	.my-statistics h2 {
-		font-size: 0.9em;
-		/* Even smaller font size for smaller devices */
-	}
-	h3 {
-	display: block;
-	font-size: 1.4em !important;
-	margin-block-start: 0.3em;
-	/* Adjusted margin at the start */
-	margin-block-end: 0.3em;
-	/* Adjusted margin at the end */
-	margin-inline-start: 0px;
-	margin-inline-end: 0px;
-	font-weight: normal;
-}
-}
 
 .full-width-textarea {
     width: calc(100% - 20px); /* Subtract the total horizontal padding to fit container width */
@@ -1812,26 +1707,7 @@ a:hover {
 	/* Include padding in width calculation */
 }
 
-.marker-limit-info {
-		margin: 0px;
-margin-bottom: 20px;
-	font-weight: bold !important;
-	/* Make all text bold */
-	color: #fff;
-	/* Set text color to black */
-	background-color: #06467c;
-	/* Light background color */
-	padding: 10px;
-	border-radius: 0px;
-}
 
-
-.marker-limit-info .highlight,
-.marker-limit-info a,
-.marker-limit-info span.highlight-word {
-	color: #d9d4c7;
-	/* Blue color for specific elements */
-}
 }
 
 

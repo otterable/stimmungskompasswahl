@@ -53,10 +53,364 @@
 
             {% if current_user.is_authenticated %}
                 <span class="user-info" style="margin-top: 10px;">Benutzer: {{ current_user.name }}</span>
-                <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
+                <a href="{{ url_for('logout', next=request.path) }}"><button class="login-button">Abmelden</button></a>
             {% else %}
-                <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
+                <a href="{{ url_for('login', next=request.path) }}"><button class="login-button">Anmelden</button></a>
             {% endif %}
         </div>
     </div>
 </div>
+
+<style>
+
+
+
+
+
+
+
+
+   	/* Universal Markers-sidebar overlay */
+
+
+/* Desktop specific styles */
+@media only screen and (min-width: 769px) {
+    .markers-sidebar {
+        display: block; /* Ensure sidebar is visible */
+        position: absolute;
+        top: 95px;
+        left: 15px;
+        bottom: 15px;
+        width: 20%;
+        border-radius: 30px;
+        overflow-y: auto;
+        padding: 20px;
+    }
+	.markers-sidebar {
+    background: #f5f1e4 !important;
+    border-radius: 30px !important;
+    z-index: 1055 !important;
+    padding-left: 20px;
+	    padding-right: 20px;
+	    padding-bottom: 0px !important;
+
+    display: none; /* Initially hidden, shown via JavaScript */
+    overflow-y: auto;
+    box-sizing: border-box; /* Includes padding in width and height */
+}
+}
+
+
+    /* Adjust width for medium-sized screens */
+    @media (min-width: 768px) and (max-width: 1445px) {
+        .markers-sidebar {
+            width: 35%; /* Adjusted width to 35% for medium screens */
+        }
+    }
+
+
+
+
+
+
+
+
+
+   	/* Universal Blue top bars */
+.marker-limit-info {
+	font-weight: bold !important;
+	/* Make all text bold */
+	color: #fff;
+	/* Set text color to black */
+	background-color: #02569d;
+	/* Light background color */
+	padding: 10px;
+	border-radius: 30px;
+}
+
+
+.marker-limit-info .highlight,
+.marker-limit-info a,
+.marker-limit-info span.highlight-word {
+	color: #d9d4c7;
+	/* Blue color for specific elements */
+}
+
+.marker-limit-info a:hover {
+	text-decoration: underline;
+	/* Underline on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 1080px) {
+
+	.marker-limit-info,
+	.my-statistics h2 {
+		font-size: 1em;
+		/* Slightly smaller font size for mobile */
+	}
+}
+
+@media (max-width: 768px) {
+
+	.marker-limit-info,
+	.my-statistics h2 {
+		font-size: 0.9em;
+		/* Even smaller font size for smaller devices */
+	}
+	h3 {
+	display: block;
+	font-size: 1.4em !important;
+	margin-block-start: 0.3em;
+	/* Adjusted margin at the start */
+	margin-block-end: 0.3em;
+	/* Adjusted margin at the end */
+	margin-inline-start: 0px;
+	margin-inline-end: 0px;
+	font-weight: normal;
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   	/* Universal Top bars */
+
+#hamburger-button {
+	display: none;
+	/* Hidden by default */
+}
+
+#hamburger-button-filter {
+	display: none;
+	/* Hidden by default */
+}
+  
+  
+
+
+
+@media only screen and (max-width: 1080px) {
+ .filter-bar .filter-button {
+       /* Add any desktop-specific styles here */
+       padding: 0px 20px;
+       /* Example: different padding */
+       margin-left: 10px;
+       /* Add space between button and preceding elements */
+     }
+	 
+	        #hamburger-button {
+         display: block;
+         /* Show the button on mobile */
+         margin: 0;
+         /* Remove any margin */
+         align-self: center;
+         /* Explicitly center the button vertically */
+       }
+
+       #hamburger-button-filter {
+         display: block;
+         /* Show the button on mobile */
+         margin: 0;
+         /* Remove any margin */
+         align-self: center;
+         /* Explicitly center the button vertically */
+       }
+	   
+
+     /* Hamburger Menu Button */
+     #hamburger-button {
+       /* Hidden by default */
+       font-size: 30px;
+       /* Icon size */
+       color: white;
+       /* Icon color */
+       background: none;
+       /* No background */
+       border: none;
+       /* No border */
+       cursor: pointer;
+       /* Pointer cursor */
+     }
+
+     #hamburger-button-filter {
+       display: none;
+       /* Hidden by default */
+       font-size: 20px;
+       /* Icon size */
+       color: white;
+       /* Icon color */
+       background-color: #111111;
+       /* No background */
+       border: none;
+       /* No border */
+       cursor: pointer;
+       /* Pointer cursor */
+     }
+	 
+	 #hamburger-button {
+         display: block;
+         /* Show the button on mobile */
+       }
+
+       #hamburger-button-filter {
+         display: block;
+         /* Show the button on mobile */
+         width: 100%;
+		 height: 50px;
+		 	   margin-top: 70px !important;
+
+         /* Make it span the entire width of the screen */
+         text-align: center;
+         /* Center the icon/text inside the button */
+         padding: 0px 0;
+         /* Adjust padding as needed for better touch area */
+
+       }
+}
+	 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+   	/* Universal */
+      .projects-header {
+	   padding: 0 20px;
+   }
+
+  @media (min-width: 1080px) {
+	   .projects-header {
+margin-top: 180px;
+   }
+  }
+ @media (max-width: 1080px) {
+	   .projects-header {
+
+	margin-top: 20px;
+   }
+  }
+  
+  
+
+/* Style for filter-button on desktop */
+   .filter-bar {
+   	 position: fixed;
+	 top: 0;
+	 z-index: 1050;
+}
+
+
+
+
+
+
+
+
+@media only screen and (max-width: 1080px) {
+#close-overlay-btn {
+  display: block; /* Show the button on mobile */
+  font-size: 30px; /* Icon size */
+  color: white; /* Icon color */
+  background: none; /* No background */
+  border: none; /* No border */
+  cursor: pointer; /* Pointer cursor */
+  margin: 0 auto; /* Center button */
+  padding: 0; /* Remove padding */
+}
+}
+
+#hamburger-button, #close-overlay-btn {
+  display: none; /* Show the button on mobile */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
+
+@media only screen and (max-width: 1080px) {
+  #hamburger-button, #close-overlay-btn {
+    display: block; /* Ensure it's displayed on smaller screens */
+    align-self: center; /* Center it in the nav bar */
+  }
+}
+
+#close-overlay-btn {
+  font-size: 30px; /* Match the size of the hamburger icon */
+  position: absolute; /* Positioning it inside the overlay */
+  top: 20px; /* Distance from the top */
+}
+
+
+@media (min-width: 1080px) {
+.login-button {
+}
+}
+
+
+@media (max-width: 1080px) {
+		.login-button {
+		padding: 20px !important;
+}
+}
+
+.login-button {
+	border-radius: 30px;
+	padding: 10px;
+	    font-size: 18px;
+	background-color: white;
+	font-weight: bold;
+	margin-top: 2px;
+	color: black;
+	border: none;
+	cursor: pointer;
+		transition: width 0.3s ease;
+	/* Transition for the transform property */
+	/* Smooth transition for background color */
+}
+
+.login-button:hover {
+    background-color: #f2f2f2; /* Slightly darker shade than white for contrast */
+    transform: scale(1.05); /* Slightly increase size to indicate hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Add a subtle shadow for depth */
+}
+
+.login-button:active {
+    background-color: #e6e6e6; /* Even darker shade for a pressed effect */
+    transform: scale(0.95); /* Slightly decrease size to mimic a press */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4); /* Adjust shadow to match press depth */
+}
+</style>

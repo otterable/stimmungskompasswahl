@@ -1,3 +1,7 @@
+{% block header %} 
+{% include 'partials/header/index.html' %}
+{% endblock %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -14,6 +18,7 @@
     </script>
   </head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@0.7.0"></script>
@@ -23,42 +28,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='admintools.css') }}">
   <body>
-<div class="top-bar">
-    <a href="/">
-        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
-    </a>  
-    <button id="hamburger-button">&#9776;</button>
-    <div id="nav-overlay" class="nav-overlay">
 
-        <div id="nav-links">
-     <button id="close-overlay-btn" class="hamburger-button">&times;</button>
-
-            <a href="/Partizipative_Planung_Karte">Karte</a>
-            <a href="/list">Projektvorschläge</a>
-            <a href="/Partizipative_Planung_Neuer_Projekt">Vorschlag hinzufügen</a>
-				 {% if newest_baustelle_id %}
-                <a href="/Partizipative_Planung_Fragen_Baustelle/{{ newest_baustelle_id }}">Bau</a>
-            {% endif %}
-			<a href="/blog">Blog</a>
-            <a href="/Ueber_Partizipative_Planung">Über</a>
-            <a href="/profil">Profil</a>
-
-  <!-- Existing links -->
-  {% if current_user.is_authenticated and current_user.id == 1 %}
-    <!-- This link is only visible to the admin -->
-    <a href="/admin/options">Admin</a>
-  {% endif %}
-  <!-- Remaining links and logic -->
-
-            {% if current_user.is_authenticated %}
-                <span class="user-info" style="margin-top: 10px;">Benutzer: {{ current_user.name }}</span>
-                <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
-            {% else %}
-                <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-            {% endif %}
-        </div>
-    </div>
-</div>
 
     </div>
     <!-- Update the buttons in the filter-bar div -->
@@ -68,8 +38,8 @@
       <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
       <button id="toggleNotes" class="c-button" data-section-id="notesSection">Notizen</button>
       <button id="toggleComments" class="c-button" data-section-id="commentsSection">Kommentare</button>
-      <button id="toggleImportantProjects" class="c-button" data-section-id="importantProjectsSection">Markierte Projektvorschläge</button>
-      <button id="toggleReportedProjects" class="c-button" data-section-id="reportedProjectsSection">Gemeldete Projektvorschläge</button>
+      <button id="toggleImportantProjects" class="c-button" data-section-id="importantProjectsSection">Markieren</button>
+      <button id="toggleReportedProjects" class="c-button" data-section-id="reportedProjectsSection">Meldungen</button>
       <button id="toggleFeaturedProjects" class="c-button" data-section-id="featuredProjectsSection" style="display:none;">Open Ausgewählte Projektvorschläge</button>
 	        <button id="toggleQuestions" class="c-button" data-section-id="questionsSection">Fragen</button>
 				        <button id="toggleBaustellen" class="c-button" data-section-id="baustellenSection">Baustellen</button>
@@ -91,9 +61,11 @@
       </div>
     </div>
     <button id="hamburger-button-filter">&#9776; Menu</button>
-    <div id="deleteAllProjectsSection" class="delete-all-projects-section" style="display: none;">
+	<div class="projects-header">
+	</div>
+    <div id="deleteAllProjectsSection" class="deleteAllProjectsSection" style="display: none;">
       <div class="stats-container">
-        <div class="stat-box" style="background-color: #f5f1e43c3 !important">
+        <div class="project-thumbnail" style="background-color: #f5f1e43c3 !important">
           <h2>Top 5 Meistgesehene Projekte</h2>
           <ul> {% for project in top_viewed_projects %} {% if project.view_count > 0 %} <li>
               <h3>
@@ -103,7 +75,7 @@
               </h3>
             </li> {% endif %} {% endfor %} </ul>
         </div>
-        <div class="stat-box" style="background-color: #ffd6a8 !important">
+        <div class="project-thumbnail" style="background-color: #ffd6a8 !important">
           <h2>Top 5 Bewertete Projekte</h2>
           <ul> {% for project in top_rated_projects %} <li>
               <h3>
@@ -113,7 +85,7 @@
               </h3>
             </li> {% endfor %} </ul>
         </div>
-        <div class="stat-box" style="background-color: #e3ffff !important">
+        <div class="project-thumbnail" style="background-color: #e3ffff !important">
           <h2>Top 5 Kommentierte Projekte</h2>
           <ul> {% for project in top_commented_projects %} <li>
               <h3>
@@ -123,7 +95,7 @@
               </h3>
             </li> {% endfor %} </ul>
         </div>
-        <div class="stat-box" style="background-color: #b8d5ff !important">
+        <div class="project-thumbnail" style="background-color: #b8d5ff !important">
           <h2>Top 5 Häufigste Kategorien</h2>
           <ul> {% for category, count in category_counts %} <li>
               <h3>
@@ -131,7 +103,7 @@
               </h3>
             </li> {% endfor %} </ul>
         </div>
-        <div class="stat-box" style="background-color: #b9ea9b !important">
+        <div class="project-thumbnail" style="background-color: #b9ea9b !important">
           <h2>Top 5 Aktivste Benutzerkonten</h2>
           <ul> {% for user in active_users %} <li>
               <h3>
@@ -139,7 +111,7 @@
               </h3>
             </li> {% endfor %} </ul>
         </div>
-        <div class="stat-box" style="background-color: #FFA69E !important">
+        <div class="project-thumbnail" style="background-color: #FFA69E !important">
           <h2>Allgemeine Statistik</h2>
           <ul>
             <li>
@@ -171,7 +143,7 @@
         </div>
       </div>
       <div class="stats-container">
-        <div class="stat-box">
+        <div class="project-thumbnail">
           <div class="chart-container">
 		  
 
@@ -192,7 +164,7 @@
 		  
 		  
         </div>
-        <div class="stat-box">
+        <div class="project-thumbnail">
           <h2>Engagierte Projektvorschläge</h2>
           <p>..und ihre Kategorien.</p>
           <select id="engagedProjectsThreshold">
@@ -206,7 +178,7 @@
           <button id="showEngagedProjectsList" style="display:none !important;">Projektliste anzeigen</button>
           <canvas id="engagedProjectsChart"></canvas>
         </div>
-        <div class="stat-box">
+        <div class="project-thumbnail">
           <div class="chart-container">
             <h2>Länge der Beiträge</h2>
             <span id="averageDescriptionLengthText">Durchschnittliche Länge: 999</span>
@@ -218,14 +190,14 @@
             <canvas id="descriptionLengthChart"></canvas>
           </div>
         </div>
-        <div class="stat-box">
+        <div class="project-thumbnail">
           <div class="chart-container">
             <h2>Projektvorschläge vs. Notizen</h2>
             <canvas id="mapObjectChart"></canvas>
           </div>
         </div>
 		
-				        <div class="stat-box">          <div class="chart-container">
+				        <div class="project-thumbnail">          <div class="chart-container">
 
 						          <h2>Beantwortete Fragen</h2>
 
@@ -244,7 +216,7 @@
 </div>
 				  </div>
 				  
-<div class="stat-box">
+<div class="project-thumbnail">
   <h2>Neue Beiträge</h2>
   <div>
     <label for="startDate">Startdatum:</label>
@@ -262,7 +234,7 @@
   <canvas id="submissionChart"></canvas>
 </div>
 
-        <div class="stat-box">
+        <div class="project-thumbnail">
           <h2>Projektinteraktion</h2>
           <div>
             <label for="activityStartDate">Startdatum:</label>
@@ -275,7 +247,7 @@
         </div>
 		
 
-        <div class="stat-box">
+        <div class="project-thumbnail">
           <h2>Projektansichten</h2>
             <label for="viewsStartDate">Startdatum:</label>
             <input type="date" id="viewsStartDate">
@@ -284,7 +256,7 @@
             <button id="updateViewsChart">Update</button>
           <canvas id="viewsChart"></canvas>
         </div>
-        <div class="stat-box">
+        <div class="project-thumbnail">
           <h2>Unique Viewers Over Time</h2>
           <div id="viewerStats"></div>
           <div>
@@ -306,7 +278,7 @@
       </div>
     </div>
     <div id="exportSection" style="display: none;">
-		<div class="my-statistics centered-text">
+		<div class="projects-header">
         <div class="marker-limit-info">
       <h3 style="font-weight:bold;">Datenexport</span>
       </h2>
@@ -376,7 +348,7 @@
       </div>
     </div>
     <div id="projectProposalsSection" style="display: none;">
-	<div class="my-statistics centered-text">
+	<div class="projects-header">
         <div class="marker-limit-info">
 <h3 style="font-weight:bold;">Es gibt <span id="num-projects">{{ project_count }} Projektvorschläge</span> von <span id="user-count">{{ users_with_projektvorschlage }} Benutzer</span>.</h3>
       </h2>
@@ -403,7 +375,7 @@
     <div id="notesSection" style="display: none;">
       <!-- Notizens Search Input -->
       <div class="map-object-search-container">
-	  <div class="my-statistics centered-text">
+	  <div class="projects-header">
         <div class="marker-limit-info">
 		            <h3 style="font-weight:bold;">Es gibt <span id="num-mapobjects">{{ mapobject_count }} Notizen.</span>
 
@@ -424,7 +396,7 @@
       </div> {% with paginated_map_objects=paginated_map_objects %} {% include 'partials/mapobject_list_section.html' %} {% endwith %}
     </div>
     <div id="commentsSection" style="display: none;">
-		  <div class="my-statistics centered-text">
+		  <div class="projects-header">
         <div class="marker-limit-info">
 <h3 style="font-weight:bold;">Es gibt <span id="num-comments">{{ comment_count }} Kommentare</span> von <span id="comment-user-count">{{ unique_comment_users_count }} Benutzer</span>.</h3>
       </h3>
@@ -439,7 +411,7 @@
     </div>
     <div id="importantProjectsSection" style="display: none;">
       <!-- Important Projects Section -->
-	  	<div class="my-statistics centered-text">
+	  	<div class="projects-header">
         <div class="marker-limit-info">
      <h3 style="font-weight:bold;">Wichtige Projektvorschläge</span> (Nur auf dieser Seite sichtbar) </h3>
 	 </div>
@@ -493,9 +465,14 @@
         </div> {% else %} <h3>Keine Projekte gefunden.</h3> {% endfor %} </div>
     </div>
     <div id="reportedProjectsSection" style="display: none;">
+	<div class="projects-header">
+
       <!-- Reported Projects Section -->
-      <h2>Gemeldete <span style="color: #003056;">Projektvorschläge</span>
-      </h2>
+	          <div class="marker-limit-info">
+
+      <h3 style="font-weight:bold;">Gemeldete <span>Projektvorschläge</span>
+      </h3>
+	  </div>
       <div class="stats-container"> {% for project in reported_projects %} <div class="project-thumbnail">
           <h3>
             <strong>{{ project.name }}</strong>
@@ -519,7 +496,8 @@
           <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}" class="register-button" target="_blank">Anzeigen</a>
         </div> {% else %} <h3>Keine gemeldeten Projektvorschläge gefunden.</h3> {% endfor %} </div>
     </div>
-	
+	    </div>
+
 	
 	<div id="baustellenSection" style="display: none;">
     {% include 'partials/baustellen_list_section.html' %}
@@ -533,7 +511,7 @@
     </div>
 		   	  
     <div id="usersSection" style="display: none;">
-			  <div class="my-statistics centered-text">
+			  <div class="projects-header">
         <div class="marker-limit-info">
        <h3 style="font-weight:bold;">Es gibt <span id="num-map-objects">{{ user_count }} Benutzer.</span>
       </h3>

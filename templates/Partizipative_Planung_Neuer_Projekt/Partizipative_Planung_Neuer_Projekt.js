@@ -1,3 +1,10 @@
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var backgroundNumber = Math.floor(Math.random() * 14) + 1; // Generates a random number between 1 and 12
+    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
+  });
+
+
 // Initialize the map
 var map = L.map('map', {
     minZoom: 15

@@ -1,8 +1,10 @@
 <!-- bookmarked_projects_section.html -->
-<div class="bookmarked-projects centered-text">
+<div class="projects-header">
 <div class="marker-limit-info">
   <h3 style="font-weight:bold;">Sie haben <span id="num-bookmarks" class="highlight">{{ bookmarked_projects|length }} Lesezeichen</span> gespeichert. </h3>
    </div>
+      </div>
+
    <div class="stats-container">
       {% if bookmarked_projects %} {% for project in bookmarked_projects %} 
       <div class="project-thumbnail" id="project-thumbnail-{{ project.id }}">
@@ -25,7 +27,7 @@
          <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}">
          <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
          </a>
-         <button onclick="removeBookmark(event, {{ project.id }})" class="register-button" style="font-weight: bold; display: inline-block; width: auto; padding: 5px 10px;">Lesezeichen entfernen</button>
+         <button onclick="removeBookmark(event, {{ project.id }})" class="register-button">Lesezeichen entfernen</button>
          <script>
             //console.log("Bookmarked project loaded: {{ project.name }}");
          </script>

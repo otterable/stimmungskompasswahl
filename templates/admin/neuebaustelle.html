@@ -825,7 +825,7 @@
         /* Adjust this value as needed to reduce gap */
         font-size: 15px;
         /* Set font size to 15px */
-        font-family: 'Roboto';
+        font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
         /* Set font family to Roboto */
         }
         #shape-note::-webkit-input-placeholder {
@@ -1246,7 +1246,7 @@
         text-align: center;
         }
         #popup-text .ql-font-serif {
-font-family: 'Roboto';        }
+font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;        }
         #popup-text .ql-align-right {
         text-align: right;
         }
@@ -2571,29 +2571,10 @@ font-family: 'Roboto';        }
         }
     </style>
     <body>
-        <div class="top-bar">
-            <a href="/">
-            <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
-            </a>  
-            <button id="hamburger-button">&#9776;</button>
-            <div id="nav-overlay" class="nav-overlay">
-                <div id="nav-links">
-                    <a href="/Partizipative_Planung_Karte">Karte</a>
-                    <a href="/list">Projektvorschläge</a>
-                    <a href="/Partizipative_Planung_Neuer_Projekt">Vorschlag hinzufügen</a>
-                    <a href="/Ueber_Partizipative_Planung">Über</a>
-                    <a href="/profil">Profil</a>
-                    {% if current_user.is_authenticated %}
-                    <span class="user-info" style="margin-top: 10px;">
-                    Benutzer: {{ current_user.name }}
-                    </span>
-                    <a href="{{ url_for('logout', next=request.path) }}"><button class="button">Abmelden</button></a>
-                    {% else %}
-                    <a href="{{ url_for('login', next=request.path) }}"><button class="button">Anmelden</button></a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+{% block header %}
+{% include 'partials/header/index.html' %}
+{% endblock %}
+
         <div class="sidebar" id="sidebar">
             <h2 style="margin-bottom: 20px; text-align: center;">Neue Karte erstellen</h2>
             <h3 style="margin-bottom: 20px; text-align: center;">Erfassen Sie die Meinungen der Bürgerinnen und Bürger zu neuen Bauprojekten.</h3>

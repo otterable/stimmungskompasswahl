@@ -1,8 +1,7 @@
 body {
-  font-family: 'Roboto';
+  font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   background-color: #f5f1e4;
   color: black;
-  background-image: url('background2.png');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -87,21 +86,15 @@ img {
 
 
 .form-container {
-  margin: 40px auto;
+  margin: 120px auto;
   width: 60%;
-  text-align: left !important;
-  /* Align the form-container content to the left */
-
-  background-color: #f5f1e4 !important;
+     background-color: #f5f1e4;
   padding: 40px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   border-radius: 30px;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+}
 
-}
-}
 
 
 .project-details {
@@ -1336,14 +1329,13 @@ width: 100%; /* Full width */
   }
 
   .form-container {
-	  margin-top: 0px !important;
-	  	  margin-bottom: 0px !important;
+    width: 100%;
+	margin-top: 60px !important;
 
-	  border-radius: 0px !important;
-    width: 100% !important;
-    /* Full width with some margin */
-    padding: 20px !important;
-    /* Smaller padding */
+padding: 30px;
+margin: 0px;
+margin-bottom: 0px !important;
+border-radius: 0px;
   }
   
   .bottom-bar {
@@ -1404,7 +1396,7 @@ width: 100%; /* Full width */
     pointer-events: none;
   }
 
-
+}
 
 
   /* Mobile Devices */

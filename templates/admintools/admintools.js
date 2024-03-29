@@ -1322,6 +1322,9 @@ function displayViewerStats(data) {
 
 `;
 }
+
+
+
 document.getElementById('hamburger-button').addEventListener('click', function() {
   var navOverlay = document.getElementById('nav-overlay');
   navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';

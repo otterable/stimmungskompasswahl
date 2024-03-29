@@ -10,11 +10,14 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('serve_image', filename='admintools.css') }}">
+<link rel="stylesheet" href="{{ url_for('serve_image', filename='general.css') }}">
+
 {% endblock %}
 
 {% block header %}
     {% include 'partials/header/index.html' %}
 {% endblock %}
+
 {% block content %}
     {%  include '/admintools/admintools.html' %}
 {% endblock %}

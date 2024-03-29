@@ -2,15 +2,14 @@
 
 {% block head_section %}
     <title>Login</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='utility.css') }}">
+
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <link rel="stylesheet" href="{{ url_for('serve_image', filename='Ueber_Partizipative_Planung.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
 
 {% endblock %}
 
-{% block styles %}
-{% include 'password_recovery/password_recovery.css' %}
-{% endblock %}
+
 
 {% block content %}
 {% include 'password_recovery/password_recovery.html' %}

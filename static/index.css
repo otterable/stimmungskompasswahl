@@ -135,12 +135,12 @@ img {
 }
 
 .mono-text {
-font-family: 'Roboto';
+font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 }
 
 
 body {
-  font-family: 'Roboto';
+  font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
   background-color: #f5f1e4;
   color: black;
@@ -532,7 +532,7 @@ input[type="file"] {
 }
 
 .project-thumbnail p {
-  font-family: 'Roboto';
+  font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   /* Change to your preferred font */
   position: relative;
   bottom: auto;

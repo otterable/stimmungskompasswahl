@@ -1,4 +1,3 @@
-<div class="my-projects centered-text">
   {% if paginated_comments and paginated_comments.items %} 
   <div class="comment-list" id="comment-list-container">
      {% for comment in paginated_comments.items %} <!-- Inside your comments loop -->
@@ -39,4 +38,3 @@
   {% endif %} {% else %} 
   <h3>Keine Kommentare gefunden.</h3>
   {% endif %} 
-</div>

@@ -1,3 +1,10 @@
+  document.addEventListener('DOMContentLoaded', function() {
+    var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
+    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
+  });
+
+
+
 function toggleReport(projectId) {
     //console.log(`Partizipative_Planung_Vorschlag.html: ${document.getElementById('report-button').innerText === 'Spam gemeldet 🛑' ? 'Removing report for' : 'Reporting'} project ID ${projectId} for user ${currentUserId}.`);
 

@@ -1,4 +1,3 @@
-<div style="    display: flex; flex-direction: column;min-height: calc(100vh - 182px);">
     <div class="filter-bar ">
     <button id="toggleProjectProposals" class="c-button" data-section-id="projectProposalsSection">Projektvorschläge</button>
     <button id="toggleLesezeichen" class="c-button" data-section-id="bookmarksSection">Lesezeichen</button>
@@ -17,9 +16,10 @@
     </div>
   </div>
   <button id="hamburger-button-filter">&#9776; Menu</button>
-  <div class="my-projects centered-text"> {% if current_user.is_authenticated %} <div id="projectProposalsSection" style="display: none;">
+{% if current_user.is_authenticated %} <div id="projectProposalsSection" style="display: none;">
+  
       <div class="info-text-field3-c">
-<div class="my-statistics centered-text">
+<div class="projects-header">
           <div class="marker-limit-info">
     <h3 style="font-weight:bold;">Projektvorschläge: <span class="highlight">{{ user_statistics.num_projects }}</span></h3>
     <h3 style="font-weight:bold;">Meistgesehenes Projekt: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_viewed_project.id) }}">{{ user_statistics.most_viewed_project.name }}</a> (<span class="highlight">{{ user_statistics.most_viewed_project.view_count }}</span> Ansichten)</h3>
@@ -42,8 +42,7 @@
       </div>
     </div>
     <div id="usersSection" style="display: none;">
-      <div class="info-text-field2">
-        <div class="centered-text">
+  <div class="projects-header">
           <div class="stats-container">
             <div class="project-thumbnail"> {% if current_user.is_authenticated %} <p>Ihr Benutzername ist: <span style="color: #003056; font-weight: bold;">{{ current_user.name }}</span>
               </p> {% if not current_user.is_googleaccount %} <p>Die verknüpfte Handynummer lautet: <span style="color: #003056;font-weight: bold;">{{ current_user.phone_number }}</span>. </p>
@@ -64,7 +63,7 @@
             </div>
           </div> {% endif %}
         </div>
-      </div
+      </div>
 	  
       <a id="download-link" href="#" style="display: none;"></a>
     </div>
@@ -80,4 +79,3 @@
   {% if not current_user.is_authenticated %} <script>
       window.location.href = "{{ url_for('login', next=url_for('profil')) }}";
   </script> {% endif %}
-</div>

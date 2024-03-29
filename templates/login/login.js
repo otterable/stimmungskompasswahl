@@ -1,3 +1,10 @@
+  document.addEventListener('DOMContentLoaded', function() {
+    var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
+    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
+  });
+
+
+
 document.getElementById('toggle-form-btn').addEventListener('click', function() {
 var form = document.getElementById('login-form');
 form.style.display = form.style.display === 'none' ? 'block' : 'none';

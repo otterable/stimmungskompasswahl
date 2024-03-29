@@ -3,6 +3,9 @@
 	/* Hide by default */
 }
 
+.bottom-bar {
+display:none;
+}
 .register-button {
     display: block; /* Each button takes the full width */
     width: calc(100% - 20px); /* Adjust width based on padding */
@@ -52,23 +55,9 @@
 
 
 
-#hamburger-button, #close-overlay-btn {
-  display: block; /* Show the button on mobile */
-  font-size: 30px; /* Icon size */
-  color: white; /* Icon color */
-  background: none; /* No background */
-  border: none; /* No border */
-  cursor: pointer; /* Pointer cursor */
-  margin: 0 auto; /* Center button */
-  padding: 0; /* Remove padding */
-}
 
-@media only screen and (max-width: 1080px) {
-  #hamburger-button, #close-overlay-btn {
-    display: block; /* Ensure it's displayed on smaller screens */
-    align-self: center; /* Center it in the nav bar */
-  }
-}
+
+
 
 #close-overlay-btn {
   font-size: 30px; /* Match the size of the hamburger icon */
@@ -111,75 +100,7 @@
 }
 
 
-#hamburger-button-filter {
-	display: none;
-	/* Hidden by default */
-	font-size: 20px;
-	/* Icon size */
-	color: white;
-	/* Icon color */
-	background-color: #111111;
-	/* No background */
-	border: none;
-	/* No border */
-	cursor: pointer;
-	/* Pointer cursor */
-}
 
-
-.marker-limit-info {
-	font-weight: bold !important;
-	/* Make all text bold */
-	color: #fff;
-	/* Set text color to black */
-	background-color: #02569d;
-	/* Light background color */
-	padding: 10px;
-	border-radius: 30px;
-}
-
-
-.marker-limit-info .highlight,
-.marker-limit-info a,
-.marker-limit-info span.highlight-word {
-	color: #d9d4c7;
-	/* Blue color for specific elements */
-}
-
-.marker-limit-info a:hover {
-	text-decoration: underline;
-	/* Underline on hover */
-}
-
-/* Responsive Design */
-@media (max-width: 1080px) {
-
-	.marker-limit-info,
-	.my-statistics h2 {
-		font-size: 1em;
-		/* Slightly smaller font size for mobile */
-	}
-}
-
-@media (max-width: 768px) {
-
-	.marker-limit-info,
-	.my-statistics h2 {
-		font-size: 0.9em;
-		/* Even smaller font size for smaller devices */
-	}
-	h3 {
-	display: block;
-	font-size: 1.4em !important;
-	margin-block-start: 0.3em;
-	/* Adjusted margin at the start */
-	margin-block-end: 0.3em;
-	/* Adjusted margin at the end */
-	margin-inline-start: 0px;
-	margin-inline-end: 0px;
-	font-weight: normal;
-}
-}
 
 
 h3 {
@@ -221,19 +142,7 @@ h3 {
 	/* Darker shade of grey on hover */
 }
 
-.stats-container {
-	margin-top: 20px;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-}
 
-.stats-container {
-	margin-top: 15px;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-}
 
 .stat-box {
 	background-color: #f5f5f5;
@@ -263,7 +172,7 @@ h3 {
 
 
 body {
-	font-family: 'Roboto';
+	font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   height: 100%; /* Ensure the root elements span the full height */
 
 	background-color: #f5f1e4;
@@ -374,6 +283,47 @@ input[type="file"] {
 	/* Smooth transition for background color */
 }
 
+
+@media (min-width: 1080px) {
+.login-button {
+		margin-left: 20px;
+}
+}
+
+
+@media (max-width: 1080px) {
+		.login-button {
+		padding: 20px !important;
+}
+}
+
+.login-button {
+	border-radius: 30px;
+	padding: 10px;
+	    font-size: 18px;
+	background-color: white;
+	font-weight: bold;
+	margin-top: 2px;
+	color: black;
+	border: none;
+	cursor: pointer;
+		transition: width 0.3s ease;
+	/* Transition for the transform property */
+	/* Smooth transition for background color */
+}
+
+.login-button:hover {
+    background-color: #f2f2f2; /* Slightly darker shade than white for contrast */
+    transform: scale(1.05); /* Slightly increase size to indicate hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Add a subtle shadow for depth */
+}
+
+.login-button:active {
+    background-color: #e6e6e6; /* Even darker shade for a pressed effect */
+    transform: scale(0.95); /* Slightly decrease size to mimic a press */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4); /* Adjust shadow to match press depth */
+}
+
 .publish-button {
 	width: 100%;
 	/* Full width */
@@ -438,9 +388,6 @@ input[type="file"] {
 
 
 
-
-
-
 .project-thumbnail {
      background-color: #e5e2d5;
      border-radius: 30px;
@@ -487,9 +434,9 @@ input[type="file"] {
    .project-thumbnail p {
      margin: 0;
      padding: 5px 0;
-     width: 100%;
+     width: 90%;
      /* Adjust the width to match the image */
-     text-align: center !important;
+     text-align: center;
      /* Center the text */
    }
 
@@ -537,7 +484,8 @@ input[type="file"] {
        /* Adjust image height for mobile */
      }
    }
-   
+
+
    
 
 
@@ -593,7 +541,6 @@ input[type="file"] {
 .user-info {
 	color: white;
 	/* Set the text color to match other links */
-	margin-right: 20px;
 	/* Right margin for spacing */
 	font-size: 18px;
 	/* Font size similar to other links */
@@ -629,12 +576,12 @@ input[type="file"] {
 
 
 
-.stats-container {
-	text-align: center;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-}
+   .stats-container {
+     text-align: center;
+     display: flex;
+     flex-wrap: wrap;
+     justify-content: center;
+   }
 
 .project img {
 	max-width: 300px;
@@ -1060,7 +1007,6 @@ nav[aria-label="Page navigation"] {
 	background-color: #f5f1e4;
 	/* Light grey background */
 
-	padding: 20px;
 	box-sizing: border-box;
 	/* Include padding in width calculation */
 }
@@ -1122,15 +1068,13 @@ nav[aria-label="Page navigation"] {
 		transition: width 0.3s ease;
 		/* Transition for the transform property */
 		border-radius: 30px;
+		margin-top: 2px;
 		/* If you want to keep the border-radius */
 		padding: 7px;
 		/* Add any other button-specific styles here */
 	}
 
-	#hamburger-button-filter {
-		display: none;
-		/* Hidden by default */
-	}
+	
 
 	.c-button {
 		border-radius: 10px;
@@ -1146,10 +1090,6 @@ nav[aria-label="Page navigation"] {
 
 }
 
-#hamburger-button {
-	display: none;
-	/* Hidden by default */
-}
 
 @media only screen and (max-width: 1080px) {
 
@@ -1241,22 +1181,6 @@ nav[aria-label="Page navigation"] {
 	}
 
 
-	/* Hamburger Menu Button */
-	#hamburger-button {
-		display: none;
-		/* Hidden by default */
-		font-size: 30px;
-		/* Icon size */
-		color: white;
-		/* Icon color */
-		background: none;
-		/* No background */
-		border: none;
-		/* No border */
-		cursor: pointer;
-		/* Pointer cursor */
-	}
-
 	/* Navigation Overlay */
 	.nav-overlay {
 		display: none;
@@ -1312,21 +1236,7 @@ nav[aria-label="Page navigation"] {
 			/* Include padding in width calculation */
 		}
 
-		.hamburger-menu {
-			position: absolute;
-			/* Adjust to absolute positioning */
-			right: 10px;
-			/* Align to the right with some space */
-			top: 10px;
-			/* Align to the top with some space */
-			z-index: 1000;
-			/* Ensure it's above other elements */
-		}
 
-		#hamburger-button {
-			display: block;
-			/* Show the button on mobile */
-		}
 
 		.top-bar a .logo {
 			margin-left: auto;
@@ -1355,7 +1265,7 @@ nav[aria-label="Page navigation"] {
 
 		html,
 		body {
-	font-family: 'Roboto';
+	font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
      background-color: #f5f1e4;
      color: black;
@@ -1426,28 +1336,7 @@ nav[aria-label="Page navigation"] {
 			/* Adjust height automatically */
 		}
 
-		#hamburger-button {
-			display: block;
-			/* Show the button on mobile */
-			margin: 0;
-			/* Remove any margin */
-			align-self: center;
-			/* Explicitly center the button vertically */
-		}
 
-#hamburger-button-filter {
-         display: block;
-         /* Show the button on mobile */
-         width: 100%;
-		 	   margin-top: 70px !important;
-
-         /* Make it span the entire width of the screen */
-         text-align: center;
-         /* Center the icon/text inside the button */
-         padding: 10px 0;
-         /* Adjust padding as needed for better touch area */
-
-       }
 
 		#filter-overlay {
 			display: none;
@@ -1620,15 +1509,7 @@ nav[aria-label="Page navigation"] {
 }
 }
 
-#hamburger-button, #close-overlay-btn {
-  display: none; /* Show the button on mobile */
-}
 
-@media only screen and (max-width: 1080px) {
-  #hamburger-button, #close-overlay-btn {
-    display: block; /* Ensure it's displayed on smaller screens */
-    align-self: center; /* Center it in the nav bar */
-  }
 }
 
 #close-overlay-btn {
@@ -1637,12 +1518,7 @@ nav[aria-label="Page navigation"] {
   top: 20px; /* Distance from the top */
 }
 
-@media only screen and (max-width: 1080px) {
-  #hamburger-button, #close-overlay-btn {
-    display: block; /* Ensure it's displayed on smaller screens */
-    align-self: center; /* Center it in the nav bar */
-  }
-}
+
 
 #close-overlay-btn {
   font-size: 30px; /* Match the size of the hamburger icon */

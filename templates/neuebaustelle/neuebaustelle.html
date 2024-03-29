@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <title>Create New Baustelle</title>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+      <!-- Include Quill stylesheet -->
+      <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+      <!-- Include Quill library -->
+      <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+	  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+
+      <!-- Include Cropper.js -->
+      <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.9/cropper.min.js"></script>
+   </head>
+   
+   <body>
+
+
+      <div class="sidebar" id="sidebar">
+         <h2 style="margin-bottom: 20px; text-align: center;">Neue Karte erstellen</h2>
+         <h3 style="margin-bottom: 20px; text-align: center;">Erfassen Sie die Meinungen der Bürgerinnen und Bürger zu neuen Bauprojekten.</h3>
+         <p style="margin-bottom: 20px; text-align: center;">Laden Sie GIS-Daten Ihres Vorhabens hoch oder zeichnen Sie diese direkt in die Karte ein.<br><br>
+            In der Übersicht erhalten Sie einen Überblick über die Fragen und Beiträge der Bürgerinnen und Bürger, auf die Sie direkt antworten können.
+         </p>
+         <form id="baustelleForm" method="post" enctype="multipart/form-data" style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px;">
+               <input type="text" id="name" name="name" placeholder="Projekttitel" required class="form-input" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: none; cursor: pointer; width: 100%; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 20px;">
+               <label for="projectImage" style="margin-bottom: 10px; display: block; text-align: center;">Bild hinzufügen</label>
+               <input type="file" id="imageInput" name="projectImage" accept="image/*">
+               <img id="imagePreview" style="max-width: 100%; display: none;">
+            </div>
+            <div style="margin-bottom: 20px;">
+               <!-- Quill Editor Container -->
+               <div id="editor-container" style="height: 200px;"></div>
+               <textarea name="description" id="description" style="display: none;"></textarea>
+            </div>
+            <label for="projectImage" style="margin-bottom: 10px; display: block; text-align: center;">GeoJSON hinzufügen</label>
+            <div style="margin-bottom: 20px;">
+               <input type="file" id="gis_data" name="gis_data[]" accept=".geojson" multiple class="form-input" onchange="loadGeoJSON(event)" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: none; cursor: pointer; width: 100%; box-sizing: border-box;">
+            </div>
+         </form>
+         <h3 style="margin-bottom: 20px;  text-align: center;">.geojson Liste</h3>
+         <div id="geojsonFilesList" style="margin-bottom: 20px;">
+            <ul id="loadedFiles"></ul>
+         </div>
+         <button type="button" onclick="submitForm()" class="register-button-m" style="margin-bottom: 20px;">Veröffentlichen</button>
+      </div>
+      <div id="map"></div>
+   </body>
+</html>

@@ -75,6 +75,8 @@ document.getElementById('nav-links').addEventListener('click', function(event) {
         event.stopPropagation();
     }
 });
+
+
 // Resize event listener
 window.addEventListener('resize', function() {
     // Check if the window width is greater than the threshold for mobile view
@@ -86,6 +88,8 @@ window.addEventListener('resize', function() {
         document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
     }
 });
+
+
 // Call the function on page load to set the initial state
 function toggleOverlay() {
     var overlay = document.getElementById("category-choices");
@@ -116,6 +120,8 @@ function toggleMenu() {
         x.style.display = "block";
     }
 }
+
+
 document.getElementById('delete-data-btn').addEventListener('click', function() {
     var confirmation = confirm('Are you sure you want to permanently delete all your data? This action cannot be undone.');
     if (confirmation) {

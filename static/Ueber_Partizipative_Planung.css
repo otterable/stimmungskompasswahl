@@ -1,8 +1,7 @@
       body {
-        font-family: 'Roboto';
+        font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
         color: black;
-        background-image: url('background2.png');
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;

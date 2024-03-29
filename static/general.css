@@ -1,0 +1,39 @@
+@media (min-width: 1080px) {
+.login-button {
+		margin-left: 20px;
+}
+}
+
+
+@media (max-width: 1080px) {
+		.login-button {
+		padding: 20px !important;
+}
+}
+
+.login-button {
+	border-radius: 30px;
+	padding: 10px;
+	    font-size: 18px;
+	background-color: white;
+	font-weight: bold;
+	margin-top: 2px;
+	color: black;
+	border: none;
+	cursor: pointer;
+		transition: width 0.3s ease;
+	/* Transition for the transform property */
+	/* Smooth transition for background color */
+}
+
+.login-button:hover {
+    background-color: #f2f2f2; /* Slightly darker shade than white for contrast */
+    transform: scale(1.05); /* Slightly increase size to indicate hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Add a subtle shadow for depth */
+}
+
+.login-button:active {
+    background-color: #e6e6e6; /* Even darker shade for a pressed effect */
+    transform: scale(0.95); /* Slightly decrease size to mimic a press */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4); /* Adjust shadow to match press depth */
+}

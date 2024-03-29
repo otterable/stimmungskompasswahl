@@ -1366,6 +1366,52 @@ markerDescriptionTextarea.addEventListener('input', function() {
 });
 updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300); // Initial update
 
+
+const closeOverlayBtns = document.querySelectorAll("[onclick^='closeVideoOverlay']");
+    closeOverlayBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const overlayId = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+            document.getElementById(overlayId).style.display = 'none';
+        });
+    });
+
+    // Ensure that the 'close-overlay-button' correctly closes the markers list overlay
+    document.getElementById('close-overlay-button').addEventListener('click', function() {
+        document.getElementById('markers-list-overlay').style.display = 'none';
+    });
+
+function adjustOverlayDisplayForDevice() {
+        const navOverlay = document.getElementById('nav-overlay');
+        const screenWidth = window.innerWidth;
+        if (screenWidth > 1080) {
+            navOverlay.style.display = 'block';
+        } else {
+            navOverlay.style.display = 'none';
+        }
+    }
+
+    // Close overlay function when the close-overlay-button is clicked
+    const closeOverlayButton = document.getElementById('close-overlay-button');
+    if (closeOverlayButton) {
+        closeOverlayButton.addEventListener('click', function() {
+            document.getElementById('markers-list-overlay').style.display = 'none';
+        });
+    }
+
+    // Close overlay function for the close-overlay-btn button
+    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+    if (closeOverlayBtn) {
+        closeOverlayBtn.addEventListener('click', function() {
+            // Adjust this to target the correct overlay ID you wish to close
+            document.getElementById('nav-overlay').style.display = 'none';
+        });
+    }
+
+    // Call the function on load and on resize
+    adjustOverlayDisplayForDevice();
+    window.addEventListener('resize', adjustOverlayDisplayForDevice);
+
 // Toggle the navigation overlay
 function toggleNavOverlay() {
     var navOverlay = document.getElementById('nav-overlay');

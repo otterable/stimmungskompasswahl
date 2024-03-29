@@ -1,9 +1,11 @@
 <!-- map_objects_section.html -->
-  <div class="my-statistics centered-text">
+<div class="projects-header">
 <div class="marker-limit-info">
   <h3 style="font-weight:bold;">Sie haben <span id="num-map-objects" class="highlight">{{ user_statistics.num_map_objects }} Notizen gepostet.</span>
      </h3>
 </div>
+</div>
+
   <div class="stats-container">
      {% if map_object_pagination.items %} {% for project in map_object_pagination.items %} {% if project.is_mapobject %} 
      <div class="project-thumbnail" data-project-id="{{ project.id }}">

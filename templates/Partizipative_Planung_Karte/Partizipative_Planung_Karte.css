@@ -97,7 +97,7 @@ justify-content: center; /* Vertically center content */
 align-items: center; /* Horizontally center content */
 border-radius: 30px;
 margin-top: 7.5px !important;
-z-index: 1500 !important;
+z-index: 1055;
 overflow: auto; /* Enables scrolling if content is larger than the overlay */
 }
 
@@ -121,7 +121,7 @@ justify-content: center; /* Vertically center content */
 align-items: center; /* Horizontally center content */
 border-radius: 30px;
 margin-top: 7.5px !important;
-z-index: 1500 !important;
+z-index: 1055;
 overflow: auto; /* Enables scrolling if content is larger than the overlay */
 }
 
@@ -849,7 +849,7 @@ margin-bottom: -25px;
 /* Adjust this value as needed to reduce gap */
 font-size: 15px;
 /* Set font size to 15px */
-font-family: 'Roboto';
+font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 /* Set font family to Roboto */
 }
 #shape-note::-webkit-input-placeholder {
@@ -1271,7 +1271,7 @@ margin-right: 50px;
 text-align: center;
 }
 #popup-text .ql-font-serif {
-font-family: 'Roboto';
+font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 }
 #popup-text .ql-align-right {
 text-align: right;
@@ -2337,44 +2337,8 @@ margin-bottom: 0px !important;
 
 
 
-/* Base styling for .markers-sidebar */
 
 
-/* Desktop specific styles */
-@media only screen and (min-width: 769px) {
-    .markers-sidebar {
-        display: block; /* Ensure sidebar is visible */
-        position: absolute;
-        top: 95px;
-        left: 15px;
-        bottom: 15px;
-        width: 20%;
-        border-radius: 30px;
-        overflow-y: auto;
-        padding: 20px;
-    }
-	.markers-sidebar {
-    background: #f5f1e4 !important;
-    border-radius: 30px !important;
-    z-index: 10030 !important;
-    padding-left: 20px;
-	    padding-right: 20px;
-	    padding-bottom: 0px !important;
-
-    display: none; /* Initially hidden, shown via JavaScript */
-    overflow-y: auto;
-    box-sizing: border-box; /* Includes padding in width and height */
-}
-}
-
-
-    /* Adjust width for medium-sized screens */
-    @media (min-width: 768px) and (max-width: 1445px) {
-        .markers-sidebar {
-            width: 35%; /* Adjusted width to 35% for medium screens */
-        }
-    }
-}
 
 
 
@@ -2385,20 +2349,25 @@ margin-bottom: 0px !important;
     height: calc(100% - 60px); /* Adjust height to leave space for the footer */
 }
 
+
+
 /* Ensure the footer is always visible at the bottom */
 /* Base styling for the footer navigation */
-.footer-navigation {
-    display: flex;
-    justify-content: center; /* Center items horizontally */
-    align-items: center; /* Align items vertically in the middle */
-    position: sticky;
-    bottom: 0;
-    background: inherit; /* Match the sidebar background */
-    padding-top: 10px;
-    padding-bottom: 20px;
-    border-top: 0px solid #ccc; /* Optional visual separation */
-    width: 100%;
-    box-sizing: border-box; /* Include padding in width */
+@media only screen and (max-width: 768px) {
+    /* Styles for the footer navigation */
+    .footer-navigation {
+        position: fixed;
+        bottom: 0;
+		        display: flex !important; /* Ensure the footer is displayed */
+width: 100%; /* Full width */
+        text-align: center; /* Center-align the content */
+        left: 0;
+        right: 0;
+        background-color: #003056; /* Background color for mobile footer */
+        padding: 10px 0; /* Adjust padding as needed */
+        z-index: 1005; /* Ensure visibility above other elements */
+        flex-direction: row; /* Ensure buttons are in a row */
+    }
 }
 
 /* Styling for buttons within .footer-navigation */
@@ -2425,7 +2394,7 @@ margin-bottom: 0px !important;
 .register-button-cl:hover {
 filter: brightness(110%);
 }
-
+}
 /* Base styling for .markers-sidebar */
 
 .scrollable-list {
@@ -2436,18 +2405,6 @@ filter: brightness(110%);
 
 /* Media query for mobile and handling single vs. multiple buttons */
 @media only screen and (max-width: 768px) {
-    .footer-navigation {
-        display: flex; /* Ensure the footer is displayed */
-        position: fixed; /* Fix it to the bottom */
-        bottom: 0;
-        left: 0;
-        width: 100%; /* Full width */
-        background-color: #003056; /* Background color */
-        padding: 10px 0; /* Some padding */
-        justify-content: center; /* Center the content */
-        box-shadow: 0 -2px 5px rgba(0,0,0,0.2); /* Optional: add shadow for better visibility */
-        z-index: 1000; /* Make sure it's above other content */
-    }
 
     .footer-navigation.one-button {
         justify-content: center; /* Center a single button */
@@ -2623,7 +2580,6 @@ overflow-x: hidden;
 /* Hide horizontal overflow */
 transition: 0.5s;
 /* Smooth transition for opening/closing */
-z-index: 10001 !important;
 /* High z-index to ensure it's on top */
 }
 .nav-overlay-active .main-content {
@@ -2636,6 +2592,10 @@ label {
 display: block;
 font-size: 16px;
 color: #333;
+}
+.nav-overlay {
+z-index: 1056 !important;
+
 }
 .register-button-m {
 width: calc(100% - 10px);

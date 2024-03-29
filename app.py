@@ -234,7 +234,7 @@ def neuebaustelle():
 
         return jsonify({'status': 'success', 'message': 'Baustelle created successfully.', 'gisfile': gisfiles, 'baustelleId': new_baustelle.id})
     else:
-        return render_template('neuebaustelle.html')
+        return render_template('neuebaustelle/index.html')
 
 def allowed_file(filename):
     # Implement your file validation logic here
@@ -280,7 +280,7 @@ def Partizipative_Planung_Fragen_Baustelle(baustelle_id):
     # For a GET request or after handling the POST request, render the Baustelle page
     # Retrieve all questions associated with this Baustelle
     questions = Question.query.filter_by(baustelle_id=baustelle_id).all()
-    return render_template('Partizipative_Planung_Fragen_Baustelle.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions,gisfile=gisfile, gis_data=gis_data, metaData=g.metaData)
+    return render_template('Partizipative_Planung_Fragen_Baustelle/index.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions,gisfile=gisfile, gis_data=gis_data, metaData=g.metaData)
 
 
 
@@ -3709,7 +3709,7 @@ def password_recovery():
         else:
             flash("Ihre Handynummer not found", "error")
     metaData=g.metaData
-    return render_template("password_recovery.html", metaData=metaData)
+    return render_template("password_recovery/index.html", metaData=metaData)
 
 
 @app.route("/download_data")

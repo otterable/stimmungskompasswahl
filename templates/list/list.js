@@ -1,3 +1,5 @@
+
+
 function openModal(projectId) {
     // AJAX request to get project details
     fetch(`/project/${projectId}`)

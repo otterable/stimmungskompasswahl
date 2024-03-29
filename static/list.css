@@ -1,5 +1,5 @@
    body {
-	font-family: 'Roboto';
+	font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
      background-color: #f5f1e4;
      color: black;
@@ -86,14 +86,12 @@
    .projects-header {
      text-align: center;
      /* Center the content */
-     margin-bottom: 20px;
      /* Add some space below the header */
    }
 
    .projects-header h1 {
      margin: 0;
      /* Remove default margin */
-     padding: 10px 0;
      /* Add some vertical padding */
    }
 
@@ -287,7 +285,7 @@
 
      justify-content: space-between;
      align-items: center;
-     padding: 20px 20px;
+     padding: 0px 20px;
      /* Add padding to the left and right */
      box-sizing: border-box;
      /* Include padding in width calculation */
@@ -776,6 +774,11 @@
      /* Align vertically within the flex container */
    }
    
+   
+   
+   
+   
+   
    .project-thumbnail {
      background-color: #e5e2d5;
      border-radius: 30px;
@@ -848,35 +851,15 @@
      }
    }
 
-   /* Medium screens (between 1024px and 1199px) */
-   @media (min-width: 1080px) and (max-width: 1445px) {
-     .project-thumbnail {
-       width: calc(50% - 20px);
-       /* Two items per row */
-       height: auto;
-       /* Height adjusts based on content */
-     }
-   }
-
-   /* Mobile screens (less than 1024px) */
-   @media (max-width: 1088px) {
-     .project-thumbnail {
-       width: calc(100% - 20px);
-       /* Full width */
-       height: auto;
-       /* Height adjusts based on content */
-     }
-
-     .project-thumbnail img {
-       height: auto;
-       /* Adjust image height for mobile */
-     }
-   }
 
 
-
+  
+  
+  
    .stats-container {
      text-align: center;
+margin-top: 20px !important;
+
      display: flex;
      flex-wrap: wrap;
      justify-content: center;
@@ -958,15 +941,7 @@
      }
    }
 
-   #hamburger-button {
-     display: none;
-     /* Hidden by default */
-   }
 
-   #hamburger-button-filter {
-     display: none;
-     /* Hidden by default */
-   }
 
    @media only screen and (max-width: 1080px) {
 
@@ -1015,44 +990,9 @@
        /* Adjust padding */
      }
 
-     .filter-bar .filter-button {
-       /* Add any desktop-specific styles here */
-       padding: 10px 20px;
-       /* Example: different padding */
-       margin-left: 10px;
-       /* Add space between button and preceding elements */
-     }
 
      /* Hamburger Menu Button */
-     #hamburger-button {
-       display: none;
-       /* Hidden by default */
-       font-size: 30px;
-       /* Icon size */
-       color: white;
-       /* Icon color */
-       background: none;
-       /* No background */
-       border: none;
-       /* No border */
-       cursor: pointer;
-       /* Pointer cursor */
-     }
-
-     #hamburger-button-filter {
-       display: none;
-       /* Hidden by default */
-       font-size: 20px;
-       /* Icon size */
-       color: white;
-       /* Icon color */
-       background-color: #111111;
-       /* No background */
-       border: none;
-       /* No border */
-       cursor: pointer;
-       /* Pointer cursor */
-     }
+   
 
      /* Navigation Overlay */
      .nav-overlay {
@@ -1114,24 +1054,7 @@
          /* Hide horizontal scrollbar */
        }
 
-       #hamburger-button {
-         display: block;
-         /* Show the button on mobile */
-       }
-
-       #hamburger-button-filter {
-         display: block;
-         /* Show the button on mobile */
-         width: 100%;
-		 	   margin-top: 70px !important;
-
-         /* Make it span the entire width of the screen */
-         text-align: center;
-         /* Center the icon/text inside the button */
-         padding: 10px 0;
-         /* Adjust padding as needed for better touch area */
-
-       }
+       
 
        .top-bar a .logo {
          margin-left: auto;
@@ -1292,7 +1215,8 @@
          /* Space between items */
          align-items: center;
          /* Vertically center items */
-         padding: 10px 15px;
+		 height: 70px;
+         padding: 0px 15px;
          /* Consistent padding */
        }
 
@@ -1316,23 +1240,7 @@
          /* Adjust height automatically */
        }
 
-       #hamburger-button {
-         display: block;
-         /* Show the button on mobile */
-         margin: 0;
-         /* Remove any margin */
-         align-self: center;
-         /* Explicitly center the button vertically */
-       }
 
-       #hamburger-button-filter {
-         display: block;
-         /* Show the button on mobile */
-         margin: 0;
-         /* Remove any margin */
-         align-self: center;
-         /* Explicitly center the button vertically */
-       }
 
 
        

@@ -6,15 +6,13 @@
 
 <style>
       body {
-        background-image: url('background2.png') !important;
 		}
 		
 		      body {
-        font-family: 'Roboto';
+        font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 
         background-color: #f5f1e4;
         color: black;
-        background-image: url('background2.png');
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
@@ -108,9 +106,7 @@ strong {
         height: auto;
     }
 
-    .form-container {
-        margin-top: 20px;
-    }
+
 	
 	
 	
@@ -274,7 +270,7 @@ strong {
 
 
       .form-container {
-        margin: 40px auto;
+        margin: 120px auto;
         width: 60%;
         background-color: #f5f1e4;
         padding: 40px;
@@ -432,54 +428,176 @@ strong {
         /* Optional: if you want rounded corners */
       }
 
-      .top-bar {
-        background-color: #003056;
-        /* Background color of the top bar */
-        height: 80px;
-        /* Height of the top bar */
-        width: 100%;
-        /* Full width of the screen */
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 20px;
-        /* Add padding to the left and right */
-        box-sizing: border-box;
-        /* Include padding in width calculation */
-        align-items: center;
-        /* This ensures vertical alignment */
-      }
+     .top-bar {
+   top: 0;
+     background-color: #003056;
+     /* Background color of the top bar */
+     height: 80px;
+     /* Height of the top bar */
+     width: 100%;
+     /* Full width of the screen */
+     display: flex;
 
-      .top-bar a .logo {
-        max-width: auto;
-        /* Adjust this value as needed */
-        max-height: 80px;
-        /* Ensure the logo fits within the bar's height */
-        margin: auto;
-      }
+     justify-content: space-between;
+     align-items: center;
+     padding: 20px 20px;
+     /* Add padding to the left and right */
+     box-sizing: border-box;
+     /* Include padding in width calculation */
+     align-items: center;
+	 position: fixed; /* This makes the bar stay at the top */
+	 z-index: 1050;
+     /* This ensures vertical alignment */
+   }
 
-      .logged-in-info {
-        text-align: center;
-        /* Centers the text inside the div */
-        padding: 2px 0;
-        /* Adds some padding above and below the text */
-        background-color: #f5f1e4;
-        /* Optional: background color, if you want to highlight the div */
-        /* Andere styling as needed, such as font size, color, etc. */
-      }
+   .top-bar a .logo {
+     max-width: auto;
+     /* Adjust this value as needed */
+     max-height: 80px;
+     /* Ensure the logo fits within the bar's height */
+     margin: auto;
+   }
+
+   /* Styles for buttons inside links in the top bar */
+   .top-bar a button {
+     transition: width 0.3s ease;
+     /* Transition for the transform property */
+     border-radius: 30px;
+     /* If you want to keep the border-radius */
+     /* Add any other button-specific styles here */
+   }
+
+   /* Hover effect for buttons inside links in the top bar */
 
 
-      /* Styles for buttons inside links in the top bar */
-      .top-bar a button {
-        transition: width 0.3s ease;
-        /* Transition for the transform property */
-        border-radius: 30px;
-        /* If you want to keep the border-radius */
-        /* Add any other button-specific styles here */
-      }
 
-      /* Hover effect for buttons inside links in the top bar */
+   /* Hover effect for links in the top bar */
+   .top-bar a:not(:has(button)):hover::after {
+     transform: scaleX(1);
+     /* Show the underscore on hover */
+     transform-origin: left;
+   }
 
+   .top-bar a {
+     color: white;
+     text-decoration: none;
+     margin-right: 20px;
+     /* Add spacing between links */
+     font-size: 18px;
+     /* Increase text size */
+     font-weight: bold;
+     /* Make text bold */
+     position: relative;
+     transition: color 0.3s ease, text-shadow 0.3s ease;
+     /* Transition for color and text shadow */
+   }
+
+
+   /* Exclude the logo link from having the underline effect */
+   .top-bar a[href="/"]:hover::after {
+     content: none;
+   }
+
+   /* Underline effect for links that do not contain the logo */
+   .top-bar a:not(:has(> .logo))::after {
+     content: "";
+     position: absolute;
+     left: 0;
+     bottom: -3px;
+     width: 100%;
+     height: 2px;
+     background-color: white;
+     transform: scaleX(0);
+     transform-origin: right;
+     transition: transform 0.3s;
+   }
+
+   /* Centering Pagination Wrapper */
+   nav[aria-label="Page navigation"] {
+     display: flex;
+     /* Use flexbox for alignment */
+     justify-content: center;
+     /* Center horizontally */
+     margin: 20px 0;
+     /* Add vertical margin for spacing */
+   }
+
+   /* Pagination Container */
+   .pagination {
+     background-color: #003056;
+     /* Background color */
+     border-radius: 30px;
+     /* Border radius */
+     padding: 10px;
+     /* Inner spacing */
+     display: inline-flex;
+     /* Align pagination items inline and allow flex properties */
+   }
+
+   /* Pagination Links */
+   .pagination .page-link {
+     color: white;
+     background-color: transparent;
+     border: none;
+     margin: 0 5px;
+     text-decoration: none;
+     /* Remove underline */
+     font-weight: bold;
+     /* Make it bold */
+   }
+
+   /* Pagination Items */
+   .pagination .page-item {
+     display: inline-block;
+     /* Display items inline */
+   }
+
+   /* Pagination Active Page */
+   .pagination .page-item.active .page-link {
+     background-color: #02569d;
+     /* Background for active page */
+     border-color: #02569d;
+     /* Border for active page */
+   }
+
+   /* Pagination Item Hover */
+   .pagination .page-item:hover .page-link {
+     background-color: #2874A6;
+     /* Slightly lighter blue on hover */
+     border-color: #2874A6;
+     /* Border color on hover */
+   }
+
+
+
+   /* Additional styles for .logo to ensure it fits well in the top bar */
+   .top-bar a .logo {
+     max-width: auto;
+     /* Adjust this value as needed */
+     max-height: 80px;
+     /* Ensure the logo fits within the bar's height */
+     margin: auto;
+   }
+
+   .top-bar a:hover {
+     color: #a8c0ff;
+     /* Change color on hover */
+     text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.7);
+     /* Add text shadow on hover */
+   }
+
+   .top-bar a::after {
+     content: "";
+     position: absolute;
+     left: 0;
+     bottom: -3px;
+     width: 100%;
+     height: 2px;
+     background-color: white;
+     transform: scaleX(0);
+     transform-origin: right;
+     transition: transform 0.3s;
+   }
 
 .register-button {
 	background-color: #003056;
@@ -811,12 +929,15 @@ strong {
           /* Adjust height automatically */
         }
 
-        .form-container {
-          width: 90%;
-          /* Full width with some margin */
-          padding: 20px;
-          /* Smaller padding */
-        }
+  .form-container {
+    width: 100%;
+	margin-top: 60px !important;
+
+padding: 30px;
+margin: 0px;
+margin-bottom: 0px !important;
+border-radius: 0px;
+  }
 
         .publish-button {
           font-size: 18px;
