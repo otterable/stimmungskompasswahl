@@ -59,6 +59,9 @@ body {
   box-sizing: border-box;
 }
 
+.gdprConsent p {
+			  text-align: center !important; /* Center align <p> text */
+}
 .form-section h3, .checkbox-section p {
 		  text-align: center !important; /* Center align <p> text */
 }
