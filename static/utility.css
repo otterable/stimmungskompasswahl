@@ -29,14 +29,15 @@
      /* Darker shade of grey on hover */
    }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+html {
+  height: -webkit-fill-available; /* For mobile browsers that support it, like Safari */
 }
 
 body {
+  min-height: 100vh; /* Ensure the body covers at least the viewport height */
+  min-height: -webkit-fill-available; /* For mobile browsers like Safari */
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -46,14 +47,22 @@ body {
   background-color: #f5f1e4;
   background-position: center center;
   background-repeat: no-repeat;
-  background-size: cover; /* Ensures cover without stretching */
-  background-attachment: scroll; /* Changed to scroll for better mobile compatibility */
+  background-size: cover; /* Ensures the background covers the whole area */
+  background-attachment: fixed; /* Keep the background fixed during scrolling */
+  width: 100vw; /* Cover the full viewport width */
+  
+  /* Use viewport units for padding to include the safe area inset */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
-/* Adjust content padding to respect safe areas */
+/* Additional styles for content within the body to respect the safe areas */
 .content {
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
+
 
 .gdprConsent p {
 			  text-align: center !important; /* Center align <p> text */

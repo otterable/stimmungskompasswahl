@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head_section %}
+<link rel="stylesheet" href="{{ url_for('serve_image', filename='Ueber_Partizipative_Planung.css') }}">
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+
+<title>Open Data - Stimmungskompass</title>
+
+{% endblock %}
+
+
+{% block header %}
+{% include 'partials/header/index.html' %}
+{% endblock %}
+
+{% block content %}
+{% include 'contact/contact.html' %}
+{% endblock %}
+
+{% block footer %}
+{% include 'partials/footer/index.html' %}
+{% endblock %}
+
+{% block scripts %}
+{% include 'contact/contact.js' %}
+{% endblock %}
+

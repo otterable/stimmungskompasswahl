@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head_section %}
+<link rel="stylesheet" href="{{ url_for('serve_image', filename='Ueber_Partizipative_Planung.css') }}">
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+
+<title>Stimmungskompass</title>
+
+{% endblock %}
+
+
+{% block header %}
+{% include 'partials/header/index.html' %}
+{% endblock %}
+
+{% block content %}
+{% include 'privacy/privacy.html' %}
+{% endblock %}
+
+{% block footer %}
+{% include 'partials/footer/index.html' %}
+{% endblock %}
+
+{% block scripts %}
+{% include 'privacy/privacy.js' %}
+{% endblock %}
+

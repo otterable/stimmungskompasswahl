@@ -814,7 +814,6 @@
    .project-thumbnail img {
      width: 90%;
      margin-top: 20px;
-     height: 400px;
      /* Fixed height for images */
      object-fit: cover;
      border-radius: 30px;

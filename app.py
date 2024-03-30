@@ -3555,6 +3555,23 @@ def GDPR_DSGVO_Impressum():
     # Additional logic can be added here if needed
     return render_template("GDPR_DSGVO_Impressum/index.html", metaData=metaData)
 
+@app.route("/privacy")
+def privacy():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    metaData=g.metaData
+    # Additional logic can be added here if needed
+    return render_template("privacy/index.html", metaData=metaData)
+
+@app.route("/contact")
+def contact():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    metaData=g.metaData
+    # Additional logic can be added here if needed
+    return render_template("contact/index.html", metaData=metaData)
+
+
 
 @app.route("/delete_project/<int:project_id>", methods=["POST"])
 @login_required
