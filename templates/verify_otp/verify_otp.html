@@ -11,10 +11,10 @@
 <title>Passwort bestätigen</title>
 </head>
 <body>
-  <h3>Sie sind fast mit Ihrer Kontoerstellung fertig.</h3>
-  <h3>Geben Sie den Code ein, der an Ihr Telefon gesendet wurde, um Ihre Registrierung zu bestätigen!</h3>
+  <h3 style="margin-top: 10px;">Sie sind fast mit Ihrer Kontoerstellung fertig.</h3>
+  <p style="margin-top: 10px;">Geben Sie den Code ein, der an Ihr Telefon gesendet wurde, um Ihre Registrierung zu bestätigen!</p>
   <form action="{{ url_for('verify_otp') }}" method="post">
-    <input type="text" name="otp" placeholder="Passwort eingeben" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required class="input">
+    <input type="text" name="otp" placeholder="Passwort eingeben" style="border-radius: 30px; margin-top: 10px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required class="input">
     <button type="submit" class="button">Verifizieren</button>
   </form>
 </div>

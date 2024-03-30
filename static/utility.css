@@ -145,9 +145,13 @@ h3 {
 
 @media only screen and (max-width: 1080px) {
 
+
+h3 {
+	  margin-top: 2px; !important; /* Center align <p> text */
+}
+
 .form-container {
     width: 100%; /* Full width on smaller screens */
-    margin-top: 60px !important;
     padding: 30px;
     margin: 0px;
     margin-bottom: 0px !important;

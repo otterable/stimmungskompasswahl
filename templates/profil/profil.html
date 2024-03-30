@@ -22,8 +22,18 @@
 <div class="projects-header">
           <div class="marker-limit-info">
     <h3 style="font-weight:bold;">Projektvorschläge: <span class="highlight">{{ user_statistics.num_projects }}</span></h3>
-    <h3 style="font-weight:bold;">Meistgesehenes Projekt: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_viewed_project.id) }}">{{ user_statistics.most_viewed_project.name }}</a> (<span class="highlight">{{ user_statistics.most_viewed_project.view_count }}</span> Ansichten)</h3>
-    <h3 style="font-weight:bold;">Höchstbewertetes Projekt: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_successful_project.id) }}">{{ user_statistics.most_successful_project.name }}</a> (<span class="highlight">{{ user_statistics.most_successful_project.upvotes }}</span> positive Bewertungen)</h3>
+   {% if user_statistics.most_viewed_project %}
+<h3 style="font-weight:bold;">Meistgesehenes Projekt: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_viewed_project.id) }}">{{ user_statistics.most_viewed_project.name }}</a> (<span class="highlight">{{ user_statistics.most_viewed_project.view_count }}</span> Ansichten)</h3>
+{% else %}
+<h3 style="font-weight:bold;">Meistgesehenes Projekt: Keine Projekte vorhanden</h3>
+{% endif %}
+
+{% if user_statistics.most_successful_project %}
+<h3 style="font-weight:bold;">Höchstbewertetes Projekt: <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=user_statistics.most_successful_project.id) }}">{{ user_statistics.most_successful_project.name }}</a> (<span class="highlight">{{ user_statistics.most_successful_project.upvotes }}</span> positive Bewertungen)</h3>
+{% else %}
+<h3 style="font-weight:bold;">Höchstbewertetes Projekt: Keine Projekte vorhanden</h3>
+{% endif %}
+
   </div>
 </div>
 
