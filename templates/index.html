@@ -67,10 +67,14 @@
     </div>
 </div>
 <!-- Featured Projects Section -->
-<div class="projects-header">
+<div class="stats-container">
+
+    <div class="info-text-container">
     <h2>Ausgewählte Projekte:</h2>
-    <p class="p-projectsheader">Sehen Sie sich die Projektvorschläge an, die von der Stadt als interessant ausgewählt wurden.</p>
+   <p class="info-text-undertitle">Sehen Sie sich die Projektvorschläge an, die von der Stadt als interessant ausgewählt wurden.</p>
 </div>
+</div>
+
 <div class="stats-container">
     {% if featured_projects %} {% for project in featured_projects %} 
     <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="window.location.href='{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}'">
