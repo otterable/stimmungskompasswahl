@@ -368,7 +368,7 @@ function generatePopupContent(question) {
     popupContent += `
       <hr>
       <div style="text-align: center;">
-        <h3>Beantworten Sie diese Frage und markieren Sie sie als beantwortet!</h3>
+        <p style="font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: bold;">Beantworten Sie diese Frage und markieren Sie sie als beantwortet!</p>
         <textarea id="answer-text-${question.id}" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Ihre Antwort hier..."></textarea>
         <br>
         <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>
@@ -409,7 +409,7 @@ function fetchQuestions() {
           popupContent += `
             <hr>
             <div style="text-align: center;">
-              <h3>Beantworten Sie diese Frage und markieren Sie sie als beantwortet!</h3>
+              <p style="font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: bold;">Beantworten Sie diese Frage und markieren Sie sie als beantwortet!</p>
               <textarea id="answer-text-${question.id}" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Ihre Antwort hier..."></textarea>
               <br>
               <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>

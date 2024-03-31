@@ -2316,30 +2316,36 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
       }
       /* Hamburger Menu Button */
       /* Navigation Overlay */
-      .nav-overlay {
-      display: none;
-      /* Hidden by default */
-      position: fixed;
-      /* Fixed position */
-      width: 100%;
-      /* Full width */
-      height: 100%;
-      /* Full height */
-      top: 0;
-      left: 0;
-      background-color: rgba(0, 0, 0, 0.9);
-      /* Semi-transparent black */
-      overflow-x: hidden;
-      /* Hide horizontal overflow */
-      transition: 0.5s;
-      /* Smooth transition for opening/closing */
-      z-index: 10001 !important;
-      /* High z-index to ensure it's on top */
-      }
-      .nav-overlay-active .main-content {
-      pointer-events: none;
-      }
-      }
+  .nav-overlay {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed position */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    /* Semi-transparent black */
+    overflow-x: hidden;
+    /* Hide horizontal overflow */
+    transition: 0.5s;
+    /* Smooth transition for opening/closing */
+    z-index: 1050; /* Highest z-index */
+    /* High z-index to ensure it's on top */
+  }
+
+
+  .nav-overlay-active {
+    display: block;
+  }
+
+  .nav-overlay-active .main-content {
+    pointer-events: none;
+  }
+}
       /* Mobile Devices */
       @media only screen and (max-width: 1080px) {
       label {

@@ -11,8 +11,10 @@
 
     <!-- Sidebar Content -->
     <div id="markers-list-overlay" class="markers-sidebar" style="display: none;">
-      <div class="scrollable-content">
+     
         <!-- HTML for Filter and Sort Dropdowns -->
+			    <div class="header-container">
+
     <div class="header-navigation">
           <select id="question-status-filter" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
             <option value="all">Alle Fragen anzeigen</option>
@@ -25,13 +27,15 @@
             <option value="oldest">Älteste</option>
           </select>
         </div>
-		
+		        </div>
 		    <div class="scrollable-list">
 
         <ul id="markers-list" style="margin-bottom:20px;">
           <!-- Marker items will be added here dynamically -->
         </ul>
       </div>
+	      <div class="footer-container">
+
 	      <div class="footer-navigation">
 
 
@@ -41,8 +45,20 @@
     </div>
 
     <div class="sidebar" id="sidebar">
-      <h1 id="baustelle-title">{{ baustelle.name }}</h1> {% if is_admin %} <a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m edit-button" style="margin-bottom: 10px; margin-top: 10px !important;">Inhalte bearbeiten</a> {% endif %} {% if baustelle.image %} <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%;"> {% endif %} <button id="show-markers-btn" class="register-button-m" style="background-color:#003056; margin-top: 10px !important; margin-bottom: 10px !important;">Liste</button>
-      <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+      <h1 id="baustelle-title">{{ baustelle.name }}</h1> {% if is_admin %}
+	  
+	  	 <div class="button-container">
+	  <a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m" style="margin-bottom: 10px">Inhalte bearbeiten</a>
+	              </div>
+
+
+	  {% endif %} {% if baustelle.image %} <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%;"> {% endif %}
+	  
+	 <div class="button-container">
+	  <button id="show-markers-btn" class="register-button-m" style="margin-top:10px; !important">Liste</button>
+            </div>
+
+	  <div id="baustelle-description">{{ baustelle.description | safe }}</div>
       <div id="geojsonFilesList" style="margin-bottom: 20px;">
         <ul id="loadedFiles"></ul>
       </div>

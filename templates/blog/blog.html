@@ -326,6 +326,7 @@ strong {
 
 .center-wrapper h1 {
     margin-bottom: 15px; /* Adjust as necessary to create space between the heading and the button */
+	font-weight: bold;
 }
 
 .horse-noise {
@@ -336,6 +337,7 @@ strong {
 }
 .center-wrapper {
     text-align: center; /* Ensures content is centered */
+	margin-top: 80px;
     padding: 20px; /* Adds padding inside the wrapper for spacing */
     display: flex; /* Use flex to control the direction and spacing of children */
     flex-direction: column; /* Stack children vertically */
@@ -351,8 +353,18 @@ strong {
     font-weight: bold; /* Makes the text bold */
 }
 
+.center-wrapper h3 {
+    font-size: 18px !important; /* Keeps the font size as previously defined */
 
+    max-width: 95%; /* Continues to limit the width for readability */
+    margin: 20px auto; /* Keeps the vertical space around the text */
+    text-align: center; /* Ensures the text is centered */
+    font-weight: bold; /* Makes the text bold */
+}
 
+p {
+font-size: 16px !important;
+}
 .form-container2 {
     display: inline-block; /* Adjusts width to fit content and allows for centering */
     margin: 10px auto; /* Top and bottom margins with auto horizontal margins */
@@ -1147,7 +1159,7 @@ font-size: 4vw !important;
 
 <div class="center-wrapper">
     <h1>Willkommen auf unserem Blog!</h1>
-    <p>Hier können Sie Neuigkeiten über den Fortschritt unserer Projekte und alle Updates bezüglich des Stimmungskompasses lesen.</p>
+    <h3 style="margin-top:10px;">Hier können Sie Neuigkeiten über den Fortschritt unserer Projekte und alle Updates bezüglich des Stimmungskompasses lesen.</h3>
     {% if current_user.is_authenticated and current_user.id == 1 %}
     <!-- Visible only to admin -->
     <button onclick="location.href='{{ url_for('createpost') }}'" class="btn register-button">Neuen Blogpost erstellen</button>

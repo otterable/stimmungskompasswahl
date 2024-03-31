@@ -52,53 +52,76 @@ function updatePaginationContent(url, containerId) {
         document.getElementById(containerId).innerHTML = html;
     }).catch(error => console.error('Error:', error));
 }
-// Toggle the navigation overlay when the hamburger button is clicked
-document.getElementById('hamburger-button').addEventListener('click', function() {
-    var navOverlay = document.getElementById('nav-overlay');
-    navOverlay.classList.toggle('nav-overlay-active');
-});
-// Close the navigation overlay when clicking on the overlay background or on a non-button element
-document.getElementById('nav-overlay').addEventListener('click', function(event) {
-    // Close only if the clicked element is not a button or a link
-    if (!event.target.closest('button, a')) {
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const navOverlay = document.getElementById('nav-overlay');
+    const navLinks = document.getElementById('nav-links'); // Container of the links
+    const hamburgerButton = document.getElementById('hamburger-button');
+    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+
+    // Toggle the navigation overlay visibility
+    function toggleNavOverlay() {
+        navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
+        console.debug(navOverlay.style.display === 'block' ? 'nav-overlay opened.' : 'nav-overlay closed.');
+    }
+
+    // Specifically close the navigation overlay
+    function closeNavOverlay() {
+        navOverlay.style.display = 'none';
+        console.debug('nav-overlay explicitly closed.');
+    }
+
+    // Open the navigation overlay explicitly
+    function openNavOverlay() {
+        navOverlay.style.display = 'block';
+        console.debug('nav-overlay opened.');
+    }
+
+    // Toggle the nav-overlay on hamburger button click
+    hamburgerButton.addEventListener('click', function() {
+        if (window.innerWidth <= 1080) { // Ensure action only on mobile
+            toggleNavOverlay();
+        }
+    });
+
+    // Close the nav-overlay using the close button
+    closeOverlayBtn.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent triggering navOverlay's click event
         closeNavOverlay();
-    }
-});
-// Function to close the navigation overlay
-function closeNavOverlay() {
-    var navOverlay = document.getElementById('nav-overlay');
-    navOverlay.classList.remove('nav-overlay-active');
-}
-// Prevent closing when clicking on buttons (delegation)
-document.getElementById('nav-links').addEventListener('click', function(event) {
-    if (event.target.tagName === 'BUTTON' || event.target.tagName === 'A') {
+    });
+
+    // Event listener for closing nav-overlay when clicking outside the links
+    navOverlay.addEventListener('click', function(event) {
+        // Detect clicks that are not on the links or the close button and within mobile view
+        if (!navLinks.contains(event.target) && window.innerWidth <= 1080) {
+            closeNavOverlay();
+        }
+    });
+
+    // Stop propagation of clicks on nav-links to prevent them from closing the overlay
+    navLinks.addEventListener('click', function(event) {
         event.stopPropagation();
+    });
+
+    // Initial display adjustment for nav-overlay based on screen width
+    function adjustNavOverlayDisplay() {
+        navOverlay.style.display = window.innerWidth > 1080 ? 'block' : 'none';
     }
+    adjustNavOverlayDisplay();
+
+    // Adjust display of nav-overlay on window resize
+    window.addEventListener('resize', adjustNavOverlayDisplay);
 });
 
 
-// Resize event listener
-window.addEventListener('resize', function() {
-    // Check if the window width is greater than the threshold for mobile view
-    if (window.innerWidth > 1080) {
-        // Make sure the nav-overlay is displayed
-        document.getElementById('nav-overlay').classList.add('nav-overlay-active');
-    } else {
-        // For mobile view, revert back to the default behavior
-        document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
-    }
-});
 
 
-// Call the function on page load to set the initial state
-function toggleOverlay() {
-    var overlay = document.getElementById("category-choices");
-    if (overlay.style.display === "none") {
-        overlay.style.display = "flex";
-    } else {
-        overlay.style.display = "none";
-    }
-}
+
+
 // JavaScript function to handle redirection to Stimmungskarte
 function redirectToStimmungskarte() {
     window.location.href = '/Partizipative_Planung_Karte';
@@ -615,13 +638,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Toggle navigation overlay
-    const hamburgerButton = document.getElementById('hamburger-button');
-    const navOverlay = document.getElementById('nav-overlay');
-    if (hamburgerButton && navOverlay) {
-        hamburgerButton.addEventListener('click', function() {
-            navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
-        });
-    }
+
 });
 
 function isAnySectionOpen() {

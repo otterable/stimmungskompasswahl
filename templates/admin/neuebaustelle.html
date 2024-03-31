@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <meta charset="UTF-8">
         <title>Create New Baustelle</title>
@@ -2334,31 +2335,38 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
         /* Adjust padding */
         }
         /* Hamburger Menu Button */
-        /* Navigation Overlay */
-        .nav-overlay {
-        display: none;
-        /* Hidden by default */
-        position: fixed;
-        /* Fixed position */
-        width: 100%;
-        /* Full width */
-        height: 100%;
-        /* Full height */
-        top: 0;
-        left: 0;
-        background-color: rgba(0, 0, 0, 0.9);
-        /* Semi-transparent black */
-        overflow-x: hidden;
-        /* Hide horizontal overflow */
-        transition: 0.5s;
-        /* Smooth transition for opening/closing */
-        z-index: 10001 !important;
-        /* High z-index to ensure it's on top */
-        }
-        .nav-overlay-active .main-content {
-        pointer-events: none;
-        }
-        }
+		
+		
+      .nav-overlay {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Fixed position */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    /* Semi-transparent black */
+    overflow-x: hidden;
+    /* Hide horizontal overflow */
+    transition: 0.5s;
+    /* Smooth transition for opening/closing */
+    z-index: 1050; /* Highest z-index */
+    /* High z-index to ensure it's on top */
+  }
+
+
+  .nav-overlay-active {
+    display: block;
+  }
+
+  .nav-overlay-active .main-content {
+    pointer-events: none;
+  }
+}
         /* Mobile Devices */
         @media only screen and (max-width: 1080px) {
         label {
@@ -2386,20 +2394,23 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
         /* Adjust logo position */
         margin-right: auto;
         }
-        #nav-links {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        }
-        #nav-links a {
-        padding: 20px;
-        /* Larger clickable area */
-        font-size: 22px;
-        /* Larger font size */
-        }
-        }
+  #nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+	background-color: #003056;
+  }
+
+  #nav-links a {
+    padding: 15px !important;
+	
+    /* Larger clickable area */
+    font-size: 22px;
+    /* Larger font size */
+  }
+}
         /* Mobile Devices */
         @media only screen and (max-width: 1080px) {
         .top-bar {
@@ -3313,6 +3324,125 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
                     });
                 }
             })
+			
+					 
+		 	document.addEventListener('click', function(event) {
+    // Check if the click is within the voting bar or its child elements
+    if (event.target.closest('.voting-bar, .upvotes, .downvotes')) {
+        return; // Exit the function early if click is on the voting bar
+    }
+    var markerOverlay = document.getElementById('marker-overlay');
+    var overlayContent = document.getElementById('overlay-content');
+    var navOverlay = document.getElementById('nav-overlay');
+    var videoOverlay = document.getElementById('video-overlay'); // First video overlay
+    var videoOverlay2 = document.getElementById('video-overlay-2'); // Second video overlay
+    // Check if the clicked element is part of the nav-overlay
+    if (navOverlay && navOverlay.contains(event.target)) {
+        return; // Exit the function if clicked inside nav-overlay
+    }
+    // Check if the clicked element is part of the video-overlay
+    if (videoOverlay && videoOverlay.contains(event.target)) {
+        return; // Exit the function if clicked inside video-overlay
+    }
+    // Check if the clicked element is part of the video-overlay-2
+    if (videoOverlay2 && videoOverlay2.contains(event.target)) {
+        return; // Exit the function if clicked inside video-overlay-2
+    }
+    // Close the marker overlay if it is open and the click is outside its content
+    if (markerOverlay && markerOverlay.style.display !== 'none' && !overlayContent.contains(event.target)) {
+        markerOverlay.style.display = 'none';
+    } else {}
+});
+            const closeOverlayBtns = document.querySelectorAll("[onclick^='closeVideoOverlay']");
+    closeOverlayBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const overlayId = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+            document.getElementById(overlayId).style.display = 'none';
+        });
+    });
+
+    
+
+function adjustOverlayDisplayForDevice() {
+        const navOverlay = document.getElementById('nav-overlay');
+        const screenWidth = window.innerWidth;
+        if (screenWidth > 1080) {
+            navOverlay.style.display = 'block';
+        } else {
+            navOverlay.style.display = 'none';
+        }
+    }
+
+
+
+    // Close overlay function for the close-overlay-btn button
+    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+    if (closeOverlayBtn) {
+        closeOverlayBtn.addEventListener('click', function() {
+            // Adjust this to target the correct overlay ID you wish to close
+            document.getElementById('nav-overlay').style.display = 'none';
+        });
+    }
+
+    // Call the function on load and on resize
+    adjustOverlayDisplayForDevice();
+    window.addEventListener('resize', adjustOverlayDisplayForDevice);
+
+// Toggle the navigation overlay
+function toggleNavOverlay() {
+    var navOverlay = document.getElementById('nav-overlay');
+    if (navOverlay.style.display === 'block') {
+        navOverlay.style.display = 'none';
+    } else {
+        navOverlay.style.display = 'block';
+    }
+}
+// Close the navigation overlay when clicking on the overlay background or on a non-button element
+document.getElementById('nav-overlay').addEventListener('click', function(event) {
+    // Close only if on mobile
+    if (window.innerWidth <= 1080 && !event.target.closest('button, a')) {
+        toggleNavOverlay();
+    }
+});
+// Event listener for hamburger button
+document.getElementById('hamburger-button').addEventListener('click', toggleNavOverlay);
+// Resize event listener
+window.addEventListener('resize', function() {
+    var navOverlay = document.getElementById('nav-overlay');
+    // Show on desktop, hide on mobile
+    if (window.innerWidth > 1080) {
+        navOverlay.style.display = 'block';
+    } else {
+        navOverlay.style.display = 'none';
+    }
+});
+// Set initial state of the nav-overlay based on device width
+window.onload = function() {
+    var navOverlay = document.getElementById('nav-overlay');
+    // Show on desktop, hide on mobile
+    if (window.innerWidth > 1080) {
+        navOverlay.style.display = 'block';
+    } else {
+        navOverlay.style.display = 'none';
+    }
+};
+
+function validateMarkerDescription(event) {
+    var description = document.getElementById('marker-description').value;
+
+    // Check for spammy content
+    if (isSpam(description)) {
+        event.preventDefault(); // Prevent form submission
+        return false;
+    }
+
+    // Add more validation checks as needed
+}
+
+
+
+
         </script>
     </body>
 </html>

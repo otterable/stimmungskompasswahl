@@ -1186,6 +1186,10 @@ nav[aria-label="Page navigation"] {
 	}
 
 
+#nav-overlay.active {
+    display: block;
+}
+
 	/* Navigation Overlay */
 	.nav-overlay {
 		display: none;

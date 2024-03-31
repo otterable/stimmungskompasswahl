@@ -108,6 +108,8 @@ p {
   justify-content: center; /* Center children vertically (for when the container is taller than its content) */
   align-items: center; /* Center children horizontally */
   min-height: 50vh; /* Minimum height of the form container */
+      word-wrap: break-word; /* This ensures long words will break and wrap onto the next line */
+
 }
 
 h3 {
@@ -157,12 +159,199 @@ h3 {
     margin-bottom: 0px !important;
     border-radius: 30px;
   }
+    .form-container2 {
+    width: 100%;
+	margin-top: 20px !important;
+
+padding: 30px;
+margin: 0px;
+margin-bottom: 0px !important;
+border-radius: 0px;
+  }
+}
+
+    .form-container {
+        margin-top: 0px;
+    }
+	
+	    .form-container2 {
+        margin-top: 0px;
+    }
+	
+	.form-container2 h1 {
+    text-align: center; /* Centers the title within its container */
+}
+
+/* Ensure your existing .form-container2 styling does not conflict */
+.form-container2 {
+    text-align: center; /* Centers content horizontally */
+    /* Add other styling as needed */
+}
+
+  
+
+.form-container2 {
+	    word-wrap: break-word; /* This ensures long words will break and wrap onto the next line */
+
+    margin-top: 0px; /* Top and bottom margin as desired, auto left and right margins for centering */
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 40px;
+    width: 90%; /* Or any width you prefer */
+    padding: 0px;
+    border-radius: 30px;
+    box-sizing: border-box; /* Ensures padding doesn't affect the final width */
+    display: flex; /* Makes it a flex container */
+    flex-direction: column; /* Aligns children elements vertically */
+    align-items: center; /* Centers the child elements horizontally */
+    justify-content: center; /* Centers the child elements vertically, useful if there's extra space */
+}
+
+.form-container2 {
+    text-align: center; /* Centers content horizontally */
+    /* Add other styling as needed */
+}
+  
+
+.stat-box {
+    background-color: #f5f5f5;
+    width: 60%;
+margin-left: 0px !important;
+margin-right: 0px !important;
+
+    padding: 20px;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    word-wrap: break-word; /* This ensures long words will break and wrap onto the next line */
+}
+
+
+.project-thumbnail {
+     background-color: #e5e2d5;
+     border-radius: 30px;
+     margin: 10px;
+     padding: 10px;
+     display: flex;
+     /* Changed to flex to better control the layout */
+     flex-direction: column;
+     /* Stack items vertically */
+     align-items: center;
+     /* Center items horizontally */
+     box-sizing: border-box;
+     transition: width 0.3s ease;
+     position: relative;
+     overflow: visible;
+     /* Ensure the content is not clipped */
+     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+   transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
+    will-change: auto; /* Default state, only specify if needed for performance */
+    /* Removed transform scale to prevent blurriness */
+}
+
+
+   /* Hover effect for project thumbnails */
+   .project-thumbnail:hover {
+     transform: scale(1.005);
+     transition: width 0.3s ease;
+	     box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Example shadow */
+
+   }
+
+   /* Image style within project thumbnails */
+   .project-thumbnail img {
+     width: 90%;
+     margin-top: 20px;
+     height: 400px;
+     /* Fixed height for images */
+     object-fit: cover;
+     border-radius: 30px;
+   }
+
+   /* Text style inside project thumbnails */
+   .project-thumbnail h2,
+   .project-thumbnail p {
+     margin: 0;
+     padding: 5px 0;
+     width: 100%;
+     /* Adjust the width to match the image */
+     text-align: center;
+     /* Center the text */
+   }
+
+   /* Remove absolute positioning from the description */
+   .project-thumbnail p {
+     position: relative;
+     /* Changed from absolute to relative */
+     bottom: auto;
+     /* Remove bottom positioning */
+     overflow: visible;
+     /* Ensure text is not clipped */
+   }
+
+   /* Desktop screens (larger than 1200px) */
+   @media (min-width: 1445px) {
+     .project-thumbnail {
+       width: calc(33.333% - 20px);
+       /* Three items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
+
+   /* Medium screens (between 1024px and 1199px) */
+   @media (min-width: 1080px) and (max-width: 1445px) {
+     .project-thumbnail {
+       width: calc(50% - 20px);
+       /* Two items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
+
+   /* Mobile screens (less than 1024px) */
+   @media (max-width: 1088px) {
+     .project-thumbnail {
+       width: calc(100% - 20px);
+       /* Full width */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+
+     .project-thumbnail img {
+       height: auto;
+       /* Adjust image height for mobile */
+     }
+   }
+   
+      .stats-container {
+     text-align: center;
+     display: flex;
+     flex-wrap: wrap;
+     justify-content: center;
+   }
+
+
+
+
+@media (min-width: 1080px) and (max-width: 1445px) {
+	.stat-box {
+		flex-basis: calc(50% - 20px);
+		/* For tablet */
+	}
+}
+
+@media (max-width: 1080px) {
+	.stat-box {
+		flex-basis: 100%;
+		/* For mobile */
+	}
 }
   
   
-  
-  
-  
+     
+
+
+
 
 a {
 color: #003056;

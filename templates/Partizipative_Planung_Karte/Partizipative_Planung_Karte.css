@@ -2351,25 +2351,64 @@ margin-bottom: 0px !important;
 
 
 
-/* Ensure the footer is always visible at the bottom */
-/* Base styling for the footer navigation */
+/* Mobile Styles */
 @media only screen and (max-width: 768px) {
-    /* Styles for the footer navigation */
     .footer-navigation {
-        position: fixed;
-        bottom: 0;
-		        display: flex !important; /* Ensure the footer is displayed */
-width: 100%; /* Full width */
-        text-align: center; /* Center-align the content */
+        position: fixed; /* Stick to the bottom of the viewport */
+        bottom: 0; /* Align at the bottom */
         left: 0;
         right: 0;
-        background-color: #003056; /* Background color for mobile footer */
-        padding: 10px 0; /* Adjust padding as needed */
-        z-index: 1005; /* Ensure visibility above other elements */
-        flex-direction: row; /* Ensure buttons are in a row */
+        background-color: #003056; /* Adjust the background color as needed */
+        padding: 10px 0;
+        display: flex;
+        justify-content: center; /* Center the content */
+        align-items: center; /* Align items vertically */
+        width: 100%; /* Full width */
+        box-sizing: border-box; /* Include padding in width calculation */
+        z-index: 1050; /* Ensure it's above most other elements */
     }
 }
 
+/* Desktop Styles */
+@media only screen and (min-width: 769px) {
+    .footer-navigation {
+        position: sticky !important;
+        bottom: 0;
+        width: 100%;
+        border-radius: 30px;
+        padding: 0px 0; /* Adjusted padding */
+        background-color: #003056; /* Solid background color */
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: auto; /* Ensure it stays at the bottom */
+        overflow: hidden; /* Prevents child elements from overflowing */
+        z-index: 10; /* Adjust z-index to ensure it's above other content */
+    }
+
+    /* If there's a specific container for the footer, ensure it fills the bottom area */
+    .footer-container { /* Adjust the selector based on your structure */
+        position: sticky;
+        bottom: 0;
+        width: 100%;
+		background-color: #f5f1e4;
+        padding-top:10px; /* No padding */
+        margin: 0; /* No margin */
+        z-index: 10; /* Adjust as necessary */
+    }
+	    /* If there's a specific container for the footer, ensure it fills the bottom area */
+    .header-container { /* Adjust the selector based on your structure */
+        position: sticky;
+        top: 0;
+        width: 100%;
+		background-color: #f5f1e4;
+        padding-bottom:10px; /* No padding */
+		padding-top:0px;
+        margin: 0; /* No margin */
+        z-index: 10; /* Adjust as necessary */
+    }
+}
 /* Styling for buttons within .footer-navigation */
 .register-button-cl {
     border-radius: 20px;
@@ -2420,6 +2459,13 @@ filter: brightness(110%);
 	.header-navigation {
 
 			padding-top: 20px !important;
+			position: sticky !Important;
+			
+	}
+		.header-container {
+top:0px !important;
+			position: sticky !Important;
+			
 	}
 }
 
@@ -2760,3 +2806,6 @@ transition: width 0.3s ease;
 transform: scale(1.005);
 transition: width 0.3s ease;
 }
+
+
+

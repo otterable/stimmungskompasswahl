@@ -1325,10 +1325,7 @@ function displayViewerStats(data) {
 
 
 
-document.getElementById('hamburger-button').addEventListener('click', function() {
-  var navOverlay = document.getElementById('nav-overlay');
-  navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
-});
+
 document.getElementById('hamburger-button-filter').addEventListener('click', function() {
   var filterOverlay = document.getElementById('filter-overlay');
   filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
@@ -1342,18 +1339,7 @@ document.getElementById('filter-overlay').addEventListener('click', function(eve
 document.getElementById('filter-form-mobile').addEventListener('click', function(event) {
   event.stopPropagation();
 });
-document.addEventListener('click', function(event) {
-  var navOverlay = document.getElementById('nav-overlay');
-  var navLinks = document.getElementById('nav-links');
-  var hamburgerButton = document.getElementById('hamburger-button');
-  if (window.innerWidth <= 1080) {
-      if (navOverlay.style.display === 'block' && !navOverlay.contains(event.target) && !hamburgerButton.contains(event.target)) {
-          navOverlay.style.display = 'none';
-      } else if (navLinks.contains(event.target)) {
-          navOverlay.style.display = 'none';
-      }
-  }
-});
+
 document.addEventListener("DOMContentLoaded", function() {
   const urlParams = new URLSearchParams(window.location.search);
   const projectID = urlParams.get('projectID');

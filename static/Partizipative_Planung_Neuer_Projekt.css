@@ -500,6 +500,8 @@ input[type="file"] {
   align-items: center;
 position: fixed; /* This makes the bar stay at the top */
 	 top: 0;
+	 	  z-index: 1010;
+
 	 }
 
 .top-bar a .logo {
@@ -795,6 +797,12 @@ position: fixed; /* This makes the bar stay at the top */
   /* Hidden by default */
 }
 
+#description-editor, #benefit-editor, #map {
+    /* No specific z-index required unless they are positioned out of flow */
+    position: relative; /* Adjust based on your layout needs */
+}
+
+
 @media only screen and (max-width: 1080px) {
 
   html,
@@ -832,6 +840,8 @@ position: fixed; /* This makes the bar stay at the top */
     padding: 0 10px;
     /* Padding on the sides */
     box-sizing: border-box;
+		  z-index: 1010;
+
     /* Include padding in width calculation */
   }
 
@@ -854,6 +864,8 @@ position: fixed; /* This makes the bar stay at the top */
   .top-bar {
     flex-direction: column;
     /* Stack items vertically */
+		  z-index: 1010;
+
     height: auto;
     /* Adjust height automatically */
   }
@@ -910,9 +922,10 @@ border-radius: 0px;
     /* Hide horizontal overflow */
     transition: 0.5s;
     /* Smooth transition for opening/closing */
-    z-index: 1000;
+    z-index: 1050; /* Highest z-index */
     /* High z-index to ensure it's on top */
   }
+
 
   .nav-overlay-active {
     display: block;
@@ -1077,7 +1090,7 @@ border-radius: 0px;
       align-items: center;
       /* Vertically center items */
       padding: 10px 15px;
-	  z-index: 1050:
+	  z-index: 1010;
       /* Consistent padding */
     }
 

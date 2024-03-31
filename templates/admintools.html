@@ -1915,38 +1915,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   </script>
   <script>
-    document.getElementById('hamburger-button').addEventListener('click', function() {
-      var navOverlay = document.getElementById('nav-overlay');
-      navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
-      console.log('Hamburger button clicked. nav-overlay display status:', navOverlay.style.display);
-    });
+ 
     document.getElementById('hamburger-button-filter').addEventListener('click', function() {
       var filterOverlay = document.getElementById('filter-overlay');
       filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
     });
     document.getElementById('filter-overlay').addEventListener('click', function(event) {
       var filterForm = document.getElementById('filter-form-mobile');
-      if (!filterForm.contains(event.target)) {
-        this.style.display = 'none';
-      }
+
     });
     document.getElementById('filter-form-mobile').addEventListener('click', function(event) {
       event.stopPropagation();
     });
-    document.addEventListener('click', function(event) {
-      var navOverlay = document.getElementById('nav-overlay');
-      var navLinks = document.getElementById('nav-links');
-      var hamburgerButton = document.getElementById('hamburger-button');
-      if (window.innerWidth <= 1080) {
-        if (navOverlay.style.display === 'block' && !navOverlay.contains(event.target) && !hamburgerButton.contains(event.target)) {
-          navOverlay.style.display = 'none';
-          console.log('nav-overlay area outside the buttons clicked, overlay closing');
-        } else if (navLinks.contains(event.target)) {
-          navOverlay.style.display = 'none';
-          console.log('nav-links area clicked, overlay closing');
-        }
-      }
-    });
+
     document.addEventListener("DOMContentLoaded", function() {
       const urlParams = new URLSearchParams(window.location.search);
       const projectID = urlParams.get('projectID');
@@ -2667,6 +2648,58 @@ function updateQuestionsStats() {
             });
         });
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const navOverlay = document.getElementById('nav-overlay');
+    const hamburgerButton = document.getElementById('hamburger-button');
+    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+    
+    // Function to show the nav-overlay
+    function showNavOverlay() {
+        if (window.innerWidth <= 1080) { // Only show on mobile
+            navOverlay.style.display = 'block';
+            console.debug('nav-overlay opened.');
+        }
+    }
+    
+    // Function to hide the nav-overlay
+    function hideNavOverlay() {
+        navOverlay.style.display = 'none';
+        console.debug('nav-overlay closed.');
+    }
+    
+    // Toggle the nav-overlay when the hamburger button is clicked
+    hamburgerButton.addEventListener('click', function() {
+        if (navOverlay.style.display === 'block') {
+            hideNavOverlay();
+        } else {
+            showNavOverlay();
+        }
+    });
+    
+    // Close the nav-overlay when the close button is clicked
+    closeOverlayBtn.addEventListener('click', function(event) {
+        event.stopPropagation(); // Prevent the click from propagating to the nav-overlay
+        hideNavOverlay();
+    });
+    
+    // Listen for clicks on the nav-overlay to close it when clicking outside of #nav-links
+    navOverlay.addEventListener('click', function(event) {
+        if (event.target === navOverlay) { // Check if the clicked element is the nav-overlay itself
+            hideNavOverlay();
+        }
+    });
+    
+    // Adjust the display of nav-overlay on resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 1080) {
+            navOverlay.style.display = 'block'; // Always show on desktop
+        } else {
+            navOverlay.style.display = 'none'; // Hide by default on mobile
+        }
+    });
+});
 
 </script>
 

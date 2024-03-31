@@ -1401,8 +1401,9 @@ def confirm_registration():
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            return redirect(url_for("index"))
+            return redirect(url_for("registered"))  # Redirect to the /registered route
     return render_template('confirm_registration.html')
+
 
 
 # Create the database tables before the first request
@@ -3563,6 +3564,14 @@ def privacy():
     # Additional logic can be added here if needed
     return render_template("privacy/index.html", metaData=metaData)
 
+@app.route("/registered")
+def registered():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    metaData=g.metaData
+    # Additional logic can be added here if needed
+    return render_template("registered/index.html", metaData=metaData)
+    
 @app.route("/contact")
 def contact():
     ip_address = request.remote_addr
