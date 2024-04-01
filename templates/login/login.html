@@ -14,6 +14,7 @@
         <h3>Melden Sie sich ein, um Beiträge und Kommentare zu posten.</h3>
       </div>
       <a href="{{ url_for('google_login') }}" class="button">Mit Google anmelden</a>
+            <button id="custom-apple-signin-button" class="button" style="margin-top: 15px; color: white;">Mit Apple anmelden</button>
       <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark" style="display:none"></div>
       <button id="toggle-form-btn" class="register-button" style="font-weight:bold">Mit Handynummer anmelden</button>
 	        <div class="login-form" id="login-form" style="display: none;">
@@ -36,3 +37,29 @@
     <!-- Right side - Cover Image Section -->
  
     </div>    </div>
+	
+
+<script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+<script type="text/javascript">
+    AppleID.auth.init({
+        clientId: 'com.ermine.stimmungskompass', // Use your actual Service ID here
+        scope: 'email',
+        redirectURI: '{{ url_for("authorize_apple", _external=True) }}',
+        state: 'state',
+        usePopup: true // or false if you want to use redirect
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('custom-apple-signin-button').addEventListener('click', function() {
+            AppleID.auth.signIn();
+        });
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('appleid-signin').addEventListener('click', function() {
+        AppleID.auth.signIn();
+    });
+});
+</script>

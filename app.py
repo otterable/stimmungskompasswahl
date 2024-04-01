@@ -69,12 +69,14 @@ from collections import Counter
 import os
 import pandas as pd
 import random
+import datetime
 import string
 import json
 import uuid
 import zipfile
 import pytz
 import io
+import jwt
 import time
 import threading
 from io import StringIO
@@ -125,6 +127,55 @@ ip_marker_additions = {}  # Initialize the dictionary to track marker additions
 ip_project_submissions = {}
 
 
+APPLE_CLIENT_ID = 'com.ermine.stimmungskompass'
+APPLE_KEY_ID = '57R5KFNS6A'
+APPLE_TEAM_ID = 'C2X4U8D64T'
+APPLE_PRIVATE_KEY = '''-----BEGIN PRIVATE KEY-----
+MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQg+5Z/POF0hP7GS97h
+XGAObKkL7+jegc92uS3H9FVhoGWgCgYIKoZIzj0DAQehRANCAASFZyI4pxpYVW61
+UPwLS+ojqPOgS/I1DNIms0eKeKCUGAGyR5u/pzjUv58AvItVxVseQyd1mjnr6BZK
+H6ZHFRfZ
+-----END PRIVATE KEY-----'''
+
+def generate_client_secret():
+    now = datetime.datetime.utcnow()
+    payload = {
+        'iss': APPLE_TEAM_ID,
+        'iat': now,
+        'exp': now + datetime.timedelta(days=180),  # Apple's current maximum is 180 days
+        'aud': 'https://appleid.apple.com',
+        'sub': APPLE_CLIENT_ID,
+    }
+    client_secret = jwt.encode(
+        payload,
+        APPLE_PRIVATE_KEY,
+        algorithm='ES256',
+        headers={'kid': APPLE_KEY_ID}
+    )
+    return client_secret
+
+# Now generate your client secret
+APPLE_CLIENT_SECRET = generate_client_secret()
+
+print("Your APPLE_CLIENT_SECRET is:", APPLE_CLIENT_SECRET)
+
+oauth.register(
+    name='apple',
+    client_id=os.environ.get('APPLE_CLIENT_ID'),
+    client_secret=os.environ.get('APPLE_CLIENT_SECRET'),
+    authorize_url='https://appleid.apple.com/auth/authorize',
+    authorize_params=None,
+    access_token_url='https://appleid.apple.com/auth/token',
+    access_token_params=None,
+    refresh_token_url=None,
+    client_kwargs={
+        'scope': 'name email',
+        'response_type': 'code id_token',
+        'response_mode': 'form_post',
+    },
+)
+
+
 google = oauth.register(
     "google",
     client_id="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com",
@@ -162,6 +213,49 @@ def get_questions(baustelle_id):
     } for question in questions]
     return jsonify(questions_data)
 
+
+
+@app.route('/login/apple')
+def apple_login():
+    redirect_uri = url_for('authorize_apple', _external=True)
+    return oauth.apple.authorize_redirect(redirect_uri)
+
+# Route for Apple authorization callback
+@app.route('/login/apple/authorize')
+def authorize_apple():
+    token = oauth.apple.authorize_access_token()
+    
+    # Decode the id_token to get user info
+    id_token = token['id_token']
+    claims = jwt.decode(id_token, '', options={"verify_signature": False})
+
+    user_email = claims.get('email')
+    user_name = claims.get('email').split('@')[0] if user_email else 'Unknown'  # Fallback to part of the email as the name
+
+    # Find or create user
+    existing_user = User.query.filter_by(phone_number=user_email).first()
+    if not existing_user:
+        # Generate a random password or use a dummy one
+        password = os.urandom(16).hex()
+        new_user = User(
+            phone_number=user_email,
+            name=user_name,
+            password_hash=generate_password_hash(password),
+            account_creation=datetime.utcnow(),
+            # Set any additional fields as necessary
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user, remember=True)
+        flash('Account created and logged in with Apple ID.', 'success')
+    else:
+        login_user(existing_user, remember=True)
+        flash('Logged in successfully with Apple ID.', 'success')
+
+    return redirect(url_for('index'))
+
+    
+    
 
 @app.route('/answer_question/<int:question_id>', methods=['POST'])
 @login_required
