@@ -224,37 +224,31 @@ def apple_login():
 @app.route('/login/apple/authorize')
 def authorize_apple():
     token = oauth.apple.authorize_access_token()
-    
-    # Decode the id_token to get user info
-    id_token = token['id_token']
-    claims = jwt.decode(id_token, '', options={"verify_signature": False})
+    if not token:
+        flash('Failed to authenticate with Apple.', 'danger')
+        return redirect(url_for('login'))
+
+    id_token = token.get('id_token')
+    if not id_token:
+        flash('Failed to retrieve ID token from Apple.', 'danger')
+        return redirect(url_for('login'))
+
+    claims = jwt.decode(id_token, options={"verify_signature": False})  # Verify in production
 
     user_email = claims.get('email')
-    user_name = claims.get('email').split('@')[0] if user_email else 'Unknown'  # Fallback to part of the email as the name
+    if not user_email:
+        flash('Failed to retrieve email from Apple ID.', 'danger')
+        return redirect(url_for('login'))
 
-    # Find or create user
-    existing_user = User.query.filter_by(phone_number=user_email).first()
-    if not existing_user:
-        # Generate a random password or use a dummy one
-        password = os.urandom(16).hex()
-        new_user = User(
-            phone_number=user_email,
-            name=user_name,
-            password_hash=generate_password_hash(password),
-            account_creation=datetime.utcnow(),
-            # Set any additional fields as necessary
-        )
-        db.session.add(new_user)
+    user = User.query.filter_by(email=user_email).first()
+    if not user:
+        user = User(email=user_email)
+        db.session.add(user)
         db.session.commit()
-        login_user(new_user, remember=True)
-        flash('Account created and logged in with Apple ID.', 'success')
-    else:
-        login_user(existing_user, remember=True)
-        flash('Logged in successfully with Apple ID.', 'success')
 
+    login_user(user, remember=True)
     return redirect(url_for('index'))
 
-    
     
 
 @app.route('/answer_question/<int:question_id>', methods=['POST'])
