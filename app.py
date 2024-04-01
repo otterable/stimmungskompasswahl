@@ -69,7 +69,6 @@ from collections import Counter
 import os
 import pandas as pd
 import random
-import datetime
 import string
 import json
 import uuid
@@ -223,33 +222,36 @@ def apple_login():
 # Route for Apple authorization callback
 @app.route('/login/apple/authorize')
 def authorize_apple():
-    token = oauth.apple.authorize_access_token()
-    if not token:
-        flash('Failed to authenticate with Apple.', 'danger')
+    try:
+        token = oauth.apple.authorize_access_token()
+        if not token:
+            current_app.logger.debug('Failed to authenticate with Apple.')
+            return redirect(url_for('login'))
+
+        id_token = token.get('id_token')
+        if not id_token:
+            current_app.logger.debug('Failed to retrieve ID token from Apple.')
+            return redirect(url_for('login'))
+
+        claims = jwt.decode(id_token, options={"verify_signature": False})  # Verify in production
+
+        user_email = claims.get('email')
+        if not user_email:
+            current_app.logger.debug('Failed to retrieve email from Apple ID.')
+            return redirect(url_for('login'))
+
+        user = User.query.filter_by(email=user_email).first()
+        if not user:
+            user = User(email=user_email)
+            db.session.add(user)
+            db.session.commit()
+
+        login_user(user, remember=True)
+        return redirect(url_for('index'))
+    except Exception as e:
+        current_app.logger.error('Error during Apple login authorization: {}'.format(e))
         return redirect(url_for('login'))
-
-    id_token = token.get('id_token')
-    if not id_token:
-        flash('Failed to retrieve ID token from Apple.', 'danger')
-        return redirect(url_for('login'))
-
-    claims = jwt.decode(id_token, options={"verify_signature": False})  # Verify in production
-
-    user_email = claims.get('email')
-    if not user_email:
-        flash('Failed to retrieve email from Apple ID.', 'danger')
-        return redirect(url_for('login'))
-
-    user = User.query.filter_by(email=user_email).first()
-    if not user:
-        user = User(email=user_email)
-        db.session.add(user)
-        db.session.commit()
-
-    login_user(user, remember=True)
-    return redirect(url_for('index'))
-
-    
+        
 
 @app.route('/answer_question/<int:question_id>', methods=['POST'])
 @login_required
