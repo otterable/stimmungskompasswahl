@@ -69,6 +69,7 @@ from collections import Counter
 import os
 import pandas as pd
 import random
+import datetime
 import string
 import json
 import uuid
@@ -158,10 +159,12 @@ APPLE_CLIENT_SECRET = generate_client_secret()
 
 print("Your APPLE_CLIENT_SECRET is:", APPLE_CLIENT_SECRET)
 
+
+# Correctly use the dynamically generated client secret in OAuth registration
 oauth.register(
     name='apple',
-    client_id=os.environ.get('APPLE_CLIENT_ID'),
-    client_secret=os.environ.get('APPLE_CLIENT_SECRET'),
+    client_id=APPLE_CLIENT_ID,
+    client_secret=APPLE_CLIENT_SECRET,  # Use the dynamically generated client secret here
     authorize_url='https://appleid.apple.com/auth/authorize',
     authorize_params=None,
     access_token_url='https://appleid.apple.com/auth/token',
@@ -217,40 +220,52 @@ def get_questions(baustelle_id):
 @app.route('/login/apple')
 def apple_login():
     redirect_uri = url_for('authorize_apple', _external=True)
+    # Debug print statement for checking the redirect URI
+    print(f"Redirecting to Apple for authorization, redirect URI: {redirect_uri}")
     return oauth.apple.authorize_redirect(redirect_uri)
+
 
 # Route for Apple authorization callback
 @app.route('/login/apple/authorize')
 def authorize_apple():
     try:
         token = oauth.apple.authorize_access_token()
+        print(f"Received token: {token}")  # Debug print
         if not token:
-            current_app.logger.debug('Failed to authenticate with Apple.')
+            print('Failed to authenticate with Apple.')
+            print('Authentication with Apple failed.', 'error')
             return redirect(url_for('login'))
-
+        
         id_token = token.get('id_token')
-        if not id_token:
-            current_app.logger.debug('Failed to retrieve ID token from Apple.')
-            return redirect(url_for('login'))
-
-        claims = jwt.decode(id_token, options={"verify_signature": False})  # Verify in production
-
+        print(f"Received ID token: {id_token}")  # Debug print
+        
+        claims = jwt.decode(id_token, '', verify=False)  # Adjust as needed for production
+        print(f"Decoded claims: {claims}")  # Debug print
+        
         user_email = claims.get('email')
-        if not user_email:
-            current_app.logger.debug('Failed to retrieve email from Apple ID.')
-            return redirect(url_for('login'))
+        print(f"User email: {user_email}")  # Debug print
 
+        # Find or create a user in your database
         user = User.query.filter_by(email=user_email).first()
         if not user:
-            user = User(email=user_email)
+            # Create a new user
+            print(f"Creating new user with email: {user_email}")
+            user = User(email=user_email, name=user_name)
             db.session.add(user)
             db.session.commit()
+            print("New user created successfully.")
+        else:
+            print(f"User with email {user_email} found in database.")
 
         login_user(user, remember=True)
+        print(f"User {user_email} logged in successfully.")
+        print('Logged in successfully with Apple.', 'success')
         return redirect(url_for('index'))
     except Exception as e:
-        current_app.logger.error('Error during Apple login authorization: {}'.format(e))
+        print(f'Error during Apple login process: {e}')  # Debug print
+        print('An error occurred during Apple login.', 'error')
         return redirect(url_for('login'))
+
         
 
 @app.route('/answer_question/<int:question_id>', methods=['POST'])
@@ -295,7 +310,7 @@ def delete_baustelle(baustelle_id):
 def neuebaustelle():
     # Check if the user is the admin
     if current_user.id != 1:
-        flash("You are not authorized to access this page.", "danger")
+        print("You are not authorized to access this page.", "danger")
         return redirect(url_for("index"))
     
     if request.method == 'POST':
@@ -360,9 +375,9 @@ def Partizipative_Planung_Fragen_Baustelle(baustelle_id):
             question = Question(text=text, baustelle_id=baustelle_id, author_id=current_user.id)  # Assuming each Question has an author
             db.session.add(question)
             db.session.commit()
-            flash('Ihre Frage wurde hinzugefügt.', 'success')
+            print('Ihre Frage wurde hinzugefügt.', 'success')
         else:
-            flash('Die Frage darf nicht leer sein.', 'warning')
+            print('Die Frage darf nicht leer sein.', 'warning')
 
         # Redirect back to the same Baustelle page to display the new question
         return redirect(url_for('Partizipative_Planung_Fragen_Baustelle', baustelle_id=baustelle_id))
@@ -917,7 +932,7 @@ def export_gis():
 def edit_post(post_id):
     post = Post.query.get_or_404(post_id)
     if current_user.id != 1:
-        flash('You are not authorized to perform this action.', 'danger')
+        print('You are not authorized to perform this action.', 'danger')
         return redirect(url_for('blog'))
     
     form = PostForm()
@@ -934,7 +949,7 @@ def edit_post(post_id):
             post.image_file = filename  # Update the post's image_file attribute
         
         db.session.commit()
-        flash('Your post has been updated.', 'success')
+        print('Your post has been updated.', 'success')
         return redirect(url_for('blog'))
     elif request.method == 'GET':
         form.title.data = post.title
@@ -950,7 +965,7 @@ def edit_post(post_id):
 def admin_options():
     # Check if the user is the admin
     if current_user.id != 1:
-        flash("You are not authorized to access this page.", "danger")
+        print("You are not authorized to access this page.", "danger")
         return redirect(url_for("index"))
     
     # Check for OTP verification
@@ -974,13 +989,13 @@ def admin_options():
 @login_required
 def delete_post(post_id):
     if current_user.id != 1:
-        flash('You are not authorized to perform this action.', 'danger')
+        print('You are not authorized to perform this action.', 'danger')
         return redirect(url_for('blog'))
 
     post = Post.query.get_or_404(post_id)
     db.session.delete(post)
     db.session.commit()
-    flash('Your post has been deleted.', 'success')
+    print('Your post has been deleted.', 'success')
     return redirect(url_for('blog'))
 
 
@@ -997,7 +1012,7 @@ def blog():
 @login_required
 def createpost():
     if current_user.id != 1:  # Checking if the current user is the admin
-        flash('You are not authorized to view this page.', 'danger')
+        print('You are not authorized to view this page.', 'danger')
         return redirect(url_for('index'))
 
     form = PostForm()
@@ -1015,7 +1030,7 @@ def createpost():
         post = Post(title=title, content=content, author_id=current_user.id, image_file=filename)
         db.session.add(post)
         db.session.commit()
-        flash('Post created successfully!', 'success')
+        print('Post created successfully!', 'success')
         return redirect(url_for('blog'))
 
     return render_template('admin/createpost.html', form=form)
@@ -1594,11 +1609,11 @@ def download_images():
             # Return the script as an HTML response
             return Response(download_script, mimetype="text/html")
         else:
-            flash('No images available to download.', 'info')
+            print('No images available to download.', 'info')
             return redirect(url_for("profil"))
     except Exception as e:
         logging.error("Error in downloading images: %s", e)
-        flash('Error in downloading images.', 'danger')
+        print('Error in downloading images.', 'danger')
         return redirect(url_for("profil"))
 
 
@@ -1728,7 +1743,7 @@ def register():
         # Check for existing user with the same Ihre Handynummer
         existing_user = User.query.filter_by(phone_number=phone_number).first()
         if existing_user:
-            flash('An account with this Ihre Handynummer already exists.', 'danger')
+            print('An account with this Ihre Handynummer already exists.', 'danger')
             logging.debug(
                 "Account registration failed: Ihre Handynummer already exists"
             )
@@ -1767,11 +1782,37 @@ def register():
     return render_template("register/index.html", metaData=metaData)
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    # Capture 'next' parameter or set to index if not present
+    next_page = request.args.get("next") or url_for("index")
+    logging.debug(
+        f"'next' parameter detected, user will be redirected to {next_page} after logging in."
+    )
+
+    if request.method == "POST":
+        username_or_phone = request.form.get("username_or_phone")
+        password = request.form.get("password")
+        user = User.query.filter_by(phone_number=username_or_phone).first()
+
+        if user and user.check_password(password):
+            login_user(user)
+            logging.debug("Login successful")
+            return jsonify(success=True, next=next_page)
+        else:
+            logging.debug("Login failed")
+            return jsonify(success=False)
+    metaData=g.metaData
+    return render_template("login/index.html", next=next_page, metaData=metaData)
+
+
 # Function to clean up old IP addresses
 def cleanup_ip_addresses():
     while True:
-        time.sleep(60)  # Check every minute
-        current_time = datetime.now()
+        time.sleep(60)  # Adjust as necessary for your application
+        current_time = datetime.datetime.utcnow()  # If you have 'import datetime'
+        print(f"Cleanup check at {current_time}")  # Debug print
 
         # Cleanup for ip_last_submitted_project
         for ip in list(ip_last_submitted_project.keys()):
@@ -2046,12 +2087,12 @@ def reset_password():
                 logging.debug(
                     f"Password reset for user with Ihre Handynummer {phone_number}"
                 )
-                flash('Your password has been reset successfully.', 'success')
+                print('Your password has been reset successfully.', 'success')
                 return redirect(url_for("login"))
             # else:
-            flash('Invalid Ihre Handynummer.', 'danger')
+            print('Invalid Ihre Handynummer.', 'danger')
         # else:
-        flash('Invalid OTP. Please try again.', 'danger')
+        print('Invalid OTP. Please try again.', 'danger')
     return render_template("reset_password.html", metaData=metaData)
 
 
@@ -2295,13 +2336,13 @@ def Partizipative_Planung_Vorschlag(project_id):
         if request.method == "POST" and current_user.is_authenticated:
             comment_text = request.form.get("comment", "").strip()
             if not (20 <= len(comment_text) <= 500):
-                flash(
+                print(
                     "Kommentare müssen zwischen 20 und 500 Zeichen lang sein.", "error"
                 )
                 return redirect(url_for("Partizipative_Planung_Vorschlag", project_id=project_id))
 
             if not can_user_post_comment(current_user.id):
-                flash(
+                print(
                     "Kommentarlimit erreicht. Bitte warten Sie, bevor Sie einen weiteren Kommentar posten.",
                     "error",
                 )
@@ -2553,7 +2594,7 @@ def admintools():
     # Check if the user is the admin
     
     if current_user.id != 1:
-        flash("", "danger")
+        print("", "danger")
         return redirect(url_for("index"))
     
     # Check for OTP verification
@@ -2644,18 +2685,18 @@ def admintools():
             if project:
                 project.is_important = False
                 db.session.commit()
-                flash("Project unmarked as important", "success")
+                print("Project unmarked as important", "success")
             else:
-                flash("Project not found for unmarking as important", "error")
+                print("Project not found for unmarking as important", "error")
 
         elif "unmark_featured" in request.form:
             project = Project.query.get(project_id)
             if project:
                 project.is_featured = False
                 db.session.commit()
-                flash("Project unmarked as featured", "success")
+                print("Project unmarked as featured", "success")
             else:
-                flash("Project not found for unmarking as featured", "error")
+                print("Project not found for unmarking as featured", "error")
 
         elif "remove_reports" in request.form:
             project_id = request.form.get("project_id")
@@ -2668,21 +2709,21 @@ def admintools():
                 # Commit the changes to the database
                 db.session.commit()
 
-                flash(
+                print(
                     "Reports have been removed from the project successfully.",
                     "success",
                 )
             else:
-                flash("Project not found for removing reports.", "error")
+                print("Project not found for removing reports.", "error")
 
         elif "delete_project" in request.form:
             project = Project.query.get(project_id)
             if project:
                 db.session.delete(project)
                 db.session.commit()
-                flash(f"Project {project_id} successfully deleted.", "success")
+                print(f"Project {project_id} successfully deleted.", "success")
             else:
-                flash(f"Project {project_id} not found for deletion.", "error")
+                print(f"Project {project_id} not found for deletion.", "error")
 
         return redirect(url_for("admintools"))
 
@@ -2697,11 +2738,11 @@ def admintools():
                     question.answered = True
                     question.answer_date = datetime.utcnow()  # Set the answer date to now
                     db.session.commit()
-                    flash("Question answered successfully.", "success")
+                    print("Question answered successfully.", "success")
                 else:
-                    flash("Question not found.", "error")
+                    print("Question not found.", "error")
             else:
-                flash("Answer text is required.", "warning")
+                print("Answer text is required.", "warning")
             return redirect(url_for("admintools"))
 
     # Load questions and other data for GET requests and for rendering after POST
@@ -3129,7 +3170,7 @@ def delete_map_object(map_object_id):
 def verify_admin_otp():
     # Ensure the user is an admin
     if current_user.id != 1:
-        flash("Access Denied: You are not authorized to perform this action.", "danger")
+        print("Access Denied: You are not authorized to perform this action.", "danger")
         return redirect(url_for("index"))
 
     if request.method == "POST":
@@ -3138,10 +3179,10 @@ def verify_admin_otp():
         # Passwort bestätigen
         if "admin_otp" in session and str(session["admin_otp"]) == entered_otp:
             session["admin_verified"] = True
-            flash("OTP Verified. Access granted to admin tools.", "success")
+            print("OTP Verified. Access granted to admin tools.", "success")
             return redirect(url_for("admin_options"))
         else:
-            flash("Invalid OTP. Please try again.", "danger")
+            print("Invalid OTP. Please try again.", "danger")
     metaData=g.metaData
     return render_template(
         "verify_admin_otp/index.html", metaData=metaData,
@@ -3293,7 +3334,7 @@ def downvote(project_id):
     ).first()
 
     if existing_downvote:
-        flash('You have already downvoted this project.', 'info')
+        print('You have already downvoted this project.', 'info')
         return redirect(url_for("list_view"))
 
     downvote = Downvote(
@@ -3301,7 +3342,7 @@ def downvote(project_id):
     )
     db.session.add(downvote)
     db.session.commit()
-    flash('Your downvote has been recorded!', 'success')
+    print('Your downvote has been recorded!', 'success')
     return redirect(url_for("list_view"))
 
 
@@ -3794,14 +3835,14 @@ def verify_otp():
                 logging.debug(
                     f"Password reset for user with Ihre Handynummer {phone_number}"
                 )
-                flash("Your password has been reset successfully.", "success")
+                print("Your password has been reset successfully.", "success")
                 return redirect(url_for("login"))
             else:
-                flash("User not found.", "error")
+                print("User not found.", "error")
 
         else:
             logging.debug("OTP verification failed")
-            flash("Invalid OTP", "error")
+            print("Invalid OTP", "error")
     metaData=g.metaData
     return render_template("verify_otp/index.html", metaData=metaData)
 
@@ -3823,7 +3864,7 @@ def password_recovery():
             session["otp"] = otp
             return redirect(url_for("verify_otp"))
         else:
-            flash("Ihre Handynummer not found", "error")
+            print("Ihre Handynummer not found", "error")
     metaData=g.metaData
     return render_template("password_recovery/index.html", metaData=metaData)
 
@@ -3865,29 +3906,6 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-
-    # Capture 'next' parameter or set to index if not present
-    next_page = request.args.get("next") or url_for("index")
-    logging.debug(
-        f"'next' parameter detected, user will be redirected to {next_page} after logging in."
-    )
-
-    if request.method == "POST":
-        username_or_phone = request.form.get("username_or_phone")
-        password = request.form.get("password")
-        user = User.query.filter_by(phone_number=username_or_phone).first()
-
-        if user and user.check_password(password):
-            login_user(user)
-            logging.debug("Login successful")
-            return jsonify(success=True, next=next_page)
-        else:
-            logging.debug("Login failed")
-            return jsonify(success=False)
-    metaData=g.metaData
-    return render_template("login/index.html", next=next_page, metaData=metaData)
 
 
 @app.route("/vote/<int:project_id>", methods=["GET", "POST"])
@@ -3902,7 +3920,7 @@ def single_vote(project_id):
         )
         db.session.add(vote)
         db.session.commit()
-        flash('Your vote has been recorded!', 'success')
+        print('Your vote has been recorded!', 'success')
         return redirect(url_for("index"))
     metaData=g.metaData
     return render_template("vote.html", project=project, metaData=metaData)
