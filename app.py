@@ -16,6 +16,8 @@ from flask import (
     g
 )
 import re
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, desc, asc, and_, cast, Date
 from flask_migrate import Migrate
@@ -69,7 +71,6 @@ from collections import Counter
 import os
 import pandas as pd
 import random
-import datetime
 import string
 import json
 import uuid
@@ -81,6 +82,7 @@ import time
 import threading
 from io import StringIO
 import random
+now = datetime.now()
 
 from dotenv import load_dotenv
 
@@ -138,25 +140,36 @@ H6ZHFRfZ
 -----END PRIVATE KEY-----'''
 
 def generate_client_secret():
-    now = datetime.datetime.utcnow()
+    now = datetime.now()
+
+    # Load the private key from its PEM format
+    private_key = serialization.load_pem_private_key(
+        APPLE_PRIVATE_KEY.encode(),
+        password=None,
+        backend=default_backend()
+    )
+
+    # Prepare payload
     payload = {
         'iss': APPLE_TEAM_ID,
         'iat': now,
-        'exp': now + datetime.timedelta(days=180),  # Apple's current maximum is 180 days
+        'exp': now + timedelta(days=180),
         'aud': 'https://appleid.apple.com',
         'sub': APPLE_CLIENT_ID,
     }
+
+    # Encode the JWT using the loaded private key
     client_secret = jwt.encode(
         payload,
-        APPLE_PRIVATE_KEY,
+        private_key,
         algorithm='ES256',
         headers={'kid': APPLE_KEY_ID}
     )
+
     return client_secret
 
-# Now generate your client secret
+# Generate and print the client secret
 APPLE_CLIENT_SECRET = generate_client_secret()
-
 print("Your APPLE_CLIENT_SECRET is:", APPLE_CLIENT_SECRET)
 
 
@@ -281,7 +294,7 @@ def answer_question(question_id):
     question = Question.query.get_or_404(question_id)
     question.answer_text = data['answer_text']
     question.answered = True
-    question.answer_date = datetime.utcnow()
+    question.answer_date = datetime.now(pytz.utc)
     db.session.commit()
 
     return jsonify({'message': 'Question answered successfully', 'success': True}), 200
@@ -404,7 +417,7 @@ def submit_question():
         baustelle_id=int(data['baustelle_id']),
         latitude=data['latitude'],
         longitude=data['longitude'],
-        date=datetime.utcnow(),
+        date=datetime.now(pytz.utc),
     )
     db.session.add(new_question)
     db.session.commit()
@@ -447,11 +460,11 @@ def log_view():
 
     # Check if this IP address has already been logged today
     existing_view = WebsiteViews.query.filter_by(
-        view_date=datetime.utcnow().date(), ip_address=ip_address
+        view_date=datetime.now(pytz.utc).date(), ip_address=ip_address
     ).first()
 
     unique_views_count = WebsiteViews.query.filter_by(
-        view_date=datetime.utcnow().date()
+        view_date=datetime.now(pytz.utc).date()
     ).count()
 
     if existing_view:
@@ -481,9 +494,9 @@ def log_view():
 def get_unique_viewers_data():
     try:
         start_date = request.args.get(
-            "start_date", (datetime.utcnow() - timedelta(days=6)).strftime("%Y-%m-%d")
+            "start_date", (datetime.now(pytz.utc) - timedelta(days=6)).strftime("%Y-%m-%d")
         )
-        end_date = request.args.get("end_date", datetime.utcnow().strftime("%Y-%m-%d"))
+        end_date = request.args.get("end_date", datetime.now(pytz.utc).strftime("%Y-%m-%d"))
 
         # Convert string dates to datetime.date objects
         start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
@@ -1479,7 +1492,7 @@ def authorized():
         session['temp_user_info'] = {
             "email": user_info.get("email"),
             "name": user_info.get("name", "Unknown"),
-            "account_creation": datetime.utcnow(),
+            "account_creation": datetime.now(pytz.utc),
             "is_googleaccount": True,
             "is_admin": False,
         }
@@ -1811,7 +1824,7 @@ def login():
 def cleanup_ip_addresses():
     while True:
         time.sleep(60)  # Adjust as necessary for your application
-        current_time = datetime.datetime.utcnow()  # If you have 'import datetime'
+        current_time =  datetime.now(pytz.utc)  # If you have 'import datetime'
         print(f"Cleanup check at {current_time}")  # Debug print
 
         # Cleanup for ip_last_submitted_project
@@ -2295,7 +2308,7 @@ def Partizipative_Planung_Vorschlag(project_id):
         ip_address = request.remote_addr
         WebsiteViews.add_view(ip_address)
         user_ip = request.remote_addr
-        current_time = datetime.utcnow()
+        current_time = datetime.now(pytz.utc)
         last_view = ProjectView.query.filter(
             and_(
                 ProjectView.project_id == project_id, ProjectView.ip_address == user_ip
@@ -2310,12 +2323,12 @@ def Partizipative_Planung_Vorschlag(project_id):
         )
 
         if last_view is None or (
-            datetime.utcnow() - last_view.last_viewed > timedelta(hours=24)
+            datetime.now(pytz.utc) - last_view.last_viewed.replace(tzinfo=pytz.utc) > timedelta(hours=24)
         ):
             new_view = ProjectView(
                 project_id=project_id,
                 ip_address=ip_address,
-                last_viewed=datetime.utcnow(),
+                last_viewed=datetime.now(pytz.utc),
             )
             db.session.add(new_view)
 
@@ -2736,7 +2749,7 @@ def admintools():
                 if question:
                     question.answer_text = answer_text
                     question.answered = True
-                    question.answer_date = datetime.utcnow()  # Set the answer date to now
+                    question.answer_date = datetime.now(pytz.utc)  # Set the answer date to now
                     db.session.commit()
                     print("Question answered successfully.", "success")
                 else:
