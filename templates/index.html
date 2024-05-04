@@ -49,8 +49,8 @@
         <img alt="Public Icon" class="info-box-icon" src="{{ url_for('serve_image', filename='index_icon_public.png') }}">
         <h3 class="info-box-title">Machen Sie einen Vorschlag!</h3>
         <p class="info-box-undertitle">Teilen Sie Ihrer Stadt mit, welche Veränderungen oder Verbesserungen Sie sich wünschen!</p>
-        <p class="info-box-undertitle">Aktuelle Projektvorschläge: {{ project_count }}</p>
-        <p class="info-box-undertitle">Aktuelle Notizen: {{ mapobject_count }}</p>
+        <p class="info-box-undertitle">Aktuelle Projektvorschläge: <strong>{{ project_count }}</strong></p>
+        <p class="info-box-undertitle">Aktuelle Notizen: <strong>{{ mapobject_count }}</strong></p>
     </div>
     <!-- Box 3 -->
     <div class="info-box box-green" onclick="redirectToList()" style="cursor: pointer; margin: 10px">
@@ -79,8 +79,10 @@
     {% if featured_projects %} {% for project in featured_projects %} 
     <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="window.location.href='{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}'">
         <h2>{{ project.name }}</h2>
-        <p class="project-date">{{ project.date.strftime('%d.%m.%Y') }}</p>
-        <!-- Voting Bar -->
+ <p class="project-date">
+                    <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
+                    Ansichten: <strong>{{ project.view_count }}</strong>
+                </p>        <!-- Voting Bar -->
         <div class="voting-bar">
             {% if project.upvotes > 0 %} 
             <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">

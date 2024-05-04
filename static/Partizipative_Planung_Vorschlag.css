@@ -1293,7 +1293,7 @@ width: 100%; /* Full width */
     /* Smaller font size */
   }
    .top-bar a button {
-    font-size: 16px !important;
+    font-size: 18px !important;
       padding: 7px !important;
     }
   .form-container h2 {
@@ -1302,11 +1302,11 @@ width: 100%; /* Full width */
   
   
   p {
-	  font-size: 16px !important;
+	  font-size: 18px !important;
   }
   
     .downvote-button, .upvote-button, .bookmark-button, .report-button, .comment-button {
-    font-size: 14px !important; /* Decreases font size to 14px on mobile devices */
+    font-size: 16px !important; /* Decreases font size to 16px on mobile devices */
 	padding: 7px !important;
   }
 

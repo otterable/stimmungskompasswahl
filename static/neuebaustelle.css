@@ -122,7 +122,7 @@
       text-decoration: none;
       display: inline-block;
       font-weight: bold;
-      font-size: 16px !important;
+      font-size: 18px !important;
       margin: auto;
       margin-top: 0px !important;
       margin-bottom: 0px;
@@ -165,7 +165,7 @@
       text-decoration: none;
       display: inline-block;
       font-weight: bold;
-      font-size: 14px !important;
+      font-size: 16px !important;
       margin: auto;
       margin-top: 0px !important;
       margin-bottom: 0px;
@@ -537,25 +537,25 @@
       .button-container .register-button-m,
       button[onclick*="markers-list-overlay"].register-button,
       #add-marker-button.register-button {
-      font-size: 14px;
+      font-size: 16px;
       /* Adjust the font size for mobile devices */
       padding: 10px 15px;
       /* Adjust padding to fit the smaller text */
       }
       #category-toggle-buttons button {
-      font-size: 14px !important;
+      font-size: 16px !important;
       /* Smaller font size for mobile devices */
       padding: 10px 15px;
       /* Adjusted padding for smaller buttons */
       }
       #custom-confirm button.register-button {
-      font-size: 14px;
+      font-size: 16px;
       /* Decrease the font size for the buttons */
       padding: 8px 10px;
       /* Decrease padding to fit the smaller buttons */
       }
       h3 {
-      font-size: 14px;
+      font-size: 16px;
       /* Slightly smaller font size for the h3 element */
       text-align: center;
       margin-top: 5px;
@@ -589,7 +589,7 @@
       /* Adjust padding to fit the larger text */
       }
       #category-toggle-buttons button {
-      font-size: 16px !important;
+      font-size: 18px !important;
       /* Larger font size for tablet devices */
       padding: 12px 18px;
       /* Adjusted padding for larger buttons */
@@ -987,7 +987,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 14px 0;
+      margin: 16px 0;
       padding: 15px;
       box-sizing: border-box;
       cursor: pointer;
@@ -1009,7 +1009,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 14px 0;
+      margin: 16px 0;
       padding: 15px;
       box-sizing: border-box;
       cursor: pointer;
@@ -1030,7 +1030,7 @@
       #info-popup {
       padding: 20px;
       max-width: 500px;
-      font-size: 14px;
+      font-size: 16px;
       z-index: 1000;
       /* Make sure the popup appears above the map */
       background-color: var(--popup-bg-color);
@@ -1701,7 +1701,7 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
       padding: 8px 15px;
       /* Increased left and right padding */
       font-size: 3vw;
-      top: 5.5%;
+      top: 5.6%;
       max-width: 60%;
       }
       .counter-color {
@@ -2279,7 +2279,7 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
       }
       @media only screen and (max-width: 1080px) {
       body {
-      font-size: 14px;
+      font-size: 16px;
       /* Smaller font size */
       }
       #hamburger-button {
@@ -2362,7 +2362,7 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
       /* 5px gap on the right */
       display: block;
       /* Change display to block for full width */
-      font-size: 16px !important;
+      font-size: 18px !important;
       }
       .button-container {
       padding: 0;

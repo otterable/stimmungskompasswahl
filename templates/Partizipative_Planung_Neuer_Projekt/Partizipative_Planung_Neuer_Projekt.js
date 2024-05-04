@@ -72,11 +72,11 @@ var marker;
 // Existing map click event handler in Partizipative_Planung_Neuer_Projekt.html
 // Define the coordinates for the boundary
 var bounds = L.latLngBounds([
-    L.latLng([48.405, 15.597]), // Southwest corner of the boundary
+    L.latLng([48.405, 15.697]), // Southwest corner of the boundary
     L.latLng([48.415, 15.607]) // Northeast corner of the boundary
 ]);
 
-console.log("Bounds set to SW: [48.405, 15.597], NE: [48.415, 15.607]");
+console.log("Bounds set to SW: [48.405, 15.697], NE: [48.415, 15.607]");
 
 // Initialize the map
 

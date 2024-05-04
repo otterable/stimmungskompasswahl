@@ -231,7 +231,7 @@ overflow: auto; /* Enables scrolling if content is larger than the overlay */
           text-decoration: none;
           display: inline-block;
           font-weight: bold;
-          font-size: 16px !important;
+          font-size: 18px !important;
           margin: auto;
           margin-top: 0px !important;
           margin-bottom: 0px;
@@ -280,7 +280,7 @@ overflow: auto; /* Enables scrolling if content is larger than the overlay */
           text-decoration: none;
           display: inline-block;
           font-weight: bold;
-          font-size: 14px !important;
+          font-size: 16px !important;
           margin: auto;
           margin-top: 0px !important;
           margin-bottom: 0px;
@@ -689,28 +689,28 @@ overflow: auto; /* Enables scrolling if content is larger than the overlay */
         .button-container .register-button-m,
         button[onclick*="markers-list-overlay"].register-button,
         #add-marker-button.register-button {
-          font-size: 14px;
+          font-size: 16px;
           /* Adjust the font size for mobile devices */
           padding: 10px 15px;
           /* Adjust padding to fit the smaller text */
         }
 
         #category-toggle-buttons button {
-          font-size: 14px !important;
+          font-size: 16px !important;
           /* Smaller font size for mobile devices */
           padding: 10px 15px;
           /* Adjusted padding for smaller buttons */
         }
 
         #custom-confirm button.register-button {
-          font-size: 14px;
+          font-size: 16px;
           /* Decrease the font size for the buttons */
           padding: 8px 10px;
           /* Decrease padding to fit the smaller buttons */
         }
 
         h3 {
-          font-size: 14px;
+          font-size: 16px;
           /* Slightly smaller font size for the h3 element */
           text-align: center;
           margin-top: 5px;
@@ -750,7 +750,7 @@ overflow: auto; /* Enables scrolling if content is larger than the overlay */
         }
 
         #category-toggle-buttons button {
-          font-size: 16px !important;
+          font-size: 18px !important;
           /* Larger font size for tablet devices */
           padding: 12px 18px;
           /* Adjusted padding for larger buttons */
@@ -764,7 +764,7 @@ overflow: auto; /* Enables scrolling if content is larger than the overlay */
         }
 
         h3 {
-          font-size: 18px;
+          font-size: 16px;
           /* Slightly smaller font size for the h3 element */
           text-align: center;
           margin-top: 5px;
@@ -1205,7 +1205,7 @@ left: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 14px 0;
+        margin: 16px 0;
         padding: 15px;
         box-sizing: border-box;
         cursor: pointer;
@@ -1228,7 +1228,7 @@ left: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 14px 0;
+        margin: 16px 0;
         padding: 15px;
         box-sizing: border-box;
         cursor: pointer;
@@ -1250,7 +1250,7 @@ left: 50%;
       #info-popup {
         padding: 20px;
         max-width: 500px;
-        font-size: 14px;
+        font-size: 16px;
         z-index: 1000;
         /* Make sure the popup appears above the map */
         background-color: var(--popup-bg-color);
@@ -2005,7 +2005,7 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
           padding: 8px 15px;
           /* Increased left and right padding */
           font-size: 3vw;
-          top: 5.5%;
+          top: 5.6%;
           max-width: 60%;
         }
 
@@ -2819,7 +2819,7 @@ width: 100%; /* Full width */
 
       @media only screen and (max-width: 1080px) {
         body {
-          font-size: 14px;
+          font-size: 16px;
           /* Smaller font size */
         }
 
@@ -2904,7 +2904,7 @@ width: 100%; /* Full width */
           /* 5px gap on the right */
           display: block;
           /* Change display to block for full width */
-          font-size: 16px !important;
+          font-size: 18px !important;
         }
 
         .button-container {
@@ -3102,7 +3102,7 @@ font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system
       #markers-list-overlay span {
         margin: 4px 0;
         /* Adjust the gap between lines */
-        font-size: 14px;
+        font-size: 16px;
         /* Adjust font size as needed */
       }
 
@@ -3560,7 +3560,7 @@ function generatePopupContent(question) {
         <textarea id="answer-text-${question.id}" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Ihre Antwort hier..."></textarea>
         <br>
         <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>
-        <button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px;">Abbrechen</button>
+																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
       </div>`;
   }
   
@@ -3601,7 +3601,7 @@ function fetchQuestions() {
               <textarea id="answer-text-${question.id}" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Ihre Antwort hier..."></textarea>
               <br>
               <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>
-              <button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px;">Abbrechen</button>
+																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
             </div>`;
         }
 
@@ -3868,10 +3868,10 @@ document.addEventListener("DOMContentLoaded", () => {
         
 																	<div id="question-form" style="text-align: center;">
 																		<h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
-																		<textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
+																		<textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-weight: bold; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
 																		<div style="display: flex; justify-content: center; margin-top: 10px;">
-																			<button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Posten</button>
-																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px;">Abbrechen</button>
+        <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>
+																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
 																		</div>
 																	</div>
     `;

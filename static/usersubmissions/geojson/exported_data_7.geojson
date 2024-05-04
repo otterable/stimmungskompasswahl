@@ -6,7 +6,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.596978148632386,
+                    15.696978148632386,
                     48.406628217526446
                 ]
             },
@@ -17,7 +17,7 @@
                 "descriptionwhy": "<p>Der alte Spielplatz im Stadtpark ist schon etwas heruntergekommen. Es w\u00e4re sinnvoll, einige Installationen zu erneuern (z.B. Schaukeln, Karusell) oder \u00fcberhaupt die eine oder andere neue Attraktion zu errichten - die Kinder w\u00fcrden sich freuen.</p>",
                 "public_benefit": "<p>Ein besserer Spielplatz in der Stadt f\u00fcr unsere Kinder.</p>",
                 "image_file": "cropped-1705410546636.jpg",
-                "geoloc": "48.406628217526446,15.596978148632386",
+                "geoloc": "48.406628217526446,15.696978148632386",
                 "date": "2024-01-12 18:34:02",
                 "author": "1",
                 "is_important": false,
@@ -31,7 +31,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.599952179923742,
+                    15.699952179923742,
                     48.4114002197786
                 ]
             },
@@ -42,7 +42,7 @@
                 "descriptionwhy": "<p>Der Bauernmarkt hat bekanntlich nur am Samstagvormittag offen. Einige w\u00fcnschen sich aber auch einen oder vielleicht sogar mehrere zus\u00e4tzliche Tage zum Einkaufen am Markt. Auch die \u00d6ffnungszeiten k\u00f6nnen \u00fcberdenkt werden. Das erweiterete Angebot wird auch bestimmt gut angenommen werden.</p>",
                 "public_benefit": "<p>Mehr M\u00f6glichkeiten, Obst, Gem\u00fcse und andere Schmankeln regional einzukaufen.</p>",
                 "image_file": "cropped-1709048072818.jpg",
-                "geoloc": "48.4114002197786,15.599952179923742",
+                "geoloc": "48.4114002197786,15.699952179923742",
                 "date": "2024-01-12 18:41:24",
                 "author": "1",
                 "is_important": false,
@@ -81,7 +81,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.596143375203608,
+                    15.696143375203608,
                     48.40761986672636
                 ]
             },
@@ -92,7 +92,7 @@
                 "descriptionwhy": "<p>Eine treffende Beschreibung</p>",
                 "public_benefit": "<p>Eine treffende Beschreibung!</p>",
                 "image_file": "cropped-1706628678299.jpg",
-                "geoloc": "48.40761986672636,15.596143375203608",
+                "geoloc": "48.40761986672636,15.696143375203608",
                 "date": "2024-01-22 14:01:33",
                 "author": "1",
                 "is_important": false,

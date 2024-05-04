@@ -36,7 +36,7 @@
     cursor: pointer;
     display: inline-block; /* Ensure alignment and proper sizing */
     text-align: center;
-    font-size: 14px;
+    font-size: 17px;
     margin: 10px 0;
 }
 
@@ -130,7 +130,7 @@ strong {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 14px;
+  font-size: 17px;
   margin: 10px 0;
   cursor: pointer;
   box-sizing: border-box;
@@ -207,6 +207,11 @@ strong {
         margin-top: 30px;
         margin-bottom: 15px;
       }
+	  
+	  p {
+    font-size: 18px !important;
+}
+
 
       .about-section p {
         text-align: justify;
@@ -224,7 +229,7 @@ strong {
       /* Responsive Design for Mobile Devices */
       @media screen and (max-width: 480px) {
         .content-container {
-          font-size: 14px;
+          font-size: 17px;
         }
       }
 
@@ -266,7 +271,13 @@ strong {
         .features-list li {
           padding-left: 15px;
         }
-      }
+		
+		h2, h1, h3 {
+        font-size: 5.6vw !important;
+    }
+}
+
+      
 
 
 
@@ -302,7 +313,7 @@ strong {
     justify-content: center; /* Optional, if you want to vertically center the contents */
 }
 .center-wrapper p {
-    font-size: 18px; /* Keeps the font size as previously defined */
+    font-size: 17px; /* Keeps the font size as previously defined */
     color: #000; /* Maintains the lighter text color for subtlety */
     max-width: 80%; /* Continues to limit the width for readability */
     margin: 20px auto; /* Keeps the vertical space around the text */
@@ -383,7 +394,7 @@ strong {
       label {
         display: block;
         margin-bottom: 10px;
-        font-size: 18px;
+        font-size: 17px;
         color: #333;
       }
 
@@ -395,7 +406,7 @@ strong {
         padding: 10px;
         border-radius: 5px;
         border: 1px solid #ccc;
-        font-size: 16px;
+        font-size: 17px;
         color: #333;
         box-sizing: border-box;
       }
@@ -542,7 +553,7 @@ position: fixed; /* This makes the bar stay at the top */
     background-color: #003056;
     color: white;
     text-align: center;
-    font-size: 14px;
+    font-size: 17px;
     font-weight: bold;
     border: 2px solid transparent;
     border-radius: 10px;
@@ -558,7 +569,7 @@ position: fixed; /* This makes the bar stay at the top */
     background-color: #003056; /* Button background color */
     color: white; /* Button text color */
     text-align: center; /* Center-aligns the text inside the button */
-    font-size: 14px; /* Text size inside the button */
+    font-size: 17px; /* Text size inside the button */
     font-weight: bold; /* Makes the text bold */
 	width: auto !important;
     border: none; /* Removes the border */
@@ -594,7 +605,7 @@ position: fixed; /* This makes the bar stay at the top */
         text-decoration: none;
         margin-right: 20px;
         /* Add spacing between links */
-        font-size: 18px;
+        font-size: 17px;
         /* Increase text size */
         font-weight: bold;
         /* Make text bold */
@@ -679,7 +690,7 @@ position: fixed; /* This makes the bar stay at the top */
         /* Set the text color to match other links */
         margin-right: 20px;
         /* Right margin for spacing */
-        font-size: 18px;
+        font-size: 17px;
         /* Font size similar to other links */
         font-weight: bold;
         /* Bold text */
@@ -760,7 +771,7 @@ position: fixed; /* This makes the bar stay at the top */
 
       .info-box-undertitle {
         color: white;
-        font-size: 16px;
+        font-size: 17px;
       }
 
       /* Specific colors for each box */
@@ -878,7 +889,7 @@ background-image: none;
         }
 
         body {
-          font-size: 14px;
+          font-size: 17px;
           /* Smaller font size */
         }
 
@@ -911,7 +922,7 @@ border-radius: 0px;
   }
 
         .publish-button {
-          font-size: 18px;
+          font-size: 17px;
           /* Slightly smaller font size */
           padding: 15px 0;
           /* Adjust padding */

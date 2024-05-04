@@ -342,7 +342,7 @@ img:hover {
 	/* Text color */
 	border: none;
 	/* No border */
-	padding: 14px 20px;
+	padding: 16px 20px;
 	/* Padding inside the button */
 	font-size: 16px;
 	/* Font size */
@@ -387,7 +387,7 @@ img:hover {
     background-color: #003056;
     color: white;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     border: 2px solid transparent;
     border-radius: 10px;
@@ -403,7 +403,7 @@ img:hover {
     background-color: #003056; /* Button background color */
     color: white; /* Button text color */
     text-align: center; /* Center-aligns the text inside the button */
-    font-size: 14px; /* Text size inside the button */
+    font-size: 16px; /* Text size inside the button */
     font-weight: bold; /* Makes the text bold */
 	width: auto !important;
     border: none; /* Removes the border */
@@ -439,7 +439,7 @@ img:hover {
 	text-align: center;
 	text-decoration: none;
 	display: inline-block;
-	font-size: 14px;
+	font-size: 16px;
 	cursor: pointer;
 	box-sizing: border-box;
 	/* Include padding in width */
@@ -655,7 +655,7 @@ nav[aria-label="Page navigation"] {
      border-radius: 30px !important;
      margin-top: 0px;
 	 font-weight: bold;
-	 font-size: 16px !important;
+	 font-size: 18px !important;
      display: flex;	 
    }
 
@@ -1337,7 +1337,7 @@ a:hover {
 	}
 
 	body {
-		font-size: 14px;
+		font-size: 16px;
 		/* Smaller font size */
 	}
 

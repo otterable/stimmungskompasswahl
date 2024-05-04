@@ -150,7 +150,7 @@ body {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 18px;
     margin: 10px 0;
     font-weight: bold;
     cursor: pointer;
@@ -245,7 +245,7 @@ body {
 
 @media screen and (max-width: 480px) {
     body {
-    font-size: 14px;
+    font-size: 18px;
     }
 
     .logo-container {
@@ -269,7 +269,7 @@ body {
 
     .button,
     .register-button {
-    font-size: 14px;
+    font-size: 18px;
     padding: 8px 15px;
     }
 
@@ -298,7 +298,7 @@ body {
 }
 
 .informative-text {
-    font-size: 14px;
+    font-size: 18px;
     margin-top: 10px;
 }
 
@@ -313,7 +313,7 @@ body {
     /* Full width of the container */
     box-sizing: border-box;
     /* Include padding in width calculation */
-    font-size: 16px;
+    font-size: 18px;
     /* Adjust font size as needed */
 }
 

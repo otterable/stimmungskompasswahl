@@ -530,7 +530,9 @@ function renderPage(page) {
     // Create and format the date text
     const dateText = document.createElement('span');
     dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    dateText.style.color = 'grey';
+    dateText.style.color = 'black';
+	    dateText.style.fontWeight = 'normal';
+
     dateText.style.display = 'block'; // Ensures the date is on its own line
 
     // Create and format the prefix and category
@@ -798,7 +800,7 @@ var upvoteButtonStyle = `
 
 var detailsButtonStyle = `
   display: inline-block;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   color: white !important;
   text-decoration: none;
@@ -836,7 +838,7 @@ var popupContent = `
         <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
             <button onmouseover="this.style.backgroundColor='#66c46a'" onmouseout="this.style.backgroundColor='#4caf50'" onclick="vote(${project.id}, 'upvote')" id="upvote-button-${project.id}" class="vote-button circle-btn upvote" style="${upvoteButtonStyle}">👍</button>
             <span id="upvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.upvotes}</span>
-            <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" class="button-hover-effect" style="font-size: 14px; font-weight: bold; color:white !important; text-decoration: none; background-color: #1a1a1a; border-radius: 30px; display: flex; flex-grow: 1; justify-content: center; align-items: center; padding: 10px; margin: 0 10px; transition: transform 0.3s ease, background-color 0.3s ease;">
+            <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" class="button-hover-effect" style="font-size: 16px; font-weight: bold; color:white !important; text-decoration: none; background-color: #1a1a1a; border-radius: 30px; display: flex; flex-grow: 1; justify-content: center; align-items: center; padding: 10px; margin: 0 10px; transition: transform 0.3s ease, background-color 0.3s ease;">
                 Details
             </a>
             <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
@@ -1306,7 +1308,6 @@ function checkMarkerLimit() {
             limitInfoElement.textContent = `Sie haben Ihr Tageslimit von ${data.max_limit} Markierungen erreicht.`;
         } else {
             const markersRemaining = data.max_limit - data.current_count;
-            limitInfoElement.textContent = `Sie haben heute schon ${data.current_count} / 10 Markierungen gepostet.`;
         }
     }).catch(error => {
         const limitInfoElement = document.getElementById('limit-info');

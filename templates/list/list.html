@@ -94,8 +94,12 @@
         <div class="stats-container">
             {% if projects %}
             {% for project in projects %}
+			
             <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="showOverlay('{{ project.name }}', '{{ project.description }}', '{{ project.image_file }}', '{{ project.full_description }}', '{{ project.author }}', '{{ project.date.strftime('%Y-%m-%d') }}')">
-                <h2>{{ project.name }}</h2>
+              
+                <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+			  <h2>{{ project.name }}</h2>
+				
                 <p class="project-date">
                     <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
                     Ansichten: <strong>{{ project.view_count }}</strong>
@@ -113,7 +117,6 @@
                     </div>
                     {% endif %}
                 </div>
-                <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
                 <p>{{ project.description }}</p>
             </div>
             {% endfor %}

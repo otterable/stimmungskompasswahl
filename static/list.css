@@ -253,7 +253,7 @@
      /* Text color */
      border: none;
      /* No border */
-     padding: 14px 20px;
+     padding: 16px 20px;
      /* Padding inside the button */
      font-size: 16px;
      /* Font size */
@@ -485,7 +485,7 @@
      position: absolute;
      top: 50%;
      left: 50%;
-	 	 	 font-size: 16px !important;
+	 	 	 font-size: 18px !important;
 
      transform: translate(-50%, -50%);
      color: white;
@@ -608,6 +608,7 @@
   align-items: center;
   margin: 0 10px;
 }
+
 
    .filter-item label {
      color: white;
@@ -781,9 +782,8 @@
    
    .project-thumbnail {
      background-color: #e5e2d5;
-     border-radius: 30px;
+  border-radius: 30px;
      margin: 10px;
-     padding: 10px;
      display: flex;
      /* Changed to flex to better control the layout */
      flex-direction: column;
@@ -802,7 +802,11 @@
 }
 
 
+}
+
+
    /* Hover effect for project thumbnails */
+    /* Hover effect for project thumbnails */
    .project-thumbnail:hover {
      transform: scale(1.005);
      transition: width 0.3s ease;
@@ -812,8 +816,8 @@
 
    /* Image style within project thumbnails */
    .project-thumbnail img {
-     width: 90%;
-     margin-top: 20px;
+     width: 100%;
+	 bottom: 0 !important;
      /* Fixed height for images */
      object-fit: cover;
      border-radius: 30px;
@@ -830,6 +834,30 @@
      /* Center the text */
    }
 
+   /* Remove absolute positioning from the description */
+   .project-thumbnail p {
+     position: relative;
+     /* Changed from absolute to relative */
+     bottom: auto;
+     /* Remove bottom positioning */
+     overflow: visible;
+     /* Ensure text is not clipped */
+   }
+   p {
+	    font-size: 18px;
+		font-weight: bold;
+   }
+   
+   .project-thumbnail p {
+     margin: 0;
+     padding: 5px 0;
+	 font-size: 16px;
+     width: 90%;
+     /* Adjust the width to match the image */
+     text-align: center;
+     /* Center the text */
+   }
+   
    /* Remove absolute positioning from the description */
    .project-thumbnail p {
      position: relative;
@@ -964,7 +992,7 @@ margin-top: 20px !important;
      }
 
      body {
-       font-size: 14px;
+       font-size: 16px;
        /* Smaller font size */
      }
 
@@ -1149,10 +1177,14 @@ margin-top: 20px !important;
          padding: 15px;
          margin-bottom: 10px;
          border-radius: 30px;
+		 color: #003056;
          border: 1px solid #ccc;
          font-size: 16px;
+		 font-weight: bold;
          box-sizing: border-box;
        }
+	   
+	   
 
        /* Style for labels (titles) in filter-form-mobile */
        #filter-overlay #filter-form-mobile .filter-item label {

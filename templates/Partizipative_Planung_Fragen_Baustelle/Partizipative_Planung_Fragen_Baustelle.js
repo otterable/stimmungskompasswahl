@@ -371,8 +371,8 @@ function generatePopupContent(question) {
         <p style="font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: bold;">Beantworten Sie diese Frage und markieren Sie sie als beantwortet!</p>
         <textarea id="answer-text-${question.id}" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Ihre Antwort hier..."></textarea>
         <br>
-        <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>
-        <button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px;">Abbrechen</button>
+        <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px; font-weight: bold; font-size: 18px;">Antworten</button>
+																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
       </div>`;
   }
   
@@ -412,8 +412,8 @@ function fetchQuestions() {
               <p style="font-size: 16px; font-family: 'Roboto', sans-serif; font-weight: bold;">Beantworten Sie diese Frage und markieren Sie sie als beantwortet!</p>
               <textarea id="answer-text-${question.id}" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Ihre Antwort hier..."></textarea>
               <br>
-              <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>
-              <button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px;">Abbrechen</button>
+        <button onclick="submitAnswer(${question.id}, ${question.latitude}, ${question.longitude})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Antworten</button>
+																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
             </div>`;
         }
 
@@ -680,10 +680,10 @@ document.addEventListener("DOMContentLoaded", () => {
         
 																	<div id="question-form" style="text-align: center;">
 																		<h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
-																		<textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
+																		<textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-weight: bold; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
 																		<div style="display: flex; justify-content: center; margin-top: 10px;">
-																			<button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px;">Posten</button>
-																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px;">Abbrechen</button>
+																			<button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px; font-weight: bold; font-size: 18px;">Posten</button>
+																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
 																		</div>
 																	</div>
     `;

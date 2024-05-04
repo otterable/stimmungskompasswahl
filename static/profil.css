@@ -13,7 +13,7 @@ display:none;
     background-color: #003056;
     color: white;
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     border: 2px solid transparent;
     border-radius: 10px;
@@ -29,7 +29,7 @@ display:none;
     background-color: #003056; /* Button background color */
     color: white; /* Button text color */
     text-align: center; /* Center-aligns the text inside the button */
-    font-size: 14px; /* Text size inside the button */
+    font-size: 16px; /* Text size inside the button */
     font-weight: bold; /* Makes the text bold */
 	width: auto !important;
     border: none; /* Removes the border */
@@ -501,7 +501,7 @@ input[type="file"] {
      border-radius: 30px !important;
      margin-top: 0px;
 	 font-weight: bold;
-	 font-size: 16px !important;
+	 font-size: 18px !important;
      display: flex;
 	 
    }
@@ -1160,7 +1160,7 @@ nav[aria-label="Page navigation"] {
 	}
 
 	body {
-		font-size: 14px;
+		font-size: 16px;
 		/* Smaller font size */
 	}
 

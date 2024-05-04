@@ -65,13 +65,13 @@
 <div id="marker-overlay">
    <div id="overlay-content">
       <div class="title-button-container">
-         <h2 class="title-imagebutton" style="font-size: 21px;">Notiz hinzufügen</h2>
+         <h2 class="title-imagebutton" style="font-size: 26px !important;">Notiz hinzufügen</h2>
          <a href="#" id="info-link">
          <img src="{{ url_for('serve_image', filename='infobutton.png') }}" alt="Info" class="info-image">
          </a>
       </div>
       <h3 style="font-size: 16px;">
-         <a href="/Partizipative_Planung_Neuer_Projekt" style="color: #003056; text-decoration: underline;">Hier klicken, um Projektvorschläge zu posten.</a>
+         <a href="/Partizipative_Planung_Neuer_Projekt" style="color: #003056; text-decoration: underline; font-size: 18px !important; font-weight: normal">Hier klicken, um Projektvorschläge zu posten.</a>
       </h3>
       <!-- Wrapper div for the select and the textarea -->
       <div style="width: 100%; box-sizing: border-box; text-align: center;">
@@ -89,14 +89,14 @@
          </select>
          <br>
          <br>
-         <h2 style="font-size: 21px;">Die ausgewählte Kategorie betrifft Themen wie:</h2>
-         <h3 id="marker-category-description" style="color:#003056; font-size: 16px;"></h3>
+         <h2 style="font-size: 21px;">Diese Kategorie betrifft Themen wie:</h2>
+         <h3 id="marker-category-description" style="color:#003056; font-size: 18px !important; font-weight: normal;"></h3>
          <!-- Description will appear here -->
-         <h2>2. Beschreiben Sie die Umstände:</h2>
-         <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 16px; font-family: 'Roboto', sans-serif;" placeholder="Was beschäftigt Sie?"></textarea>
+         <h2 style="font-size: 21px;">2. Beschreiben Sie die Umstände:</h2>
+         <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-family: 'Roboto', sans-serif; font-weight: bold;" placeholder="Was beschäftigt Sie?"></textarea>
       </div>
       <br>
-      <h3 style="font-size: 16px" id="limit-info">limit info here</h3>
+      <h3 style="font-size: 16px; display:none !important;" id="limit-info">limit info here</h3>
       <div class="button-container">
          <button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>
       </div>

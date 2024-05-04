@@ -43,7 +43,7 @@ img {
 #ios-install-prompt p {
     margin: 0 auto;
     padding: 0 5px; /* Adjust padding */
-    font-size: 14px; /* Adjust font size for readability */
+    font-size: 16px; /* Adjust font size for readability */
     word-wrap: break-word; /* Prevent overflow */
 }
 
@@ -61,7 +61,7 @@ img {
     border-radius: 5px;
     background-color: #2874A6; /* Button color */
     color: white;
-    font-size: 14px; /* Button font size */
+    font-size: 16px; /* Button font size */
 }
 		
 		
@@ -558,7 +558,7 @@ input[type="file"] {
      border-radius: 30px !important;
      margin-top: 0px;
 	 font-weight: bold;
-	 font-size: 16px !important;
+	 font-size: 18px !important;
      display: flex;
 	 
    }
@@ -954,7 +954,7 @@ font-size: 5vw;
   }
 
   body {
-    font-size: 14px;
+    font-size: 16px;
     /* Smaller font size */
   }
 
@@ -1371,7 +1371,7 @@ background-color: #06467c !important;
 	}
 	 
 	 	.projects-header p, .info-box-title p, .info-text-title p, .info-box-container p, .cover-text-container h2, p, .projects-header p, project-description p, .info-text-undertitle p, .info-text-undertitle, .p-projectsheader, .p-projectsheader p   {
-	   font-size: 3.5vw !important;
+	   font-size: 5vw !important;
 	   			   font-weight: 400 !important;
 	    justify-content: center !important; /* Centers items vertically */
 	 }
@@ -1380,7 +1380,7 @@ background-color: #06467c !important;
 		 display:none;
 	 }
 	 .cover-text-container h1 {
-		   font-size: 5vw !important;
+		   font-size: 5.6vw !important;
 		   margin: 0px !important;
 	    justify-content: center !important; /* Centers items vertically */
 	 }
@@ -1390,7 +1390,7 @@ background-color: #06467c !important;
 	 }
 	
 	.projects-header h1, .info-box-title h3, .info-text-title h3, .info-box-container h3, .h1-cs, .h1-cs h1, .projects-header h2 {
-	   font-size: 5vw !important;
+	   font-size: 5.6vw !important;
 	   margin-bottom: 2vw !important;
 	    justify-content: center !important; /* Centers items vertically */
 	 }
@@ -1441,7 +1441,7 @@ background-color: #06467c !important;
   }
 
   .info-text-title {
-    font-size: 6vw;
+    font-size: 5.6vw;
     /* Larger size for smaller screens */
   }
 

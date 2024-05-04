@@ -79,9 +79,8 @@ align-items: center;
 	
 #marker-overlay {
 position: absolute; /* Changed from fixed to absolute */
-top: 40px; /* Estimate based on viewport height and gap */
+top: 0px; /* Estimate based on viewport height and gap */
 word-wrap: break-word; /* Break long words to prevent horizontal overflow */
-bottom: 50px; /* 15px away from the bottom */
 width: auto; /* Allow width to adjust to left and right margins */
 min-width: calc(100% - 30px); /* Ensure it takes at least the width minus margins */
 height: auto; /* Adjust height automatically */
@@ -91,12 +90,12 @@ display: none;
 left: 0;
 right: 0;
         background-color: #f5f1e4;
+		height: 100%;
 
 flex-direction: column;
 justify-content: center; /* Vertically center content */
 align-items: center; /* Horizontally center content */
-border-radius: 30px;
-margin-top: 7.5px !important;
+border-radius: 0px;
 z-index: 1055;
 overflow: auto; /* Enables scrolling if content is larger than the overlay */
 }
@@ -166,7 +165,7 @@ text-align: center;
 text-decoration: none;
 display: inline-block;
 font-weight: bold;
-font-size: 16px !important;
+font-size: 18px !important;
 margin: auto;
 margin-top: 0px !important;
 margin-bottom: 0px;
@@ -209,7 +208,7 @@ text-align: center;
 text-decoration: none;
 display: inline-block;
 font-weight: bold;
-font-size: 14px !important;
+font-size: 16px !important;
 margin: auto;
 margin-top: 0px !important;
 margin-bottom: 0px;
@@ -569,25 +568,25 @@ width: 500px !important;
 .button-container .register-button-m,
 button[onclick*="markers-list-overlay"].register-button,
 #add-marker-button.register-button {
-font-size: 14px;
+font-size: 18px;
 /* Adjust the font size for mobile devices */
 padding: 10px 15px;
 /* Adjust padding to fit the smaller text */
 }
 #category-toggle-buttons button {
-font-size: 14px !important;
+font-size: 16px !important;
 /* Smaller font size for mobile devices */
 padding: 10px 15px;
 /* Adjusted padding for smaller buttons */
 }
 #custom-confirm button.register-button {
-font-size: 14px;
+font-size: 16px;
 /* Decrease the font size for the buttons */
 padding: 8px 10px;
 /* Decrease padding to fit the smaller buttons */
 }
 h3 {
-font-size: 14px;
+font-size: 16px;
 /* Slightly smaller font size for the h3 element */
 text-align: center;
 margin-top: 5px;
@@ -614,7 +613,7 @@ padding: 12px 18px;
 /* Adjust padding to fit the larger text */
 }
 #category-toggle-buttons button {
-font-size: 16px !important;
+font-size: 18px !important;
 /* Larger font size for tablet devices */
 padding: 12px 18px;
 /* Adjusted padding for larger buttons */
@@ -1032,7 +1031,7 @@ font-weight: bold;
 display: flex;
 align-items: center;
 justify-content: center;
-margin: 14px 0;
+margin: 16px 0;
 padding: 15px;
 box-sizing: border-box;
 cursor: pointer;
@@ -1054,7 +1053,7 @@ font-weight: bold;
 display: flex;
 align-items: center;
 justify-content: center;
-margin: 14px 0;
+margin: 16px 0;
 padding: 15px;
 box-sizing: border-box;
 cursor: pointer;
@@ -1075,7 +1074,7 @@ width: 100%;
 #info-popup {
 padding: 20px;
 max-width: 500px;
-font-size: 14px;
+font-size: 16px;
 z-index: 1000;
 /* Make sure the popup appears above the map */
 background-color: var(--popup-bg-color);
@@ -1748,7 +1747,7 @@ border-radius: 30px;
 padding: 8px 15px;
 /* Increased left and right padding */
 font-size: 3vw;
-top: 5.5%;
+top: 5.6%;
 max-width: 60%;
 }
 .counter-color {
@@ -1930,7 +1929,8 @@ width: 100%;
 padding: 10px;
 border-radius: 5px;
 border: 1px solid #ccc;
-font-size: 16px;
+font-size: 18px;
+font-weight:bold;
 color: #333;
 box-sizing: border-box;
 }
@@ -2426,7 +2426,7 @@ margin-bottom: 0px !important;
     justify-content: center; /* Center text horizontally */
     align-items: center; /* Center text vertically */
     flex: 1; /* Flex-grow to fill available space */
-    font-size: 16px; /* Set font size to 16px */
+    font-size: 18px; /* Set font size to 16px */
 }
 
 /* Adjust hover effect for .register-button-cl */
@@ -2572,7 +2572,7 @@ display: none;
 }
 @media only screen and (max-width: 1080px) {
 body {
-font-size: 14px;
+font-size: 18px;
 /* Smaller font size */
 }
 #hamburger-button {
@@ -2652,7 +2652,7 @@ margin-right: 5px;
 /* 5px gap on the right */
 display: block;
 /* Change display to block for full width */
-font-size: 16px !important;
+font-size: 18px !important;
 }
 .button-container {
 padding: 0;

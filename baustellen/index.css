@@ -43,7 +43,7 @@ img {
 #ios-install-prompt p {
     margin: 0 auto;
     padding: 0 5px; /* Adjust padding */
-    font-size: 14px; /* Adjust font size for readability */
+    font-size: 16px; /* Adjust font size for readability */
     word-wrap: break-word; /* Prevent overflow */
 }
 
@@ -61,7 +61,7 @@ img {
     border-radius: 5px;
     background-color: #2874A6; /* Button color */
     color: white;
-    font-size: 14px; /* Button font size */
+    font-size: 16px; /* Button font size */
 }
 		
 		
@@ -932,7 +932,7 @@ input[type="file"] {
   }
 
   body {
-    font-size: 14px;
+    font-size: 16px;
     /* Smaller font size */
   }
 
@@ -1127,7 +1127,7 @@ input[type="file"] {
 
     .cover-text-container h1 {
       margin-top: 45px;
-      font-size: 5.5vw;
+      font-size: 5.6vw;
       /* Increase font size for smaller screens */
     }
 
@@ -1188,12 +1188,12 @@ input[type="file"] {
   }
 
   .info-text-title {
-    font-size: 6vw;
+    font-size: 5.6vw;
     /* Larger size for smaller screens */
   }
 
   .info-text-undertitle {
-    font-size: 16px !important;
+    font-size: 18px !important;
     /* Larger size for smaller screens */
   }
 }
