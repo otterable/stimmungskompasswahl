@@ -6,7 +6,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.696978148632386,
+                    15.596978148632386,
                     48.406628217526446
                 ]
             },
@@ -17,7 +17,7 @@
                 "descriptionwhy": "<p>Der alte Spielplatz im Stadtpark ist schon etwas heruntergekommen. Es w\u00e4re sinnvoll, einige Installationen zu erneuern (z.B. Schaukeln, Karusell) oder \u00fcberhaupt die eine oder andere neue Attraktion zu errichten - die Kinder w\u00fcrden sich freuen.</p>",
                 "public_benefit": "<p>Ein besserer Spielplatz in der Stadt f\u00fcr unsere Kinder.</p>",
                 "image_file": "cropped-1705410546636.jpg",
-                "geoloc": "48.406628217526446,15.696978148632386",
+                "geoloc": "48.406628217526446,15.596978148632386",
                 "date": "2024-01-12 18:34:02",
                 "author": "1",
                 "is_important": false,
@@ -30,7 +30,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.699952179923742,
+                    15.599952179923742,
                     48.4114002197786
                 ]
             },
@@ -41,7 +41,7 @@
                 "descriptionwhy": "<p>Der Bauernmarkt hat bekanntlich nur am Samstagvormittag offen. Einige w\u00fcnschen sich aber auch einen oder vielleicht sogar mehrere zus\u00e4tzliche Tage zum Einkaufen am Markt. Auch die \u00d6ffnungszeiten k\u00f6nnen \u00fcberdenkt werden. Das erweiterete Angebot wird auch bestimmt gut angenommen werden.</p>",
                 "public_benefit": "<p>Mehr M\u00f6glichkeiten, Obst, Gem\u00fcse und andere Schmankeln regional einzukaufen. </p>",
                 "image_file": "cropped-86558428535058272468.jpg",
-                "geoloc": "48.4114002197786,15.699952179923742",
+                "geoloc": "48.4114002197786,15.599952179923742",
                 "date": "2024-01-12 18:41:24",
                 "author": "1",
                 "is_important": false,
@@ -54,7 +54,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.679311321073867,
+                    15.579311321073867,
                     48.400403343800946
                 ]
             },
@@ -65,7 +65,7 @@
                 "descriptionwhy": "<p>Der Radweg entlang des Flusses hat mittlerweile einige Sch\u00e4den durch Wurzeln nahestehender B\u00e4ume. Au\u00dferdem ist er zwischendurch durch die Stra\u00dfe unterbrochen - auch das sollte f\u00fcr eine verbesserte Sicherheit behoben werden.</p>",
                 "public_benefit": "<p>Der Radweg wird sicherer und angenehmer zu befahren, vor allem f\u00fcr Kinder.</p>",
                 "image_file": "cropped-00235735669304345436.jpg",
-                "geoloc": "48.400403343800946,15.679311321073867",
+                "geoloc": "48.400403343800946,15.579311321073867",
                 "date": "2024-01-12 18:47:16",
                 "author": "1",
                 "is_important": true,
@@ -78,7 +78,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.696291026774496,
+                    15.596291026774496,
                     48.40768129470201
                 ]
             },
@@ -89,7 +89,7 @@
                 "descriptionwhy": "<p>Leider sind die paar wenigen Parkpl\u00e4tze immer belegt, sodass ich oft auch als Anwohner keinen Platz finde. Es w\u00e4re gut, die Regelungen f\u00fcrs Parken zu \u00fcberarbeiten und die Parkpl\u00e4tze nur f\u00fcr Anwohner zu vergeben.</p>",
                 "public_benefit": "<p>Gesicherte Autostellpl\u00e4tze f\u00fcr die Anwohner.</p>",
                 "image_file": "cropped-1705924254619.jpg",
-                "geoloc": "48.40768129470201,15.696291026774496",
+                "geoloc": "48.40768129470201,15.596291026774496",
                 "date": "2024-01-12 18:52:29",
                 "author": "1",
                 "is_important": false,
@@ -246,7 +246,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.681531524658205,
+                    15.581531524658205,
                     48.403195076809354
                 ]
             },
@@ -257,7 +257,7 @@
                 "descriptionwhy": "In dieser Gegend gibt es leider keine Buslinie.",
                 "public_benefit": "Default public benefit description",
                 "image_file": "default_image.jpg",
-                "geoloc": "48.403195076809354, 15.681531524658205",
+                "geoloc": "48.403195076809354, 15.581531524658205",
                 "date": "2024-01-17 17:04:46",
                 "author": "0",
                 "is_important": false,
@@ -318,7 +318,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.689985847473146,
+                    15.589985847473146,
                     48.41595736821784
                 ]
             },
@@ -329,7 +329,7 @@
                 "descriptionwhy": "Ein paar mehr Sitz- und Liegeb\u00e4nke im Kurpark w\u00e4ren nett - vor allem rund um die Kuranstalt\n",
                 "public_benefit": "Default public benefit description",
                 "image_file": "default_image.jpg",
-                "geoloc": "48.41595736821784, 15.689985847473146",
+                "geoloc": "48.41595736821784, 15.589985847473146",
                 "date": "2024-01-17 17:19:58",
                 "author": "0",
                 "is_important": false,
@@ -390,7 +390,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.680072402954103,
+                    15.580072402954103,
                     48.40202693927076
                 ]
             },
@@ -401,7 +401,7 @@
                 "descriptionwhy": "Vor einiger Zeit wurden in der Allee alte B\u00e4ume umgeschnitten - hoffentlich werden die bald durch neue ersetzt",
                 "public_benefit": "Default public benefit description",
                 "image_file": "default_image.jpg",
-                "geoloc": "48.40202693927076, 15.680072402954103",
+                "geoloc": "48.40202693927076, 15.580072402954103",
                 "date": "2024-01-17 17:25:28",
                 "author": "0",
                 "is_important": false,
@@ -438,7 +438,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.699040985107424,
+                    15.599040985107424,
                     48.41081580348463
                 ]
             },
@@ -449,7 +449,7 @@
                 "descriptionwhy": "Ich w\u00fcrde mich \u00fcber mehr Kunstinstallationen oder \u00f6ffentlich ausgestellte Kunst freuen.",
                 "public_benefit": "Default public benefit description",
                 "image_file": "default_image.jpg",
-                "geoloc": "48.41081580348463, 15.699040985107424",
+                "geoloc": "48.41081580348463, 15.599040985107424",
                 "date": "2024-01-17 17:28:34",
                 "author": "0",
                 "is_important": false,
@@ -462,7 +462,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.694685077667238,
+                    15.594685077667238,
                     48.40583041052556
                 ]
             },
@@ -473,7 +473,7 @@
                 "descriptionwhy": "Was wurde aus der wechselnden Austellung der Stadtgallerie? In letzter Zeit gibt es leider nur selten neue Austellungen.",
                 "public_benefit": "Default public benefit description",
                 "image_file": "default_image.jpg",
-                "geoloc": "48.40583041052556, 15.694685077667238",
+                "geoloc": "48.40583041052556, 15.594685077667238",
                 "date": "2024-01-17 17:29:48",
                 "author": "0",
                 "is_important": false,
@@ -510,7 +510,7 @@
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    15.696143375203608,
+                    15.596143375203608,
                     48.40761986672636
                 ]
             },
@@ -521,7 +521,7 @@
                 "descriptionwhy": "<p>Eine treffende Beschreibung</p>",
                 "public_benefit": "<p>Eine treffende Beschreibung!</p>",
                 "image_file": "cropped-1706628678299.jpg",
-                "geoloc": "48.40761986672636,15.696143375203608",
+                "geoloc": "48.40761986672636,15.596143375203608",
                 "date": "2024-01-22 14:01:33",
                 "author": "1",
                 "is_important": false,
