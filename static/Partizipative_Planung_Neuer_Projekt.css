@@ -16,6 +16,37 @@ body {
 
 }
 
+
+/* Set the background color of the Quill toolbar */
+.ql-toolbar {
+    background-color: white; /* White background for the toolbar */
+    border-bottom: 1px solid #ccc; /* Light grey border to separate toolbar from editor */
+}
+
+/* Style the toolbar buttons for a cleaner look */
+.ql-toolbar button {
+    color: #333; /* Darker text for better readability */
+    background-color: transparent; /* Transparent background to avoid overriding */
+}
+
+/* Hover and active state styling for toolbar buttons */
+.ql-toolbar button:hover,
+.ql-toolbar button:focus,
+.ql-toolbar button.ql-active {
+    color: #0056b3; /* Highlight color for hover and active states */
+    background-color: #e6e6e6; /* Light grey background on hover and active */
+}
+
+
+.ql-container {
+    background-color: white; /* Sets the background color to white */
+    border: 1px solid #ccc; /* Optional: Adds a light grey border around the editor */
+}
+
+.ql-editor {
+    min-height: 200px; /* Ensures there is a minimum height for easier editing */
+}
+
 .leaflet-tile {
   margin: 0 !important;
   padding: 0 !important;

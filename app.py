@@ -3181,25 +3181,24 @@ def delete_map_object(map_object_id):
 @app.route("/verify_admin_otp", methods=["GET", "POST"])
 @login_required
 def verify_admin_otp():
-    # Ensure the user is an admin
+    print(f"Request method: {request.method}")  # Debug: Print request method
     if current_user.id != 1:
         print("Access Denied: You are not authorized to perform this action.", "danger")
         return redirect(url_for("index"))
 
     if request.method == "POST":
         entered_otp = request.form.get("otp")
-
-        # Passwort bestätigen
+        print(f"Entered OTP: {entered_otp}")  # Debug: Log the entered OTP
         if "admin_otp" in session and str(session["admin_otp"]) == entered_otp:
             session["admin_verified"] = True
             print("OTP Verified. Access granted to admin tools.", "success")
             return redirect(url_for("admin_options"))
         else:
             print("Invalid OTP. Please try again.", "danger")
-    metaData=g.metaData
-    return render_template(
-        "verify_admin_otp/index.html", metaData=metaData,
-    )  # Ensure this template exists for OTP input
+            flash("Invalid OTP. Please try again.", "danger")
+            return redirect(url_for('verify_admin_otp'))
+
+    return render_template("verify_admin_otp/index.html")
 
 
 import os
@@ -3725,29 +3724,25 @@ def contact():
     return render_template("contact/index.html", metaData=metaData)
 
 
-
 @app.route("/delete_project/<int:project_id>", methods=["POST"])
 @login_required
 def delete_project(project_id):
     try:
         project = Project.query.get_or_404(project_id)
         app.logger.debug(
-            f"User {current_user.id} attempting to delete project {project_id}, owned by user {project.author}"
+            f"User {current_user.id} attempting to delete project {project_id}."
         )
 
-        # Convert project.author to int for comparison
-        project_author_id = int(project.author)
-        app.logger.debug(f"Converted project.author to int: {project_author_id}")
-
-        if project_author_id == current_user.id:
+        # Check for admin ID or match project's author if it exists
+        if current_user.id == 1 or getattr(project, 'author_id', current_user.id) == current_user.id:
             db.session.delete(project)
             db.session.commit()
-            app.logger.debug(f"Project {project_id} deleted successfully.")
+            app.logger.debug(f"Project {project_id} deleted successfully by user {current_user.id}.")
             return jsonify(
                 {"success": True, "message": "Project deleted successfully."}
             )  # Return JSON response
         else:
-            app.logger.debug(f"Permission denied to delete project {project_id}.")
+            app.logger.debug(f"Permission denied to delete project {project_id} for user {current_user.id}.")
             return (
                 jsonify({"success": False, "message": "Permission denied."}),
                 403,

@@ -102,20 +102,16 @@
 	list-style-type: none;
 }
 
-
 .stats-container {
-	margin-top: 20px;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center; /* Center align items vertically */
+  justify-content: center;
+  height: auto; /* Start with auto height, JavaScript will adjust it */
 }
 
-.stats-container {
-	margin-top: 15px;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-}
+
 
 .stat-box {
 	background-color: #e5e2d5;
@@ -1198,14 +1194,12 @@ ul {
 }
 
 .stats-container {
-	display: flex;
-	/* Use flexbox for layout */
-	flex-wrap: wrap;
-	/* Allow items to wrap to next line */
-	justify-content: center;
-	/* Center items horizontally */
-	align-items: flex-start;
-	/* Align items to the start of the container vertically */
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center; /* Center align items vertically */
+  justify-content: center;
+  height: auto; /* Start with auto height, JavaScript will adjust it */
 }
 
 /* Overlay styles */
@@ -1714,31 +1708,71 @@ a:hover {
 
 
 
+ input[type="date"] {
+    width: auto; /* Adjust width as needed */
+    padding: 8px 12px; /* Comfortable padding */
+        margin: 8px 0; /* Add some margin for external spacing */
+        display: inline-block; /* Ensuring the input behaves as a block-level element */
+        border: 1px solid #ccc; /* Standard border color */
+        border-radius: 4px; /* Rounded corners for modern look */
+        box-sizing: border-box; /* Handles the padding and border inside of the box's dimensions */
+        font-size: 16px; /* Larger font size for better readability */
+        background-color: white; /* Background color white */
+        color: #444; /* Text color to something darker for contrast */
+        font-family: Arial, sans-serif; /* Modern font family */
+        transition: border-color 0.3s; /* Smooth transition for interactions */
+    }
+
+    input[type="date"]:hover {
+        border-color: #888; /* Change border color on hover for visual feedback */
+    }
+
+    input[type="date"]:focus {
+        border-color: #0056b3; /* Highlight color when the element is focused */
+        outline: none; /* Remove the default focus outline */
+    }
 
 
+select {
+    width: auto; /* Adjust width as needed */
+	min-width: 100px;
+    padding: 8px 12px; /* Comfortable padding */
+    font-size: 16px; /* Legible font size */
+    border: 1px solid #ccc; /* Subtle border */
+    border-radius: 10px; /* Rounded corners for a modern look */
+    appearance: none; /* Remove default system appearance */
+ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>'); /* Custom dropdown arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* Position for the arrow icon */
+    background-color: #fff; /* Background color */	
+    cursor: pointer; /* Pointer cursor on hover */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
+    margin-bottom: 10px; /* Spacing below the dropdown */
+}
 
+select:hover {
+    border-color: #888; /* Darker border on hover */
+}
+
+select:focus {
+    outline: none;
+    border-color: #0056b3; /* Focus color */
+}
 
 
 .project-thumbnail {
-     background-color: #e5e2d5;
-     border-radius: 30px;
-     margin: 10px;
-     padding: 10px;
-     display: flex;
-     /* Changed to flex to better control the layout */
-     flex-direction: column;
-     /* Stack items vertically */
-     align-items: center;
-     /* Center items horizontally */
-     box-sizing: border-box;
-     transition: width 0.3s ease;
-     position: relative;
-     overflow: visible;
-     /* Ensure the content is not clipped */
-     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-   transition: box-shadow 0.3s ease-out; /* Adjusted for shadow or other properties */
-    will-change: auto; /* Default state, only specify if needed for performance */
-    /* Removed transform scale to prevent blurriness */
+  background-color: #e5e2d5;
+  border-radius: 30px;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  transition: width 0.3s ease, box-shadow 0.3s ease-out;
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 

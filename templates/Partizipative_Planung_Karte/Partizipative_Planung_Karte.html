@@ -70,9 +70,7 @@
          <img src="{{ url_for('serve_image', filename='infobutton.png') }}" alt="Info" class="info-image">
          </a>
       </div>
-      <h3 style="font-size: 16px;">
-         <a href="/Partizipative_Planung_Neuer_Projekt" style="color: #003056; text-decoration: underline; font-size: 18px !important; font-weight: normal">Hier klicken, um Projektvorschläge zu posten.</a>
-      </h3>
+
       <!-- Wrapper div for the select and the textarea -->
       <div style="width: 100%; box-sizing: border-box; text-align: center;">
          <h2 style="font-size: 21px;">1. Kategorie auswählen:</h2>
@@ -96,6 +94,9 @@
          <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-family: 'Roboto', sans-serif; font-weight: bold;" placeholder="Was beschäftigt Sie?"></textarea>
       </div>
       <br>
+	        <h3 style="font-size: 16px;">
+         <a href="/Partizipative_Planung_Neuer_Projekt" style="color: #003056; text-decoration: underline; font-size: 18px !important; font-weight: normal">Sie möchten stattdessen einen Projektvorschlag posten?</a>
+      </h3>
       <h3 style="font-size: 16px; display:none !important;" id="limit-info">limit info here</h3>
       <div class="button-container">
          <button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>

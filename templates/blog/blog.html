@@ -1170,30 +1170,42 @@ font-size: 5vw !important;
 
 {% for post in posts %}
 <div class="form-container">
-        <div class="post">
-            <div class="post-title">
-                <h2>{{ post.title }}</h2>
-            </div>
-            <p class="post-date">{{ post.date_posted.strftime('%d.%m.%Y') }}</p>
-            <p class="post-content">{{ post.content | safe }}</p> <!-- Description above image -->
-            {% if post.image_file %}
-            <img src="{{ url_for('static', filename='blogimages/' ~ post.image_file) }}" alt="Image for {{ post.title }}" class="post-image">
-            {% endif %}
-            {% if current_user.is_authenticated and current_user.id == 1 %}
-          <div class="admin-controls">
-    <!-- Bearbeiten button -->
-    <button onclick="location.href='{{ url_for('edit_post', post_id=post.id) }}'" class="btn edit-button">Bearbeiten</button>
-    <!-- Löschen form -->
-    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="post" style="display: inline;">
-        <button type="submit" class="btn delete-button">Löschen</button>
-    </form>
+    <div class="post">
+        <div class="post-title">
+            <h2>{{ post.title }}</h2>
+        </div>
+        <p class="post-date">{{ post.date_posted.strftime('%d.%m.%Y') }}</p>
+        <p class="post-content">{{ post.content | safe }}</p>
+        {% if post.image_file %}
+        <img src="{{ url_for('static', filename='blogimages/' ~ post.image_file) }}" alt="Image for {{ post.title }}" class="post-image">
+        {% endif %}
+        {% if current_user.is_authenticated and current_user.id == 1 %}
+        <div class="admin-controls">
+            <!-- Bearbeiten button -->
+            <button onclick="location.href='{{ url_for('edit_post', post_id=post.id) }}'" class="btn edit-button">Bearbeiten</button>
+            <!-- Löschen form -->
+            <form id="deleteForm{{ post.id }}" action="{{ url_for('delete_post', post_id=post.id) }}" method="post" style="display: inline;">
+                <button type="button" onclick="confirmDelete({{ post.id }})" class="btn delete-button">Löschen</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
-            {% endif %}
-        </div>
-</div>
 
 <script>
+
+function confirmDelete(postId) {
+    if (confirm('Möchten Sie diesen Blogpost wirklich löschen?')) {
+        // If confirmed, submit the corresponding form
+        document.getElementById('deleteForm' + postId).submit();
+    } else {
+        // If cancelled, do nothing
+        alert('Löschvorgang abgebrochen.');
+    }
+}
+
+
 // Toggle the navigation overlay when the hamburger button is clicked
 document.getElementById('hamburger-button').addEventListener('click', function() {
     var navOverlay = document.getElementById('nav-overlay');

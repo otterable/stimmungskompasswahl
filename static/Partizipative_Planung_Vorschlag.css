@@ -362,9 +362,9 @@ input[type="file"] {
 }
 
 .share-buttons a img {
-  width: 50px;
+  width: 45px;
   /* Width of each button */
-  height: 50px;
+  height: 45px;
   /* Height of each button */
 }
 
@@ -814,11 +814,14 @@ position: fixed; /* This makes the bar stay at the top */
 
 @media only screen and (max-width: 1080px) {
     .voting-buttons-container {
+		font-size: 10px !important;
         justify-content: space-between; /* Space out buttons evenly */
         width: 100%; /* Ensure the container spans the full width */
     }
 
     .voting-buttons-container .button {
+				font-size: 14px !important;
+
         flex-grow: 1; /* Allow buttons to grow and fill the container */
         margin: 0 5px; /* Add a small margin between buttons for spacing */
     }

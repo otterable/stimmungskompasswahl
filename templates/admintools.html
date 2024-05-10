@@ -156,7 +156,7 @@
               <button class="mapobject-toggle active" data-filter="all">Alles</button>
               <button class="mapobject-toggle" data-filter="false">Nur Projektvorschläge</button>
               <button class="mapobject-toggle" data-filter="true">Nur Notizen</button>
-              <button id="togglePercentage">Show Percentages</button>
+              <button id="togglePercentage">% anzeigen</button>
               <!-- New Button -->
             </div>
             <canvas id="projectCategoryChart"></canvas>
@@ -1268,10 +1268,12 @@ function updateCommentCountDisplay() {
       togglePercentageBtn.addEventListener('click', () => {
         showPercentage = !showPercentage;
         console.log(`Toggle PercentAlter: Now showing ${showPercentage ? 'percentages' : 'numbers'}`);
-        togglePercentageBtn.textContent = showPercentage ? 'Show Numbers' : 'Show Percentages';
+        togglePercentageBtn.textContent = showPercentage ? 'Zahlen anzeigen' : '% anzeigen';
         fetchChartData(true); // Update only project category chart
       });
     }
+	
+	
 
     function fetchChartData(updateOnlyCategoryChart = false, updateOnlyDescriptionLengthChart = false) {
       console.log("Fetching chart data...");
@@ -1632,69 +1634,72 @@ function updateChart(startDate, endDate, includeMapObjects, excludeMapObjects) {
       updateViewsChart(startDate, endDate);
     });
 
-    function fetchAndRenderEngagedProjectsChart(threshold) {
-      fetch(`/get_engaged_projects?threshold=${threshold}`).then(response => response.json()).then(data => {
+function fetchAndRenderEngagedProjectsChart(threshold) {
+    fetch(`/get_engaged_projects?threshold=${threshold}`).then(response => response.json()).then(data => {
         if (!data || data.length === 0) {
-          console.log("No data available for the threshold:", threshold);
-          return;
+            console.log("No data available for the threshold:", threshold);
+            return;
         }
         let categoryCounts = data.reduce((counts, project) => {
-          counts[project.category] = (counts[project.category] || 0) + 1;
-          return counts;
+            counts[project.category] = (counts[project.category] || 0) + 1;
+            return counts;
         }, {});
         const ctx = document.getElementById('engagedProjectsChart').getContext('2d');
-        if (engagedProjectsChart) engagedProjectsChart.destroy();
-        engagedProjectsChart = new Chart(ctx, {
-          type: 'pie',
-          data: {
-            labels: Object.keys(categoryCounts),
-            datasets: [{
-              data: Object.values(categoryCounts),
-              backgroundColor: ['#003056', '#36A2EB', '#e82b10', '#f57736', '#f6e0bf', '#028d9e', '#036a90'],
-              datalabels: {
-                formatter: (value, ctx) => {
-                  return value; // Display the raw value
-                },
-                color: '#FFFFFF',
-                font: {
-                  size: 14, // Ensure this matches your desired size
-                  weight: 'bold'
-                },
-                anchor: 'end', // Set anchor to 'end' for positioning
-                align: 'start', // Set align to 'start' for positioning
-                offset: 10, // Adjust offset if needed
-                textStrokeColor: '#000000',
-                textStrokeWidth: 4
-              }
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              datalabels: {
-                color: '#FFFFFF',
-                font: {
-                  size: 14, // Ensure this matches your desired size
-                  weight: 'bold'
-                },
-                textStrokeColor: '#000000',
-                textStrokeWidth: 4
-              },
-              legend: {
-                labels: {
-                  font: {
-                    size: 14,
-                    weight: 'bold',
-                    color: 'black'
-                  }
-                }
-              }
+
+        // Check if the chart instance exists and has the destroy method
+        if (window.engagedProjectsChart && typeof window.engagedProjectsChart.destroy === 'function') {
+            window.engagedProjectsChart.destroy();
+        }
+
+        window.engagedProjectsChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(categoryCounts),
+                datasets: [{
+                    data: Object.values(categoryCounts),
+                    backgroundColor: ['#003056', '#36A2EB', '#e82b10', '#f57736', '#f6e0bf', '#028d9e', '#036a90'],
+                    datalabels: {
+                        formatter: (value) => value,
+                        color: '#FFFFFF',
+                        font: {
+                            size: 20,
+                            weight: 'bold'
+                        },
+                        anchor: 'end',
+                        align: 'start',
+                        offset: 10,
+                        textStrokeColor: '#000000',
+                        textStrokeWidth: 5
+                    }
+                }]
             },
-            title: {
-              display: false,
-              text: 'Engagierte Projektvorschläge'
+            options: {
+                responsive: true,
+                plugins: {
+                    datalabels: {
+                        color: '#FFFFFF',
+                        font: {
+                            size: 30,
+                            weight: 'bold'
+                        },
+                        textStrokeColor: '#000000',
+                        textStrokeWidth: 4
+                    },
+                    legend: {
+                        display: true,
+                        labels: {
+                            font: {
+                                size: 24, // Significantly increased size
+                                weight: 'bold',
+                                color: '#000000'
+                            }
+                        }
+                    }
+                },
+                title: {
+                    display: false
+                }
             }
-          }
         });
         console.log("Engaged Projects Chart loaded with data:", categoryCounts);
       }).catch(error => {

@@ -1,49 +1,46 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='utility.css') }}">
-
-    <meta name="google-signin-client_id" content="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.comLogin successful!">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <meta name="google-signin-client_id" content="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-  </head>
-<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-
-  <body>
-
-
-  <div class ="edge">
-<div class="form-container">
-<div class="logo-container" onclick="window.location.href='/'">
-  <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
-</div>
-
-	<div class ="edge">
-  <h1>Admin Verifizierung</h1>
-      <div id="phone-form">
-      <form id="phone-number-form">
- <h3>Bitte das Passwort eingeben, dass sie per SMS an die registrierte Handynummer geschickt wurde.</h3> {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} <div class="alert alert-{{ category }}">{{ message }}</div> {% endfor %} {% endif %} {% endwith %} <form action="{{ url_for('verify_admin_otp') }}" method="POST">
-    <input type="text" id="otp" name="otp" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
-    <button type="submit" class="register-button" style="font-weight: bold">Verifizieren</button>
-  </form>
-      </div>
-
-    </div>   
-  </div>
-
-    </div>   
+</head>
+<body>
+    <div class="edge">
+        <div class="form-container">
+            <div class="logo-container" onclick="window.location.href='/'">
+                <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
+            </div>
+            <h1>Admin Verifizierung</h1>
+            <div id="phone-form">
+                <h3>Bitte das Passwort eingeben, dass sie per SMS an die registrierte Handynummer geschickt wurde.</h3>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                <form action="{{ url_for('verify_admin_otp') }}" method="POST">
+                    <input type="text" id="otp" name="otp" required
+                        style="border-radius: 30px; padding: 15px; background-color: white;
+                        font-weight: bold; color: black; border: 1px solid #003056;
+                        cursor: pointer; width: 100%; box-sizing: border-box;">
+                    <button type="submit" class="register-button" style="font-weight: bold">Verifizieren</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
+            document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
+        });
+    </script>
 </body>
 </html>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
-    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
-  });
-</script>

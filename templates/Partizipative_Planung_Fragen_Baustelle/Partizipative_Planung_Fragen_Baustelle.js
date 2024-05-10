@@ -1,89 +1,97 @@
     // var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
-      var map = L.map('map').setView([48.40868923524383, 15.611355395082073], 17);
-      var currentDrawnLayer = null;
-      var selectedToolButton = null;
-      // Track the current base layer
-      var currentBaseLayer = 'Standardkarte'; // Default layer
-      // Calculate the offset for boundaries
-      var horizontalOffset = 1125; // 1.0225 km on each side, total 2.25 km
-      var verticalOffset = 594; // 0.59375 km on each side, total 1.02875 km
-      // Define the boundaries
-    var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
-      var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
-      var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
-      var bounds = L.latLngBounds(southWest, northEast);
-      // Calculate extended bounds for 10 km buffer
-      var extendedHorizontalOffset = horizontalOffset + 100000; // Add 10 km
-      var extendedVerticalOffset = verticalOffset + 100000; // Add 10 km
-      var extendedSouthWest = map.unproject(centerPoint.subtract([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
-      var extendedNorthEast = map.unproject(centerPoint.add([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
-      var extendedBounds = L.latLngBounds(extendedSouthWest, extendedNorthEast);
-      // Set the max bounds to restrict dragging beyond 10 km from the original boundary
-      map.setMaxBounds(extendedBounds);
-      // Debugging: Log when the user reaches the edge of the draggable area
-      map.on('drag', function() {
-        if (!extendedBounds.contains(map.getCenter())) {}
-      });
-      // Define the coordinates for a very large outer rectangle
-      var outerBounds = [
-        L.latLng(-90, -180),
-        L.latLng(90, -180),
-        L.latLng(90, 180),
-        L.latLng(-90, 180),
-        L.latLng(-90, -180)
-      ];
-      // Define the coordinates for the inner rectangle (the boundary)
-      var innerBounds = [
-        bounds.getSouthWest(),
-        bounds.getNorthWest(),
-        bounds.getNorthEast(),
-        bounds.getSouthEast(),
-        bounds.getSouthWest()
-      ];
-      var boundary = L.latLngBounds(innerBounds);
-      // Create a polygon with a hole (inverted polygon)
-
-      // Draw the boundary rectangle
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        minZoom: 13,
-        attribution: '| © OpenStreetMap contributors'
-      }).addTo(map);
-      // Map layers
-      var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        minZoom: 13,
-        attribution: '....'
-      });
-      var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        minZoom: 13,
-        attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, GIS User Community'
-      });
-      var thunderforestLayers = {
-        "Atlas": L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-          minZoom: 13,
-          attribution: 'Tiles © Thunderforest, ....'
-        }),
-        "Neighbourhood": L.tileLayer('https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-          minZoom: 13,
-          attribution: 'Tiles © Thunderforest, ....'
-        }),
-        "Transport": L.tileLayer('https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-          minZoom: 13,
-          attribution: 'Tiles © Thunderforest, ....'
-        }),
-        "Cycle": L.tileLayer('https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-          minZoom: 13,
-          attribution: 'Tiles © Thunderforest, ....'
-        }),
-        "Mobile_Atlas": L.tileLayer('https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-          minZoom: 13,
-          attribution: 'Tiles © Thunderforest, ....'
-        }),
-        "Pioneer": L.tileLayer('https://tile.thunderforest.com/pioneer/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-          minZoom: 13,
-          attribution: 'Tiles © Thunderforest, ....'
-        }),
-      };
+var map = L.map('map').setView([48.4102, 15.6022], 15);
+var currentDrawnLayer = null;
+var selectedToolButton = null;
+// Track the current base layer
+var currentBaseLayer = 'Standardkarte'; // Default layer
+// Calculate the offset for boundaries
+var horizontalOffset = 1125; // 1.0225 km on each side, total 2.25 km
+var verticalOffset = 594; // 0.59375 km on each side, total 1.02875 km
+// Define the boundaries
+var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
+var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
+var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
+var bounds = L.latLngBounds(southWest, northEast);
+// Calculate extended bounds for 10 km buffer
+var extendedHorizontalOffset = horizontalOffset + 1000; // Add 10 km
+var extendedVerticalOffset = verticalOffset + 1000; // Add 10 km
+var extendedSouthWest = map.unproject(centerPoint.subtract([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
+var extendedNorthEast = map.unproject(centerPoint.add([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
+var extendedBounds = L.latLngBounds(extendedSouthWest, extendedNorthEast);
+// Set the max bounds to restrict dragging beyond 10 km from the original boundary
+map.setMaxBounds(extendedBounds);
+// Debugging: Log when the user reaches the edge of the draggable area
+map.on('drag', function() {
+    if (!extendedBounds.contains(map.getCenter())) {}
+});
+// Define the coordinates for a very large outer rectangle
+var outerBounds = [
+    L.latLng(-90, -180),
+    L.latLng(90, -180),
+    L.latLng(90, 180),
+    L.latLng(-90, 180),
+    L.latLng(-90, -180)
+];
+// Define the coordinates for the inner rectangle (the boundary)
+var innerBounds = [
+    bounds.getSouthWest(),
+    bounds.getNorthWest(),
+    bounds.getNorthEast(),
+    bounds.getSouthEast(),
+    bounds.getSouthWest()
+];
+var boundary = L.latLngBounds(innerBounds);
+// Create a polygon with a hole (inverted polygon)
+var invertedPolygon = L.polygon([outerBounds, innerBounds], {
+    color: 'grey',
+    fillColor: 'grey',
+    fillOpacity: 0.5
+}).addTo(map);
+// Draw the boundary rectangle
+L.rectangle(bounds, {
+    color: "#808080",
+    weight: 2,
+    fill: false
+}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    minZoom: 15,
+    attribution: '| © OpenStreetMap contributors'
+}).addTo(map);
+// Map layers
+var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    minZoom: 15,
+    attribution: '....'
+});
+var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    minZoom: 15,
+    attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, GIS User Community'
+});
+var thunderforestLayers = {
+    "Atlas": L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
+        minZoom: 15,
+        attribution: 'Tiles © Thunderforest, ....'
+    }),
+    "Neighbourhood": L.tileLayer('https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
+        minZoom: 15,
+        attribution: 'Tiles © Thunderforest, ....'
+    }),
+    "Transport": L.tileLayer('https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
+        minZoom: 15,
+        attribution: 'Tiles © Thunderforest, ....'
+    }),
+    "Cycle": L.tileLayer('https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
+        minZoom: 15,
+        attribution: 'Tiles © Thunderforest, ....'
+    }),
+    "Mobile_Atlas": L.tileLayer('https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
+        minZoom: 15,
+        attribution: 'Tiles © Thunderforest, ....'
+    }),
+    "Pioneer": L.tileLayer('https://tile.thunderforest.com/pioneer/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
+        minZoom: 15,
+        attribution: 'Tiles © Thunderforest, ....'
+    }),
+};
       // basemap.at layers
       var basemapLayers = {
         "GeolandBasemap": L.tileLayer('http://maps.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png', {
@@ -675,20 +683,25 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-      map.on('click', function(e) {
+map.on('click', function(e) {
+    // Check if the click event location is within the defined bounds
+    if (bounds.contains(e.latlng)) {
         const popupContent = `
-        
-																	<div id="question-form" style="text-align: center;">
-																		<h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
-																		<textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-weight: bold; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
-																		<div style="display: flex; justify-content: center; margin-top: 10px;">
-																			<button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px; font-weight: bold; font-size: 18px;">Posten</button>
-																			<button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
-																		</div>
-																	</div>
-    `;
+            <div id="question-form" style="text-align: center;">
+                <h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
+                <textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-weight: bold; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
+                <div style="display: flex; justify-content: center; margin-top: 10px;">
+                    <button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px; font-weight: bold; font-size: 18px;">Posten</button>
+                    <button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
+                </div>
+            </div>
+        `;
         L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
-      });
+    } else {
+        console.log("Click outside the designated area: No popup created.");
+    }
+});
+
       document.addEventListener("DOMContentLoaded", function() {
         
         
