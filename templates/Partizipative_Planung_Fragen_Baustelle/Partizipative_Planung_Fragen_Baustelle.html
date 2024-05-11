@@ -11,59 +11,88 @@
 
     <!-- Sidebar Content -->
     <div id="markers-list-overlay" class="markers-sidebar" style="display: none;">
-     
-        <!-- HTML for Filter and Sort Dropdowns -->
-			    <div class="header-container">
-
-    <div class="header-navigation">
-          <select id="question-status-filter" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
-            <option value="all">Alle Fragen anzeigen</option>
-            <option value="answered">Beantwortete Fragen</option>
-            <option value="unanswered">Unbeantwortete Fragen</option>
-          </select>
-          <!-- Sort by time -->
-          <select id="question-time-sort" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
-            <option value="newest">Neueste</option>
-            <option value="oldest">Älteste</option>
-          </select>
-        </div>
-		        </div>
-		    <div class="scrollable-list">
-
-        <ul id="markers-list" style="margin-bottom:20px;">
-          <!-- Marker items will be added here dynamically -->
-        </ul>
-      </div>
-	      <div class="footer-container">
-
-	      <div class="footer-navigation">
-
-
-      <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-cl">Schließen</button>
-    </div>
-	    </div>
-    </div>
-
-    <div class="sidebar" id="sidebar">
-      <h1 id="baustelle-title">{{ baustelle.name }}</h1> {% if is_admin %}
-	  
-	  	 <div class="button-container">
-	  <a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m" style="margin-bottom: 10px">Inhalte bearbeiten</a>
-	              </div>
-
-
-	  {% endif %} {% if baustelle.image %} <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%;"> {% endif %}
-	  
-	 <div class="button-container">
-	  <button id="show-markers-btn" class="register-button-m" style="margin-top:10px; !important">Liste</button>
+        <div class="header-container">
+            <div class="header-navigation">
+                <select id="question-status-filter" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                    <option value="all">Alle Fragen anzeigen</option>
+                    <option value="answered">Beantwortete Fragen</option>
+                    <option value="unanswered">Unbeantwortete Fragen</option>
+                </select>
+                <!-- Sort by time -->
+                <select id="question-time-sort" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                    <option value="newest">Neueste</option>
+                    <option value="oldest">Älteste</option>
+                </select>
             </div>
-
-	  <div id="baustelle-description">{{ baustelle.description | safe }}</div>
-      <div id="geojsonFilesList" style="margin-bottom: 20px;">
-        <ul id="loadedFiles"></ul>
-      </div>
+        </div>
+        <div class="scrollable-list">
+            <ul id="markers-list" style="margin-bottom:20px;">
+                <!-- Marker items will be added here dynamically -->
+            </ul>
+        </div>
+        <div class="footer-container">
+            <div class="footer-navigation">
+                <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-cl">Schließen</button>
+            </div>
+        </div>
     </div>
+
+    <!-- Expandable Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button id="expand-sidebar-btn" class="expand-button">☰</button> <!-- Button to expand the sidebar -->
+        <h2 id="baustelle-title">{{ baustelle.name }}</h2> <!-- Visible by default -->
+				  <div class="mobile-only-content">
+
+        <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px; margin: auto;">Liste</button> <!-- Also visible by default -->
+		</div>
+		  <div class="desktop-only-content">
+        {% if is_admin %}
+            <div class="button-container">
+                <a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m" style="margin-bottom: 10px">Inhalte bearbeiten</a>
+            </div>
+        {% endif %}
+        {% if baustelle.image %}
+            <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%; margin-top:20px;">
+        {% endif %}
+		        <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px;">Liste</button> <!-- Also visible by default -->
+        <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+        <div id="geojsonFilesList" style="margin-bottom: 20px;">
+            <ul id="loadedFiles"></ul>
+        </div>
+    </div>
+    </div>
+
+    <div id="expanded-sidebar" class="expanded-sidebar" style="display: none;">
+        <button onclick="toggleSidebar()" class="close-button">X</button> <!-- Close button -->
+        {% if is_admin %}
+        <div class="button-container">
+            <a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m" style="margin-bottom: 10px">Inhalte bearbeiten</a>
+        </div>
+        {% endif %}
+        {% if baustelle.image %}
+        <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%;">
+        {% endif %}
+        <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+        <div id="geojsonFilesList" style="margin-bottom: 20px;">
+            <ul id="loadedFiles"></ul>
+        </div>
+    </div>
+
     <div id="map"></div>
 
+<script>
+function toggleSidebar() {
+    var expandedSidebar = document.getElementById('expanded-sidebar');
+    if (window.innerWidth < 768) {
+        if (expandedSidebar.style.display === 'none' || expandedSidebar.style.display === '') {
+            expandedSidebar.style.display = 'block';
+        } else {
+            expandedSidebar.style.display = 'none';
+        }
+    }
+}
+
+document.getElementById('expand-sidebar-btn').addEventListener('click', toggleSidebar);
+</script>
   </body>
 </html>

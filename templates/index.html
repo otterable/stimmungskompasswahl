@@ -78,25 +78,29 @@
 <div class="stats-container">
     {% if featured_projects %} {% for project in featured_projects %} 
     <div class="project-thumbnail" data-project-id="{{ project.id }}" onclick="window.location.href='{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}'">
-        <h2>{{ project.name }}</h2>
- <p class="project-date">
+                   
+                <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+			  <h2>{{ project.name }}</h2>
+				
+                <p class="project-date">
                     <strong>{{ project.date.strftime('%d.%m.%Y') }}</strong>,
                     Ansichten: <strong>{{ project.view_count }}</strong>
-                </p>        <!-- Voting Bar -->
-        <div class="voting-bar">
-            {% if project.upvotes > 0 %} 
-            <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
-                <span>{{ project.upvotes }} 👍 </span>
-            </div>
-            {% endif %} {% if project.downvotes > 0 %} 
-            <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
-                <span>{{ project.downvotes }} 👎 </span>
-            </div>
-            {% endif %} 
-        </div>
-        <img src="{{ url_for('serve_image', filename='usersubmissions/' + project.image_file) }}" alt="{{ project.name }}">
+                </p>
+                <!-- Voting Bar -->
+                <div class="voting-bar">
+                    {% if project.upvotes > 0 %}
+                    <div class="upvotes" style="width: {{ project.upvote_percentage }}%;">
+                        <span>{{ project.upvotes }} 👍</span>
+                    </div>
+                    {% endif %}
+                    {% if project.downvotes > 0 %}
+                    <div class="downvotes" style="width: {{ project.downvote_percentage }}%;">
+                        <span>{{ project.downvotes }} 👎</span>
+                    </div>
+                    {% endif %}
+                </div>
         <div class="project-description">{{ project.descriptionwhy|safe }}</div>
-    </div>
+            </div>
     {% endfor %} {% else %} 
     <p style="text-align: center;">Keine hervorgehobenen Projekte gefunden.</p>
     {% endif %} 

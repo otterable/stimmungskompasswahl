@@ -1543,6 +1543,45 @@ overflow-y: auto;
 background: var(--sidebar-bg);
 /* Use variable for background */
 }
+    .expanded-sidebar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+        background: var(--sidebar-bg);
+        overflow-y: auto;
+        padding: 20px;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        z-index: 20000;
+    }
+
+    .close-button, .expand-button {
+        font-size: 20px;
+        border: none;
+        background: none;
+    }
+
+    .expand-button {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+    }
+
+
+	
+	.appear-on-mobile {
+    display: block;
+}
+
+.hide-on-mobile {
+    display: none;
+}
+	#map {
+    transition: top 0.3s ease;
+}
 #sidebar-mobileheader {
 position: fixed;
 top: 15px;
@@ -1585,6 +1624,56 @@ display: none !important;
 .appear-on-mobile {
 display: block !important;
 }
+}
+}
+.desktop-only-content {
+    display: none; /* Hidden by default */
+}
+@media (min-width: 768px) {
+    .desktop-only-content {
+        display: flex; /* Use flexbox to manage layout */
+        flex-direction: column; /* Stack children vertically */
+        align-items: center; /* Center content horizontally */
+        justify-content: center; /* Center content vertically if necessary */
+        width: 100%; /* Take the full width of its parent */
+    }
+
+
+.mobile-only-content {
+    display: none; /* Hidden by default */
+}
+    .expand-button, .close-button {
+        display: none; /* Hide expand and close buttons on desktop */
+    }
+
+    .appear-on-mobile {
+        display: none; /* Hide mobile-specific buttons on desktop */
+    }
+}
+
+}
+@media (min-width: 768px) {
+    .expand-button, .close-button {
+        display: none;
+    }
+
+    .expanded-sidebar {
+        display: block; /* Always show the full sidebar on desktop */
+        position: static; /* Normal flow, not fixed */
+        width: auto;
+        border-radius: 0;
+        padding: 0;
+        top: auto;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        overflow-y: visible;
+    }
+
+    #sidebar {
+        height: auto; /* Let it expand as needed */
+        overflow-y: auto; /* Enable scrolling if needed */
+    }
 }
 .title-button-container {
 display: flex;
@@ -1760,6 +1849,58 @@ padding: 8px 15px;
 font-size: 3vw;
 top: 5.6%;
 max-width: 60%;
+}
+
+.expand-button, .close-button {
+	background-color: #f5f1e4;
+        color: black; /* Black text/icon color */
+        border-radius: 50%; /* Circular shape */
+        width: 22px; /* Diameter of the circle */
+        height: 22px; /* Diameter of the circle */
+        font-size: 18px; /* Icon size */
+        border: none; /* No border */
+        display: flex; /* Use flexbox for centering */
+        align-items: center; /* Vertical center */
+        justify-content: center; /* Horizontal center */
+        position: absolute; /* Absolute positioning */
+        cursor: pointer; /* Pointer cursor for better UX */
+    }
+   .close-button {
+        background-color: white; /* White background */
+        color: black; /* Black text/icon color */
+        border-radius: 50%; /* Circular shape */
+        width: 30px; /* Diameter of the circle */
+        height: 30px; /* Diameter of the circle */
+        font-size: 20px; /* Icon size */
+        border: none; /* No border */
+        display: flex; /* Use flexbox for centering */
+		margin-left: auto !important;
+		margin-right: auto !important;
+        align-items: center; /* Vertical center */
+        justify-content: center; /* Horizontal center */
+        position: fixed; /* Fixed positioning */
+        cursor: pointer; /* Pointer cursor for better UX */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for 3D effect */
+        top: 20px; /* Margin from the top */
+        z-index: 1001; /* High z-index to ensure it's above other content */
+    }
+    /* Positioning the open button */
+    .expand-button {
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Precise centering */
+        bottom: 20px; /* Positioned at the bottom with a margin */
+    }
+
+    /* Positioning the close button */
+    .close-button {
+        top: 20px; /* Margin from the top */
+    }
+	
+.desktop-only-content {
+    display: none; /* Hidden by default */
+}
+.mobile-only-content {
+    display: block; /* Hidden by default */
 }
 .counter-color {
 height: 12px;
