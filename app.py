@@ -1514,13 +1514,14 @@ def confirm_registration():
                 account_creation=temp_user_info.get("account_creation"),
                 is_googleaccount=temp_user_info.get("is_googleaccount"),
                 is_admin=temp_user_info.get("is_admin"),
-                password_hash="google_oauth",  # Consider a secure approach
+                password_hash="google_oauth",  # This needs a secure approach for handling passwords
             )
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
             return redirect(url_for("registered"))  # Redirect to the /registered route
     return render_template('confirm_registration.html')
+
 
 
 
@@ -2086,8 +2087,7 @@ def request_otp():
 
 @app.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
-    
-    metaData=g.metaData
+    metaData = g.metaData
     if request.method == "POST":
         otp_entered = request.form.get("otp")
         new_password = request.form.get("new_password")
@@ -2097,16 +2097,9 @@ def reset_password():
             if user:
                 user.set_password(new_password)
                 db.session.commit()
-                logging.debug(
-                    f"Password reset for user with Ihre Handynummer {phone_number}"
-                )
-                print('Your password has been reset successfully.', 'success')
-                return redirect(url_for("login"))
-            # else:
-            print('Invalid Ihre Handynummer.', 'danger')
-        # else:
-        print('Invalid OTP. Please try again.', 'danger')
+                return redirect(url_for("pwresetcon"))
     return render_template("reset_password.html", metaData=metaData)
+
 
 
 @app.route("/Partizipative_Planung_Neuer_Projekt")
@@ -3711,9 +3704,19 @@ def privacy():
 def registered():
     ip_address = request.remote_addr
     WebsiteViews.add_view(ip_address)
-    metaData=g.metaData
-    # Additional logic can be added here if needed
+    metaData = g.metaData
     return render_template("registered/index.html", metaData=metaData)
+
+
+
+@app.route("/pwresetcon")
+def pwresetcon():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    metaData = g.metaData
+    return render_template("pwresetcon/index.html", metaData=metaData)
+
+    
     
 @app.route("/contact")
 def contact():
