@@ -2110,10 +2110,10 @@ def reset_password():
 
 
 @app.route("/Partizipative_Planung_Neuer_Projekt")
+@login_required  # This decorator ensures that the route requires a login
 def Partizipative_Planung_Neuer_Projekt():
-    metaData=g.metaData
+    metaData = g.metaData
     return render_template("Partizipative_Planung_Neuer_Projekt/index.html", metaData=metaData)
-
 
 @app.route("/submit_project", methods=["GET", "POST"])
 @login_required

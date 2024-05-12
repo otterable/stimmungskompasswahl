@@ -1,20 +1,22 @@
     // var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
-var map = L.map('map').setView([48.4102, 15.6022], 15);
+var map = L.map('map', {
+    minZoom: 16
+}).setView([48.40875, 15.61142], 17);  // Updated center coordinates
 var currentDrawnLayer = null;
 var selectedToolButton = null;
 // Track the current base layer
 var currentBaseLayer = 'Standardkarte'; // Default layer
 // Calculate the offset for boundaries
-var horizontalOffset = 1125; // 1.0225 km on each side, total 2.25 km
-var verticalOffset = 594; // 0.59375 km on each side, total 1.02875 km
+var horizontalOffset = 1000; // 1.0225 km on each side, total 2.25 km
+var verticalOffset = 1000; // 0.59375 km on each side, total 1.02875 km
 // Define the boundaries
-var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
+var centerPoint = map.project([48.40875, 15.61142], map.getZoom()); // Updated coordinates
 var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
 var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
 var bounds = L.latLngBounds(southWest, northEast);
 // Calculate extended bounds for 10 km buffer
-var extendedHorizontalOffset = horizontalOffset + 1000; // Add 10 km
-var extendedVerticalOffset = verticalOffset + 1000; // Add 10 km
+var extendedHorizontalOffset = horizontalOffset + 200; // Add 10 km
+var extendedVerticalOffset = verticalOffset + 200; // Add 10 km
 var extendedSouthWest = map.unproject(centerPoint.subtract([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
 var extendedNorthEast = map.unproject(centerPoint.add([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
 var extendedBounds = L.latLngBounds(extendedSouthWest, extendedNorthEast);

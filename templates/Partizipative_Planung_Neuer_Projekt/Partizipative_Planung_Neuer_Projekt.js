@@ -687,25 +687,27 @@ function startTimer(expiryTime, publishButton) {
 }
 document.getElementById('info-link').addEventListener('click', function(e) {
     e.preventDefault(); // Prevent default link behavior
-    openVideoOverlay();
+    handleMobileRedirectOrOverlay();
 });
 
-function openVideoOverlay() {
+function handleMobileRedirectOrOverlay() {
     var iframe = document.getElementById('youtube-iframe');
-    var videoSrc;
+    var desktopVideoUrl = 'https://www.youtube.com/embed/N2u47YzgFv4?autoplay=1&mute=1&enablejsapi=1';
+    var mobileVideoUrl = 'https://www.youtube.com/watch?v=gHzh1hiZY4Y';
 
-    // Check screen width and set the video source accordingly
     if (window.innerWidth > 1080) {
         // Desktop video
-        videoSrc = 'https://www.youtube.com/embed/N2u47YzgFv4?autoplay=1&mute=1&enablejsapi=1';
+        iframe.src = desktopVideoUrl;
+        document.getElementById('video-overlay').style.display = 'flex';
+        console.log('Video overlay opened for desktop.');
     } else {
-        // Mobile video
-        videoSrc = 'https://www.youtube.com/embed/gHzh1hiZY4Y?autoplay=1&mute=1&enablejsapi=1';
+        // Mobile redirect with confirmation
+        if (confirm('Sie werden zur YouTube weitergeleitet, um das Video anzusehen. Akzeptieren?')) {
+            window.location.href = mobileVideoUrl; // Redirect to YouTube
+        } else {
+            console.log('User declined to be redirected.');
+        }
     }
-
-    iframe.src = videoSrc;
-    document.getElementById('video-overlay').style.display = 'flex';
-    console.log('Video overlay opened');
 }
 
 function closeVideoOverlay() {
@@ -762,7 +764,6 @@ function showReplayImage() {
     replayContainer.innerHTML = ''; // Clear any existing content
     replayContainer.appendChild(replayImg); // Add the replay image to the container
 }
-
 
 function replayVideo() {
     console.log('Replay clicked');

@@ -413,9 +413,8 @@ function toggleMarkerSidebar() {
 }
 var allMarkers = []; // Store all markers
 var filteredMarkers = []; // Store currently filtered markers
-var currentPage = 1;
-var showFullProjectsOnly = false;
-const markersPerPage = 10; // Number of markers per page
+var displayedMarkersCount = 0;
+const markersPerPage = 20; // Number of markers per page
 const categoryColors = {
     'Transport': '#133873',
     'Öffentliche Plätze': '#ff5c00',
@@ -428,123 +427,150 @@ const categoryColors = {
     'Andere': '#212121'
 };
 
-function addMarkersToOverlay(markersData) {
-    allMarkers = markersData;
-    filterByCategory("Alle"); // Initialize with all markers visible
-}
+function addMarkersToOverlay(markers) {
+    allMarkers = markers; // Store all markers
+    displayedMarkersCount = 0; // Reset displayed markers count
+    loadMoreMarkers(); // Load initial set of markers
+    const sortedMarkers = sortMarkersByNewest(markers);
+    let currentPage = 1; // Start with the first page
+    let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to Sortieren by newest
+    let showFullProjectsOnly = false;
+    const categoryColors = {
+        'Transport': '#133873',
+        'Öffentliche Plätze': '#ff5c00',
+        'Umwelt': '#4CAF50',
+        'Verwaltung': '#653993',
+        'Kultur': '#431307',
+        'Bildung': '#eab003',
+        'Gesundheit': '#9A031E',
+        'Sport': '#3d4f53',
+        'Andere': '#212121'
+    };
 
-function loadMoreMarkers() {
-    currentPage++;
-    renderPage(currentPage);
-}
-
-function filterByCategory(category) {
-    let tempMarkers = allMarkers;
-    if (category !== "Alle") {
-        tempMarkers = tempMarkers.filter(marker => marker.category === category);
+    function filterByCategory(category) {
+        let tempMarkers = markers;
+        if (category !== "Alle") {
+            tempMarkers = tempMarkers.filter(marker => marker.category === category);
+        }
+        if (showFullProjectsOnly) {
+            tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
+        }
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sortieren by Sortieren by newest
+        renderPage(1); // Reset to the first page after filtering
     }
-    if (showFullProjectsOnly) {
-        tempMarkers = tempMarkers.filter(marker => marker.type === "Projektvorschlag");
-    }
-    filteredMarkers = tempMarkers;
-    renderPage(1);
-}
 
-function sortMarkers(sortType) {
-    if (sortType === "Neueste") {
-        filteredMarkers.sort((a, b) => new Date(b.date) - new Date(a.date));
-    } else if (sortType === "Älteste") {
-        filteredMarkers.sort((a, b) => new Date(a.date) - new Date(b.date));
-    }
-    renderPage(1);
-}
+    function sortMarkers(sortType) {
+        if (sortType === "Neueste") {
+            filteredMarkers.sort((a, b) => new Date(b.date) - new Date(a.date));
+        } else if (sortType === "Älteste") {
+            filteredMarkers.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
 
-function createFilters() {
+        renderPage(1); // Reset to the first page after sorting
+    }
+
+    function createCategoryFilter() {
+        const filterDiv = document.getElementById('category-filter');
+        filterDiv.innerHTML = ''; // Clear existing content
+        const select = document.createElement('select');
+        select.id = 'category-select';
+        select.onchange = function() {
+            filterByCategory(this.value);
+        };
+        const categories = ["Alle", "Transport", "Öffentliche Plätze", "Umwelt", "Verwaltung", "Kultur", "Bildung", "Gesundheit", "Sport", "Andere"];
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.innerText = category;
+            select.appendChild(option);
+        });
+        filterDiv.appendChild(select);
+    }
+
+    function createSortFilter() {
+        const sortDiv = document.getElementById('sort-filter');
+        sortDiv.innerHTML = ''; // Clear existing content
+        const select = document.createElement('select');
+        select.id = 'sort-select';
+        select.onchange = function() {
+            sortMarkers(this.value);
+        };
+        const sortOptions = ["Neueste", "Älteste"];
+        sortOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.innerText = option;
+            select.appendChild(optionElement);
+        });
+        sortDiv.appendChild(select);
+    }
+    // Call these functions to create filters
     createCategoryFilter();
     createSortFilter();
-    createFullProjectFilter();
-}
 
-function createCategoryFilter() {
-    const filterDiv = document.getElementById('category-filter');
-    filterDiv.innerHTML = '';
-    const select = document.createElement('select');
-    select.id = 'category-select';
-    select.onchange = function() {
-        filterByCategory(this.value);
-    };
-    const categories = ["Alle", "Transport", "Öffentliche Plätze", "Umwelt", "Verwaltung", "Kultur", "Bildung", "Gesundheit", "Sport", "Andere"];
-    categories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category;
-        option.innerText = category;
-        select.appendChild(option);
-    });
-    filterDiv.appendChild(select);
-}
-
-function createSortFilter() {
-    const sortDiv = document.getElementById('sort-filter');
-    sortDiv.innerHTML = '';
-    const select = document.createElement('select');
-    select.id = 'sort-select';
-    select.onchange = function() {
-        sortMarkers(this.value);
-    };
-    const sortOptions = ["Neueste", "Älteste"];
-    sortOptions.forEach(option => {
-        const optionElement = document.createElement('option');
-        optionElement.value = option;
-        optionElement.innerText = option;
-        select.appendChild(optionElement);
-    });
-    sortDiv.appendChild(select);
-}
-
-function createFullProjectFilter() {
-    const filterDiv = document.getElementById('full-project-filter');
-    filterDiv.innerHTML = '';
-    const button = document.createElement('button');
-    button.textContent = "Nur Projektvorschläge anzeigen";
-    button.addEventListener('click', function() {
-        showFullProjectsOnly = !showFullProjectsOnly;
-        filterByCategory(document.getElementById('category-select').value);
-    });
-    filterDiv.appendChild(button);
-}
+    function paginateMarkers(page, markersPerPage) {
+        const startIndex = (page - 1) * markersPerPage;
+        const endIndex = startIndex + markersPerPage;
+        return filteredMarkers.slice(startIndex, endIndex);
+    }
 
 function renderPage(page) {
-    const startIndex = (page - 1) * markersPerPage;
-    const endIndex = startIndex + markersPerPage;
-    const paginatedMarkers = filteredMarkers.slice(startIndex, endIndex);
+    currentPage = parseInt(page);
+    const paginatedMarkers = paginateMarkers(page, markersPerPage);
     const list = document.getElementById('markers-list');
     list.innerHTML = '';
-    paginatedMarkers.forEach(marker => {
-        const listItem = document.createElement('li');
-        const dateText = document.createElement('span');
-        dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE');
-        const categorySpan = document.createElement('span');
-        categorySpan.textContent = ` [${marker.category}] `;
-        categorySpan.style.color = categoryColors[marker.category];
-        const descriptionText = document.createTextNode(marker.description || "No description provided");
-        listItem.appendChild(dateText);
-        listItem.appendChild(categorySpan);
-        listItem.appendChild(descriptionText);
-        list.appendChild(listItem);
+    if (paginatedMarkers.length === 0) {
+        const noMarkersMessage = document.createElement('p');
+        noMarkersMessage.textContent = "Keine Beiträge gefunden!";
+        noMarkersMessage.style.textAlign = 'center';
+        list.appendChild(noMarkersMessage);
+    } else {
+        paginatedMarkers.forEach(marker => {
+    const listItem = document.createElement('li');
+
+    // Create and format the date text
+    const dateText = document.createElement('span');
+    dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    dateText.style.color = 'black';
+	    dateText.style.fontWeight = 'normal';
+
+    dateText.style.display = 'block'; // Ensures the date is on its own line
+
+    // Create and format the prefix and category
+    const prefixAndCategory = document.createElement('span');
+    let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
+    // Use inline styles to enforce color
+    prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
+    prefixAndCategory.style.display = 'block'; // Ensures the prefix and category are on their own line
+
+    // Create and format the display text
+    const displayText = document.createElement('span');
+    displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
+    displayText.style.color = 'black'; // All text black as requested
+
+    // Combine them into a single link element
+    const link = document.createElement('a');
+    link.href = "#";
+    link.style.textDecoration = 'none';
+    link.appendChild(dateText);
+    link.appendChild(prefixAndCategory);
+    link.appendChild(displayText);
+    link.onclick = function() {
+        centerMapOnMarker(marker.id);
+        return false;
+    };
+
+    listItem.appendChild(link);
+    list.appendChild(listItem);
+});
+
+    }
+}
+
+
+    window.addEventListener('resize', function() {
+        renderPage(currentPage);
     });
-    updateMoreButtonDisplay();
-}
-
-function updateMoreButtonDisplay() {
-    const showMoreBtn = document.getElementById('show-more-markers');
-    showMoreBtn.style.display = (currentPage * markersPerPage < filteredMarkers.length) ? 'block' : 'none';
-}
-
-window.onload = function() {
-    createFilters();
-    addMarkersToOverlay(/* Your initial markers data here */);
-};
-
     document.getElementById('show-markers-btn').addEventListener('click', function() {
         var markersListOverlay = document.getElementById('markers-list-overlay');
         var showMarkersBtn = this; // Reference the clicked button
@@ -641,7 +667,7 @@ window.onload = function() {
     createSortFilter(); // Create sort filter
     createFullProjectFilter(); // Create full project filter
     renderPage(currentPage);
-
+}
 
 function updateMarkerIcons() {
     for (var category in categoryLayers) {
@@ -1442,22 +1468,33 @@ function validateMarkerDescription(event) {
 
     // Add more validation checks as needed
 }
-
-
 document.getElementById('info-link').addEventListener('click', function(e) {
     e.preventDefault();
-    openVideoOverlay('youtube-iframe', 'video-overlay', 'aXB8KE_gpm8', 'V7EjnHuLZjI');
+    handleMobileRedirectOrOverlay('youtube-iframe', 'video-overlay', 'aXB8KE_gpm8', 'V7EjnHuLZjI');
 });
 document.getElementById('info-link2').addEventListener('click', function(e) {
     e.preventDefault();
-    openVideoOverlay('youtube-iframe-2', 'video-overlay-2', '9-bWivUusZ4', '9xEXWG8TybY');
+    handleMobileRedirectOrOverlay('youtube-iframe-2', 'video-overlay-2', '9-bWivUusZ4', '9xEXWG8TybY');
 });
 
-function openVideoOverlay(iframeId, overlayId, desktopVideoId, mobileVideoId) {
+function handleMobileRedirectOrOverlay(iframeId, overlayId, desktopVideoId, mobileVideoId) {
     var iframe = document.getElementById(iframeId);
+    var videoUrl = 'https://www.youtube.com/watch?v=' + mobileVideoId;
     var videoId = window.innerWidth > 1080 ? desktopVideoId : mobileVideoId; // Choose video based on screen width
-    iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&enablejsapi=1';
-    document.getElementById(overlayId).style.display = 'flex';
+    
+    if (window.innerWidth <= 1080) {
+        // Mobile interaction
+        if (confirm('Sie werden zur YouTube weitergeleitet, um das Video anzusehen. Akzeptieren?')) {
+            window.location.href = videoUrl; // Redirect to YouTube
+        } else {
+            console.log('User declined to be redirected.');
+        }
+    } else {
+        // Desktop video
+        iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&enablejsapi=1';
+        document.getElementById(overlayId).style.display = 'flex';
+        console.log('Video overlay opened for desktop.');
+    }
 }
 
 function closeVideoOverlay(iframeId, overlayId) {
@@ -1466,12 +1503,15 @@ function closeVideoOverlay(iframeId, overlayId) {
         iframe.src = '';
     }
     document.getElementById(overlayId).style.display = 'none';
+    console.log('Video overlay closed');
 }
+
 // Initialize YouTube API
 var tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
 var player, player2;
 
 function onYouTubeIframeAPIReady() {
@@ -1525,6 +1565,7 @@ function replayVideo(iframeId, containerId) {
     playerToUse.seekTo(0);
     playerToUse.playVideo();
 }
+
 // Event listeners for closing overlays
 document.getElementById('video-overlay').addEventListener('click', function(event) {
     if (!event.target.closest('#youtube-iframe, #replay-image')) {
@@ -1536,4 +1577,3 @@ document.getElementById('video-overlay-2').addEventListener('click', function(ev
         closeVideoOverlay('youtube-iframe-2', 'video-overlay-2');
     }
 });
-
