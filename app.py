@@ -3196,21 +3196,19 @@ def verify_admin_otp():
 
 import os
 import shutil
-
-
 @app.route("/delete_my_data", methods=["POST"])
 @login_required
 def delete_my_data():
     try:
         user_id = current_user.id
 
-        # Löschen user's votes
+        # Delete user's votes
         Vote.query.filter_by(user_id=user_id).delete()
 
-        # Löschen user's comments
+        # Delete user's comments
         Comment.query.filter_by(user_id=user_id).delete()
 
-        # Löschen user's projects and associated files
+        # Delete user's projects and associated files
         projects = Project.query.filter_by(author=user_id).all()
         for project in projects:
             total_votes = sum(vote.upvote + vote.downvote for vote in project.votes)
@@ -3224,17 +3222,15 @@ def delete_my_data():
                 project.upvote_percentage = 0
                 project.downvote_percentage = 0
 
-            # Löschen associated files (if applicable)
-            project_files_path = os.path.join(
-                "actual/path/to/project_files", str(project.id)
-            )
-            if os.path.exists(project_files_path):
+            # Delete associated files (if applicable)
+            project_files_path = os.path.join("actual/path/to/project_files", str(project.id))
+            if (os.path.exists(project_files_path)):
                 shutil.rmtree(project_files_path)
 
-            # Löschen the project record from the database
+            # Delete the project record from the database
             db.session.delete(project)
 
-        # Löschen user account
+        # Delete user account
         user = User.query.filter_by(id=user_id).first()
         if user:
             db.session.delete(user)
@@ -3245,21 +3241,11 @@ def delete_my_data():
         # Log out the user
         logout_user()
 
-        # Return JSON response
-        return jsonify(
-            {"success": True, "message": "Your data has been deleted successfully."}
-        )
+        # Return JSON response for successful deletion
+        return jsonify({"success": True, "message": "Your data has been deleted successfully."})
     except Exception as e:
         logging.error(f"Error in delete_my_data: {e}")
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "message": "An error occurred while deleting your data.",
-                }
-            ),
-            500,
-        )
+        return jsonify({"success": False, "message": "An error occurred while deleting your data."}), 500
 
 
 @app.route("/upload_screenshot", methods=["POST"])
@@ -3707,6 +3693,12 @@ def registered():
     metaData = g.metaData
     return render_template("registered/index.html", metaData=metaData)
 
+@app.route("/deleted")
+def deleted():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    metaData = g.metaData
+    return render_template("deleted/index.html", metaData=metaData)
 
 
 @app.route("/pwresetcon")

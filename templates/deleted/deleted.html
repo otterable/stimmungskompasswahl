@@ -1,0 +1,37 @@
+    <link rel="stylesheet" href="{{ url_for('static', filename='utility.css') }}">
+  <head>
+  <div class="form-container2">
+  <div class="logo-container" onclick="window.location.href='/'">
+  <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
+</div></div>
+
+          <div class="stats-container" style=" margin:auto !Important;">
+
+<div class="project-thumbnail" style="background-color: #faf6eb; margin:auto !Important;">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stimmungskompass</title>
+</head>
+<body>
+
+      <h2>Ihr Passwort wurde erfolgreich geändert!</h2>
+      <p>Sie können nun neue Projektvorschläge oder Notizen einreichen oder Fragen zu einer Baustelle stellen.</p>
+	  </div>
+	  	  </div>
+
+		            <div class="stats-container" style="margin-bottom:20px;">
+
+		    <div class="logo-container" onclick="window.location.href='/'">
+
+	  <a href="/" class="register-button" style="background-color: none!important;">OK!</a>
+</div>
+</div>
+
+</div>
+</body>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
+    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
+  });
+</script>

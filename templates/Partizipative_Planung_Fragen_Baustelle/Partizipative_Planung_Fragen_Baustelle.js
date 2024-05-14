@@ -463,44 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       document.addEventListener("DOMContentLoaded", fetchQuestions);
 
-      function submitQuestion(lat, lng) {
-        const questionText = document.getElementById('question-text').value;
-        const baustelleId = window.location.pathname.split("/").pop(); // Extracting Baustelle ID from URL
-        if (questionText.trim() === '') {
-          alert('Bitte geben Sie eine Frage ein.');
-          return;
-        }
-        const payload = {
-          text: questionText,
-          author: 'Anonymous', // Adjust as needed
-          baustelle_id: baustelleId,
-          latitude: lat,
-          longitude: lng,
-        };
-        fetch('/submit_question', { // Make sure this endpoint matches your Flask route
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        }).then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        }).then(data => {
-          console.log(`Question ID ${data.id} by author ${data.author} has been posted on ${data.date} with text ${data.text}, on baustelle_id ${data.baustelle_id}, at ${lat},${lng} coordinates. Question ID has not been answered yet, setting icon to static/baustelle_questionpending.png.`);
-          map.closePopup();
-          // Create and add the marker with the custom icon based on the answered status
-          const icon = createCustomIcon(data.answered);
-          L.marker([lat, lng], {
-            icon: icon
-          }).addTo(map).bindPopup(`
-													<strong>Frage:</strong> ${data.text}
-													<br>
-														<small>${data.date}</small>`);
-        }).catch(error => console.error('Error:', error));
-      };
+
       fetchQuestions(); // This will run the function to fetch and display questions on load
       var markersById = {};
       document.addEventListener("DOMContentLoaded", function() {
@@ -685,25 +648,104 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+
 map.on('click', function(e) {
-    // Check if the click event location is within the defined bounds
+    console.log("Map clicked at:", e.latlng); // Debugging click event
     if (bounds.contains(e.latlng)) {
+        console.log("Click within bounds"); // Debugging bounds check
+        if (window.innerWidth <= 768) { // Check if it's a mobile device
+            console.log("Mobile device detected"); // Debugging mobile detection
+                  document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('map').style.bottom = '15px';
+        }
+
         const popupContent = `
             <div id="question-form" style="text-align: center;">
                 <h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
                 <textarea id="question-text" class="textarea" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-weight: bold; font-family: 'Roboto', sans-serif; resize: none;" placeholder="Ihre Frage hier..."></textarea>
                 <div style="display: flex; justify-content: center; margin-top: 10px;">
                     <button onclick="submitQuestion(${e.latlng.lat}, ${e.latlng.lng})" class="button" style="background-color: #003056; color: white; margin-right: 5px; font-weight: bold; font-size: 18px;">Posten</button>
-                    <button onclick="map.closePopup();" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
+                    <button onclick="handleAbbrechenClick()" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
                 </div>
             </div>
         `;
-        L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
+        const popup = L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
+
+        // Add a listener for when the popup is closed to restore the sidebar
+        map.on('popupclose', function() {
+			if (window.innerWidth <= 768) { // Check if it's a mobile device
+        console.log("Restoring sidebar and map dimensions for mobile"); // Debugging mobile-specific actions
+        document.getElementById('sidebar').style.display = 'block';
+            document.getElementById('map').style.bottom = '165px';
+        document.getElementById('map').style.right = '';
+        document.getElementById('map').style.left = '';
+    }
+            console.log("Popup closed event triggered"); // Debugging popupclose event
+            closePopup();
+			
+        });
+
     } else {
         console.log("Click outside the designated area: No popup created.");
     }
 });
 
+function closePopup() {
+    console.log("Closing popup"); // Debugging closePopup
+    if (window.innerWidth <= 768) { // Check if it's a mobile device
+        console.log("Restoring sidebar and map dimensions for mobile"); // Debugging mobile-specific actions
+        document.getElementById('sidebar').style.display = 'block';
+        document.getElementById('map').style.width = '';
+        document.getElementById('map').style.right = '';
+        document.getElementById('map').style.left = '';
+    }
+    map.closePopup(); // Ensure the popup is closed
+}
+
+function handleAbbrechenClick() {
+    console.log("Abbrechen button clicked"); // Debugging button click
+    closePopup();
+}
+
+function submitQuestion(lat, lng) {
+    console.log("Submitting question at:", lat, lng); // Debugging question submission
+    const questionText = document.getElementById('question-text').value;
+    const baustelleId = window.location.pathname.split("/").pop();
+    if (questionText.trim() === '') {
+        alert('Bitte geben Sie eine Frage ein.');
+        return;
+    }
+    const payload = {
+        text: questionText,
+        author: 'Anonymous',
+        baustelle_id: baustelleId,
+        latitude: lat,
+        longitude: lng,
+    };
+    fetch('/submit_question', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(data => {
+        console.log(`Question ID ${data.id} by author ${data.author} has been posted on ${data.date} with text ${data.text}, on baustelle_id ${data.baustelle_id}, at ${lat},${lng} coordinates. Question ID has not been answered yet, setting icon to static/baustelle_questionpending.png.`);
+        const icon = createCustomIcon(data.answered);
+        L.marker([lat, lng], {
+            icon: icon
+        }).addTo(map).bindPopup(`
+            <strong>Frage:</strong> ${data.text}
+            <br>
+            <small>${data.date}</small>
+        `);
+        closePopup(); // Call to restore the sidebar and map on mobile
+    }).catch(error => console.error('Error:', error));
+}
       document.addEventListener("DOMContentLoaded", function() {
         
         

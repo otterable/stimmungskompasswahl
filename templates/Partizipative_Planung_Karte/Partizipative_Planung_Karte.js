@@ -414,7 +414,7 @@ function toggleMarkerSidebar() {
 var allMarkers = []; // Store all markers
 var filteredMarkers = []; // Store currently filtered markers
 var displayedMarkersCount = 0;
-const markersPerPage = 20; // Number of markers per page
+const markersPerPage = 5; // Number of markers per page
 const categoryColors = {
     'Transport': '#133873',
     'Öffentliche Plätze': '#ff5c00',
@@ -430,33 +430,23 @@ const categoryColors = {
 function addMarkersToOverlay(markers) {
     allMarkers = markers; // Store all markers
     displayedMarkersCount = 0; // Reset displayed markers count
-    loadMoreMarkers(); // Load initial set of markers
+    filteredMarkers = markers.slice(); // Initialize filtered markers to all markers
     const sortedMarkers = sortMarkersByNewest(markers);
     let currentPage = 1; // Start with the first page
-    let filteredMarkers = markers.slice().sort((a, b) => b.id - a.id); // Default to Sortieren by newest
     let showFullProjectsOnly = false;
-    const categoryColors = {
-        'Transport': '#133873',
-        'Öffentliche Plätze': '#ff5c00',
-        'Umwelt': '#4CAF50',
-        'Verwaltung': '#653993',
-        'Kultur': '#431307',
-        'Bildung': '#eab003',
-        'Gesundheit': '#9A031E',
-        'Sport': '#3d4f53',
-        'Andere': '#212121'
-    };
 
     function filterByCategory(category) {
-        let tempMarkers = markers;
+        let tempMarkers = allMarkers;
         if (category !== "Alle") {
             tempMarkers = tempMarkers.filter(marker => marker.category === category);
         }
         if (showFullProjectsOnly) {
             tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
         }
-        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sortieren by Sortieren by newest
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+        displayedMarkersCount = 0; // Reset displayed markers count
         renderPage(1); // Reset to the first page after filtering
+        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
     }
 
     function sortMarkers(sortType) {
@@ -465,8 +455,9 @@ function addMarkersToOverlay(markers) {
         } else if (sortType === "Älteste") {
             filteredMarkers.sort((a, b) => new Date(a.date) - new Date(b.date));
         }
-
+        displayedMarkersCount = 0; // Reset displayed markers count
         renderPage(1); // Reset to the first page after sorting
+        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
     }
 
     function createCategoryFilter() {
@@ -504,9 +495,6 @@ function addMarkersToOverlay(markers) {
         });
         sortDiv.appendChild(select);
     }
-    // Call these functions to create filters
-    createCategoryFilter();
-    createSortFilter();
 
     function paginateMarkers(page, markersPerPage) {
         const startIndex = (page - 1) * markersPerPage;
@@ -514,63 +502,147 @@ function addMarkersToOverlay(markers) {
         return filteredMarkers.slice(startIndex, endIndex);
     }
 
-function renderPage(page) {
-    currentPage = parseInt(page);
-    const paginatedMarkers = paginateMarkers(page, markersPerPage);
-    const list = document.getElementById('markers-list');
-    list.innerHTML = '';
-    if (paginatedMarkers.length === 0) {
-        const noMarkersMessage = document.createElement('p');
-        noMarkersMessage.textContent = "Keine Beiträge gefunden!";
-        noMarkersMessage.style.textAlign = 'center';
-        list.appendChild(noMarkersMessage);
-    } else {
-        paginatedMarkers.forEach(marker => {
-    const listItem = document.createElement('li');
+    function renderPage(page) {
+        currentPage = parseInt(page);
+        const paginatedMarkers = paginateMarkers(page, markersPerPage);
+        const list = document.getElementById('markers-list');
+        list.innerHTML = '';
+        if (paginatedMarkers.length === 0) {
+            const noMarkersMessage = document.createElement('p');
+            noMarkersMessage.textContent = "Keine Beiträge gefunden!";
+            noMarkersMessage.style.textAlign = 'center';
+            list.appendChild(noMarkersMessage);
+        } else {
+            paginatedMarkers.forEach(marker => {
+                const listItem = document.createElement('li');
+                // Create and format the date text
+                const dateText = document.createElement('span');
+                dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                dateText.style.color = 'black';
+                dateText.style.fontWeight = 'normal';
+                dateText.style.display = 'block'; // Ensures the date is on its own line
 
-    // Create and format the date text
-    const dateText = document.createElement('span');
-    dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    dateText.style.color = 'black';
-	    dateText.style.fontWeight = 'normal';
+                // Create and format the prefix and category
+                const prefixAndCategory = document.createElement('span');
+                let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
+                // Use inline styles to enforce color
+                prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
+                prefixAndCategory.style.display = 'block'; // Ensures the prefix and category are on their own line
 
-    dateText.style.display = 'block'; // Ensures the date is on its own line
+                // Create and format the display text
+                const displayText = document.createElement('span');
+                displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
+                displayText.style.color = 'black'; // All text black as requested
 
-    // Create and format the prefix and category
-    const prefixAndCategory = document.createElement('span');
-    let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
-    // Use inline styles to enforce color
-    prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
-    prefixAndCategory.style.display = 'block'; // Ensures the prefix and category are on their own line
+                // Combine them into a single link element
+                const link = document.createElement('a');
+                link.href = "#";
+                link.style.textDecoration = 'none';
+                link.appendChild(dateText);
+                link.appendChild(prefixAndCategory);
+                link.appendChild(displayText);
+                link.onclick = function() {
+                    centerMapOnMarker(marker.id);
+                    return false;
+                };
 
-    // Create and format the display text
-    const displayText = document.createElement('span');
-    displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
-    displayText.style.color = 'black'; // All text black as requested
-
-    // Combine them into a single link element
-    const link = document.createElement('a');
-    link.href = "#";
-    link.style.textDecoration = 'none';
-    link.appendChild(dateText);
-    link.appendChild(prefixAndCategory);
-    link.appendChild(displayText);
-    link.onclick = function() {
-        centerMapOnMarker(marker.id);
-        return false;
-    };
-
-    listItem.appendChild(link);
-    list.appendChild(listItem);
-});
-
+                listItem.appendChild(link);
+                list.appendChild(listItem);
+            });
+        }
+        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
     }
-}
 
+    function loadMoreMarkers() {
+        const startIndex = displayedMarkersCount;
+        const endIndex = startIndex + markersPerPage;
+        const moreMarkers = filteredMarkers.slice(startIndex, endIndex);
+        const list = document.getElementById('markers-list');
+        moreMarkers.forEach(marker => {
+            const listItem = document.createElement('li');
+            // Create and format the date text
+            const dateText = document.createElement('span');
+            dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            dateText.style.color = 'black';
+            dateText.style.fontWeight = 'normal';
+            dateText.style.display = 'block'; // Ensures the date is on its own line
+
+            // Create and format the prefix and category
+            const prefixAndCategory = document.createElement('span');
+            let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
+            // Use inline styles to enforce color
+            prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
+            prefixAndCategory.style.display = 'block'; // Ensures the prefix and category are on their own line
+
+            // Create and format the display text
+            const displayText = document.createElement('span');
+            displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
+            displayText.style.color = 'black'; // All text black as requested
+
+            // Combine them into a single link element
+            const link = document.createElement('a');
+            link.href = "#";
+            link.style.textDecoration = 'none';
+            link.appendChild(dateText);
+            link.appendChild(prefixAndCategory);
+            link.appendChild(displayText);
+            link.onclick = function() {
+                centerMapOnMarker(marker.id);
+                return false;
+            };
+
+            listItem.appendChild(link);
+            list.appendChild(listItem);
+        });
+        displayedMarkersCount += moreMarkers.length;
+        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
+    }
+
+    function updateShowMoreButton() {
+        const showMoreButton = document.getElementById('show-more-markers');
+        if (displayedMarkersCount >= filteredMarkers.length) {
+            showMoreButton.style.display = 'none';
+        } else if (filteredMarkers.length <= markersPerPage) {
+            showMoreButton.style.display = 'none';
+        } else {
+            showMoreButton.style.display = 'block';
+        }
+    }
+
+    function updateMarkerVisibility() {
+        showFullProjectsOnly = !showFullProjectsOnly;
+        // Retrieve the currently selected category
+        const selectedCategory = document.getElementById('category-select').value;
+        let tempMarkers = allMarkers;
+        if (showFullProjectsOnly) {
+            tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
+        }
+        if (selectedCategory !== "Alle") {
+            tempMarkers = tempMarkers.filter(marker => marker.category === selectedCategory);
+        }
+        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+        displayedMarkersCount = 0; // Reset displayed markers count
+        renderPage(1); // Reset to the first page after filtering
+        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
+    }
+
+    function createFullProjectFilter() {
+        const filterDiv = document.getElementById('full-project-filter');
+        filterDiv.innerHTML = ''; // Clear existing content
+        // Create the button
+        const filterButton = document.createElement('button');
+        filterButton.id = 'full-project-filter-button';
+        filterButton.className = 'register-button-cl'; // Use your desired class
+        filterButton.textContent = 'Nur Projektvorschläge anzeigen';
+        // Event listener for the button
+        filterButton.addEventListener('click', updateMarkerVisibility);
+        filterDiv.appendChild(filterButton);
+    }
 
     window.addEventListener('resize', function() {
         renderPage(currentPage);
     });
+
     document.getElementById('show-markers-btn').addEventListener('click', function() {
         var markersListOverlay = document.getElementById('markers-list-overlay');
         var showMarkersBtn = this; // Reference the clicked button
@@ -586,7 +658,7 @@ function renderPage(page) {
             showMarkersBtn.innerText = 'Liste ausblenden';
         }
     });
-    // Event listener for the 'Schließen' button
+
     document.getElementById('close-overlay-button').addEventListener('click', function() {
         var markersListOverlay = document.getElementById('markers-list-overlay');
         var showMarkersBtn = document.getElementById('show-markers-btn');
@@ -594,79 +666,13 @@ function renderPage(page) {
         markersListOverlay.style.display = 'none';
         showMarkersBtn.innerText = 'Liste anzeigen';
     });
-    // Global variable to track the filter state
-    // Function to update marker visibility
-    // Function to update marker visibility and synchronize button states
-    function updateMarkerVisibility() {
-        showFullProjectsOnly = !showFullProjectsOnly;
-        // Retrieve the currently selected category
-        const selectedCategory = document.getElementById('category-select').value;
-        let tempMarkers = markers;
-        if (showFullProjectsOnly) {
-            tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
-        }
-        if (selectedCategory !== "Alle") {
-            tempMarkers = tempMarkers.filter(marker => marker.category === selectedCategory);
-        }
-        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sortieren by newest
-        renderPage(1); // Reset to the first page after filtering
-        for (var category in categoryLayers) {
-            categoryLayers[category].eachLayer(function(marker) {
-                if (showFullProjectsOnly && marker.options.isMapObject) {
-                    map.removeLayer(marker);
-                } else {
-                    map.addLayer(marker);
-                }
-            });
-        }
-        // Update the text of both buttons
-        const filterButton = document.getElementById('full-project-filter-button');
-        const hideMarkersButton = document.getElementById('hideNonMapMarkers');
-        if (filterButton) {
-            filterButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
-        }
-        if (hideMarkersButton) {
-            hideMarkersButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
-        }
-    }
-    // Function to create the full project filter
-    function createFullProjectFilter() {
-        const filterDiv = document.getElementById('full-project-filter');
-        filterDiv.innerHTML = ''; // Clear existing content
-        // Create the button
-        const filterButton = document.createElement('button');
-        filterButton.id = 'full-project-filter-button';
-        filterButton.className = 'register-button-cl'; // Use your desired class
-        filterButton.textContent = 'Nur Projektvorschläge anzeigen';
-        // Event listener for the button
-        filterButton.addEventListener('click', updateMarkerVisibility);
-        filterDiv.appendChild(filterButton);
-    }
-    // Button event listener for hideNonMapMarkers button
+
     document.getElementById('hideNonMapMarkers').addEventListener('click', updateMarkerVisibility);
-    // Initialize the filter button
-    createFullProjectFilter();
-    // Call to create the filter UI
-    function updatePaginationControls(page, markersPerPage) {
-        const totalPages = Math.ceil(filteredMarkers.length / markersPerPage);
-        const paginationDiv = document.getElementById('pagination-controls');
-        paginationDiv.innerHTML = '';
-        for (let i = 1; i <= totalPages; i++) {
-            const pageButton = document.createElement('button');
-            pageButton.innerText = i;
-            pageButton.onclick = function() {
-                renderPage(i);
-            };
-            if (i === page) {
-                pageButton.style.fontWeight = 'bold';
-            }
-            paginationDiv.appendChild(pageButton);
-        }
-    }
+
     createCategoryFilter(); // Create category filter
     createSortFilter(); // Create sort filter
     createFullProjectFilter(); // Create full project filter
-    renderPage(currentPage);
+    renderPage(currentPage); // Render the first page of markers
 }
 
 function updateMarkerIcons() {

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     attachPaginationEvent('comments-container');
     attachPaginationEvent('map-objects-container');
-    attachPaginationEvent('projects-container'); // Add this line
+    attachPaginationEvent('projects-container');
     if (!isAnySectionOpen()) {
         document.getElementById('toggleProjectProposals').click();
     }
@@ -10,12 +10,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function attachPaginationEvent(containerId) {
     let container = document.getElementById(containerId);
     if (container) {
-        //console.log('Attaching click event to:', containerId);
         container.addEventListener('click', function(e) {
             if (e.target.tagName === 'A' && e.target.classList.contains('page-link')) {
                 e.preventDefault();
                 const url = new URL(e.target.href);
-                //console.log('Fetching URL:', url.href);
                 updatePaginationContent(url.href, containerId);
             }
         });
@@ -53,84 +51,64 @@ function updatePaginationContent(url, containerId) {
     }).catch(error => console.error('Error:', error));
 }
 
-
-
-
-
 document.addEventListener('DOMContentLoaded', function() {
     const navOverlay = document.getElementById('nav-overlay');
-    const navLinks = document.getElementById('nav-links'); // Container of the links
+    const navLinks = document.getElementById('nav-links');
     const hamburgerButton = document.getElementById('hamburger-button');
     const closeOverlayBtn = document.getElementById('close-overlay-btn');
 
-    // Toggle the navigation overlay visibility
     function toggleNavOverlay() {
         navOverlay.style.display = navOverlay.style.display === 'block' ? 'none' : 'block';
         console.debug(navOverlay.style.display === 'block' ? 'nav-overlay opened.' : 'nav-overlay closed.');
     }
 
-    // Specifically close the navigation overlay
     function closeNavOverlay() {
         navOverlay.style.display = 'none';
         console.debug('nav-overlay explicitly closed.');
     }
 
-    // Open the navigation overlay explicitly
     function openNavOverlay() {
         navOverlay.style.display = 'block';
         console.debug('nav-overlay opened.');
     }
 
-    // Toggle the nav-overlay on hamburger button click
     hamburgerButton.addEventListener('click', function() {
-        if (window.innerWidth <= 1080) { // Ensure action only on mobile
+        if (window.innerWidth <= 1080) {
             toggleNavOverlay();
         }
     });
 
-    // Close the nav-overlay using the close button
     closeOverlayBtn.addEventListener('click', function(event) {
-        event.stopPropagation(); // Prevent triggering navOverlay's click event
+        event.stopPropagation();
         closeNavOverlay();
     });
 
-    // Event listener for closing nav-overlay when clicking outside the links
     navOverlay.addEventListener('click', function(event) {
-        // Detect clicks that are not on the links or the close button and within mobile view
         if (!navLinks.contains(event.target) && window.innerWidth <= 1080) {
             closeNavOverlay();
         }
     });
 
-    // Stop propagation of clicks on nav-links to prevent them from closing the overlay
     navLinks.addEventListener('click', function(event) {
         event.stopPropagation();
     });
 
-    // Initial display adjustment for nav-overlay based on screen width
     function adjustNavOverlayDisplay() {
         navOverlay.style.display = window.innerWidth > 1080 ? 'block' : 'none';
     }
     adjustNavOverlayDisplay();
 
-    // Adjust display of nav-overlay on window resize
     window.addEventListener('resize', adjustNavOverlayDisplay);
 });
 
-
-
-
-
-
-// JavaScript function to handle redirection to Stimmungskarte
 function redirectToStimmungskarte() {
     window.location.href = '/Partizipative_Planung_Karte';
 }
-// JavaScript function to handle redirection to Suggest an Idea
+
 function redirectToList() {
     window.location.href = '/list';
 }
-// JavaScript function to handle redirection to List of Current Suggestions
+
 function redirectToneuerbeitrag() {
     window.location.href = '/Partizipative_Planung_Neuer_Projekt';
 }
@@ -144,56 +122,54 @@ function toggleMenu() {
     }
 }
 
-
-document.getElementById('delete-data-btn').addEventListener('click', function() {
-    var confirmation = confirm('Are you sure you want to permanently delete all your data? This action cannot be undone.');
+document.getElementById('delete-data-btn').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default form submission
+    var confirmation = confirm('Sind Sie sicher, dass Sie Ihr gesamtes Konto dauerhaft löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.');
     if (confirmation) {
         fetch('{{ url_for("delete_my_data") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-                // Add CSRF token if you're using CSRF protection, otherwise remove this line
             }
         }).then(response => response.json()).then(data => {
-            alert(data.message);
             if (data.success) {
-                window.location.href = '/'; // Redirect to the homepage or login page
+                window.location.href = '/deleted.html';
+            } else {
+                alert(data.message);
             }
         }).catch(error => console.error('Error:', error));
+    } else {
+        alert('Ihr Konto wurde nicht gelöscht.');
     }
 });
+
 let currentOpenSection = null;
-// Attach event listeners
 document.querySelectorAll('.control-bar .c-button').forEach(button => {
     button.addEventListener('click', function() {
         const sectionId = this.getAttribute('data-section-id');
         toggleSection(sectionId);
     });
 });
-// Initialize with project proposals section open
 document.addEventListener('DOMContentLoaded', function() {
     if (!isAnySectionOpen()) {
         toggleSection('projectProposalsSection');
     }
 });
-// Function to check if any section is open
+
 function isAnySectionOpen() {
     let sections = document.querySelectorAll('.section');
     return Array.from(sections).some(section => section.style.display === 'block');
 }
-// Function to open the project proposals section
+
 function openProjectProposalsSection() {
     const projectProposalsButton = document.getElementById('toggleProjectProposals');
     projectProposalsButton.click();
     console.debug('No sections open, opening projectProposalsSection');
 }
-// Attach event listeners
+
 document.getElementById('toggleLesezeichen').addEventListener('click', function() {
     toggleSection('bookmarksSection');
 });
-// Attach the toggleSection function to the new button
-
-// Attach the toggleSection function to each button
 document.querySelectorAll('.control-bar .c-button').forEach(button => {
     button.addEventListener('click', function() {
         const sectionId = this.getAttribute('data-section-id');
@@ -201,14 +177,10 @@ document.querySelectorAll('.control-bar .c-button').forEach(button => {
     });
 });
 
-
 function toggleSection(sectionId) {
-    
-    console.log(sectionId)
     const section = document.getElementById(sectionId);
     const projectProposalsSection = document.getElementById('projectProposalsSection');
     const projectProposalsButton = document.getElementById('toggleProjectProposals');
-    // Close the current open section if it's not the one being toggled
     if (currentOpenSection && currentOpenSection !== sectionId) {
         const currentSection = document.getElementById(currentOpenSection);
         if (currentSection) {
@@ -217,13 +189,11 @@ function toggleSection(sectionId) {
             console.debug(currentOpenSection + ' section closed');
         }
     }
-    // Toggle the clicked section
     if (section.style.display === 'none') {
         section.style.display = 'block';
         document.querySelector(`[data-section-id="${sectionId}"]`).classList.add('active');
         console.debug(sectionId + ' section opened');
         currentOpenSection = sectionId;
-        // Close project proposals if it's open and not the current section
         if (projectProposalsSection.style.display === 'block' && sectionId !== 'projectProposalsSection') {
             projectProposalsSection.style.display = 'none';
             projectProposalsButton.classList.remove('active');
@@ -233,7 +203,6 @@ function toggleSection(sectionId) {
         section.style.display = 'none';
         document.querySelector(`[data-section-id="${sectionId}"]`).classList.remove('active');
         console.debug(sectionId + ' section closed, opening projectProposalsSection');
-        // Open project proposals section if it's not already open
         if (projectProposalsSection.style.display === 'none') {
             projectProposalsSection.style.display = 'block';
             projectProposalsButton.classList.add('active');
@@ -248,8 +217,6 @@ function toggleSection(sectionId) {
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
-// Update event listeners
-
 document.getElementById('toggleProjectProposals').addEventListener('click', function() {
     toggleSection('projectProposalsSection');
 });
@@ -265,7 +232,6 @@ document.getElementById('toggleUsers').addEventListener('click', function() {
 });
 
 function submitExportForm() {
-    
     var formData = new FormData(document.getElementById("exportForm"));
     formData.forEach(function(value, key) {
         console.debug("Form Data - Key:", key, "Value:", value);
@@ -280,28 +246,24 @@ function submitExportForm() {
             console.error('Server responded with status:', response.status);
             throw new Error('Server responded with status ' + response.status);
         }
-        return response.json(); // Expecting a JSON response now
+        return response.json();
     }).then(data => {
         if (data.filepath) {
-            // Trigger download using the filepath received
-            window.location.href = data.filepath; // This will start the download
+            window.location.href = data.filepath;
         } else {
             console.error('File path not received from server');
         }
     }).catch(error => {
         console.error('Export error:', error);
     });
-    return false; // Prevent traditional form submission
+    return false;
 }
 
-
 function deleteComment(event, commentId) {
-    event.preventDefault(); // Prevent the form from submitting normally
-
+    event.preventDefault();
     if (!confirm('Möchten Sie diesen Kommentar wirklich löschen?')) {
-        return; // User canceled the action
+        return;
     }
-
     fetch(`/delete_comment/${commentId}`, {
             method: 'POST',
             headers: {
@@ -315,13 +277,8 @@ function deleteComment(event, commentId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Remove the comment from the DOM
                 document.querySelector(`.project-thumbnail[data-comment-id="${commentId}"]`).remove();
-
-                // Update the number of comments displayed in the comments section
                 updateNumComments();
-
-                // Specifically update the comment count in the "marker-limit-info" div
                 updateCommentCountInStatistics();
             } else {
                 alert('Fehler beim Löschen des Kommentars.');
@@ -334,36 +291,31 @@ function updateNumComments() {
     const numCommentsSpan = document.querySelector('.my-comments h2 span');
     let numComments = parseInt(numCommentsSpan.textContent);
     if (!isNaN(numComments) && numComments > 0) {
-        numCommentsSpan.textContent = `${numComments - 1} Kommentar(e)`; // Decrement the comment count
+        numCommentsSpan.textContent = `${numComments - 1} Kommentar(e)`;
     }
 }
 
 function updateCommentCountInStatistics() {
-    // Assuming the comment count is the second element with the class 'highlight' in its parent container
     const numCommentsStatSpan = document.querySelectorAll('.marker-limit-info .highlight')[1];
     if (numCommentsStatSpan) {
         let numComments = parseInt(numCommentsStatSpan.textContent);
         if (!isNaN(numComments) && numComments > 0) {
             numCommentsStatSpan.textContent = `${numComments - 1}`;
-            // If there is a specific wording to update (e.g., "Kommentare" word itself), handle that here as well
         }
     }
 }
 
-
 function removeBookmark(event, projectId) {
-    event.preventDefault(); // Stop the form from submitting
+    event.preventDefault();
     const confirmation = confirm('Möchten Sie dieses Lesezeichen wirklich entfernen?');
     if (!confirmation) {
-        return; // User canceled the action
+        return;
     }
-
     fetch(`/remove_bookmark/${projectId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            // Include CSRF token if your application requires it
         },
     }).then(response => {
         if (!response.ok) {
@@ -371,13 +323,10 @@ function removeBookmark(event, projectId) {
         }
         return response.json();
     }).then(data => {
-        //console.log('Bookmark removed:', data);
-        // Remove the project thumbnail from the DOM
         const thumbnailToRemove = document.getElementById(`project-thumbnail-${projectId}`);
         if (thumbnailToRemove) {
             thumbnailToRemove.remove();
         }
-        // Update the number of bookmarks displayed
         updateNumBookmarks();
     }).catch(error => console.error('Error:', error));
 }
@@ -386,30 +335,26 @@ function updateNumBookmarks() {
     const numBookmarksSpan = document.getElementById('num-bookmarks');
     let numBookmarks = parseInt(numBookmarksSpan.textContent);
     if (!isNaN(numBookmarks)) {
-        numBookmarksSpan.textContent = `${numBookmarks - 1} Lesezeichen`; // Decrement the bookmark count
+        numBookmarksSpan.textContent = `${numBookmarks - 1} Lesezeichen`;
     }
 }
 
 function confirmDeleteMapObject(event, projectId) {
-    event.preventDefault(); // Prevent default form submission
+    event.preventDefault();
     const confirmation = confirm('Möchten Sie diese Notiz wirklich löschen?');
     if (!confirmation) {
-        return; // User canceled the action
+        return;
     }
-
     fetch(`/delete_project/${projectId}`, {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/json'
-            // Include CSRF token as necessary
         },
     }).then(response => response.json()).then(data => {
         if (data.success) {
             alert('Notiz erfolgreich gelöscht.');
-            // Remove the map object from the DOM
             document.querySelector(`.project-thumbnail[data-project-id="${projectId}"]`).remove();
-            // Update the count of map objects
             updateNumMapObjects();
         } else {
             alert('Fehler beim Löschen der Notiz.');
@@ -421,11 +366,9 @@ function updateNumMapObjects() {
     const numMapObjectsSpan = document.getElementById('num-map-objects');
     let numMapObjects = parseInt(numMapObjectsSpan.textContent);
     if (!isNaN(numMapObjects)) {
-        // Reconstruct the sentence with the updated count
-        numMapObjectsSpan.innerHTML = `${numMapObjects - 1} Notizen <span style="color: #003056;">gepostet.</span>`; // Decrement the count and ensure "gepostet." remains
+        numMapObjectsSpan.innerHTML = `${numMapObjects - 1} Notizen <span style="color: #003056;">gepostet.</span>`;
     }
 }
-
 
 document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('.project-thumbnail').forEach(projectThumbnail => {
@@ -439,29 +382,24 @@ document.addEventListener("DOMContentLoaded", function() {
         if (downvotesElement) {
             downvotes = parseInt(downvotesElement.textContent.match(/\d+/) ? downvotesElement.textContent.match(/\d+/)[0] : "0");
         }
-        // Log the project details and adjust border-radius
         if (upvotes > 0 && downvotes > 0) {
-            //console.log(`Project loaded with ${upvotes} upvotes and ${downvotes} downvotes. Adjusting border-radius.`);
             if (upvotesElement) upvotesElement.style.borderRadius = '30px 0 0 30px';
             if (downvotesElement) downvotesElement.style.borderRadius = '0 30px 30px 0';
         } else if (upvotes > 0 && downvotes === 0) {
-            //console.log(`Project loaded with ${upvotes} upvotes and 0 downvotes. Adjusting border-radius for upvotes.`);
             if (upvotesElement) upvotesElement.style.borderRadius = '30px';
         } else if (downvotes > 0 && upvotes === 0) {
-            //console.log(`Project loaded with ${downvotes} downvotes and 0 upvotes. Adjusting border-radius for downvotes.`);
             if (downvotesElement) downvotesElement.style.borderRadius = '30px';
         } else {
-            //console.log(`Project loaded with 0 upvotes and 0 downvotes. Setting border-radius to 30px on both sides.`);
             if (upvotesElement) upvotesElement.style.borderRadius = '30px';
-            if (downvotesElement) downvotesElement.style.borderRadius = '30px';
+            if (downvotesElement) upvotesElement.style.borderRadius = '30px';
         }
     });
 });
-let currentPageNumber = 1; // Default to page 1
+
+let currentPageNumber = 1;
 document.addEventListener('DOMContentLoaded', function() {
-    //console.log('DOM fully loaded. Initializing event listeners.');
     attachEventListeners();
-    updateCurrentPageNumberFromURL(); // Initialize currentPageNumber based on URL at load
+    updateCurrentPageNumberFromURL();
 });
 
 function attachEventListeners() {
@@ -486,7 +424,6 @@ function attachPaginationEventListeners(event) {
 
 function handleDeleteRequest(form) {
     const projectId = new URL(form.action).pathname.split('/').pop();
-    //console.log('Attempting to delete project with ID:', projectId);
     fetch(form.action, {
         method: 'POST',
         headers: {
@@ -494,7 +431,6 @@ function handleDeleteRequest(form) {
         }
     }).then(response => response.json()).then(data => {
         if (data.success) {
-            //console.log('Project deleted successfully:', projectId);
             updatePageAfterDeletion();
         } else {
             console.error('Error deleting project:', data.message);
@@ -507,7 +443,6 @@ function updateCurrentPageNumberFromLink(url) {
     const pageParam = urlObj.searchParams.get('map_object_page');
     if (pageParam) {
         currentPageNumber = pageParam;
-        //console.log('Updated currentPageNumber from link:', currentPageNumber);
     }
 }
 
@@ -518,16 +453,13 @@ function updatePageAfterDeletion() {
     if (remainingProjects > 0) {
         newURL = `${currentBaseURL}?project_page=1&map_object_page=${currentPageNumber}&comment_page=1`;
     } else {
-        // Handle case when no remaining projects on current page
         let newPageNumber = currentPageNumber > 1 ? currentPageNumber - 1 : 1;
         newURL = `${currentBaseURL}?project_page=1&map_object_page=${newPageNumber}&comment_page=1`;
     }
-    //console.log(`Page update triggered. Fetching URL: ${newURL}`);
     fetchPage(newURL);
 }
 
 function fetchPage(url) {
-    //console.log('Fetching page section:', url);
     fetch(url, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
@@ -548,7 +480,6 @@ function updateSectionContent(html) {
     const newContent = doc.querySelector('.my-map-objects');
     if (newContent) {
         document.querySelector('.my-map-objects').innerHTML = newContent.innerHTML;
-        //console.log('Page content updated.');
     } else {
         console.error('New content not found in the response');
     }
@@ -559,21 +490,18 @@ function updateCurrentPageNumberFromURL() {
     const pageParam = urlObj.searchParams.get('map_object_page');
     if (pageParam) {
         currentPageNumber = pageParam;
-        //console.log('Updated currentPageNumber from URL:', currentPageNumber);
     }
 }
+
 document.addEventListener('DOMContentLoaded', function() {
     let currentOpenSection = null;
 
     function toggleSection(sectionId) {
-        
         const section = document.getElementById(sectionId);
         if (!section) {
             console.error("Section not found:", sectionId);
             return;
         }
-
-        // Toggle only if the section is not already open
         if (section.style.display === 'none') {
             section.style.display = 'block';
             if (currentOpenSection && currentOpenSection !== sectionId) {
@@ -597,29 +525,20 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function(event) {
             event.preventDefault();
             const sectionId = this.getAttribute('data-section-id');
-
-            // Check if the clicked section is the same as the currently open section
             if (currentOpenSection === sectionId) {
-                // Close only the overlay
                 document.getElementById('filter-overlay').style.display = 'none';
                 console.debug('Overlay closed, current section remains open:', sectionId);
             } else {
-                // Toggle the section and close the overlay
                 toggleSection(sectionId);
                 document.getElementById('filter-overlay').style.display = 'none';
             }
         });
     });
 
-    // Opening 'projectProposalsSection' by default
     if (!isAnySectionOpen()) {
         toggleSection('projectProposalsSection');
     }
-
-    // Open 'projectProposalsSection' by default when the page loads
     toggleSection('projectProposalsSection');
-
-    // Toggle filter overlay
     const hamburgerButtonFilter = document.getElementById('hamburger-button-filter');
     const filterOverlay = document.getElementById('filter-overlay');
     if (hamburgerButtonFilter && filterOverlay) {
@@ -627,8 +546,6 @@ document.addEventListener('DOMContentLoaded', function() {
             filterOverlay.style.display = filterOverlay.style.display === 'flex' ? 'none' : 'flex';
         });
     }
-
-    // Close filter overlay when clicking outside
     if (filterOverlay) {
         filterOverlay.addEventListener('click', function(event) {
             if (event.target === this) {
@@ -636,9 +553,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    // Toggle navigation overlay
-
 });
 
 function isAnySectionOpen() {
@@ -647,24 +561,21 @@ function isAnySectionOpen() {
 }
 
 function deleteProject(event, projectId) {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault();
     const confirmation = confirm('Möchten Sie dieses Projekt wirklich löschen?');
     if (!confirmation) {
-        return; // Stop if the user cancels
+        return;
     }
-
     fetch(`/delete_project/${projectId}`, {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/json'
         },
-        // Include CSRF token as needed
     }).then(response => response.json()).then(data => {
         if (data.success) {
             alert('Projekt erfolgreich gelöscht.');
             document.querySelector(`form[data-project-id="${projectId}"]`).closest('.project-thumbnail').remove();
-            // Call function to update project counts
             updateProjectCounts();
         } else {
             alert('Fehler beim Löschen des Projekts.');
@@ -673,16 +584,13 @@ function deleteProject(event, projectId) {
 }
 
 function updateProjectCounts() {
-    const projectCountSpan = document.querySelector('.highlight'); // Adjust the selector as necessary
+    const projectCountSpan = document.querySelector('.highlight');
     let currentCount = parseInt(projectCountSpan.textContent);
     if (!isNaN(currentCount)) {
-        projectCountSpan.textContent = currentCount - 1; // Decrement count
+        projectCountSpan.textContent = currentCount - 1;
     }
 }
 
-	
-	document.getElementById('close-overlay-btn').addEventListener('click', function() {
+document.getElementById('close-overlay-btn').addEventListener('click', function() {
     document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
 });
-	
-
