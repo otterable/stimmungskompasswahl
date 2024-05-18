@@ -621,33 +621,34 @@ input[type="file"] {
 
 
 /* Desktop screens (larger than 1200px) */
-@media (min-width: 1445px) {
-  .project-thumbnail {
-    width: calc(33.333% - 20px);
-    /* Three items per row */
-    height: auto;
-    /* Height adjusts based on content */
-  }
+   @media (min-width: 1445px) {
+     .project-thumbnail {
+       width: calc(33.333% - 20px);
+       /* Three items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
+
+@media (min-width: 768px) and (max-width: 1444px) {
+    .project-thumbnail {
+        width: calc(50% - 20px);
+        /* Two items per row */
+        height: auto;
+        /* Height adjusts based on content */
+    }
 }
 
-/* Medium screens (between 1024px and 1199px) */
-@media (min-width: 768px) and (max-width: 1445px) {
-  .project-thumbnail {
-    width: calc(50% - 20px);
-    /* Two items per row */
-    height: auto;
-    /* Height adjusts based on content */
-  }
-}
 
-/* Mobile screens (less than 1024px) */
-@media (max-width: 1080px) {
-  .project-thumbnail {
-    width: calc(100% - 20px);
-    /* Full width */
-    height: auto;
-    /* Height adjusts based on content */
-  }
+@media (max-width: 767px) {
+    .project-thumbnail {
+        width: calc(100% - 20px);
+        /* One item per row */
+        height: auto;
+        /* Height adjusts based on content */
+    }
+
+  
 
   .project-thumbnail img {
     height: auto;

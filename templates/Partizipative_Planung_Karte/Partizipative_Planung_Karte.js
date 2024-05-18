@@ -1,3 +1,5 @@
+// Existing JavaScript code
+
 if (typeof isSpam === 'undefined') {
     window.isSpam = function() {
         return false;
@@ -8,42 +10,39 @@ var swearWords = {
     "de": [],
     "en": []
 };
+
 // Function to load swear words from filter.json
 function loadSwearWords() {
     fetch('/static/filter.json').then(response => response.json()).then(data => {
         swearWords = data;
     }).catch(error => {});
 }
+
 // Call this function when the page loads
 loadSwearWords();
+
 var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
+
 // Initialize the map
 var map = L.map('map').setView([48.4102, 15.6022], 15);
 var currentDrawnLayer = null;
 var selectedToolButton = null;
-// Track the current base layer
 var currentBaseLayer = 'Standardkarte'; // Default layer
-// Calculate the offset for boundaries
 var horizontalOffset = 1125; // 1.0225 km on each side, total 2.25 km
 var verticalOffset = 594; // 0.59375 km on each side, total 1.02875 km
-// Define the boundaries
 var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
 var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
 var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
 var bounds = L.latLngBounds(southWest, northEast);
-// Calculate extended bounds for 10 km buffer
 var extendedHorizontalOffset = horizontalOffset + 1000; // Add 10 km
 var extendedVerticalOffset = verticalOffset + 1000; // Add 10 km
 var extendedSouthWest = map.unproject(centerPoint.subtract([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
 var extendedNorthEast = map.unproject(centerPoint.add([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
 var extendedBounds = L.latLngBounds(extendedSouthWest, extendedNorthEast);
-// Set the max bounds to restrict dragging beyond 10 km from the original boundary
 map.setMaxBounds(extendedBounds);
-// Debugging: Log when the user reaches the edge of the draggable area
 map.on('drag', function() {
     if (!extendedBounds.contains(map.getCenter())) {}
 });
-// Define the coordinates for a very large outer rectangle
 var outerBounds = [
     L.latLng(-90, -180),
     L.latLng(90, -180),
@@ -51,7 +50,6 @@ var outerBounds = [
     L.latLng(-90, 180),
     L.latLng(-90, -180)
 ];
-// Define the coordinates for the inner rectangle (the boundary)
 var innerBounds = [
     bounds.getSouthWest(),
     bounds.getNorthWest(),
@@ -60,13 +58,11 @@ var innerBounds = [
     bounds.getSouthWest()
 ];
 var boundary = L.latLngBounds(innerBounds);
-// Create a polygon with a hole (inverted polygon)
 var invertedPolygon = L.polygon([outerBounds, innerBounds], {
     color: 'grey',
     fillColor: 'grey',
     fillOpacity: 0.5
 }).addTo(map);
-// Draw the boundary rectangle
 L.rectangle(bounds, {
     color: "#808080",
     weight: 2,
@@ -76,7 +72,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     minZoom: 15,
     attribution: '| © OpenStreetMap contributors'
 }).addTo(map);
-// Map layers
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     minZoom: 15,
     attribution: '....'
@@ -111,7 +106,6 @@ var thunderforestLayers = {
         attribution: 'Tiles © Thunderforest, ....'
     }),
 };
-// basemap.at layers
 var basemapLayers = {
     "GeolandBasemap": L.tileLayer('http://maps.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png', {
         minZoom: 15,
@@ -132,42 +126,32 @@ var baseLayers = {
     "Kontrast": thunderforestLayers.Mobile_Atlas,
     "Papyrus": thunderforestLayers.Pioneer,
 };
-// Add default layer to map
 baseLayers["Standardkarte"].addTo(map);
 map.on('baselayerchange', function(e) {
     currentBaseLayer = e.name;
     updateMarkerIcons();
 });
 L.control.layers(baseLayers).addTo(map);
-// Global variable to store the future marker icon and details
 let futureMarker = {
     icon: null,
     category: '',
     description: ''
 };
-// Function to create a colored circle icon
 function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
     var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
     var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
     var strokeWidth = currentBaseLayer === 'Satellit' ? 5 : outlineSize * 10;
     var strokeOpacity = currentBaseLayer === 'Satellit' ? 1 : 0.5;
-    // Star emoji
-    var starSize = adjustedPinSize / 2; // Star emoji size
-    var starEmoji = isFeatured ? `
-         											<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
-    // Black outline for featured project
-    var blackOutline = isFeatured ? `
-         											<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : '';
-    // SVG icon with conditional star and outline
+    var starSize = adjustedPinSize / 2;
+    var starEmoji = isFeatured ? `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="${starSize}" fill="yellow">⭐</text>` : '';
+    var blackOutline = isFeatured ? `<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4 + 2}" stroke="black" stroke-width="2" fill="none" />` : '';
     var svgIcon = `
-         											<svg
-         												xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
-         												<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" fill="${fillColor}" />
-         												<circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
-                ${blackOutline}
-                ${starEmoji}
-            
-         											</svg>`;
+        <svg xmlns="http://www.w3.org/2000/svg" width="${adjustedPinSize}" height="${adjustedPinSize}" viewBox="0 0 ${adjustedPinSize} ${adjustedPinSize}">
+            <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" fill="${fillColor}" />
+            <circle cx="${adjustedPinSize / 2}" cy="${adjustedPinSize / 2}" r="${adjustedPinSize / 4}" stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="none" stroke-opacity="${strokeOpacity}" />
+            ${blackOutline}
+            ${starEmoji}
+        </svg>`;
     return L.icon({
         iconUrl: `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgIcon)))}`,
         iconSize: [adjustedPinSize, adjustedPinSize],
@@ -175,45 +159,34 @@ function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
         popupAnchor: [0, -adjustedPinSize / 2]
     });
 }
-// Function to create a simple SVG icon for cursor
 function createCursorIcon(fillColor) {
-    var svgCursorIcon = `
-         											<svg
-         												xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-         												<circle cx="12" cy="12" r="10" fill="${fillColor}" />
-         											</svg>`;
+    var svgCursorIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${fillColor}" /></svg>`;
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgCursorIcon)))}`;
 }
 var isMarkerCreationActive = false;
-// Function to set the map cursor and activate marker creation process
 function setMapCursor() {
     var cursorIconUrl = futureMarker.icon;
     document.getElementById('map').style.cursor = `url('${cursorIconUrl}') 12 12, auto`;
-    isMarkerCreationActive = true; // Activate marker creation process
+    isMarkerCreationActive = true;
 }
-// Function to handle map click for placing a marker
 function handleMapClick(e) {
-    // Only process click if marker creation is active
     if (isMarkerCreationActive) {
-        // Check if the clicked location is inside the boundary
         if (boundary.contains(e.latlng)) {
             selectedLatLng = e.latlng;
             var tempMarker = L.marker(e.latlng, {
                 icon: createIcon(24, 2, getCategoryColor(futureMarker.category))
             }).addTo(map);
             showCustomConfirm(selectedLatLng, tempMarker);
-        } else {}
+        }
     }
 }
-// Register the map click event listener
 map.on('click', handleMapClick);
-// Function to show the custom confirmation dialog
 function showCustomConfirm(latlng, tempMarker) {
     var confirmDiv = document.getElementById('custom-confirm');
     confirmDiv.style.display = 'block';
     document.getElementById('confirm-yes').onclick = function() {
         saveMarkerData(latlng, futureMarker.category, futureMarker.description, function(savedMarkerData) {
-            map.removeLayer(tempMarker); // Remove the temporary marker
+            map.removeLayer(tempMarker);
             addNewMarker(latlng, futureMarker.category, futureMarker.description, savedMarkerData.id);
         });
         confirmDiv.style.display = 'none';
@@ -221,37 +194,33 @@ function showCustomConfirm(latlng, tempMarker) {
         isMarkerCreationActive = false;
     };
     document.getElementById('confirm-tryagain').onclick = function() {
-        map.removeLayer(tempMarker); // Remove the temporary marker
+        map.removeLayer(tempMarker);
         confirmDiv.style.display = 'none';
-        isMarkerCreationActive = true; // Reactivate marker creation process
-        setMapCursor(); // Reset cursor to marker icon
+        isMarkerCreationActive = true;
+        setMapCursor();
     };
     document.getElementById('confirm-no').onclick = function() {
-        map.removeLayer(tempMarker); // Remove the temporary marker
+        map.removeLayer(tempMarker);
         confirmDiv.style.display = 'none';
         resetMapCursor();
-        isMarkerCreationActive = false; // Deactivate marker creation process
+        isMarkerCreationActive = false;
     };
 
     function addNewMarker(latLng, category, description, markerId) {
         var fillColor = getCategoryColor(category);
-        var popupContent = `
-         											<div style="text-align: center;">${description}</div>`;
+        var popupContent = `<div style="text-align: center;">${description}</div>`;
         var marker = L.marker(latLng, {
-            icon: createIcon(24, 2, fillColor, false), // Assuming the new marker is not featured
+            icon: createIcon(24, 2, fillColor, false),
             category: category,
             isMapObject: true,
             isFeatured: false
         }).addTo(map);
         marker.bindPopup(popupContent);
-        // Attach the markerId to the marker
         marker.markerId = markerId;
-        // Add the new marker to the corresponding category layer
         if (!categoryLayers[category]) {
             categoryLayers[category] = L.layerGroup().addTo(map);
         }
         marker.addTo(categoryLayers[category]);
-        // Update button text for the category
         updateCategoryButtonText(category);
     }
 
@@ -262,45 +231,38 @@ function showCustomConfirm(latlng, tempMarker) {
         }
     }
     document.getElementById('confirm-tryagain').onclick = function() {
-        map.removeLayer(tempMarker); // Remove the temporary marker
+        map.removeLayer(tempMarker);
         confirmDiv.style.display = 'none';
-        isMarkerCreationActive = true; // Reactivate marker creation process
-        setMapCursor(); // Reset cursor to marker icon
+        isMarkerCreationActive = true;
+        setMapCursor();
     };
     document.getElementById('confirm-no').onclick = function() {
         map.removeLayer(tempMarker);
         confirmDiv.style.display = 'none';
         resetMapCursor();
-        isMarkerCreationActive = false; // Deactivate marker creation process
+        isMarkerCreationActive = false;
     };
 }
-// Function to reset map cursor
 function resetMapCursor() {
     document.getElementById('map').style.cursor = '';
-    isMarkerCreationActive = false; // Deactivate marker creation process
+    isMarkerCreationActive = false;
 }
-// Function to open marker overlay
 function openMarkerOverlay(event) {
     var overlay = document.getElementById('marker-overlay');
     if (overlay) {
-        overlay.style.display = 'flex'; // Force display flex
+        overlay.style.display = 'flex';
         overlay.style.justifyContent = 'center';
         overlay.style.alignItems = 'center';
-        overlay.style.zIndex = '10000'; // Ensure it's above other content
-        // Update the category description when the overlay is opened
+        overlay.style.zIndex = '10000';
         updateMarkerCategoryDescription();
-    } else {}
-    // Stop propagation if it's a user-triggered event
+    }
     if (event) {
         event.stopPropagation();
     }
 }
-// Function to initialize event listeners
 function initializeEventListeners() {
-    // Attach a click event listener to the "marker-description" text area
     document.getElementById('marker-description').addEventListener('click', function() {});
 }
-// Call the function to initialize the event listeners
 initializeEventListeners();
 
 function updateMarkerCategoryDescription() {
@@ -342,79 +304,56 @@ function updateMarkerCategoryDescription() {
     }
     categoryDescription.textContent = categoryText;
 }
-var swearWords = {
-    "de": [],
-    "en": []
-};
-// Function to load swear words from filter.json
-function loadSwearWords() {
-    fetch('/static/filter.json').then(response => response.json()).then(data => {
-        swearWords = data;
-    }).catch(error => {});
-}
-// Call this function when the page loads
-loadSwearWords();
-// Function to check for swear words in a given text
 function containsSwearWords(text, language) {
     var words = swearWords[language] || [];
     var textWords = text.toLowerCase().split(/\s+/);
     return textWords.some(word => words.includes(word));
 }
-// Function to handle posting a marker
-// Function to handle posting a marker
 function postMarker() {
-    // Get the textarea and its value
     var markerDescriptionTextarea = document.getElementById('marker-description');
     var description = markerDescriptionTextarea.value;
 
     if (containsSwearWords(description, 'de') || containsSwearWords(description, 'en')) {
         alert("Bitte entfernen Sie unangebrachte Ausdrücke aus Ihrer Beschreibung.");
-        return; // Stop the function here if swear words are found
+        return;
     }
     if (isSpam(description)) {
         alert("Ihr Text scheint Spam zu enthalten. Bitte überprüfen Sie ihn und versuchen Sie es erneut.");
         return;
     }
-    // Check if the description meets the minimum character requirement
     if (description.length < 15) {
         alert("Bitte geben Sie mindestens 15 Zeichen ein.");
-        return; // Stop the function if the condition is not met
+        return;
     }
-    // Continue with the rest of your function if the condition is met
     var markerOverlay = document.getElementById('marker-overlay');
     if (markerOverlay) {
         markerOverlay.style.display = 'none';
     } else {
         return;
     }
-    // Get the selected category from the form
     var selectedCategory = document.getElementById('marker-category').value;
-    // Prepare the future marker details
     futureMarker.category = selectedCategory;
     futureMarker.description = description;
     var fillColor = getCategoryColor(selectedCategory);
     futureMarker.icon = createCursorIcon(fillColor);
-    // Change the cursor to the future marker icon
     setMapCursor();
-    // Clear the textarea
     document.getElementById('marker-description').value = '';
 }
-// Function to toggle the sidebar visibility and adjust map size
 function toggleMarkerSidebar() {
     var sidebar = document.getElementById('sidebar');
     var mapElement = document.getElementById('map');
     if (sidebar.style.display === 'none' || sidebar.style.display === '') {
         sidebar.style.display = 'block';
-        mapElement.classList.add('sidebar-visible'); // Add class to resize map
+        mapElement.classList.add('sidebar-visible');
     } else {
         sidebar.style.display = 'none';
-        mapElement.classList.remove('sidebar-visible'); // Remove class to resize map
+        mapElement.classList.remove('sidebar-visible');
     }
 }
-var allMarkers = []; // Store all markers
-var filteredMarkers = []; // Store currently filtered markers
+var allMarkers = [];
+var filteredMarkers = [];
 var displayedMarkersCount = 0;
-const markersPerPage = 5; // Number of markers per page
+const markersPerPage = 5; // Number of markers per page, increased to 20 as per the requirement
 const categoryColors = {
     'Transport': '#133873',
     'Öffentliche Plätze': '#ff5c00',
@@ -426,295 +365,257 @@ const categoryColors = {
     'Sport': '#3d4f53',
     'Andere': '#212121'
 };
+var showFullProjectsOnly = false;
+var currentPage = 1;
 
 function addMarkersToOverlay(markers) {
-    allMarkers = markers; // Store all markers
-    displayedMarkersCount = 0; // Reset displayed markers count
-    filteredMarkers = markers.slice(); // Initialize filtered markers to all markers
-    const sortedMarkers = sortMarkersByNewest(markers);
-    let currentPage = 1; // Start with the first page
-    let showFullProjectsOnly = false;
+    allMarkers = markers;
+    displayedMarkersCount = 0;
+    filterMarkers();
+    createCategoryFilter();
+    createSortFilter();
+    createFullProjectFilter();
+}
 
-    function filterByCategory(category) {
-        let tempMarkers = allMarkers;
-        if (category !== "Alle") {
-            tempMarkers = tempMarkers.filter(marker => marker.category === category);
-        }
-        if (showFullProjectsOnly) {
-            tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
-        }
-        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
-        displayedMarkersCount = 0; // Reset displayed markers count
-        renderPage(1); // Reset to the first page after filtering
-        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
+function filterMarkers() {
+    let tempMarkers = allMarkers;
+    const selectedCategory = document.getElementById('category-select') ? document.getElementById('category-select').value : "Alle";
+    
+    if (selectedCategory !== "Alle") {
+        tempMarkers = tempMarkers.filter(marker => marker.category === selectedCategory);
     }
-
-    function sortMarkers(sortType) {
-        if (sortType === "Neueste") {
-            filteredMarkers.sort((a, b) => new Date(b.date) - new Date(a.date));
-        } else if (sortType === "Älteste") {
-            filteredMarkers.sort((a, b) => new Date(a.date) - new Date(b.date));
-        }
-        displayedMarkersCount = 0; // Reset displayed markers count
-        renderPage(1); // Reset to the first page after sorting
-        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
+    if (showFullProjectsOnly) {
+        tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
     }
+    filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
+    renderPage(1);
+    updateShowMoreButton();
+    updateMapMarkers();
+}
 
-    function createCategoryFilter() {
-        const filterDiv = document.getElementById('category-filter');
-        filterDiv.innerHTML = ''; // Clear existing content
-        const select = document.createElement('select');
-        select.id = 'category-select';
-        select.onchange = function() {
-            filterByCategory(this.value);
+function updateMapMarkers() {
+    for (var category in categoryLayers) {
+        categoryLayers[category].eachLayer(function(marker) {
+            if (showFullProjectsOnly && marker.options.isMapObject) {
+                map.removeLayer(marker);
+            } else if (!map.hasLayer(marker)) {
+                map.addLayer(marker);
+            }
+        });
+    }
+}
+
+function updateShowMoreButton() {
+    const showMoreButton = document.getElementById('show-more-markers');
+    if (filteredMarkers.length <= displayedMarkersCount || filteredMarkers.length <= markersPerPage) {
+        showMoreButton.style.display = 'none';
+    } else {
+        showMoreButton.style.display = 'block';
+    }
+}
+
+function loadMoreMarkers() {
+    const paginatedMarkers = paginateMarkers(currentPage, markersPerPage);
+    const list = document.getElementById('markers-list');
+    
+    paginatedMarkers.forEach(marker => {
+        const listItem = document.createElement('li');
+        const dateText = document.createElement('span');
+        dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        dateText.style.color = 'black';
+        dateText.style.fontWeight = 'normal';
+        dateText.style.display = 'block';
+        const prefixAndCategory = document.createElement('span');
+        let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
+        prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
+        prefixAndCategory.style.display = 'block';
+        const displayText = document.createElement('span');
+        displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
+        displayText.style.color = 'black';
+        const link = document.createElement('a');
+        link.href = "#";
+        link.style.textDecoration = 'none';
+        link.appendChild(dateText);
+        link.appendChild(prefixAndCategory);
+        link.appendChild(displayText);
+        link.onclick = function() {
+            centerMapOnMarker(marker.id);
+            return false;
         };
-        const categories = ["Alle", "Transport", "Öffentliche Plätze", "Umwelt", "Verwaltung", "Kultur", "Bildung", "Gesundheit", "Sport", "Andere"];
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category;
-            option.innerText = category;
-            select.appendChild(option);
-        });
-        filterDiv.appendChild(select);
-    }
-
-    function createSortFilter() {
-        const sortDiv = document.getElementById('sort-filter');
-        sortDiv.innerHTML = ''; // Clear existing content
-        const select = document.createElement('select');
-        select.id = 'sort-select';
-        select.onchange = function() {
-            sortMarkers(this.value);
-        };
-        const sortOptions = ["Neueste", "Älteste"];
-        sortOptions.forEach(option => {
-            const optionElement = document.createElement('option');
-            optionElement.value = option;
-            optionElement.innerText = option;
-            select.appendChild(optionElement);
-        });
-        sortDiv.appendChild(select);
-    }
-
-    function paginateMarkers(page, markersPerPage) {
-        const startIndex = (page - 1) * markersPerPage;
-        const endIndex = startIndex + markersPerPage;
-        return filteredMarkers.slice(startIndex, endIndex);
-    }
-
-    function renderPage(page) {
-        currentPage = parseInt(page);
-        const paginatedMarkers = paginateMarkers(page, markersPerPage);
-        const list = document.getElementById('markers-list');
-        list.innerHTML = '';
-        if (paginatedMarkers.length === 0) {
-            const noMarkersMessage = document.createElement('p');
-            noMarkersMessage.textContent = "Keine Beiträge gefunden!";
-            noMarkersMessage.style.textAlign = 'center';
-            list.appendChild(noMarkersMessage);
-        } else {
-            paginatedMarkers.forEach(marker => {
-                const listItem = document.createElement('li');
-                // Create and format the date text
-                const dateText = document.createElement('span');
-                dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                dateText.style.color = 'black';
-                dateText.style.fontWeight = 'normal';
-                dateText.style.display = 'block'; // Ensures the date is on its own line
-
-                // Create and format the prefix and category
-                const prefixAndCategory = document.createElement('span');
-                let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
-                // Use inline styles to enforce color
-                prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
-                prefixAndCategory.style.display = 'block'; // Ensures the prefix and category are on their own line
-
-                // Create and format the display text
-                const displayText = document.createElement('span');
-                displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
-                displayText.style.color = 'black'; // All text black as requested
-
-                // Combine them into a single link element
-                const link = document.createElement('a');
-                link.href = "#";
-                link.style.textDecoration = 'none';
-                link.appendChild(dateText);
-                link.appendChild(prefixAndCategory);
-                link.appendChild(displayText);
-                link.onclick = function() {
-                    centerMapOnMarker(marker.id);
-                    return false;
-                };
-
-                listItem.appendChild(link);
-                list.appendChild(listItem);
-            });
-        }
-        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
-    }
-
-    function loadMoreMarkers() {
-        const startIndex = displayedMarkersCount;
-        const endIndex = startIndex + markersPerPage;
-        const moreMarkers = filteredMarkers.slice(startIndex, endIndex);
-        const list = document.getElementById('markers-list');
-        moreMarkers.forEach(marker => {
-            const listItem = document.createElement('li');
-            // Create and format the date text
-            const dateText = document.createElement('span');
-            dateText.textContent = new Date(marker.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            dateText.style.color = 'black';
-            dateText.style.fontWeight = 'normal';
-            dateText.style.display = 'block'; // Ensures the date is on its own line
-
-            // Create and format the prefix and category
-            const prefixAndCategory = document.createElement('span');
-            let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
-            // Use inline styles to enforce color
-            prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
-            prefixAndCategory.style.display = 'block'; // Ensures the prefix and category are on their own line
-
-            // Create and format the display text
-            const displayText = document.createElement('span');
-            displayText.textContent = marker.is_mapobject ? marker.descriptionwhy : marker.name;
-            displayText.style.color = 'black'; // All text black as requested
-
-            // Combine them into a single link element
-            const link = document.createElement('a');
-            link.href = "#";
-            link.style.textDecoration = 'none';
-            link.appendChild(dateText);
-            link.appendChild(prefixAndCategory);
-            link.appendChild(displayText);
-            link.onclick = function() {
-                centerMapOnMarker(marker.id);
-                return false;
-            };
-
-            listItem.appendChild(link);
-            list.appendChild(listItem);
-        });
-        displayedMarkersCount += moreMarkers.length;
-        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
-    }
-
-    function updateShowMoreButton() {
-        const showMoreButton = document.getElementById('show-more-markers');
-        if (displayedMarkersCount >= filteredMarkers.length) {
-            showMoreButton.style.display = 'none';
-        } else if (filteredMarkers.length <= markersPerPage) {
-            showMoreButton.style.display = 'none';
-        } else {
-            showMoreButton.style.display = 'block';
-        }
-    }
-
-    function updateMarkerVisibility() {
-        showFullProjectsOnly = !showFullProjectsOnly;
-        // Retrieve the currently selected category
-        const selectedCategory = document.getElementById('category-select').value;
-        let tempMarkers = allMarkers;
-        if (showFullProjectsOnly) {
-            tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
-        }
-        if (selectedCategory !== "Alle") {
-            tempMarkers = tempMarkers.filter(marker => marker.category === selectedCategory);
-        }
-        filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
-        displayedMarkersCount = 0; // Reset displayed markers count
-        renderPage(1); // Reset to the first page after filtering
-        updateShowMoreButton(); // Update the visibility of the "Mehr anzeigen" button
-    }
-
-    function createFullProjectFilter() {
-        const filterDiv = document.getElementById('full-project-filter');
-        filterDiv.innerHTML = ''; // Clear existing content
-        // Create the button
-        const filterButton = document.createElement('button');
-        filterButton.id = 'full-project-filter-button';
-        filterButton.className = 'register-button-cl'; // Use your desired class
-        filterButton.textContent = 'Nur Projektvorschläge anzeigen';
-        // Event listener for the button
-        filterButton.addEventListener('click', updateMarkerVisibility);
-        filterDiv.appendChild(filterButton);
-    }
-
-    window.addEventListener('resize', function() {
-        renderPage(currentPage);
+        listItem.appendChild(link);
+        list.appendChild(listItem);
     });
 
-    document.getElementById('show-markers-btn').addEventListener('click', function() {
-        var markersListOverlay = document.getElementById('markers-list-overlay');
-        var showMarkersBtn = this; // Reference the clicked button
-        if (markersListOverlay.style.display === 'block') {
-            // Hide the overlay and change button text to "Liste anzeigen"
-            markersListOverlay.style.display = 'none';
-            showMarkersBtn.innerText = 'Liste anzeigen';
-        } else {
-            // Show the overlay and change button text to "Liste ausblenden"
-            createSortFilter(); // Initialize sorting filter
-            markersListOverlay.style.display = 'block';
-            renderPage(1); // Render the first page of markers
-            showMarkersBtn.innerText = 'Liste ausblenden';
-        }
-    });
+    displayedMarkersCount += paginatedMarkers.length;
+    currentPage++;
+    updateShowMoreButton();
+}
 
-    document.getElementById('close-overlay-button').addEventListener('click', function() {
-        var markersListOverlay = document.getElementById('markers-list-overlay');
-        var showMarkersBtn = document.getElementById('show-markers-btn');
-        // Hide the overlay and change button text to "Liste anzeigen"
+function paginateMarkers(page, markersPerPage) {
+    const startIndex = (page - 1) * markersPerPage;
+    const endIndex = startIndex + markersPerPage;
+    return filteredMarkers.slice(startIndex, endIndex);
+}
+
+function renderPage(page) {
+    currentPage = parseInt(page);
+    const list = document.getElementById('markers-list');
+    list.innerHTML = '';
+    displayedMarkersCount = 0;
+    loadMoreMarkers();
+}
+
+function sortMarkers(sortType) {
+    if (sortType === "Neueste") {
+        filteredMarkers.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } else if (sortType === "Älteste") {
+        filteredMarkers.sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+    renderPage(1);
+}
+
+function filterByCategory(category) {
+    filterMarkers();
+}
+
+function createCategoryFilter() {
+    const filterDiv = document.getElementById('category-filter');
+    filterDiv.innerHTML = '';
+    const select = document.createElement('select');
+    select.id = 'category-select';
+    select.onchange = function() {
+        filterByCategory(this.value);
+    };
+    const categories = ["Alle", "Transport", "Öffentliche Plätze", "Umwelt", "Verwaltung", "Kultur", "Bildung", "Gesundheit", "Sport", "Andere"];
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.innerText = category;
+        select.appendChild(option);
+    });
+    filterDiv.appendChild(select);
+}
+
+function createSortFilter() {
+    const sortDiv = document.getElementById('sort-filter');
+    sortDiv.innerHTML = '';
+    const select = document.createElement('select');
+    select.id = 'sort-select';
+    select.onchange = function() {
+        sortMarkers(this.value);
+    };
+    const sortOptions = ["Neueste", "Älteste"];
+    sortOptions.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.innerText = option;
+        select.appendChild(optionElement);
+    });
+    sortDiv.appendChild(select);
+}
+
+function createFullProjectFilter() {
+    const filterDiv = document.getElementById('full-project-filter');
+    filterDiv.innerHTML = '';
+    const filterButton = document.createElement('button');
+    filterButton.id = 'full-project-filter-button';
+    filterButton.className = 'register-button-cl';
+    filterButton.textContent = 'Nur Projektvorschläge anzeigen';
+    filterButton.addEventListener('click', function() {
+        toggleFullProjectFilter();
+        syncFullProjectFilterButtons();
+    });
+    filterDiv.appendChild(filterButton);
+}
+
+function toggleFullProjectFilter() {
+    showFullProjectsOnly = !showFullProjectsOnly;
+    filterMarkers();
+    updateFullProjectFilterButtonText();
+}
+
+function updateFullProjectFilterButtonText() {
+    const filterButton = document.getElementById('full-project-filter-button');
+    if (filterButton) {
+        filterButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
+    }
+}
+
+function syncFullProjectFilterButtons() {
+    const mapButton = document.getElementById('hideNonMapMarkers');
+    const overlayButton = document.getElementById('full-project-filter-button');
+    if (mapButton) {
+        mapButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
+    }
+    if (overlayButton) {
+        overlayButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
+    }
+}
+
+window.addEventListener('resize', function() {
+    renderPage(currentPage);
+});
+
+document.getElementById('show-markers-btn').addEventListener('click', function() {
+    var markersListOverlay = document.getElementById('markers-list-overlay');
+    var showMarkersBtn = this;
+    if (markersListOverlay.style.display === 'block') {
         markersListOverlay.style.display = 'none';
         showMarkersBtn.innerText = 'Liste anzeigen';
-    });
+    } else {
+        createSortFilter();
+        markersListOverlay.style.display = 'block';
+        renderPage(1);
+        showMarkersBtn.innerText = 'Liste ausblenden';
+    }
+});
 
-    document.getElementById('hideNonMapMarkers').addEventListener('click', updateMarkerVisibility);
+document.getElementById('close-overlay-button').addEventListener('click', function() {
+    var markersListOverlay = document.getElementById('markers-list-overlay');
+    var showMarkersBtn = document.getElementById('show-markers-btn');
+    markersListOverlay.style.display = 'none';
+    showMarkersBtn.innerText = 'Liste anzeigen';
+});
 
-    createCategoryFilter(); // Create category filter
-    createSortFilter(); // Create sort filter
-    createFullProjectFilter(); // Create full project filter
-    renderPage(currentPage); // Render the first page of markers
-}
+createCategoryFilter();
+createSortFilter();
+createFullProjectFilter();
+renderPage(currentPage);
 
 function updateMarkerIcons() {
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
-            var pinSize = 24; // Base pin size
+            var pinSize = 24;
             var outlineSize = 2;
             var fillColor = getCategoryColor(marker.options.category);
-            var isFeatured = marker.options.isFeatured; // Use the isFeatured option set on the marker
+            var isFeatured = marker.options.isFeatured;
             var newIcon = createIcon(pinSize, outlineSize, fillColor, isFeatured);
             marker.setIcon(newIcon);
         });
     }
 }
 document.addEventListener('click', function(event) {
-    // Check if the click is within the voting bar or its child elements
     if (event.target.closest('.voting-bar, .upvotes, .downvotes')) {
-        return; // Exit the function early if click is on the voting bar
+        return;
     }
     var markerOverlay = document.getElementById('marker-overlay');
     var overlayContent = document.getElementById('overlay-content');
     var navOverlay = document.getElementById('nav-overlay');
-    var videoOverlay = document.getElementById('video-overlay'); // First video overlay
-    var videoOverlay2 = document.getElementById('video-overlay-2'); // Second video overlay
-    // Check if the clicked element is part of the nav-overlay
+    var videoOverlay = document.getElementById('video-overlay');
+    var videoOverlay2 = document.getElementById('video-overlay-2');
     if (navOverlay && navOverlay.contains(event.target)) {
-        return; // Exit the function if clicked inside nav-overlay
+        return;
     }
-    // Check if the clicked element is part of the video-overlay
     if (videoOverlay && videoOverlay.contains(event.target)) {
-        return; // Exit the function if clicked inside video-overlay
+        return;
     }
-    // Check if the clicked element is part of the video-overlay-2
     if (videoOverlay2 && videoOverlay2.contains(event.target)) {
-        return; // Exit the function if clicked inside video-overlay-2
+        return;
     }
-    // Close the marker overlay if it is open and the click is outside its content
     if (markerOverlay && markerOverlay.style.display !== 'none' && !overlayContent.contains(event.target)) {
         markerOverlay.style.display = 'none';
-    } else {}
+    }
 });
-// Function to get color based on category with added debugging
 function getCategoryColor(category) {
     var color;
     switch (category) {
@@ -746,12 +647,12 @@ function getCategoryColor(category) {
             color = '#212121';
             break;
         default:
-            color = '#888'; // Default color
+            color = '#888';
             break;
     }
     return color;
 }
-var categoryLayers = {}; // Global object to hold category layers
+var categoryLayers = {};
 function logSelectedCategory() {
     var selectedCategory = document.getElementById('marker-category').value;
 }
@@ -763,19 +664,14 @@ function addMarkers(projects) {
             var coords = project.geoloc.split(',');
             var latLng = L.latLng(parseFloat(coords[0]), parseFloat(coords[1]));
             var fillColor = getCategoryColor(project.category);
-            var isFeatured = project.is_featured; // Check if the project is featured
+            var isFeatured = project.is_featured;
             var popupContent;
-
-            // Format date
             var formattedDate = new Date(project.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-            // Calculate vote percentages
             var totalVotes = project.upvotes + project.downvotes;
             var upvotePercentage = totalVotes > 0 ? ((project.upvotes / totalVotes) * 100).toFixed(1) : 0;
             var downvotePercentage = totalVotes > 0 ? ((project.downvotes / totalVotes) * 100).toFixed(1) : 0;
 
             if (project.is_mapobject) {
-                // For Notizens, show simple description with date and category
                 popupContent = `
                     <div style="text-align: center;">
                         <span style="color: grey;">${formattedDate}</span><br>
@@ -783,82 +679,68 @@ function addMarkers(projects) {
                         ${project.descriptionwhy}
                     </div>`;
             } else {
-    // For Projektvorschläges, show detailed popup with voting details
-var upvoteButtonStyle = project.upvoted_by_user ? 'background-color: #4caf50;' : '';
-var downvoteButtonStyle = project.downvoted_by_user ? 'background-color: #9a031e;' : '';
-var votingDetailsHtml = `
-                            
-         											
-                        `;
-    var votingBarHtml = `
-        <div class="voting-bar" style="margin-top: 1px;">
-            <div class="upvotes" style="width: ${upvotePercentage}%;"></div>
-            <div class="downvotes" style="width: ${downvotePercentage}%;"></div>
-        </div>
-    `;
-var upvoteButtonStyle = `
-  background-color: #4caf50 !important;
-  color: white !important;
-  padding: 10px !important;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s ease, transform 0.3s ease !important;
-`;
-
-var detailsButtonStyle = `
-  display: inline-block;
-  font-size: 16px;
-  font-weight: bold;
-  color: white !important;
-  text-decoration: none;
-  background-color: #007bff;
-  padding: 10px;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s ease, transform 0.3s ease !important;
-  height: 40px; /* Match the height of vote buttons */
-  line-height: 20px; /* Adjust the line height to vertically center the text */
-  border-radius: 4px; /* Optional: to match the button style */
-`;
-
-var votingButtonsHeight = '40px'; // This should be the same height as your upvote/downvote buttons
-
-
-var downvoteButtonStyle = `
-  background-color: #9A031E !important;
-  color: white !important;
-  padding: 10px !important;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s ease, transform 0.3s ease !important;
-`;
-
-var popupContent = `
-    <div style="text-align: center; z-index:1000 !important">
-	  <span style="color: grey;">${formattedDate}</span><br>
+                var upvoteButtonStyle = project.upvoted_by_user ? 'background-color: #4caf50;' : '';
+                var downvoteButtonStyle = project.downvoted_by_user ? 'background-color: #9a031e;' : '';
+                var votingDetailsHtml = ``;
+                var votingBarHtml = `
+                    <div class="voting-bar" style="margin-top: 1px;">
+                        <div class="upvotes" style="width: ${upvotePercentage}%;"></div>
+                        <div class="downvotes" style="width: ${downvotePercentage}%;"></div>
+                    </div>
+                `;
+                var upvoteButtonStyle = `
+                    background-color: #4caf50 !important;
+                    color: white !important;
+                    padding: 10px !important;
+                    cursor: pointer;
+                    border: none;
+                    transition: background-color 0.3s ease, transform 0.3s ease !important;
+                `;
+                var detailsButtonStyle = `
+                    display: inline-block;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: white !important;
+                    text-decoration: none;
+                    background-color: #007bff;
+                    padding: 10px;
+                    cursor: pointer;
+                    border: none;
+                    transition: background-color 0.3s ease, transform 0.3s ease !important;
+                    height: 40px;
+                    line-height: 20px;
+                    border-radius: 4px;
+                `;
+                var votingButtonsHeight = '40px';
+                var downvoteButtonStyle = `
+                    background-color: #9A031E !important;
+                    color: white !important;
+                    padding: 10px !important;
+                    cursor: pointer;
+                    border: none;
+                    transition: background-color 0.3s ease, transform 0.3s ease !important;
+                `;
+                var popupContent = `
+                    <div style="text-align: center; z-index:1000 !important">
+                        <span style="color: grey;">${formattedDate}</span><br>
                         <strong style="color: ${categoryColors[project.category] || 'black'};">${project.category}</strong><br>
-        <b>${project.name}</b>
-        <br>
-        <img src="/static/usersubmissions/${project.image_file}" style="width:500px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
-        ${votingDetailsHtml}
-        ${votingBarHtml}
-        <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
-            <button onmouseover="this.style.backgroundColor='#66c46a'" onmouseout="this.style.backgroundColor='#4caf50'" onclick="vote(${project.id}, 'upvote')" id="upvote-button-${project.id}" class="vote-button circle-btn upvote" style="${upvoteButtonStyle}">👍</button>
-            <span id="upvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.upvotes}</span>
-            <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" class="button-hover-effect" style="font-size: 16px; font-weight: bold; color:white !important; text-decoration: none; background-color: #1a1a1a; border-radius: 30px; display: flex; flex-grow: 1; justify-content: center; align-items: center; padding: 10px; margin: 0 10px; transition: transform 0.3s ease, background-color 0.3s ease;">
-                Details
-            </a>
-            <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
-            <button onmouseover="this.style.backgroundColor='#cc5045'" onmouseout="this.style.backgroundColor='#9A031E'" onclick="vote(${project.id}, 'downvote')" id="downvote-button-${project.id}" class="vote-button circle-btn downvote" style="${downvoteButtonStyle}">👎</button>
-        </div>
-
-    </div>
-
-	
-`;
-
-
-}
+                        <b>${project.name}</b>
+                        <br>
+                        <img src="/static/usersubmissions/${project.image_file}" style="width:500px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
+                        ${votingDetailsHtml}
+                        ${votingBarHtml}
+                        <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
+                            <button onmouseover="this.style.backgroundColor='#66c46a'" onmouseout="this.style.backgroundColor='#4caf50'" onclick="vote(${project.id}, 'upvote')" id="upvote-button-${project.id}" class="vote-button circle-btn upvote" style="${upvoteButtonStyle}">👍</button>
+                            <span id="upvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.upvotes}</span>
+                            <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" class="button-hover-effect" style="font-size: 16px; font-weight: bold; color:white !important; text-decoration: none; background-color: #1a1a1a; border-radius: 30px; display: flex; flex-grow: 1; justify-content: center; align-items: center; padding: 10px; margin: 0 10px; transition: transform 0.3s ease, background-color 0.3s ease;">
+                                Details
+                            </a>
+                            <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
+                            <button onmouseover="this.style.backgroundColor='#cc5045'" onmouseout="this.style.backgroundColor='#9A031E'" onclick="vote(${project.id}, 'downvote')" id="downvote-button-${project.id}" class="vote-button circle-btn downvote" style="${downvoteButtonStyle}">👎</button>
+                        </div>
+                    </div>
+                `;
+            }
 
             var marker = L.marker(latLng, {
                 icon: createIcon(24, 2, fillColor, isFeatured),
@@ -885,40 +767,31 @@ var popupContent = `
         }
     });
 }
+
 function updatePopupContent(projectId, data) {
-    // Retrieve the popup for the project
     var popup = markersById[projectId].getPopup();
     var popupContentDiv = document.createElement('div');
     popupContentDiv.innerHTML = popup.getContent();
 
-    // Update original counters
     var originalUpvoteCountElement = popupContentDiv.querySelector(`#upvote-count-${projectId}`);
     var originalDownvoteCountElement = popupContentDiv.querySelector(`#downvote-count-${projectId}`);
     if (originalUpvoteCountElement) originalUpvoteCountElement.innerText = data.upvote_count;
     if (originalDownvoteCountElement) originalDownvoteCountElement.innerText = data.downvote_count;
 
-    // Assuming new counters have specific IDs or classes that distinguish them from the original counters
-    // Update new counters - Ensure these selectors correctly match your new counter elements
     var newUpvoteCountElement = popupContentDiv.querySelector(`#new-upvote-count-${projectId}`);
     var newDownvoteCountElement = popupContentDiv.querySelector(`#new-downvote-count-${projectId}`);
     if (newUpvoteCountElement) newUpvoteCountElement.innerText = data.upvote_count;
     if (newDownvoteCountElement) newDownvoteCountElement.innerText = data.downvote_count;
 
-    // Update the popup content
     popup.setContent(popupContentDiv.innerHTML);
-
-    // Optionally, re-open the popup to refresh the content
     markersById[projectId].bindPopup(popup).openPopup();
 }
-
-
 
 document.addEventListener('DOMContentLoaded', function() {
     fetch('/get_projects_with_vote_status')
         .then(response => response.json())
         .then(projects => {
             projects.forEach(project => {
-                // Correctly select the project's vote buttons using actual IDs in your HTML
                 const upvoteButton = document.querySelector(`#upvote-button-${project.id}`);
                 const downvoteButton = document.querySelector(`#downvote-button-${project.id}`);
 
@@ -930,7 +803,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log(`Downvote loaded: User ID ${project.user_id} has previously downvoted project ID ${project.id}, turning the circle button of downvote to color #9a031e.`);
                 }
 
-                // Logging to console if vote buttons found and user has voted
                 if ((upvoteButton || downvoteButton) && project.user_vote) {
                     console.log(`Vote loaded: User ID ${project.user_id} has previously ${project.user_vote}d project ID ${project.id}, adjusting the circle button color.`);
                 }
@@ -939,12 +811,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => console.error('Error loading project votes:', error));
 });
 
-
 function setInitialVoteBarStyles(projectId) {
     document.querySelectorAll('.voting-bar').forEach(votingBar => {
         const upvoteElement = votingBar.querySelector('.upvotes');
         const downvoteElement = votingBar.querySelector('.downvotes');
-        // Adjust border-radius
         const upvotePercentage = parseFloat(upvoteElement.style.width);
         const downvotePercentage = parseFloat(downvoteElement.style.width);
         if (upvotePercentage > 0 && downvotePercentage > 0) {
@@ -957,7 +827,6 @@ function setInitialVoteBarStyles(projectId) {
             downvoteElement.style.borderRadius = '30px';
             upvoteElement.style.borderRadius = '0';
         }
-        // Attach event listeners for voting
         upvoteElement.onclick = function() {
             vote(projectId, 'upvote');
         };
@@ -966,13 +835,11 @@ function setInitialVoteBarStyles(projectId) {
         };
     });
 }
-// Call the function on page load
 document.addEventListener('DOMContentLoaded', function() {
     setInitialVoteBarStyles();
 });
 
 function vote(projectId, voteType) {
-    // Check if user is logged in
     if (!userLoggedIn) {
         alert("Melden Sie sich an, um über Projekte abzustimmen.");
         return;
@@ -989,36 +856,30 @@ function vote(projectId, voteType) {
         })
     }).then(response => response.json()).then(data => {
         if (data.success) {
-            // Update UI elements
             updateVotingUI(projectId, data);
-        } else {}
+        }
     }).catch(error => {});
 }
 
 function updateVotingUI(projectId, data) {
     var openPopup = null;
     map.eachLayer(function(layer) {
-        // Check if layer has a popup and if it is open
         if (layer.getPopup && layer.getPopup() && layer.getPopup().isOpen()) {
             openPopup = layer.getPopup();
         }
     });
 	
-	
- if (markersById[projectId] && markersById[projectId].getPopup().isOpen()) {
-        // Directly access the popup's content DOM
+    if (markersById[projectId] && markersById[projectId].getPopup().isOpen()) {
         const popup = markersById[projectId].getPopup();
         const popupContent = popup.getContent();
         const parser = new DOMParser();
         const popupDom = parser.parseFromString(popupContent, 'text/html');
 
-        // Update upvote and downvote counts
         const upvoteCountElement = popupDom.getElementById(`upvote-count-${projectId}`);
         const downvoteCountElement = popupDom.getElementById(`downvote-count-${projectId}`);
         if (upvoteCountElement) upvoteCountElement.textContent = data.upvote_count;
         if (downvoteCountElement) downvoteCountElement.textContent = data.downvote_count;
 
-        // Update the voting bars based on percentages
         const upvotesBar = popupDom.querySelector('.upvotes');
         const downvotesBar = popupDom.querySelector('.downvotes');
         if (upvotesBar && downvotesBar) {
@@ -1027,15 +888,12 @@ function updateVotingUI(projectId, data) {
             upvotesBar.style.width = `${upvotePercentage}%`;
             downvotesBar.style.width = `${downvotePercentage}%`;
 
-            // Adjust the border-radius based on the presence of votes
             upvotesBar.style.borderRadius = data.upvote_count > 0 && data.downvote_count > 0 ? '30px 0 0 30px' : '30px';
             downvotesBar.style.borderRadius = data.upvote_count > 0 && data.downvote_count > 0 ? '0 30px 30px 0' : '30px';
         }
 
-        // Serialize the updated DOM and set it as the new popup content
         popup.setContent(new XMLSerializer().serializeToString(popupDom.documentElement));
     }
-    // Reapply the initial vote bar styles to ensure the UI is correctly updated
     setInitialVoteBarStyles(projectId);
 }
 
@@ -1050,48 +908,16 @@ function adjustBorderRadius(upvoteElement, downvoteElement, upvoteCount, downvot
     }
 }
 
-function loadMoreMarkers() {
-    const list = document.getElementById('markers-list');
-    const showMoreBtn = document.getElementById('show-more-markers');
-    // Determine the next set of markers to display
-    const nextMarkers = allMarkers.slice(displayedMarkersCount, displayedMarkersCount + markersPerPage);
-    nextMarkers.forEach(marker => {
-        // Create list item for each marker
-        const listItem = document.createElement('li');
-        const displayText = marker.is_mapobject ? marker.descriptionwhy : marker.name;
-        const link = document.createElement('a');
-        link.href = "#";
-        link.style.color = categoryColors[marker.category] || 'black';
-        link.style.fontWeight = marker.is_mapobject ? 'normal' : 'bold';
-        link.style.textDecoration = 'none';
-        link.innerHTML = displayText;
-        link.onclick = function() {
-            centerMapOnMarker(marker.id);
-            return false;
-        };
-        listItem.appendChild(link);
-        list.appendChild(listItem);
-    });
-    // Update the count of displayed markers
-    displayedMarkersCount += nextMarkers.length;
-    // Check if there are more markers to show
-    if (displayedMarkersCount < allMarkers.length) {
-        showMoreBtn.style.display = 'block'; // Show the "Show More" button
-    } else {
-        showMoreBtn.style.display = 'none'; // Hide the button if no more markers
-    }
-}
 fetch('/get_projects').then(response => {
     if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
     }
     return response.json();
 }).then(data => {
-    const sortedData = sortMarkersByNewest(data); // Sortieren data by newest
-    addMarkers(sortedData); // Add markers to the map in sorted order
+    const sortedData = sortMarkersByNewest(data);
+    addMarkers(sortedData);
     createCategoryButtons();
-    updateCategoryButtonColors(); // Update category button colors
-    // Ensure markers in the overlay are sorted by newest
+    updateCategoryButtonColors();
     addMarkersToOverlay(sortedData);
 }).catch(error => {});
 
@@ -1100,16 +926,11 @@ function sortMarkersByNewest(markers) {
 }
 var markersListOverlay = document.getElementById('markers-list-overlay');
 
-
-
 function containsSwearWords(text, language) {
     var words = swearWords[language] || [];
     var textWords = text.toLowerCase().split(/\s+/);
     return textWords.some(word => words.includes(word));
 }
-
-
-
 
 function centerMapOnMarker(markerId) {
     var marker = markersById[markerId];
@@ -1117,67 +938,54 @@ function centerMapOnMarker(markerId) {
         var markerLatLng = marker.getLatLng();
         var popup = marker.getPopup();
 
-        // Temporarily open the popup offscreen to measure its size if it's not already open
         var wasPopupOpen = map.hasLayer(popup);
         if (!wasPopupOpen) {
-            popup.setLatLng(new L.LatLng(-90, -180)); // Offscreen position
+            popup.setLatLng(new L.LatLng(-90, -180));
             popup.openOn(map);
         }
 
-        // Measure the popup size or use default values
-        var popupWidth = popup.getElement() ? popup.getElement().clientWidth : 300; // Default width
-        var popupHeight = popup.getElement() ? popup.getElement().clientHeight : 200; // Default height
+        var popupWidth = popup.getElement() ? popup.getElement().clientWidth : 300;
+        var popupHeight = popup.getElement() ? popup.getElement().clientHeight : 200;
 
-        // Close the popup if it was not originally open
         if (!wasPopupOpen) {
             map.closePopup(popup);
         }
 
         var xOffset = 0;
         var yOffset = 0;
-        // Adjust offsets for mobile screens
         if (window.innerWidth <= 1080) {
-            xOffset = 0; // Adjust xOffset as needed based on mobile layout
-            yOffset = popupHeight / 4 + 20; // Adjust yOffset as needed to center on mobile, and additional 20 pixels to move it below
+            xOffset = 0;
+            yOffset = popupHeight / 4 + 20;
         } else {
-            yOffset = 20; // For non-mobile, move the marker 20px below the center
+            yOffset = 20;
         }
 
-        // Calculate the new center of the map
         var point = map.project(markerLatLng, map.getZoom()).subtract([xOffset, yOffset]);
         var newCenter = map.unproject(point, map.getZoom());
 
-        // Set the map view to the new position
         map.setView(newCenter, map.getZoom());
 
-        // Open the popup after a short delay to allow the map to finish moving
         setTimeout(function() {
             marker.openPopup();
-        }, 00); // 300 milliseconds delay
+        }, 00);
 
-        // Close the markers list overlay on mobile and tablet, and update button text
         if (window.innerWidth <= 1080) {
             var sidebar = document.getElementById('markers-list-overlay');
             sidebar.style.display = 'none';
             var showMarkersBtn = document.getElementById('show-markers-btn');
             showMarkersBtn.innerText = 'Liste anzeigen';
         }
-    } else {}
+    }
 }
-
-
-
 
 function createCategoryButtons() {
     var container = document.getElementById('category-toggle-buttons');
     for (var category in categoryLayers) {
         var wrapperDiv = document.createElement('div');
         wrapperDiv.style.textAlign = 'center';
-        // Create the category button
         var button = document.createElement('button');
         button.innerText = `${category} (${categoryLayers[category].getLayers().length} Beiträge)`;
         button.setAttribute('category-name', category);
-        // Apply custom styles to the button
         button.style.fontWeight = 'bold';
         button.style.lineHeight = '1';
         button.style.cursor = 'pointer';
@@ -1191,9 +999,9 @@ function createCategoryButtons() {
         button.style.transition = 'background-color 0.2s ease-in-out';
         button.style.borderRadius = '30px';
         button.style.textAlign = 'center';
-        button.style.border = 'none'; // Ensure no border is applied
-        button.style.outline = 'none'; // Remove any focus outline
-        button.style.boxShadow = 'none'; // Remove any shadow that might appear as an outline
+        button.style.border = 'none';
+        button.style.outline = 'none';
+        button.style.boxShadow = 'none';
         button.style.flexGrow = '1';
         button.style.flexShrink = '1';
         button.style.padding = '7px';
@@ -1203,11 +1011,9 @@ function createCategoryButtons() {
         button.style.backgroundColor = getCategoryColor(category);
         applyButtonStyles(button);
         setButtonState(button, category);
-        // Add faded effect if the layer is not initially visible
         if (!map.hasLayer(categoryLayers[category])) {
             button.classList.add('faded');
         }
-        // Set onclick event
         button.onclick = function() {
             toggleCategory(this.innerText);
             setButtonState(this, this.getAttribute('category-name'));
@@ -1227,7 +1033,6 @@ function setButtonState(button, category) {
 
 function applyButtonStyles(button) {
     button.style.fontWeight = 'bold';
-    // ... rest of the styling ...
 }
 
 function toggleCategory(categoryName) {
@@ -1263,7 +1068,7 @@ function updateCategoryButtonColors() {
     const categoryButtons = document.querySelectorAll('#category-toggle-buttons button');
     categoryButtons.forEach(button => {
         const buttonText = button.textContent.trim();
-        const categoryMatch = buttonText.match(/^(.*?)(?=\s*\()/); // Use regex to extract the category name before the "("
+        const categoryMatch = buttonText.match(/^(.*?)(?=\s*\()/);
         const category = categoryMatch ? categoryMatch[0].trim() : "";
         const color = categoryColors[category];
         if (color) {
@@ -1271,13 +1076,11 @@ function updateCategoryButtonColors() {
         }
     });
 }
-// Call the function after the buttons are added to the DOM
 updateCategoryButtonColors();
 let selectedLatLng;
-// Variable to store the selected latitude and longitude
-// Add this function in your JavaScript
+
 function saveMarkerData(latlng, category, description, callback) {
-    var isAuthenticated = false /* logic to determine if the user is authenticated */
+    var isAuthenticated = false
     var dataToSend = {
         lat: latlng.lat,
         lng: latlng.lng,
@@ -1293,14 +1096,14 @@ function saveMarkerData(latlng, category, description, callback) {
         dataType: 'json',
         success: function(response) {
             if (callback) {
-                callback(response); // Execute the callback with the response data
+                callback(response);
             }
             checkMarkerLimit();
         },
         error: function(xhr, textStatus, errorThrown) {
             if (xhr.status === 429) {
                 alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
-            } else {}
+            }
         }
     });
 }
@@ -1321,13 +1124,11 @@ function checkMarkerLimit() {
         limitInfoElement.textContent = "Fehler beim Abrufen der Marker-Limit-Informationen.";
     });
 }
-// Call checkMarkerLimit on page load
 document.addEventListener('DOMContentLoaded', function() {
     checkMarkerLimit();
 });
-// Timer function
 function startTimer(expiryTime) {
-    if (!expiryTime) return; // Add this check
+    if (!expiryTime) return;
     var countDownDate = new Date(expiryTime).getTime();
     var addButton = document.getElementById('add-marker-button');
     var overlayButton = document.getElementById('open-overlay');
@@ -1349,7 +1150,6 @@ function startTimer(expiryTime) {
         }
     }, 1000);
 }
-// Function for updating character count on textarea
 function updateTextareaCharCountFeedback(textareaElement, feedbackElement, minLimit, maxLimit) {
     var charCount = textareaElement.value.length;
     var charRemaining = maxLimit - charCount;
@@ -1363,17 +1163,14 @@ function updateTextareaCharCountFeedback(textareaElement, feedbackElement, minLi
     }
     feedbackElement.style.color = '#003056';
 }
-// Create a feedback element for the marker description textarea
 var markerDescriptionTextarea = document.getElementById('marker-description');
 var markerDescriptionFeedback = document.createElement('div');
 markerDescriptionFeedback.id = 'markerDescriptionFeedback';
 markerDescriptionTextarea.parentNode.insertBefore(markerDescriptionFeedback, markerDescriptionTextarea.nextSibling);
-// Event listener for the marker description textarea
 markerDescriptionTextarea.addEventListener('input', function() {
     updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300);
 });
-updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300); // Initial update
-
+updateTextareaCharCountFeedback(markerDescriptionTextarea, markerDescriptionFeedback, 15, 300);
 
 const closeOverlayBtns = document.querySelectorAll("[onclick^='closeVideoOverlay']");
     closeOverlayBtns.forEach(btn => {
@@ -1384,10 +1181,9 @@ const closeOverlayBtns = document.querySelectorAll("[onclick^='closeVideoOverlay
         });
     });
 
-    // Ensure that the 'close-overlay-button' correctly closes the markers list overlay
-    document.getElementById('close-overlay-button').addEventListener('click', function() {
-        document.getElementById('markers-list-overlay').style.display = 'none';
-    });
+document.getElementById('close-overlay-button').addEventListener('click', function() {
+    document.getElementById('markers-list-overlay').style.display = 'none';
+});
 
 function adjustOverlayDisplayForDevice() {
         const navOverlay = document.getElementById('nav-overlay');
@@ -1399,7 +1195,6 @@ function adjustOverlayDisplayForDevice() {
         }
     }
 
-    // Close overlay function when the close-overlay-button is clicked
     const closeOverlayButton = document.getElementById('close-overlay-button');
     if (closeOverlayButton) {
         closeOverlayButton.addEventListener('click', function() {
@@ -1407,20 +1202,16 @@ function adjustOverlayDisplayForDevice() {
         });
     }
 
-    // Close overlay function for the close-overlay-btn button
     const closeOverlayBtn = document.getElementById('close-overlay-btn');
     if (closeOverlayBtn) {
         closeOverlayBtn.addEventListener('click', function() {
-            // Adjust this to target the correct overlay ID you wish to close
             document.getElementById('nav-overlay').style.display = 'none';
         });
     }
 
-    // Call the function on load and on resize
     adjustOverlayDisplayForDevice();
     window.addEventListener('resize', adjustOverlayDisplayForDevice);
 
-// Toggle the navigation overlay
 function toggleNavOverlay() {
     var navOverlay = document.getElementById('nav-overlay');
     if (navOverlay.style.display === 'block') {
@@ -1429,51 +1220,46 @@ function toggleNavOverlay() {
         navOverlay.style.display = 'block';
     }
 }
-// Close the navigation overlay when clicking on the overlay background or on a non-button element
+
 document.getElementById('nav-overlay').addEventListener('click', function(event) {
-    // Close only if on mobile
     if (window.innerWidth <= 1080 && !event.target.closest('button, a')) {
         toggleNavOverlay();
     }
 });
-// Event listener for hamburger button
+
 document.getElementById('hamburger-button').addEventListener('click', toggleNavOverlay);
-// Resize event listener
+
 window.addEventListener('resize', function() {
     var navOverlay = document.getElementById('nav-overlay');
-    // Show on desktop, hide on mobile
     if (window.innerWidth > 1080) {
         navOverlay.style.display = 'block';
     } else {
         navOverlay.style.display = 'none';
     }
 });
-// Set initial state of the nav-overlay based on device width
+
 window.onload = function() {
     var navOverlay = document.getElementById('nav-overlay');
-    // Show on desktop, hide on mobile
     if (window.innerWidth > 1080) {
         navOverlay.style.display = 'block';
     } else {
         navOverlay.style.display = 'none';
     }
 };
+
 document.addEventListener('DOMContentLoaded', function() {
-    var submitButton = document.getElementById('add-marker-button'); // Assuming this is your submit button's ID
+    var submitButton = document.getElementById('add-marker-button');
     submitButton.addEventListener('click', validateMarkerDescription);
 });
 
 function validateMarkerDescription(event) {
     var description = document.getElementById('marker-description').value;
-
-    // Check for spammy content
     if (isSpam(description)) {
-        event.preventDefault(); // Prevent form submission
+        event.preventDefault();
         return false;
     }
-
-    // Add more validation checks as needed
 }
+
 document.getElementById('info-link').addEventListener('click', function(e) {
     e.preventDefault();
     handleMobileRedirectOrOverlay('youtube-iframe', 'video-overlay', 'aXB8KE_gpm8', 'V7EjnHuLZjI');
@@ -1486,17 +1272,15 @@ document.getElementById('info-link2').addEventListener('click', function(e) {
 function handleMobileRedirectOrOverlay(iframeId, overlayId, desktopVideoId, mobileVideoId) {
     var iframe = document.getElementById(iframeId);
     var videoUrl = 'https://www.youtube.com/watch?v=' + mobileVideoId;
-    var videoId = window.innerWidth > 1080 ? desktopVideoId : mobileVideoId; // Choose video based on screen width
+    var videoId = window.innerWidth > 1080 ? desktopVideoId : mobileVideoId;
     
     if (window.innerWidth <= 1080) {
-        // Mobile interaction
         if (confirm('Sie werden zur YouTube weitergeleitet, um das Video anzusehen. Akzeptieren?')) {
-            window.location.href = videoUrl; // Redirect to YouTube
+            window.location.href = videoUrl;
         } else {
             console.log('User declined to be redirected.');
         }
     } else {
-        // Desktop video
         iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&enablejsapi=1';
         document.getElementById(overlayId).style.display = 'flex';
         console.log('Video overlay opened for desktop.');
@@ -1512,7 +1296,6 @@ function closeVideoOverlay(iframeId, overlayId) {
     console.log('Video overlay closed');
 }
 
-// Initialize YouTube API
 var tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -1572,7 +1355,6 @@ function replayVideo(iframeId, containerId) {
     playerToUse.playVideo();
 }
 
-// Event listeners for closing overlays
 document.getElementById('video-overlay').addEventListener('click', function(event) {
     if (!event.target.closest('#youtube-iframe, #replay-image')) {
         closeVideoOverlay('youtube-iframe', 'video-overlay');
@@ -1582,4 +1364,15 @@ document.getElementById('video-overlay-2').addEventListener('click', function(ev
     if (!event.target.closest('#youtube-iframe-2, #replay-image')) {
         closeVideoOverlay('youtube-iframe-2', 'video-overlay-2');
     }
+});
+
+// Add event listeners to both buttons in karte.html
+document.getElementById('hideNonMapMarkers').addEventListener('click', function() {
+    toggleFullProjectFilter();
+    syncFullProjectFilterButtons();
+});
+
+document.querySelector('.register-button-cl').addEventListener('click', function() {
+    toggleFullProjectFilter();
+    syncFullProjectFilterButtons();
 });

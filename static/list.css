@@ -878,9 +878,24 @@
      }
    }
 
+@media (min-width: 768px) and (max-width: 1444px) {
+    .project-thumbnail {
+        width: calc(50% - 20px);
+        /* Two items per row */
+        height: auto;
+        /* Height adjusts based on content */
+    }
+}
 
 
-  
+@media (max-width: 767px) {
+    .project-thumbnail {
+        width: calc(100% - 20px);
+        /* One item per row */
+        height: auto;
+        /* Height adjusts based on content */
+    }
+}
   
   
    .stats-container {
