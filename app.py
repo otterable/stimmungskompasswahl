@@ -2097,9 +2097,12 @@ def reset_password():
             if user:
                 user.set_password(new_password)
                 db.session.commit()
-                return redirect(url_for("pwresetcon"))
+                logging.debug("Password reset for user with phone number %s", phone_number)
+                return jsonify({"success": True, "message": "Passwort erfolgreich zurückgesetzt", "redirect_url": url_for("pwresetcon")})
+        else:
+            logging.debug("OTP verification failed for password reset")
+            return jsonify({"success": False, "message": "Ungültiges OTP"}), 400
     return render_template("reset_password.html", metaData=metaData)
-
 
 
 @app.route("/Partizipative_Planung_Neuer_Projekt")
@@ -3196,6 +3199,7 @@ def verify_admin_otp():
 
 import os
 import shutil
+
 @app.route("/delete_my_data", methods=["POST"])
 @login_required
 def delete_my_data():
@@ -3224,7 +3228,7 @@ def delete_my_data():
 
             # Delete associated files (if applicable)
             project_files_path = os.path.join("actual/path/to/project_files", str(project.id))
-            if (os.path.exists(project_files_path)):
+            if os.path.exists(project_files_path):
                 shutil.rmtree(project_files_path)
 
             # Delete the project record from the database
@@ -3241,11 +3245,12 @@ def delete_my_data():
         # Log out the user
         logout_user()
 
-        # Return JSON response for successful deletion
-        return jsonify({"success": True, "message": "Your data has been deleted successfully."})
+        # Redirect to deleted page
+        return redirect(url_for('deleted'))
     except Exception as e:
         logging.error(f"Error in delete_my_data: {e}")
         return jsonify({"success": False, "message": "An error occurred while deleting your data."}), 500
+
 
 
 @app.route("/upload_screenshot", methods=["POST"])
@@ -3825,7 +3830,11 @@ def verify_otp():
 
             login_user(new_user)
             logging.debug("New user registered: %s", new_user.phone_number)
-            return jsonify({"success": True, "message": "Konto erfolgreich erstellt"})
+            
+            redirect_url = url_for('registered')
+            logging.debug(f"Redirecting to: {redirect_url}")
+            
+            return jsonify({"success": True, "message": "Konto erfolgreich erstellt", "redirect_url": redirect_url})
 
         elif "reset_otp" in session and session["reset_otp"] == int(user_otp):
             # Handle Password Reset
@@ -3835,20 +3844,18 @@ def verify_otp():
                 new_password = request.form.get("new_password")
                 user.set_password(new_password)
                 db.session.commit()
-                logging.debug(
-                    f"Password reset for user with Ihre Handynummer {phone_number}"
-                )
-                print("Your password has been reset successfully.", "success")
+                logging.debug(f"Password reset for user with Ihre Handynummer {phone_number}")
                 return redirect(url_for("login"))
             else:
-                print("User not found.", "error")
+                logging.debug("User not found for password reset.")
+                return jsonify({"success": False, "message": "User not found."}), 404
 
         else:
             logging.debug("OTP verification failed")
-            print("Invalid OTP", "error")
-    metaData=g.metaData
-    return render_template("verify_otp/index.html", metaData=metaData)
+            return jsonify({"success": False, "message": "Invalid OTP"}), 400
 
+    metaData = g.metaData
+    return render_template("verify_otp/index.html", metaData=metaData)
 
 @app.route("/password_recovery", methods=["GET", "POST"])
 def password_recovery():

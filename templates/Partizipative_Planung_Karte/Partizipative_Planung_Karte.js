@@ -353,7 +353,7 @@ function toggleMarkerSidebar() {
 var allMarkers = [];
 var filteredMarkers = [];
 var displayedMarkersCount = 0;
-const markersPerPage = 5; // Number of markers per page, increased to 20 as per the requirement
+const markersPerPage = 20; // Number of markers per page, increased to 20 as per the requirement
 const categoryColors = {
     'Transport': '#133873',
     'Öffentliche Plätze': '#ff5c00',

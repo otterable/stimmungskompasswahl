@@ -131,11 +131,17 @@ document.getElementById('delete-data-btn').addEventListener('click', function(ev
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(response => response.json()).then(data => {
-            if (data.success) {
-                window.location.href = '/deleted.html';
+        }).then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
             } else {
-                alert(data.message);
+                return response.json().then(data => {
+                    if (data.success) {
+                        window.location.href = '/deleted.html';
+                    } else {
+                        alert(data.message);
+                    }
+                });
             }
         }).catch(error => console.error('Error:', error));
     } else {
