@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.success) {
                 window.location.href = data.next || "{{ url_for('index') }}";
             } else {
-                alert('Login failed - invalid credentials.');
+                alert('Anmeldung fehlgeschlagen - ungültige Anmeldedaten.');
             }
         });
     };
@@ -84,11 +85,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function onSignIn(googleUser) {
     var profile = googleUser.getBasicProfile();
-    alert('Google login successful! Welcome, ' + profile.getName());
+    alert('Google-Anmeldung erfolgreich! Willkommen, ' + profile.getName() + '!');
 }
 
 function onFailure(error) {
-    alert('Google login failed. Please try again.');
+    alert('Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.');
 }
 
 function renderButton() {

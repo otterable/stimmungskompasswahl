@@ -93,6 +93,7 @@ account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
 auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
 twilio_number = os.environ.get("TWILIO_PHONE_NUMBER")
 
+
 # Initialize the Flask app
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(
@@ -103,10 +104,14 @@ oauth = OAuth(app)
 
 # Configure the database
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project_voting.db"
-app.config["UPLOAD_FOLDER"] = "static/usersubmissions"
+# Define the UPLOAD_FOLDER
+app.config[
+    "UPLOAD_FOLDER"
+] = "static/usersubmissions"  # Specify the folder where uploaded files will be saved
 app.config['GEOJSON_FOLDER'] = 'static/usersubmissions/geojson'
 app.config['BAUSTELLE_IMAGE_FOLDER'] = 'static/baustellepics'
-db = SQLAlchemy(app)
+
+db.init_app(app)
 migrate = Migrate(app, db)
 
 # Initialize Flask-Login
@@ -117,7 +122,13 @@ login_manager.login_view = "login"
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Apple credentials
+ip_last_posted = {}
+ip_last_submitted_project = {}
+ip_last_added_marker = {}
+ip_marker_additions = {}  # Initialize the dictionary to track marker additions
+ip_project_submissions = {}
+
+
 APPLE_CLIENT_ID = 'com.ermine.stimmungskompass'
 APPLE_KEY_ID = '57R5KFNS6A'
 APPLE_TEAM_ID = 'C2X4U8D64T'
@@ -130,11 +141,15 @@ H6ZHFRfZ
 
 def generate_client_secret():
     now = datetime.now()
+
+    # Load the private key from its PEM format
     private_key = serialization.load_pem_private_key(
         APPLE_PRIVATE_KEY.encode(),
         password=None,
         backend=default_backend()
     )
+
+    # Prepare payload
     payload = {
         'iss': APPLE_TEAM_ID,
         'iat': now,
@@ -142,21 +157,27 @@ def generate_client_secret():
         'aud': 'https://appleid.apple.com',
         'sub': APPLE_CLIENT_ID,
     }
+
+    # Encode the JWT using the loaded private key
     client_secret = jwt.encode(
         payload,
         private_key,
         algorithm='ES256',
         headers={'kid': APPLE_KEY_ID}
     )
+
     return client_secret
 
+# Generate and print the client secret
 APPLE_CLIENT_SECRET = generate_client_secret()
 print("Your APPLE_CLIENT_SECRET is:", APPLE_CLIENT_SECRET)
 
+
+# Correctly use the dynamically generated client secret in OAuth registration
 oauth.register(
     name='apple',
     client_id=APPLE_CLIENT_ID,
-    client_secret=APPLE_CLIENT_SECRET,
+    client_secret=APPLE_CLIENT_SECRET,  # Use the dynamically generated client secret here
     authorize_url='https://appleid.apple.com/auth/authorize',
     authorize_params=None,
     access_token_url='https://appleid.apple.com/auth/token',
@@ -169,6 +190,7 @@ oauth.register(
     },
 )
 
+
 google = oauth.register(
     "google",
     client_id="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com",
@@ -176,6 +198,7 @@ google = oauth.register(
     server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
     client_kwargs={"scope": "openid email profile"},
 )
+
 
 @app.before_request
 def before_request():
@@ -210,33 +233,35 @@ def get_questions(baustelle_id):
 @app.route('/login/apple')
 def apple_login():
     redirect_uri = url_for('authorize_apple', _external=True)
+    # Debug print statement for checking the redirect URI
     print(f"Redirecting to Apple for authorization, redirect URI: {redirect_uri}")
     return oauth.apple.authorize_redirect(redirect_uri)
 
 
 # Route for Apple authorization callback
-@app.route('/login/apple/authorize', methods=['GET', 'POST'])
+@app.route('/login/apple/authorize')
 def authorize_apple():
     try:
         token = oauth.apple.authorize_access_token()
-        print(f"Received token: {token}")
+        print(f"Received token: {token}")  # Debug print
         if not token:
             print('Failed to authenticate with Apple.')
             print('Authentication with Apple failed.', 'error')
             return redirect(url_for('login'))
         
         id_token = token.get('id_token')
-        print(f"Received ID token: {id_token}")
+        print(f"Received ID token: {id_token}")  # Debug print
         
-        claims = jwt.decode(id_token, options={"verify_signature": False})
-        print(f"Decoded claims: {claims}")
+        claims = jwt.decode(id_token, '', verify=False)  # Adjust as needed for production
+        print(f"Decoded claims: {claims}")  # Debug print
         
         user_email = claims.get('email')
-        user_name = claims.get('name')
-        print(f"User email: {user_email}")
+        print(f"User email: {user_email}")  # Debug print
 
+        # Find or create a user in your database
         user = User.query.filter_by(email=user_email).first()
         if not user:
+            # Create a new user
             print(f"Creating new user with email: {user_email}")
             user = User(email=user_email, name=user_name)
             db.session.add(user)
@@ -250,10 +275,9 @@ def authorize_apple():
         print('Logged in successfully with Apple.', 'success')
         return redirect(url_for('index'))
     except Exception as e:
-        print(f'Error during Apple login process: {e}')
+        print(f'Error during Apple login process: {e}')  # Debug print
         print('An error occurred during Apple login.', 'error')
         return redirect(url_for('login'))
-
 
         
 
@@ -830,8 +854,10 @@ def get_project_category_chart_data():
 
 @app.route("/login/google")
 def google_login():
+    # Generate a nonce and store it in the session
     nonce = "".join(random.choices(string.ascii_uppercase + string.digits, k=16))
     session["google_auth_nonce"] = nonce
+
     redirect_uri = url_for("authorized", _external=True)
     return oauth.google.authorize_redirect(
         redirect_uri, nonce=nonce, prompt="select_account"
@@ -1458,9 +1484,11 @@ def authorized():
     token = oauth.google.authorize_access_token()
     nonce = session.pop("google_auth_nonce", None)
     user_info = oauth.google.parse_id_token(token, nonce=nonce)
+
     existing_user = User.query.filter_by(phone_number=user_info.get("email")).first()
 
     if not existing_user:
+        # Temporarily store user information in the session
         session['temp_user_info'] = {
             "email": user_info.get("email"),
             "name": user_info.get("name", "Unknown"),
@@ -1468,6 +1496,7 @@ def authorized():
             "is_googleaccount": True,
             "is_admin": False,
         }
+        # Redirect to GDPR consent confirmation page
         return redirect(url_for('confirm_registration'))
     else:
         login_user(existing_user)
@@ -1485,12 +1514,12 @@ def confirm_registration():
                 account_creation=temp_user_info.get("account_creation"),
                 is_googleaccount=temp_user_info.get("is_googleaccount"),
                 is_admin=temp_user_info.get("is_admin"),
-                password_hash="google_oauth",
+                password_hash="google_oauth",  # This needs a secure approach for handling passwords
             )
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user)
-            return redirect(url_for("registered"))
+            return redirect(url_for("registered"))  # Redirect to the /registered route
     return render_template('confirm_registration.html')
 
 
