@@ -20,7 +20,7 @@
                 <h3>Melden Sie sich ein, um Beiträge und Kommentare zu posten.</h3>
             </div>
             <a href="{{ url_for('google_login') }}" class="button" style="display:block">Mit Google anmelden</a>
-            <button id="custom-apple-signin-button" class="button" style="margin-top: 15px; color: white; display:block;">Mit Apple anmelden</button>
+            <button id="custom-apple-signin-button" class="button" style="margin-top: 15px; color: white; display:none;">Mit Apple anmelden</button>
             <button id="toggle-form-btn" class="register-button" style="font-weight:bold">Mit Handynummer anmelden</button>
             <div class="login-form" id="login-form" style="display: none;">
                 <form action="{{ url_for('login', next=next) }}" method="post">
