@@ -1,5 +1,21 @@
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.querySelector("form");
+    let resendOtpButton;
+
+    function startResendOtpTimer() {
+        resendOtpButton.disabled = true;
+        let countdown = 30;
+        const countdownInterval = setInterval(() => {
+            resendOtpButton.innerText = `OTP erneut senden (${countdown}s)`;
+            countdown -= 1;
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                resendOtpButton.disabled = false;
+                resendOtpButton.innerText = "OTP erneut senden";
+            }
+        }, 1000);
+    }
+
     form.onsubmit = function(event) {
         event.preventDefault();
         fetch("{{ url_for('register') }}", {
@@ -10,7 +26,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.log("Registration success:", data);
                 // Clear the form and display OTP input field
                 form.innerHTML = '<input type="text" name="otp" placeholder="OTP eingeben" required style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;">' +
-                    '<button type="submit" class="button" style="font-weight: bold; margin-top: 10px;">OTP bestätigen</button>';
+                    '<button type="submit" class="button" style="font-weight: bold; margin-top: 10px;">OTP bestätigen</button>' +
+                    '<button type="button" id="resend-otp" class="button" style="font-weight: bold; margin-top: 10px;">OTP erneut senden</button>';
+                
+                resendOtpButton = document.getElementById('resend-otp');
+                startResendOtpTimer();
+
+                resendOtpButton.addEventListener('click', function() {
+                    fetch("{{ url_for('resend_otp') }}", {
+                        method: 'POST'
+                    }).then(response => response.json()).then(data => {
+                        if (data.success) {
+                            alert("OTP wurde erneut gesendet.");
+                            startResendOtpTimer();
+                        } else {
+                            alert(data.message);
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+                    });
+                });
+
                 // Add event listener for OTP submission
                 form.onsubmit = function(event) {
                     event.preventDefault();
@@ -28,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         }
                     }).catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
+                        alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
                     });
                 };
             } else {
@@ -37,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }).catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while sending the registration data.');
+            alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
         });
     };
 });

@@ -1,4 +1,18 @@
 $(document).ready(function() {
+    function startResendOtpTimer() {
+        $('#resend-otp').prop('disabled', true);
+        let countdown = 30;
+        const countdownInterval = setInterval(() => {
+            $('#resend-otp').text(`OTP erneut senden (${countdown}s)`);
+            countdown -= 1;
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                $('#resend-otp').prop('disabled', false);
+                $('#resend-otp').text("OTP erneut senden");
+            }
+        }, 1000);
+    }
+
     $('#phone-number-form').submit(function(e) {
         e.preventDefault();
         $.ajax({
@@ -11,6 +25,7 @@ $(document).ready(function() {
                 if (response.success) {
                     $('#phone-form').hide();
                     $('#otp-form').show();
+                    startResendOtpTimer();
                 } else {
                     alert(response.message);
                 }
@@ -18,7 +33,7 @@ $(document).ready(function() {
         });
     });
 
-    $('#otp-form').submit(function(e) {
+    $('#otp-reset-form').submit(function(e) {
         e.preventDefault();
         $.ajax({
             type: 'POST',
@@ -34,16 +49,38 @@ $(document).ready(function() {
                 } else {
                     alert(response.message);
                 }
+            },
+            error: function(response) {
+                alert('OTP-Verifizierung für das Zurücksetzen des Passworts fehlgeschlagen');
             }
         });
     });
+
+    $('#resend-otp').click(function() {
+        $.ajax({
+            type: 'POST',
+            url: '{{ url_for("request_otp") }}',
+            data: {
+                phone_number: $('#phone_number').val()  // Ensure phone number is sent
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert("OTP wurde erneut gesendet.");
+                    startResendOtpTimer();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function() {
+                alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+            }
+        });
+    });
+
+    var backgroundNumber = Math.floor(Math.random() * 12) + 1;
+    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
 });
 
 function redirectToIndex() {
     window.location.href = '/';
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
-    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
-});

@@ -1744,9 +1744,7 @@ def calculate_age(dob):
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        logging.debug(
-            "Registration attempt: %s", request.form
-        )  # Debug: print form data
+        logging.debug("Registration attempt: %s", request.form)  # Debug: print form data
         ip_address = request.remote_addr
         WebsiteViews.add_view(ip_address)
         phone_number = request.form.get("phone_number")
@@ -1757,19 +1755,8 @@ def register():
         # Check for existing user with the same Ihre Handynummer
         existing_user = User.query.filter_by(phone_number=phone_number).first()
         if existing_user:
-            print('An account with this Ihre Handynummer already exists.', 'danger')
-            logging.debug(
-                "Account registration failed: Ihre Handynummer already exists"
-            )
-            return (
-                jsonify(
-                    {
-                        "success": False,
-                        "message": "Diese Handynummer ist bereits registriert.",
-                    }
-                ),
-                400,
-            )
+            logging.debug("Account registration failed: Ihre Handynummer already exists")
+            return jsonify({"success": False, "message": "Diese Handynummer ist bereits registriert."}), 400
 
         # Generate OTP and handle verification
         otp = randint(100000, 999999)
@@ -1779,7 +1766,7 @@ def register():
             from_=twilio_number,
             to=phone_number,
         )
-        logging.debug(f"Twilio message S{message.sid}")
+        logging.debug(f"Twilio message SID: {message.sid}")
 
         # Save the user data in session temporarily
         session["user_data"] = {
@@ -1791,9 +1778,11 @@ def register():
         }
 
         logging.debug("OTP sent for verification to Ihre Handynummer: %s", phone_number)
-        return jsonify({"success": True, "message": "OTP sent successfully"})
-    metaData=g.metaData
+        return jsonify({"success": True, "message": "OTP wurde gesendet."})
+    metaData = g.metaData
     return render_template("register/index.html", metaData=metaData)
+
+
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -2076,13 +2065,12 @@ def request_otp():
         if otp:
             session["reset_otp"] = otp
             session["phone_number"] = phone_number
-            logging.debug(
-                f"OTP generated and session updated for Ihre Handynummer {phone_number}"
-            )
-            return jsonify(success=True, message="OTP sent to your phone.")
+            logging.debug(f"OTP generated and session updated for Ihre Handynummer {phone_number}")
+            return jsonify(success=True, message="OTP wurde gesendet.")
         else:
-            return jsonify(success=False, message="Failed to send OTP.")
-    return jsonify(success=False, message="Ihre Handynummer not found.")
+            return jsonify(success=False, message="Fehler beim Senden des OTP.")
+    logging.debug(f"Ihre Handynummer not found: {phone_number}")
+    return jsonify(success=False, message="Ihre Handynummer wurde nicht gefunden.")
 
 
 @app.route("/reset_password", methods=["GET", "POST"])
@@ -2097,7 +2085,7 @@ def reset_password():
             if user:
                 user.set_password(new_password)
                 db.session.commit()
-                logging.debug("Password reset for user with phone number %s", phone_number)
+                logging.debug(f"Password reset for user with Ihre Handynummer {phone_number}")
                 return jsonify({"success": True, "message": "Passwort erfolgreich zurückgesetzt", "redirect_url": url_for("pwresetcon")})
         else:
             logging.debug("OTP verification failed for password reset")
@@ -3838,24 +3826,65 @@ def verify_otp():
 
         elif "reset_otp" in session and session["reset_otp"] == int(user_otp):
             # Handle Password Reset
-            phone_number = session.pop("phone_number")
+            phone_number = session.get("phone_number")
             user = User.query.filter_by(phone_number=phone_number).first()
             if user:
                 new_password = request.form.get("new_password")
                 user.set_password(new_password)
                 db.session.commit()
-                logging.debug(f"Password reset for user with Ihre Handynummer {phone_number}")
-                return redirect(url_for("login"))
+                logging.debug(f"Password reset for user with phone number %s", phone_number)
+                return jsonify({"success": True, "message": "Passwort erfolgreich zurückgesetzt", "redirect_url": url_for("pwresetcon")})
             else:
                 logging.debug("User not found for password reset.")
-                return jsonify({"success": False, "message": "User not found."}), 404
+                return jsonify({"success": False, "message": "Benutzer nicht gefunden."}), 404
 
         else:
             logging.debug("OTP verification failed")
-            return jsonify({"success": False, "message": "Invalid OTP"}), 400
+            return jsonify({"success": False, "message": "Ungültiges OTP"}), 400
 
     metaData = g.metaData
     return render_template("verify_otp/index.html", metaData=metaData)
+
+
+@app.route("/resend_otp", methods=["POST"])
+def resend_otp():
+    if "user_data" in session:
+        user_data = session["user_data"]
+        phone_number = user_data["phone_number"]
+
+        # Generate new OTP and update the session
+        otp = randint(100000, 999999)
+        user_data["otp"] = otp
+        session["user_data"] = user_data
+
+        client = Client(account_sid, auth_token)
+        message = client.messages.create(
+            body=f"Stimmungskompass: Ihr OTP ist: {otp}. Fügen Sie hinzu, um die Registrierung abzuschließen!",
+            from_=twilio_number,
+            to=phone_number,
+        )
+        logging.debug(f"New OTP sent to: {phone_number}, Twilio message SID: {message.sid}")
+        return jsonify({"success": True, "message": "OTP wurde erneut gesendet."})
+    elif "phone_number" in session:
+        phone_number = session["phone_number"]
+
+        # Generate new OTP and update the session
+        otp = randint(100000, 999999)
+        session["reset_otp"] = otp
+
+        client = Client(account_sid, auth_token)
+        message = client.messages.create(
+            body=f"Stimmungskompass: Ihr OTP ist: {otp}. Fügen Sie hinzu, um die Passwort-Zurücksetzung abzuschließen!",
+            from_=twilio_number,
+            to=phone_number,
+        )
+        logging.debug(f"New OTP sent to: {phone_number}, Twilio message SID: {message.sid}")
+        return jsonify({"success": True, "message": "OTP wurde erneut gesendet."})
+    else:
+        logging.debug("No user data in session for OTP resend.")
+        return jsonify({"success": False, "message": "Fehler beim Senden des OTP."}), 400
+
+
 
 @app.route("/password_recovery", methods=["GET", "POST"])
 def password_recovery():
@@ -3871,11 +3900,12 @@ def password_recovery():
                 to=phone_number,
             )
             session["phone_number"] = phone_number
-            session["otp"] = otp
+            session["reset_otp"] = otp
             return redirect(url_for("verify_otp"))
         else:
-            print("Ihre Handynummer not found", "error")
-    metaData=g.metaData
+            logging.debug(f"Ihre Handynummer not found: {phone_number}")
+            return jsonify({"success": False, "message": "Ihre Handynummer wurde nicht gefunden."}), 404
+    metaData = g.metaData
     return render_template("password_recovery/index.html", metaData=metaData)
 
 
