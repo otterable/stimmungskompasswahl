@@ -213,6 +213,8 @@ def apple_login():
     print(f"Redirecting to Apple for authorization, redirect URI: {redirect_uri}")
     return oauth.apple.authorize_redirect(redirect_uri)
 
+
+# Route for Apple authorization callback
 @app.route('/login/apple/authorize', methods=['GET', 'POST'])
 def authorize_apple():
     try:
@@ -252,48 +254,6 @@ def authorize_apple():
         print('An error occurred during Apple login.', 'error')
         return redirect(url_for('login'))
 
-
-
-# Route for Apple authorization callback
-@app.route('/login/apple/authorize')
-def authorize_apple():
-    try:
-        token = oauth.apple.authorize_access_token()
-        print(f"Received token: {token}")  # Debug print
-        if not token:
-            print('Failed to authenticate with Apple.')
-            print('Authentication with Apple failed.', 'error')
-            return redirect(url_for('login'))
-        
-        id_token = token.get('id_token')
-        print(f"Received ID token: {id_token}")  # Debug print
-        
-        claims = jwt.decode(id_token, '', verify=False)  # Adjust as needed for production
-        print(f"Decoded claims: {claims}")  # Debug print
-        
-        user_email = claims.get('email')
-        print(f"User email: {user_email}")  # Debug print
-
-        # Find or create a user in your database
-        user = User.query.filter_by(email=user_email).first()
-        if not user:
-            # Create a new user
-            print(f"Creating new user with email: {user_email}")
-            user = User(email=user_email, name=user_name)
-            db.session.add(user)
-            db.session.commit()
-            print("New user created successfully.")
-        else:
-            print(f"User with email {user_email} found in database.")
-
-        login_user(user, remember=True)
-        print(f"User {user_email} logged in successfully.")
-        print('Logged in successfully with Apple.', 'success')
-        return redirect(url_for('index'))
-    except Exception as e:
-        print(f'Error during Apple login process: {e}')  # Debug print
-        print('An error occurred during Apple login.', 'error')
-        return redirect(url_for('login'))
 
         
 
@@ -876,7 +836,6 @@ def google_login():
     return oauth.google.authorize_redirect(
         redirect_uri, nonce=nonce, prompt="select_account"
     )
-
 
 
 def generate_pie_chart_categories(workbook, categories):
@@ -1533,6 +1492,7 @@ def confirm_registration():
             login_user(new_user)
             return redirect(url_for("registered"))
     return render_template('confirm_registration.html')
+
 
 
 
