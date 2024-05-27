@@ -5,6 +5,51 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
+
+# models.py
+class QuestionSet(db.Model):
+    __tablename__ = 'question_set'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    questions = db.relationship('QuestionSetQuestion', backref='questionset', lazy=True, cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "questions": [question.to_dict() for question in self.questions]
+        }
+
+class QuestionSetQuestion(db.Model):
+    __tablename__ = 'question_set_question'
+    id = db.Column(db.Integer, primary_key=True)
+    questionset_id = db.Column(db.Integer, db.ForeignKey('question_set.id'), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    marker_color = db.Column(db.String(7), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "questionset_id": self.questionset_id,
+            "title": self.title,
+            "description": self.description,
+            "marker_color": self.marker_color
+        }
+
+class QuestionSetAnswer(db.Model):
+    __tablename__ = 'question_set_answer'
+    id = db.Column(db.Integer, primary_key=True)
+    questionset_id = db.Column(db.Integer, db.ForeignKey('question_set.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question_set_question.id'), nullable=False)
+    answer_text = db.Column(db.Text, nullable=False)
+    answer_time = db.Column(db.DateTime, default=datetime.utcnow)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    author_id = db.Column(db.Integer, nullable=True)
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     phone_number = db.Column(db.String(20), unique=True, nullable=False)

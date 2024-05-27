@@ -101,6 +101,11 @@
       <div class="button-container">
          <button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>
       </div>
+	  
+
+
+
+
    </div>
 </div>
 <div>
@@ -143,6 +148,29 @@
       <div id="category-toggle-buttons">
          <!-- Buttons will be added here dynamically -->
       </div>
+	  
+	  	  <!-- Add to karte.html -->
+    <a href="{{ url_for('create_questionset') }}">
+        <button>Create New Question Set</button>
+    </a>
+<button id="guided-mode-button">Guided Mode</button>
+
+<!-- Guided Mode Modal -->
+<div id="guided-mode-modal" style="display: none;">
+    <h2>Select a set of questions</h2>
+    <select id="questionset-select"></select>
+    <button id="start-guided-mode">Start</button>
+    <button id="cancel-guided-mode">Cancel</button>
+</div>
+
+<!-- Question Modal -->
+<div id="question-modal" style="display: none;">
+    <h2 id="question-title"></h2>
+    <p id="question-description"></p>
+    <button id="answer-question">Answer</button>
+    <button id="next-question">Next</button>
+    <button id="cancel-qa-mode">Cancel</button>
+</div>
    </div>
    <?php CATEGORIES PULL END ?>
 </div>

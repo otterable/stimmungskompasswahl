@@ -1,14 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
-    var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
+    var backgroundNumber = Math.floor(Math.random() * 12) + 1;
     document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
-});
 
-document.getElementById('toggle-form-btn').addEventListener('click', function() {
-    var form = document.getElementById('login-form');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-});
+    document.getElementById('toggle-form-btn').addEventListener('click', function() {
+        var form = document.getElementById('login-form');
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    });
 
-document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('custom-apple-signin-button').addEventListener('click', function() {
+        AppleID.auth.signIn();
+    });
+
     const form = document.querySelector("form");
     form.onsubmit = function(event) {
         event.preventDefault();
@@ -19,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.success) {
                 window.location.href = data.next || "{{ url_for('index') }}";
             } else {
-                alert('Login failed - invalid credentials.');
+                alert('Anmeldung fehlgeschlagen - ungültige Anmeldedaten.');
             }
         });
     };
@@ -27,11 +33,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function onSignIn(googleUser) {
     var profile = googleUser.getBasicProfile();
-    alert('Google login successful! Welcome, ' + profile.getName());
+    alert('Google-Anmeldung erfolgreich! Willkommen, ' + profile.getName() + '!');
 }
 
 function onFailure(error) {
-    alert('Google login failed. Please try again.');
+    alert('Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.');
 }
 
 function renderButton() {

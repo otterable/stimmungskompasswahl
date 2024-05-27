@@ -1,0 +1,69 @@
+<!-- create_questionlist.html -->
+
+<h2>Create a question set!</h2>
+<form id="questionset-form">
+    <label for="questionset-title">Title of Questionset:</label>
+    <input type="text" id="questionset-title" name="title" required>
+    <label for="questionset-description">Description of Questionset:</label>
+    <textarea id="questionset-description" name="description" required></textarea>
+
+    <div id="questions-container"></div>
+    <button type="button" id="add-question">Add Question</button>
+    <button type="submit">Publish</button>
+</form>
+
+<script>
+document.getElementById('add-question').addEventListener('click', addQuestion);
+
+function addQuestion() {
+    const container = document.getElementById('questions-container');
+    const questionCount = container.children.length + 1;
+
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question';
+
+    questionDiv.innerHTML = `
+        <h3>Question ${questionCount}</h3>
+        <label for="question-title-${questionCount}">Title:</label>
+        <input type="text" id="question-title-${questionCount}" name="questions[${questionCount - 1}][title]" required>
+        <label for="question-description-${questionCount}">Description:</label>
+        <textarea id="question-description-${questionCount}" name="questions[${questionCount - 1}][description]" required></textarea>
+        <label for="question-marker-color-${questionCount}">Marker color:</label>
+        <input type="color" id="question-marker-color-${questionCount}" name="questions[${questionCount - 1}][marker_color]" required>
+    `;
+
+    container.appendChild(questionDiv);
+}
+
+document.getElementById('questionset-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const data = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        questions: []
+    };
+
+    const questionCount = document.getElementById('questions-container').children.length;
+    for (let i = 0; i < questionCount; i++) {
+        data.questions.push({
+            title: formData.get(`questions[${i}][title]`),
+            description: formData.get(`questions[${i}][description]`),
+            marker_color: formData.get(`questions[${i}][marker_color]`)
+        });
+    }
+
+    fetch('/create_questionset', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+      .then(data => {
+          alert(data.message);
+          window.location.reload();
+      });
+});
+</script>

@@ -34,7 +34,10 @@ from models import (
     Baustelle,
     Question,
     GeoJSONFeature,
-    Post
+    Post,
+    QuestionSet,
+    QuestionSetQuestion,
+    QuestionSetAnswer
 )
 from flask_login import (
     LoginManager,
@@ -1920,7 +1923,21 @@ def add_marker():
         app.logger.error(f"Error saving marker: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/get_all_question_category_colors')
+def get_all_question_category_colors():
+    question_categories = QuestionSetQuestion.query.with_entities(QuestionSetQuestion.title, QuestionSetQuestion.marker_color).all()
+    category_colors = {category.title: category.marker_color for category in question_categories}
+    return jsonify(category_colors)
+    
 
+@app.route('/get_category_color/<string:category>', methods=['GET'])
+def get_category_color(category):
+    question = QuestionSetQuestion.query.filter_by(title=category).first()
+    if question:
+        return jsonify({"color": question.marker_color})
+    else:
+        return jsonify({"color": "#888"})  # Default color
+        
 @app.route("/get_projects")
 def get_projects():
     try:
@@ -2030,6 +2047,11 @@ def generate_otp_and_send(phone_number):
 def favicon():
     app.logger.debug("Favicon loaded successfully")  # Add this debug message
     return url_for("static", filename="favicon.ico")
+
+
+
+# app.py
+
 
 
 @app.route("/Partizipative_Planung_Karte")
@@ -3328,6 +3350,67 @@ def downvote(project_id):
     db.session.commit()
     print('Your downvote has been recorded!', 'success')
     return redirect(url_for("list_view"))
+
+
+
+@app.route('/create_questionset', methods=['GET', 'POST'])
+@login_required
+def create_questionset():
+    if not (current_user.is_admin or current_user.id == 1):
+        abort(403)
+    if request.method == 'POST':
+        data = request.json
+        title = data.get('title')
+        description = data.get('description')
+        questions = data.get('questions')
+
+        questionset = QuestionSet(title=title, description=description)
+        db.session.add(questionset)
+        db.session.commit()
+
+        for question in questions:
+            questionset_question = QuestionSetQuestion(
+                questionset_id=questionset.id,
+                title=question['title'],
+                description=question['description'],
+                marker_color=question['marker_color']
+            )
+            db.session.add(questionset_question)
+        db.session.commit()
+
+        return jsonify({'message': 'Question set created successfully'}), 200
+
+    return render_template('create_questionset.html')
+
+
+@app.route("/answer_questionset/<int:questionset_id>", methods=["POST"])
+@login_required
+def answer_questionset(questionset_id):
+    data = request.json
+    for answer in data.get("answers"):
+        question_answer = QuestionSetAnswer(
+            questionset_id=questionset_id,
+            question_id=answer["question_id"],
+            answer_text=answer["answer_text"],
+            latitude=answer["latitude"],
+            longitude=answer["longitude"],
+            author_id=current_user.id if current_user.is_authenticated else None
+        )
+        db.session.add(question_answer)
+    db.session.commit()
+    return jsonify({"message": "Answers saved successfully"}), 200
+
+@app.route("/get_questionsets", methods=["GET"])
+def get_questionsets():
+    questionsets = QuestionSet.query.all()
+    return jsonify([qs.to_dict() for qs in questionsets])
+
+
+
+@app.route("/get_questionset/<int:questionset_id>", methods=["GET"])
+def get_questionset(questionset_id):
+    questionset = QuestionSet.query.get_or_404(questionset_id)
+    return jsonify(questionset.to_dict())
 
 
 @app.route("/vote/<int:project_id>/<string:vote_type>", methods=["POST"])

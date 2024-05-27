@@ -1,10 +1,23 @@
-// Existing JavaScript code
-
 if (typeof isSpam === 'undefined') {
     window.isSpam = function() {
         return false;
     };
 }
+
+let questionCategoryColors = {};
+
+function fetchQuestionCategoryColors() {
+    fetch('/get_all_question_category_colors')
+        .then(response => response.json())
+        .then(data => {
+            questionCategoryColors = data;
+            updateCategoryButtonColors();
+        })
+        .catch(error => console.error('Error fetching question category colors:', error));
+}
+
+document.addEventListener('DOMContentLoaded', fetchQuestionCategoryColors);
+
 
 var swearWords = {
     "de": [],
@@ -223,6 +236,8 @@ function showCustomConfirm(latlng, tempMarker) {
         marker.addTo(categoryLayers[category]);
         updateCategoryButtonText(category);
     }
+
+
 
     function updateCategoryButtonText(category) {
         var button = document.querySelector(`button[category-name="${category}"]`);
@@ -617,41 +632,27 @@ document.addEventListener('click', function(event) {
     }
 });
 function getCategoryColor(category) {
-    var color;
-    switch (category) {
-        case 'Transport':
-            color = '#133873';
-            break;
-        case 'Öffentliche Plätze':
-            color = '#ff5c00';
-            break;
-        case 'Umwelt':
-            color = '#4CAF50';
-            break;
-        case 'Verwaltung':
-            color = '#653993';
-            break;
-        case 'Kultur':
-            color = '#431307';
-            break;
-        case 'Bildung':
-            color = '#eab003';
-            break;
-        case 'Gesundheit':
-            color = '#9A031E';
-            break;
-        case 'Sport':
-            color = '#3d4f53';
-            break;
-        case 'Andere':
-            color = '#212121';
-            break;
-        default:
-            color = '#888';
-            break;
+    const categoryColors = {
+        'Transport': '#133873',
+        'Öffentliche Plätze': '#ff5c00',
+        'Umwelt': '#4CAF50',
+        'Verwaltung': '#653993',
+        'Kultur': '#431307',
+        'Bildung': '#eab003',
+        'Gesundheit': '#9A031E',
+        'Sport': '#3d4f53',
+        'Andere': '#212121'
+    };
+
+    // Check if the category is a standard one with hardcoded color
+    if (categoryColors.hasOwnProperty(category)) {
+        return categoryColors[category];
     }
-    return color;
+
+    // Use cached color for question/answer categories
+    return questionCategoryColors[category] || '#888'; // Default color if not found
 }
+
 var categoryLayers = {};
 function logSelectedCategory() {
     var selectedCategory = document.getElementById('marker-category').value;
@@ -675,7 +676,7 @@ function addMarkers(projects) {
                 popupContent = `
                     <div style="text-align: center;">
                         <span style="color: grey;">${formattedDate}</span><br>
-                        <strong style="color: ${categoryColors[project.category] || 'black'};">${project.category}</strong><br>
+                        <strong style="color: ${fillColor};">${project.category}</strong><br>
                         ${project.descriptionwhy}
                     </div>`;
             } else {
@@ -688,42 +689,10 @@ function addMarkers(projects) {
                         <div class="downvotes" style="width: ${downvotePercentage}%;"></div>
                     </div>
                 `;
-                var upvoteButtonStyle = `
-                    background-color: #4caf50 !important;
-                    color: white !important;
-                    padding: 10px !important;
-                    cursor: pointer;
-                    border: none;
-                    transition: background-color 0.3s ease, transform 0.3s ease !important;
-                `;
-                var detailsButtonStyle = `
-                    display: inline-block;
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: white !important;
-                    text-decoration: none;
-                    background-color: #007bff;
-                    padding: 10px;
-                    cursor: pointer;
-                    border: none;
-                    transition: background-color 0.3s ease, transform 0.3s ease !important;
-                    height: 40px;
-                    line-height: 20px;
-                    border-radius: 4px;
-                `;
-                var votingButtonsHeight = '40px';
-                var downvoteButtonStyle = `
-                    background-color: #9A031E !important;
-                    color: white !important;
-                    padding: 10px !important;
-                    cursor: pointer;
-                    border: none;
-                    transition: background-color 0.3s ease, transform 0.3s ease !important;
-                `;
                 var popupContent = `
                     <div style="text-align: center; z-index:1000 !important">
                         <span style="color: grey;">${formattedDate}</span><br>
-                        <strong style="color: ${categoryColors[project.category] || 'black'};">${project.category}</strong><br>
+                        <strong style="color: ${fillColor};">${project.category}</strong><br>
                         <b>${project.name}</b>
                         <br>
                         <img src="/static/usersubmissions/${project.image_file}" style="width:500px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
@@ -767,6 +736,7 @@ function addMarkers(projects) {
         }
     });
 }
+
 
 function updatePopupContent(projectId, data) {
     var popup = markersById[projectId].getPopup();
@@ -1054,29 +1024,19 @@ function toggleCategory(categoryName) {
 }
 
 function updateCategoryButtonColors() {
-    const categoryColors = {
-        'Transport': '#133873',
-        'Öffentliche Plätze': '#ff5c00',
-        'Umwelt': '#4CAF50',
-        'Verwaltung': '#653993',
-        'Kultur': '#431307',
-        'Bildung': '#eab003',
-        'Gesundheit': '#9A031E',
-        'Sport': '#3d4f53',
-        'Andere': '#212121'
-    };
     const categoryButtons = document.querySelectorAll('#category-toggle-buttons button');
     categoryButtons.forEach(button => {
         const buttonText = button.textContent.trim();
         const categoryMatch = buttonText.match(/^(.*?)(?=\s*\()/);
         const category = categoryMatch ? categoryMatch[0].trim() : "";
-        const color = categoryColors[category];
+        const color = getCategoryColor(category);
         if (color) {
             button.style.backgroundColor = color;
         }
     });
 }
 updateCategoryButtonColors();
+
 let selectedLatLng;
 
 function saveMarkerData(latlng, category, description, callback) {
@@ -1375,4 +1335,179 @@ document.getElementById('hideNonMapMarkers').addEventListener('click', function(
 document.querySelector('.register-button-cl').addEventListener('click', function() {
     toggleFullProjectFilter();
     syncFullProjectFilterButtons();
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    function openGuidedModeModal() {
+        console.log("Guided Mode button clicked.");
+        fetch('/get_questionsets')
+            .then(response => response.json())
+            .then(questionsets => {
+                const select = document.getElementById('questionset-select');
+                if (!select) {
+                    console.error("Questionset select element not found.");
+                    return;
+                }
+                select.innerHTML = '';
+                questionsets.forEach(qs => {
+                    const option = document.createElement('option');
+                    option.value = qs.id;
+                    option.textContent = qs.title;
+                    select.appendChild(option);
+                });
+                document.getElementById('guided-mode-modal').style.display = 'block';
+            })
+            .catch(error => {
+                console.error("Error fetching question sets:", error);
+            });
+    }
+
+    function startGuidedMode() {
+        const questionsetId = document.getElementById('questionset-select').value;
+        fetch(`/get_questionset/${questionsetId}`)
+            .then(response => response.json())
+            .then(questionset => {
+                currentQuestionset = questionset;
+                currentQuestionIndex = 0;
+                document.getElementById('guided-mode-modal').style.display = 'none';
+                showQuestionModal();
+            })
+            .catch(error => {
+                console.error("Error fetching questionset:", error);
+            });
+    }
+
+    function showQuestionModal() {
+        const question = currentQuestionset.questions[currentQuestionIndex];
+        document.getElementById('question-title').textContent = question.title;
+        document.getElementById('question-description').textContent = question.description;
+        document.getElementById('question-modal').style.display = 'block';
+    }
+
+    document.getElementById('guided-mode-button').addEventListener('click', openGuidedModeModal);
+
+    document.getElementById('start-guided-mode').addEventListener('click', startGuidedMode);
+
+    document.getElementById('cancel-guided-mode').addEventListener('click', () => {
+        document.getElementById('guided-mode-modal').style.display = 'none';
+    });
+
+    document.getElementById('answer-question').addEventListener('click', () => {
+        map.on('click', handleMapClick);
+        document.getElementById('question-modal').style.display = 'none';
+    });
+
+    document.getElementById('next-question').addEventListener('click', () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuestionset.questions.length) {
+            showQuestionModal();
+        } else {
+            submitAnswers();
+        }
+    });
+
+    document.getElementById('cancel-qa-mode').addEventListener('click', () => {
+        document.getElementById('question-modal').style.display = 'none';
+    });
+
+    function submitAnswers() {
+        fetch(`/answer_questionset/${currentQuestionset.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ answers })
+        }).then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('question-modal').style.display = 'none';
+            })
+            .catch(error => {
+                console.error("Error submitting answers:", error);
+            });
+    }
+
+    let currentQuestionset = null;
+    let currentQuestionIndex = 0;
+    let answers = [];
+    let tempMarker = null;
+
+    function handleMapClick(e) {
+        const question = currentQuestionset.questions[currentQuestionIndex];
+        const answerText = prompt('Enter your answer:');
+        if (answerText) {
+            answers.push({
+                question_id: question.id,
+                answer_text: answerText,
+                latitude: e.latlng.lat,
+                longitude: e.latlng.lng
+            });
+
+            // Save the marker data to the server
+            saveMarkerData(e.latlng, question.title, answerText, function(savedMarkerData) {
+                // Add marker to the map
+                addNewMarker(e.latlng, question.title, answerText, savedMarkerData.id, question.marker_color);
+                map.off('click', handleMapClick);
+                document.getElementById('question-modal').style.display = 'block';
+            });
+        }
+    }
+
+function addNewMarker(latLng, title, description, markerId, color) {
+    var fillColor = color || getCategoryColor(title);
+    var popupContent = `<div style="text-align: center;"><strong>${title}</strong><br>${description}</div>`;
+    var marker = L.marker(latLng, {
+        icon: createIcon(24, 2, fillColor, false),
+        category: title,
+        isMapObject: true,
+        isFeatured: false
+    }).addTo(map);
+    marker.bindPopup(popupContent);
+    marker.markerId = markerId;
+    if (!categoryLayers[title]) {
+        categoryLayers[title] = L.layerGroup().addTo(map);
+    }
+    marker.addTo(categoryLayers[title]);
+    updateCategoryButtonText(title);
+}
+
+
+    function saveMarkerData(latlng, category, description, callback) {
+        var dataToSend = {
+            lat: latlng.lat,
+            lng: latlng.lng,
+            category: category,
+            description: description,
+            is_mapobject: true
+        };
+        $.ajax({
+            url: '/add_marker',
+            method: 'POST',
+            data: JSON.stringify(dataToSend),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function(response) {
+                if (callback) {
+                    callback(response);
+                }
+                checkMarkerLimit();
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                if (xhr.status === 429) {
+                    alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
+                }
+            }
+        });
+    }
+
+    function updateCategoryButtonText(category) {
+        var button = document.querySelector(`button[category-name="${category}"]`);
+        if (button && categoryLayers[category]) {
+            button.innerText = `${category} (${categoryLayers[category].getLayers().length} Beiträge)`;
+        }
+    }
+
+    console.log("Event listeners for Guided Mode have been added.");
 });
