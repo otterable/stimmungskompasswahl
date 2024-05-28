@@ -119,10 +119,10 @@ class Project(db.Model):
     author = db.Column(db.String(100), nullable=False)
     is_important = db.Column(db.Boolean, default=False)
     p_reports = db.Column(db.Integer, default=0)
-    is_featured = db.Column(db.Boolean, default=False)  # New field
-    is_mapobject = db.Column(db.Boolean, default=False)
+    is_featured = db.Column(db.Boolean, default=False)
+    is_mapobject = db.Column(db.String(20), default='')  # Change to String
     is_global = db.Column(db.Boolean, default=False)
-    view_count = db.Column(db.Integer, default=0)  # New field for view count
+    view_count = db.Column(db.Integer, default=0)
 
     # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
@@ -142,8 +142,10 @@ class Project(db.Model):
             "is_important": self.is_important,
             "p_reports": self.p_reports,
             "view_count": self.view_count,
-            "is_featured": self.is_featured  # Include new field
+            "is_featured": self.is_featured,
+            "is_mapobject": self.is_mapobject  # Include new field
         }
+
 
 class WebsiteViews(db.Model):
     id = db.Column(db.Integer, primary_key=True)

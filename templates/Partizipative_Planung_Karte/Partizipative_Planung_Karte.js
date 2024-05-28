@@ -441,7 +441,14 @@ function loadMoreMarkers() {
         dateText.style.fontWeight = 'normal';
         dateText.style.display = 'block';
         const prefixAndCategory = document.createElement('span');
-        let prefix = marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ";
+        let prefix;
+        if (marker.is_mapobject === 'question') {
+            prefix = "Frage: ";
+        } else if (marker.is_mapobject === 'true') {
+            prefix = "Notiz: ";
+        } else {
+            prefix = "Projektvorschlag: ";
+        }
         prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
         prefixAndCategory.style.display = 'block';
         const displayText = document.createElement('span');
@@ -465,6 +472,8 @@ function loadMoreMarkers() {
     currentPage++;
     updateShowMoreButton();
 }
+
+
 
 function paginateMarkers(page, markersPerPage) {
     const startIndex = (page - 1) * markersPerPage;
@@ -672,7 +681,14 @@ function addMarkers(projects) {
             var upvotePercentage = totalVotes > 0 ? ((project.upvotes / totalVotes) * 100).toFixed(1) : 0;
             var downvotePercentage = totalVotes > 0 ? ((project.downvotes / totalVotes) * 100).toFixed(1) : 0;
 
-            if (project.is_mapobject) {
+            if (project.is_mapobject === 'question') {
+                popupContent = `
+                    <div style="text-align: center;">
+                        <span style="color: grey;">${formattedDate}</span><br>
+                        <strong style="color: ${fillColor};">${project.category}</strong><br>
+                        ${project.descriptionwhy}
+                    </div>`;
+            } else if (project.is_mapobject === 'true') {
                 popupContent = `
                     <div style="text-align: center;">
                         <span style="color: grey;">${formattedDate}</span><br>
@@ -736,6 +752,8 @@ function addMarkers(projects) {
         }
     });
 }
+
+
 
 
 function updatePopupContent(projectId, data) {
@@ -1473,34 +1491,36 @@ function addNewMarker(latLng, title, description, markerId, color) {
     updateCategoryButtonText(title);
 }
 
-
-    function saveMarkerData(latlng, category, description, callback) {
-        var dataToSend = {
-            lat: latlng.lat,
-            lng: latlng.lng,
-            category: category,
-            description: description,
-            is_mapobject: true
-        };
-        $.ajax({
-            url: '/add_marker',
-            method: 'POST',
-            data: JSON.stringify(dataToSend),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(response) {
-                if (callback) {
-                    callback(response);
-                }
-                checkMarkerLimit();
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                if (xhr.status === 429) {
-                    alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
-                }
+function saveMarkerData(latlng, category, description, callback, isQuestion = false) {
+    var dataToSend = {
+        lat: latlng.lat,
+        lng: latlng.lng,
+        category: category,
+        description: description,
+        is_mapobject: isQuestion ? 'question' : 'true'
+    };
+    $.ajax({
+        url: '/add_marker',
+        method: 'POST',
+        data: JSON.stringify(dataToSend),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function(response) {
+            if (callback) {
+                callback(response);
             }
-        });
-    }
+            checkMarkerLimit();
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            if (xhr.status === 429) {
+                alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
+            }
+        }
+    });
+}
+
+
+
 
     function updateCategoryButtonText(category) {
         var button = document.querySelector(`button[category-name="${category}"]`);
