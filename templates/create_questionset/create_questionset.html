@@ -1,13 +1,71 @@
-{% extends "base.html" %}
-{% block content %}
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- create_questionlist.html -->
 
 
 
 <style>
+
+.input-field {
+	margin-bottom: 30px;
+}
+
+label {
+	display: block;
+	margin-bottom: 10px;
+	font-size: 18px;
+	color: #333;
+}
+
+input[type="text"],
+select,
+#description-editor,
+#benefit-editor {
+	width: 100%;
+	padding: 10px;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	font-size: 16px;
+	color: #333;
+	box-sizing: border-box;
+}
+
+.register-button:hover, .register-button-link:hover {
+    background-color: #004680; /* Changes the background color on hover */
+}
+
+.register-button:active, .register-button-link:active {
+    transform: translateY(1px); /* Moves the button down slightly to simulate a press */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow to simulate depth */
+}
+
+
+.register-button:hover {
+
+	transform: scale(1.005) !important;
+	/* Scale up on hover */
+}
+
+		.button,
+		.register-button {
+			padding: 10px 20px !important;
+		}
+input[type="file"] {
+	border: none;
+}
+
+.button {
+	border-radius: 30px;
+	padding: 15px;
+	background-color: white;
+	font-weight: bold;
+	color: black;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+	/* Smooth transition for background color */
+}
+
+
+
       body {
 		}
 		
@@ -277,16 +335,7 @@ strong {
 
 
 
-      .form-container {
-        margin: 120px auto;
-        width: 60%;
-        background-color: #f5f1e4;
-        padding: 40px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        border-radius: 30px;
-        box-sizing: border-box;
-		align-content: center;
-      }
+
 
 .center-wrapper h1 {
     margin-bottom: 15px; /* Adjust as necessary to create space between the heading and the button */
@@ -816,9 +865,9 @@ position: fixed; /* This makes the bar stay at the top */
           height: auto;
           /* Adjust height automatically */
         }
-
+}
    .form-container {
-    width: 100%;
+    width: 91%;
 	margin-top: 60px !important;
 
 padding: 30px;
@@ -1073,124 +1122,72 @@ border-radius: 0px;
   position: absolute; /* Positioning it inside the overlay */
   top: 20px; /* Distance from the top */
 }
-
-.register-button {
-    display: block; /* Each button takes the full width */
-    width: calc(100% - 20px); /* Adjust width based on padding */
-    padding: 10px 15px;
-    background-color: #003056;
-    color: white;
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    text-decoration: none !important; /* Removes the underline from links */
-    cursor: pointer;
-    margin: 5px 0; /* Adjust top and bottom margins as needed */
-    transition: background-color 0.3s;
-}
-
-.register-button, .register-button-link {
-    display: inline-block !important; /* Ensures the element is only as wide as its content */
-    padding: 10px 15px; /* Padding around the text */
-    background-color: #003056; /* Button background color */
-    color: white; /* Button text color */
-    text-align: center; /* Center-aligns the text inside the button */
-    font-size: 16px; /* Text size inside the button */
-    font-weight: bold; /* Makes the text bold */
-	width: auto !important;
-    border: none; /* Removes the border */
-    border-radius: 10px; /* Rounds the corners of the button */
-    text-decoration: none !important; /* Removes the underline from links */
-    cursor: pointer; /* Changes the cursor to a pointer to indicate it's clickable */
-    margin: 5px; /* Adds margin around the button */
-    transition: background-color 0.3s; /* Animates the background color change on hover */
-    line-height: 1.5; /* Adjusts the line height */
-    font-family: inherit; /* Inherits the font family from the parent */
-    vertical-align: middle; /* Aligns the button vertically */
-    box-sizing: border-box !important; /* Includes padding and border in the element's size */
-}
-
-.register-button:hover, .register-button-link:hover {
-    background-color: #004680; /* Changes the background color on hover */
-}
-
-.register-button:active, .register-button-link:active {
-    transform: translateY(1px); /* Moves the button down slightly to simulate a press */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow to simulate depth */
-}
-
-
 		</style>
-		
-<div class="form-container">
-        <h1>Neuen Beitrag Erstellen</h1>
-        <form action="" method="POST" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                <label class="form-control-label" for="title">Titel:</label> <!-- Changed Title to Titel -->
-                {{ form.title(class="form-control") }}
-                {% if form.title.errors %}
-                    {% for error in form.title.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label class="form-control-label" for="content">Inhalt:</label>
-                <div id="editor" style="height: 300px;"></div> <!-- Quill Editor placeholder -->
-                {{ form.content(class="form-control", style="display: none;") }} <!-- Initially hidden, will be populated by Quill -->
-                {% if form.content.errors %}
-                    {% for error in form.content.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                <label class="form-control-label" for="image">Bild hinzufügen:</label> <!-- Changed Add Image to Bild hinzufügen -->
-                <input id="image-input" type="file" name="image" class="form-control-file">
-                {% if form.image.errors %}
-                    {% for error in form.image.errors %}
-                        <small class="text-danger">{{ error }}</small>
-                    {% endfor %}
-                {% endif %}
-            </div>
-            <button type="submit" class="publish-button">Beitrag Veröffentlichen</button>
-        </form>
+		<div class="form-container">
+<h2>Create a question set!</h2>
+<form id="questionset-form">
+    <label for="questionset-title">Title of Questionset:</label>
+    <input type="text" id="questionset-title" name="title" required>
+    <label for="questionset-description">Description of Questionset:</label>
+    <textarea id="questionset-description" name="description" required></textarea>
+
+    <div id="questions-container"></div>
+    <button type="button" class="register-button" id="add-question">Add Question</button>
+    <button type="submit" class="register-button">Publish</button>
+</form>
 </div>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var toolbarOptions = [
-        ['bold', 'italic', 'underline'],
-        [{ 'header': 1 }, { 'header': 2 }, { 'header': false }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        ['clean']
-    ];
+document.getElementById('add-question').addEventListener('click', addQuestion);
 
-    var quill = new Quill('#editor', {
-        modules: {
-            toolbar: toolbarOptions
+function addQuestion() {
+    const container = document.getElementById('questions-container');
+    const questionCount = container.children.length + 1;
+
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'question';
+
+    questionDiv.innerHTML = `
+        <h3>Question ${questionCount}</h3>
+        <label for="question-title-${questionCount}">Title:</label>
+        <input type="text" id="question-title-${questionCount}" name="questions[${questionCount - 1}][title]" required>
+        <label for="question-description-${questionCount}">Description:</label>
+        <textarea id="question-description-${questionCount}" name="questions[${questionCount - 1}][description]" required></textarea>
+        <label for="question-marker-color-${questionCount}">Marker color:</label>
+        <input type="color" id="question-marker-color-${questionCount}" name="questions[${questionCount - 1}][marker_color]" required>
+    `;
+
+    container.appendChild(questionDiv);
+}
+
+document.getElementById('questionset-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const data = {
+        title: formData.get('title'),
+        description: formData.get('description'),
+        questions: []
+    };
+
+    const questionCount = document.getElementById('questions-container').children.length;
+    for (let i = 0; i < questionCount; i++) {
+        data.questions.push({
+            title: formData.get(`questions[${i}][title]`),
+            description: formData.get(`questions[${i}][description]`),
+            marker_color: formData.get(`questions[${i}][marker_color]`)
+        });
+    }
+
+    fetch('/create_questionset', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
         },
-        theme: 'snow'
-    });
-
-    quill.on('text-change', function() {
-        document.querySelector("textarea[name='content']").value = quill.root.innerHTML;
-    });
+        body: JSON.stringify(data)
+    }).then(response => response.json())
+      .then(data => {
+          alert(data.message);
+          window.location.reload();
+      });
 });
 </script>
-{% endblock %}
-
-{% block header %}
-{% include 'partials/header/index.html' %}
-{% endblock %}
-
-{% block footer %}
-{% include 'partials/footer/index.html' %}
-{% endblock %}
-
-{% block scripts %}
-{% include 'Ueber_Partizipative_Planung/Ueber_Partizipative_Planung.js' %}
-{% endblock %}

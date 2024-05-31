@@ -440,6 +440,12 @@ background: var(--sidebar-bg);
 /* Use variable for background */
 }
 
+
+   #guided-mode-modal {
+        display: none;
+        /* Other styles */
+    }
+	
 @media (max-width: 768px) {
 .overlay {
 		display:none;
@@ -447,7 +453,6 @@ background: var(--sidebar-bg);
 	position: absolute; /* Changed from fixed to absolute */
 top: 40px; /* Estimate based on viewport height and gap */
 word-wrap: break-word; /* Break long words to prevent horizontal overflow */
-bottom: 50px; /* 15px away from the bottom */
 width: auto; /* Allow width to adjust to left and right margins */
 min-width: calc(100% - 30px); /* Ensure it takes at least the width minus margins */
 height: auto; /* Adjust height automatically */

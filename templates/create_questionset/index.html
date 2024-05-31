@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block head_section %}
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+
+<title>Stimmungskompass</title>
+
+{% endblock %}
+
+
+{% block header %}
+{% include 'partials/header/index.html' %}
+{% endblock %}
+
+{% block content %}
+{% include 'create_questionset/create_questionset.html' %}
+{% endblock %}
+
+{% block footer %}
+{% include 'partials/footer/index.html' %}
+{% endblock %}
+
+

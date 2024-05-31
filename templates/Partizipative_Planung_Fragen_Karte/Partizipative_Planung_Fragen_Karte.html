@@ -42,7 +42,7 @@
         <div class="header-navigation">
             <div id="category-filter"></div>
             <div id="sort-filter"></div>
-            <div id="full-project-filter"></div>
+            <div id="full-project-filter" style="display:none"></div>
         </div>
     </div>
 
@@ -135,19 +135,20 @@
       <img class="hide-on-mobile resistant-image" id="overlay-image" src="static/overlay.jpg" style="max-width: 97%; height: auto; display: block; margin-left:auto; margin-right:auto; margin-top: 3px; margin-bottom: 20px; border-radius: 30px; max-height: 368px;" /> 
       <?php CITY LOGO END ?> 
       <div class="button-container">
-         <button id="open-overlay" class="register-button-m" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
+         <button id="open-overlay" class="register-button-m" onclick="openMarkerOverlay(event)"  style="display:none">Hinzufügen</button>
+		 	        <button id="guided-mode-button" class="register-button-m" style="margin-bottom: 10px;">Guided Mode</button>
+
       </div>
       <div class="button-container">
          <button id="show-markers-btn" class="register-button-m">Liste anzeigen</button>
       </div>
-      <div class="button-container">
-         <button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Nur Projektvorschläge anzeigen</button>
+      <div class="button-container" style="display:none'">
+         <button id="hideNonMapMarkers" class="register-button-m"  style="display:none">Nur Projektvorschläge anzeigen</button>
       </div>
-      <div class="button-container">
-         <button id="toggle-answer-markers-btn" class="register-button-m" style="margin-bottom: 10px;">Antwortmarkierungen ein-/ausblenden</button>
+      <div class="button-container" style="display:none'">
+         <button id="toggle-answer-markers-btn" class="register-button-m"  style="display:none">Antwortmarkierungen ein-/ausblenden</button>
       </div>
       <h3 style="display: block; text-align: center; margin-top: 5px;"> Klicken Sie zum ein- und ausblenden. </h3>
-	        <button id="guided-mode-button" class="register-button-m">Guided Mode</button>
 			      <!-- Guided Mode Modal -->
 
 
@@ -155,10 +156,7 @@
          <!-- Buttons will be added here dynamically -->
       </div>
       <!-- Add to karte.html -->
-      <a href="{{ url_for('create_questionset') }}">
-        <button class="register-button-m">Create New Question Set</button>
-      </a>
-
+     
 
    </div>
    <?php CATEGORIES PULL END ?>
@@ -187,8 +185,6 @@
         </div>
     </div>
 </div>
-
-
 
 
 

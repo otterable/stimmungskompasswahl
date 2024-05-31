@@ -384,7 +384,7 @@ var showFullProjectsOnly = false;
 var currentPage = 1;
 
 function addMarkersToOverlay(markers) {
-    allMarkers = markers;
+    allMarkers = markers.filter(marker => marker.is_answer); // Filter only answer markers
     displayedMarkersCount = 0;
     filterMarkers();
     createCategoryFilter();
@@ -432,7 +432,7 @@ function updateShowMoreButton() {
 function loadMoreMarkers() {
     const paginatedMarkers = paginateMarkers(currentPage, markersPerPage);
     const list = document.getElementById('markers-list');
-    
+
     paginatedMarkers.forEach(marker => {
         const listItem = document.createElement('li');
         const dateText = document.createElement('span');
@@ -441,11 +441,11 @@ function loadMoreMarkers() {
         dateText.style.fontWeight = 'normal';
         dateText.style.display = 'block';
         const prefixAndCategory = document.createElement('span');
-        let prefix = marker.is_answer ? "Answer: " : (marker.is_mapobject ? "Notiz: " : "Projektvorschlag: ");
+        let prefix = "Answer: ";
         prefixAndCategory.innerHTML = `<strong style="color: black;">${prefix}</strong><strong style="color: ${categoryColors[marker.category] || 'black'};">${marker.category}</strong>`;
         prefixAndCategory.style.display = 'block';
         const displayText = document.createElement('span');
-        displayText.textContent = marker.is_answer ? marker.descriptionwhy : (marker.is_mapobject ? marker.descriptionwhy : marker.name);
+        displayText.textContent = marker.descriptionwhy;
         displayText.style.color = 'black';
         const link = document.createElement('a');
         link.href = "#";
@@ -467,7 +467,6 @@ function loadMoreMarkers() {
 }
 
 
-
 function paginateMarkers(page, markersPerPage) {
     const startIndex = (page - 1) * markersPerPage;
     const endIndex = startIndex + markersPerPage;
@@ -481,6 +480,7 @@ function renderPage(page) {
     displayedMarkersCount = 0;
     loadMoreMarkers();
 }
+
 
 function sortMarkers(sortType) {
     if (sortType === "Neueste") {
@@ -669,9 +669,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Other initialization code...
 
     // Add event listener for the toggle button
-    document.getElementById('toggle-answer-markers-btn').addEventListener('click', function() {
-        toggleAnswerMarkers();
-    });
 
     // Initial log of markers when page loads
     logMarkerCounts();
@@ -701,12 +698,7 @@ function showAllMarkers() {
     });
 }
 
-function updateAnswerToggleButtonText() {
-    const toggleButton = document.getElementById('toggle-answer-markers-btn');
-    if (toggleButton) {
-        toggleButton.textContent = showAnswersOnly ? 'Alle Markierungen anzeigen' : 'Antwortmarkierungen ein-/ausblenden';
-    }
-}
+
 
 // Function to log marker counts
 function logMarkerCounts() {
@@ -731,7 +723,7 @@ function logMarkerCounts() {
 // Make sure to add `isAnswer` property to your markers in addMarkers function
 function addMarkers(projects) {
     projects.forEach(project => {
-        if (project.geoloc) {
+        if (project.is_answer && project.geoloc) {
             var coords = project.geoloc.split(',');
             var latLng = L.latLng(parseFloat(coords[0]), parseFloat(coords[1]));
             var fillColor = getCategoryColor(project.category);
@@ -807,13 +799,8 @@ function addMarkers(projects) {
                 }
             });
             markersById[project.id] = marker;
-            if (project.is_answer) {
-                answerMarkers.push(marker);
-                console.debug(`Marker created via Guide mode, answering "${project.descriptionwhy}" to question title "${project.category}". Marker is an answer marker, is_answer=true has been assigned. is_mapobject=false.`);
-            } else {
-                nonAnswerMarkers.push(marker);
-                console.debug(`Marker created via regular mode, category "${project.category}", with description "${project.descriptionwhy}". Marker is not an answer marker, setting is_answer=false, and is_mapobject=true.`);
-            }
+            answerMarkers.push(marker);
+            console.debug(`Marker created via Guide mode, answering "${project.descriptionwhy}" to question title "${project.category}". Marker is an answer marker, is_answer=true has been assigned. is_mapobject=false.`);
             if (!categoryLayers[project.category]) {
                 categoryLayers[project.category] = L.layerGroup().addTo(map);
             }
@@ -824,7 +811,6 @@ function addMarkers(projects) {
     // Log marker counts after markers are added
     logMarkerCounts();
 }
-
 document.getElementById('guided-mode-button').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'flex';
 });
@@ -1454,10 +1440,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let answers = [];
     let tempMarker = null;
 
-    function openGuidedModeModal() {
-        console.log("Guided Mode button clicked.");
+    fetchQuestionSetsAndPrepare(); // Changed function name to indicate new behavior
+
+    function fetchQuestionSetsAndPrepare() {
         fetch('/get_questionsets')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(questionsets => {
                 const select = document.getElementById('questionset-select');
                 if (!select) {
@@ -1471,46 +1463,72 @@ document.addEventListener('DOMContentLoaded', function() {
                     option.textContent = qs.title;
                     select.appendChild(option);
                 });
-                document.getElementById('guided-mode-modal').style.display = 'flex';
+
+                // Log how many question sets were loaded without changing the UI
+                console.log(`GUIDED MODE: ${questionsets.length} Question sets loaded.`);
             })
             .catch(error => {
                 console.error("Error fetching question sets:", error);
             });
     }
 
-    function startGuidedMode() {
-        const questionsetId = document.getElementById('questionset-select').value;
-        fetch(`/get_questionset/${questionsetId}`)
-            .then(response => response.json())
-            .then(questionset => {
-                currentQuestionset = questionset;
-                currentQuestionIndex = 0;
-                answers = [];
-                document.getElementById('guided-mode-modal').style.display = 'none';
-                showQuestionModal();
-            })
-            .catch(error => {
-                console.error("Error fetching questionset:", error);
-            });
-    }
+    document.getElementById('guided-mode-button').addEventListener('click', openGuidedModeModal);
 
-    function showQuestionModal() {
-        if (currentQuestionIndex < currentQuestionset.questions.length) {
-            const question = currentQuestionset.questions[currentQuestionIndex];
-            document.getElementById('question-title').textContent = question.title;
-            document.getElementById('question-description').textContent = question.description;
-            document.getElementById('next-question').textContent = 'Next';
-            document.getElementById('question-modal').style.display = 'flex';
-            updateSummaryContent();
-        } else {
-            console.log("All questions have been answered.");
-            document.getElementById('question-title').textContent = "All questions have been answered.";
-            document.getElementById('question-description').textContent = "Press Finish to submit all answers.";
-            document.getElementById('next-question').textContent = 'Finish';
-            document.getElementById('question-modal').style.display = 'flex';
-            updateSummaryContent();
-        }
+document.getElementById('guided-mode-button').addEventListener('click', function() {
+    const select = document.getElementById('questionset-select');
+    if (select.options.length === 1) {
+        // If only one question set is available, start guided mode immediately without showing the modal
+        startGuidedMode(select.options[0].value);
+    } else {
+        // More than one question set, show modal to allow user to select
+        document.getElementById('guided-mode-modal').style.display = 'flex';
     }
+});
+
+    function openGuidedModeModal() {
+    const select = document.getElementById('questionset-select');
+    if (select.children.length === 1) {
+        // Automatically start guided mode with the single question set
+        startGuidedMode(select.children[0].value);
+    } else {
+        // More than one question set, show modal to allow selection
+        document.getElementById('guided-mode-modal').style.display = 'flex';
+    }
+}
+
+function startGuidedMode(questionsetId) {
+    fetch(`/get_questionset/${questionsetId}`)
+        .then(response => response.json())
+        .then(questionset => {
+            currentQuestionset = questionset;
+            currentQuestionIndex = 0;
+            answers = [];
+            showQuestionModal();
+        })
+        .catch(error => {
+            console.error("Error fetching questionset:", error);
+        });
+}
+	
+	    document.getElementById('guided-mode-button').addEventListener('click', openGuidedModeModal);
+
+
+
+function showQuestionModal() {
+    if (currentQuestionIndex < currentQuestionset.questions.length) {
+        const question = currentQuestionset.questions[currentQuestionIndex];
+        document.getElementById('question-title').textContent = question.title;
+        document.getElementById('question-description').textContent = question.description;
+        document.getElementById('next-question').textContent = 'Next';
+        document.getElementById('question-modal').style.display = 'flex';
+    } else {
+        console.log("All questions have been answered.");
+        document.getElementById('question-title').textContent = "All questions have been answered.";
+        document.getElementById('question-description').textContent = "Press Finish to submit all answers.";
+        document.getElementById('next-question').textContent = 'Finish';
+        document.getElementById('question-modal').style.display = 'flex';
+    }
+}
 
     function updateSummaryContent() {
         const summaryContent = document.getElementById('summary-content');
@@ -1656,5 +1674,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function addMarkersToOverlay(markers) {
+        allMarkers = markers.filter(marker => marker.is_answer); // Filter only answer markers
+        displayedMarkersCount = 0;
+        filterMarkers();
+        createCategoryFilter();
+        createSortFilter();
+        createFullProjectFilter();
+    }
+
     console.log("Event listeners for Guided Mode have been added.");
-});
+});;

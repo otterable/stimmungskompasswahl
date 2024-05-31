@@ -1454,18 +1454,43 @@ def export_projects():
         print("Error:", str(e))  # More detailed error logging
         return jsonify({"error": str(e)}), 500
 
-@app.route("/get_categories")
+@app.route('/get_categories', methods=['GET'])
 def get_categories():
     try:
         categories = [
             project.category
             for project in Project.query.distinct(Project.category).all()
         ]
+        unique_categories = list(set(categories))
         app.logger.debug("Fetched categories for dropdown")
-        return jsonify(success=True, categories=categories)
+        return jsonify(success=True, categories=unique_categories)
     except Exception as e:
         app.logger.error(f"Error in get_categories: {e}")
         return jsonify(success=False, error=str(e)), 500
+
+@app.route('/get_projects_by_category/<string:category>', methods=['GET'])
+def get_projects_by_category(category):
+    try:
+        projects = Project.query.filter_by(category=category).all()
+        app.logger.debug(f"Fetched projects for category {category}")
+        return jsonify(success=True, projects=[project.to_dict() for project in projects])
+    except Exception as e:
+        app.logger.error(f"Error in get_projects_by_category: {e}")
+        return jsonify(success=False, error=str(e)), 500
+
+@app.route('/delete_projects_by_category/<string:category>', methods=['POST'])
+@login_required
+def delete_projects_by_category(category):
+    try:
+        projects = Project.query.filter_by(category=category).all()
+        for project in projects:
+            db.session.delete(project)
+        db.session.commit()
+        app.logger.debug(f"All projects in category {category} deleted successfully by user {current_user.id}.")
+        return jsonify(success=True, message=f"All projects in category {category} deleted successfully.")
+    except Exception as e:
+        app.logger.error(f"Error deleting projects in category {category}: {e}")
+        return jsonify(success=False, message=str(e)), 500
 
 
 @app.route("/get_unique_categories")
@@ -1877,14 +1902,14 @@ def add_marker():
     # Filter additions within the last 24 hours
     additions = [time for time in additions if now - time < timedelta(days=1)]
 
-    if len(additions) >= 300:  # Assuming a limit of 2 markers per day
+    if len(additions) >= 300:  # Assuming a limit of 300 markers per day
         app.logger.warning(
             f"IP {ip_address} blocked from adding new markers due to rate limit"
         )
         return (
             jsonify(
                 {
-                    "error": "Rate limit exceeded. You can only add 2 markers every 24 hours"
+                    "error": "Rate limit exceeded. You can only add 300 markers every 24 hours"
                 }
             ),
             429,
@@ -1895,15 +1920,19 @@ def add_marker():
         public_benefit = data.get("public_benefit", "-")
         image_file = data.get("image_file", "keinbild.jpg")
 
+        is_answer = data.get("is_answer", False)
+        is_mapobject = data.get("is_mapobject", False)
+
         new_project = Project(
-            name="Notiz",
+            name="Notiz" if is_mapobject else data.get("name", "Projektvorschlag"),
             category=data["category"],
             descriptionwhy=data["description"],
             public_benefit=public_benefit,
             image_file=image_file,
             geoloc=f"{data['lat']}, {data['lng']}",
             author=author_id,
-            is_mapobject=True,
+            is_mapobject=is_mapobject,
+            is_answer=is_answer
         )
 
         db.session.add(new_project)
@@ -1922,6 +1951,7 @@ def add_marker():
     except Exception as e:
         app.logger.error(f"Error saving marker: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/get_all_question_category_colors')
 def get_all_question_category_colors():
@@ -1945,9 +1975,8 @@ def get_projects():
         projects_data = []
         for project in projects:
             project_data = project.to_dict()
-            project_data[
-                "is_mapobject"
-            ] = project.is_mapobject  # Include the is_mapobject attribute
+            project_data["is_mapobject"] = project.is_mapobject  # Include the is_mapobject attribute
+            project_data["is_answer"] = project.is_answer  # Include the is_answer attribute
             upvotes = sum(1 for vote in project.votes if vote.upvote)
             downvotes = sum(1 for vote in project.votes if vote.downvote)
             upvote_percentage = (
@@ -2076,6 +2105,31 @@ def Partizipative_Planung_Karte():
         project_data['downvoted_by_user'] = project.downvoted_by_user
     metaData = g.metaData
     return render_template("Partizipative_Planung_Karte/index.html", projects=projects_data, metaData=metaData)
+
+
+
+
+@app.route("/Partizipative_Planung_Fragen_Karte")
+def Partizipative_Planung_Fragen_Karte():
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    projects = Project.query.filter_by(is_answer=True).all()  # Fetch only projects with is_answer=True
+    for project in projects:
+        project.upvoted_by_user = False
+        project.downvoted_by_user = False
+        if current_user.is_authenticated:
+            user_vote = Vote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
+            if user_vote:
+                if user_vote.upvote:
+                    project.upvoted_by_user = True
+                elif user_vote.downvote:
+                    project.downvoted_by_user = True
+    projects_data = [project.to_dict() for project in projects]
+    for project_data, project in zip(projects_data, projects):
+        project_data['upvoted_by_user'] = project.upvoted_by_user
+        project_data['downvoted_by_user'] = project.downvoted_by_user
+    metaData = g.metaData
+    return render_template("Partizipative_Planung_Fragen_Karte/index.html", projects=projects_data, metaData=metaData)
 
 
 @app.route("/request_otp", methods=["POST"])
@@ -3352,10 +3406,9 @@ def downvote(project_id):
     return redirect(url_for("list_view"))
 
 
-
 @app.route('/create_questionset', methods=['GET', 'POST'])
-@login_required
 def create_questionset():
+    metaData = g.metaData
     if not (current_user.is_admin or current_user.id == 1):
         abort(403)
     if request.method == 'POST':
@@ -3380,31 +3433,43 @@ def create_questionset():
 
         return jsonify({'message': 'Question set created successfully'}), 200
 
-    return render_template('create_questionset.html')
+    return render_template("create_questionset/index.html", metaData=metaData)
 
 
 @app.route("/answer_questionset/<int:questionset_id>", methods=["POST"])
-@login_required
 def answer_questionset(questionset_id):
     data = request.json
-    for answer in data.get("answers"):
-        question_answer = QuestionSetAnswer(
-            questionset_id=questionset_id,
-            question_id=answer["question_id"],
-            answer_text=answer["answer_text"],
-            latitude=answer["latitude"],
-            longitude=answer["longitude"],
-            author_id=current_user.id if current_user.is_authenticated else None
-        )
-        db.session.add(question_answer)
-    db.session.commit()
-    return jsonify({"message": "Answers saved successfully"}), 200
+    try:
+        for answer in data.get("answers"):
+            question_answer = QuestionSetAnswer(
+                questionset_id=questionset_id,
+                question_id=answer["question_id"],
+                answer_text=answer["answer_text"],
+                latitude=answer["latitude"],
+                longitude=answer["longitude"],
+                author_id=current_user.id if current_user.is_authenticated else None,
+                is_answer=True  # Add this line
+            )
+            db.session.add(question_answer)
+        db.session.commit()
+        return jsonify({"message": "Answers saved successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/get_question_sets', methods=['GET'])
+def get_question_sets():
+    question_sets = QuestionSet.query.all()
+    return jsonify({
+        'question_sets': [qs.to_dict() for qs in question_sets]
+    })
+
 
 @app.route("/get_questionsets", methods=["GET"])
 def get_questionsets():
     questionsets = QuestionSet.query.all()
     return jsonify([qs.to_dict() for qs in questionsets])
-
 
 
 @app.route("/get_questionset/<int:questionset_id>", methods=["GET"])
@@ -3413,6 +3478,24 @@ def get_questionset(questionset_id):
     return jsonify(questionset.to_dict())
 
 
+@app.route('/delete_question_set/<int:id>', methods=['DELETE'])
+def delete_question_set(id):
+    question_set = QuestionSet.query.get(id)
+    if not question_set:
+        return jsonify({'message': 'Question set not found.'}), 404
+    
+    data = request.get_json()
+    delete_markers = data.get('delete_markers', False)
+    
+    if delete_markers:
+        # Delete all answers associated with the question set
+        QuestionSetAnswer.query.filter_by(questionset_id=id).delete()
+    
+    db.session.delete(question_set)
+    db.session.commit()
+    
+    return jsonify({'message': 'Question set deleted successfully.'}), 200
+        
 @app.route("/vote/<int:project_id>/<string:vote_type>", methods=["POST"])
 @login_required
 def vote(project_id, vote_type):

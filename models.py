@@ -49,6 +49,21 @@ class QuestionSetAnswer(db.Model):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     author_id = db.Column(db.Integer, nullable=True)
+    is_answer = db.Column(db.Boolean, default=True)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "questionset_id": self.questionset_id,
+            "question_id": self.question_id,
+            "answer_text": self.answer_text,
+            "answer_time": self.answer_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "author_id": self.author_id,
+            "is_answer": self.is_answer
+        }
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -119,10 +134,11 @@ class Project(db.Model):
     author = db.Column(db.String(100), nullable=False)
     is_important = db.Column(db.Boolean, default=False)
     p_reports = db.Column(db.Integer, default=0)
-    is_featured = db.Column(db.Boolean, default=False)
-    is_mapobject = db.Column(db.String(20), default='')  # Change to String
+    is_featured = db.Column(db.Boolean, default=False)  # New field
+    is_mapobject = db.Column(db.Boolean, default=False)
     is_global = db.Column(db.Boolean, default=False)
-    view_count = db.Column(db.Integer, default=0)
+    view_count = db.Column(db.Integer, default=0)  # New field for view count
+    is_answer = db.Column(db.Boolean, default=False)  # Ensure this property is set correctly
 
     # Relationships
     votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
@@ -143,9 +159,9 @@ class Project(db.Model):
             "p_reports": self.p_reports,
             "view_count": self.view_count,
             "is_featured": self.is_featured,
-            "is_mapobject": self.is_mapobject  # Include new field
+            "is_mapobject": self.is_mapobject,
+            "is_answer": self.is_answer  # Ensure this property is included in the dict
         }
-
 
 class WebsiteViews(db.Model):
     id = db.Column(db.Integer, primary_key=True)

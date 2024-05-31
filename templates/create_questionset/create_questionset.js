@@ -1,18 +1,28 @@
-<!-- create_questionlist.html -->
 
-<h2>Create a question set!</h2>
-<form id="questionset-form">
-    <label for="questionset-title">Title of Questionset:</label>
-    <input type="text" id="questionset-title" name="title" required>
-    <label for="questionset-description">Description of Questionset:</label>
-    <textarea id="questionset-description" name="description" required></textarea>
+  // JavaScript function to handle redirection to Stimmungskarte
+  function redirectToStimmungskarte() {
+    window.location.href = '/Partizipative_Planung_Karte';
+  }
+  // JavaScript function to handle redirection to Suggest an Idea
+  function redirectToList() {
+    window.location.href = '/list';
+  }
+  // JavaScript function to handle redirection to List of Current Suggestions
+  function redirectToneuerbeitrag() {
+    window.location.href = '/Partizipative_Planung_Neuer_Projekt';
+  }
 
-    <div id="questions-container"></div>
-    <button type="button" id="add-question">Add Question</button>
-    <button type="submit">Publish</button>
-</form>
+  function toggleMenu() {
+    var x = document.getElementById("nav-links");
+    if (x.style.display === "block") {
+      x.style.display = "none";
+    } else {
+      x.style.display = "block";
+    }
+  }
+  
+    
 
-<script>
 document.getElementById('add-question').addEventListener('click', addQuestion);
 
 function addQuestion() {
@@ -66,4 +76,3 @@ document.getElementById('questionset-form').addEventListener('submit', function(
           window.location.reload();
       });
 });
-</script>

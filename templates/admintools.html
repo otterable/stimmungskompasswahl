@@ -43,6 +43,9 @@
       <button id="toggleFeaturedProjects" class="c-button" data-section-id="featuredProjectsSection" style="display:none;">Open Ausgewählte Projektvorschläge</button>
 	        <button id="toggleQuestions" class="c-button" data-section-id="questionsSection">Fragen</button>
 				        <button id="toggleBaustellen" class="c-button" data-section-id="baustellenSection">Baustellen</button>
+						<button id="toggleQuestionSets" class="c-button" data-section-id="questionSetsSection">Fragensets</button>
+<button id="toggleCategories" class="c-button" data-section-id="categoriesSection">Kategorien</button>
+
       <button id="toggleUsers" class="c-button" data-section-id="usersSection">Benutzer</button>
 	  
     </div>
@@ -509,7 +512,72 @@
       {% include 'partials/question_list_section.html' %}
 	
     </div>
-		   	  
+		
+
+
+
+
+<!-- Add the section for managing question sets -->
+<div id="questionSetsSection" style="display: none;">
+    <div class="projects-header">
+        <h3 style="font-weight:bold;">Fragensets verwalten</h3>
+    </div>
+    <div class="stats-container">
+        <div class="project-thumbnail">
+            <h2>Fragensets</h2>
+            <ul id="questionSetList">
+                <!-- Dynamically populated with question sets -->
+            </ul>
+            <button id="refreshQuestionSets" class="register-button">Aktualisieren</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Add the section for managing categories and projects -->
+<div id="categoriesSection" style="display: none;">
+    <div class="projects-header">
+        <h3 style="font-weight:bold;">Kategorien verwalten</h3>
+    </div>
+    <div class="stats-container">
+        <div class="project-thumbnail">
+            <h2>Kategorien</h2>
+            <p id="categoryCount">Anzahl von Kategorien: 0</p>
+            <ul id="categoryList">
+                <!-- Dynamically populated with categories -->
+            </ul>
+            <button id="refreshCategories" class="register-button">Aktualisieren</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add the section for listing projects of a specific category -->
+<div id="projectsByCategorySection" style="display: none;">
+    <div class="projects-header">
+        <h3 style="font-weight:bold;">Projekte der Kategorie <span id="categoryTitle"></span></h3>
+        <button id="backToCategories" class="register-button">Zurück zu Kategorien</button>
+    </div>
+    <div class="stats-container">
+        <div class="project-thumbnail">
+            <ul id="projectList">
+                <!-- Dynamically populated with projects of the selected category -->
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+		
     <div id="usersSection" style="display: none;">
 			  <div class="projects-header">
         <div class="marker-limit-info">
@@ -521,6 +589,236 @@
     </div>
     <!-- Section for Deleting All Projects -->
   </body>
+  
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle section for managing question sets
+        document.getElementById('toggleQuestionSets').addEventListener('click', function() {
+            toggleSection('questionSetsSection');
+            fetchQuestionSets();
+        });
+
+        // Fetch question sets and populate the list
+        function fetchQuestionSets() {
+            fetch('/get_question_sets')
+                .then(response => response.json())
+                .then(data => {
+                    const questionSetList = document.getElementById('questionSetList');
+                    questionSetList.innerHTML = '';
+                    data.question_sets.forEach(set => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <strong>${set.title}</strong>: ${set.description}
+                            <button class="delete-button" data-id="${set.id}">Löschen</button>
+                        `;
+                        questionSetList.appendChild(listItem);
+                    });
+
+                    // Add event listeners to delete buttons
+                    const deleteButtons = document.querySelectorAll('.delete-button');
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const questionSetId = this.getAttribute('data-id');
+                            deleteQuestionSet(questionSetId);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching question sets:', error));
+        }
+
+        // Delete a question set
+        function deleteQuestionSet(id) {
+            const deleteMarkers = confirm('Möchten Sie auch alle zugehörigen Antworten (Marker) löschen?');
+            const deleteQuestionSet = confirm('Sind Sie sicher, dass Sie dieses Fragenset löschen möchten?');
+
+            if (deleteQuestionSet) {
+                fetch(`/delete_question_set/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ delete_markers: deleteMarkers })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Fragenset erfolgreich gelöscht.');
+                        fetchQuestionSets(); // Refresh the list after deletion
+                    } else {
+                        alert('Fehler beim Löschen des Fragensets.');
+                    }
+                })
+                .catch(error => console.error('Error deleting question set:', error));
+            }
+        }
+
+        // Refresh button to fetch question sets again
+        document.getElementById('refreshQuestionSets').addEventListener('click', fetchQuestionSets);
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle section for managing categories and projects
+        document.getElementById('toggleCategories').addEventListener('click', function() {
+            toggleSection('categoriesSection');
+            fetchCategories();
+        });
+
+        // Fetch categories and populate the list
+        function fetchCategories() {
+            fetch('/get_categories')
+                .then(response => response.json())
+                .then(data => {
+                    const categoryList = document.getElementById('categoryList');
+                    const categoryCount = document.getElementById('categoryCount');
+                    categoryList.innerHTML = '';
+                    const uniqueCategories = [...new Set(data.categories)];
+                    categoryCount.textContent = `Anzahl von Kategorien: ${uniqueCategories.length}`;
+
+                    uniqueCategories.forEach(category => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            Kategorie: <strong>${category}</strong> 
+                            <button class="view-projects-button" data-category="${category}">Projekte anzeigen</button>
+                            <button class="delete-category-button" data-category="${category}">Kategorie löschen</button>
+                        `;
+                        categoryList.appendChild(listItem);
+                    });
+
+                    // Add event listeners to view and delete buttons
+                    const viewProjectsButtons = document.querySelectorAll('.view-projects-button');
+                    viewProjectsButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const category = this.getAttribute('data-category');
+                            fetchProjectsByCategory(category);
+                        });
+                    });
+
+                    const deleteCategoryButtons = document.querySelectorAll('.delete-category-button');
+                    deleteCategoryButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const category = this.getAttribute('data-category');
+                            deleteCategory(category);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching categories:', error));
+        }
+
+        // Fetch projects of a specific category and populate the list
+        function fetchProjectsByCategory(category) {
+            fetch(`/get_projects_by_category/${category}`)
+                .then(response => response.json())
+                .then(data => {
+                    const projectList = document.getElementById('projectList');
+                    const categoryTitle = document.getElementById('categoryTitle');
+                    categoryTitle.textContent = category;
+                    projectList.innerHTML = '';
+
+                    data.projects.forEach(project => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <strong>${project.name}</strong> 
+                            <button class="view-project-button" data-id="${project.id}">Anzeigen</button>
+                            <button class="delete-project-button" data-id="${project.id}">Löschen</button>
+                        `;
+                        projectList.appendChild(listItem);
+                    });
+
+                    // Add event listeners to view and delete buttons
+                    const viewProjectButtons = document.querySelectorAll('.view-project-button');
+                    viewProjectButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const projectId = this.getAttribute('data-id');
+                            window.location.href = `/project/${projectId}`;  // Change the URL as per your routing
+                        });
+                    });
+
+                    const deleteProjectButtons = document.querySelectorAll('.delete-project-button');
+                    deleteProjectButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            const projectId = this.getAttribute('data-id');
+                            deleteProject(projectId);
+                        });
+                    });
+
+                    toggleSection('projectsByCategorySection');
+                })
+                .catch(error => console.error('Error fetching projects by category:', error));
+        }
+
+        // Delete a project
+        function deleteProject(id) {
+            if (confirm('Sind Sie sicher, dass Sie dieses Projekt löschen möchten?')) {
+                fetch(`/delete_project/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Projekt erfolgreich gelöscht.');
+                        const category = document.getElementById('categoryTitle').textContent;
+                        fetchProjectsByCategory(category);  // Refresh the list after deletion
+                    } else {
+                        alert('Fehler beim Löschen des Projekts.');
+                    }
+                })
+                .catch(error => console.error('Error deleting project:', error));
+            }
+        }
+
+        // Delete all projects of a category
+        function deleteCategory(category) {
+            if (confirm(`Sind Sie sicher, dass Sie alle Projekte der Kategorie ${category} löschen möchten?`)) {
+                fetch(`/delete_projects_by_category/${category}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert(`Alle Projekte der Kategorie ${category} wurden erfolgreich gelöscht.`);
+                        fetchCategories();  // Refresh the list after deletion
+                    } else {
+                        alert('Fehler beim Löschen der Kategorie.');
+                    }
+                })
+                .catch(error => console.error('Error deleting category:', error));
+            }
+        }
+
+        // Back to categories list
+        document.getElementById('backToCategories').addEventListener('click', function() {
+            toggleSection('categoriesSection');
+        });
+
+        // Refresh button to fetch categories again
+        document.getElementById('refreshCategories').addEventListener('click', fetchCategories);
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Replace 'None' with '...' in all initial paginations
