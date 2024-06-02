@@ -3471,11 +3471,16 @@ def get_questionsets():
     questionsets = QuestionSet.query.all()
     return jsonify([qs.to_dict() for qs in questionsets])
 
-
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({'error': 'Not found'}), 404
+    
 @app.route("/get_questionset/<int:questionset_id>", methods=["GET"])
 def get_questionset(questionset_id):
-    questionset = QuestionSet.query.get_or_404(questionset_id)
-    return jsonify(questionset.to_dict())
+    questionset = QuestionSet.query.get(questionset_id)
+    if questionset is None:
+        return jsonify({'error': 'Question set not found'}), 404
+    return jsonify(questionset.to_dict()), 200
 
 
 @app.route('/delete_question_set/<int:id>', methods=['DELETE'])

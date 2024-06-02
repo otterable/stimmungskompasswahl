@@ -193,6 +193,8 @@ function handleMapClick(e) {
         }
     }
 }
+
+
 map.on('click', handleMapClick);
 function showCustomConfirm(latlng, tempMarker) {
     var confirmDiv = document.getElementById('custom-confirm');
@@ -280,80 +282,11 @@ function initializeEventListeners() {
 }
 initializeEventListeners();
 
-function updateMarkerCategoryDescription() {
-    const categorySelect = document.getElementById("marker-category");
-    const categoryDescription = document.getElementById("marker-category-description");
-    const selectedOption = categorySelect.value;
-    let categoryText = "";
-    switch (selectedOption) {
-        case "Transport":
-            categoryText = "Wünschen Sie sich einen neuen Radweg? Eine neue Busverbindung? Gibt es Probleme mit dem Parken?";
-            break;
-        case "Öffentliche Plätze":
-            categoryText = "Sollen öffentliche Plätze umgestaltet werden? Braucht es mehr Grünflächen?";
-            break;
-        case "Umwelt":
-            categoryText = "Ist Ihnen Umweltverschmutzung aufgefallen? Haben Sie Ideen, um die Stadt sauberer, ökologischer oder Zukunftsfit zu machen?";
-            break;
-        case "Verwaltung":
-            categoryText = "Gibt es Ideen für bessere Dienste der Verwaltung? Projektvorschläge, öffentliche Veranstaltungen betreffen?";
-            break;
-        case "Kultur":
-            categoryText = "Gibt es Ideen für Veranstaltungen, Kunstinstallationen, Theater oder Literatur?";
-            break;
-        case "Bildung":
-            categoryText = "Welche Dinge im Bereich der Bildung, Schulen und Hochschulen können wir als Gemeinde verbessern?";
-            break;
-        case "Gesundheit":
-            categoryText = "Ideen zum Thema Gesundheit? Verbesserungsvorschläge für medizinische Einrichtungen oder gesundheitsfördernde Maßnahmen?";
-            break;
-        case "Sport":
-            categoryText = "Ideen zu Sportveranstaltungen, Sportplätzen oder städtischen Kursen?";
-            break;
-        case "Andere":
-            categoryText = "Haben Sie einen eigenen Vorschlag, der in keine der genannten Kategorien passt? Teilen Sie Ihre Idee uns mit!";
-            break;
-        default:
-            categoryText = "Bitte wählen Sie eine Kategorie aus.";
-            break;
-    }
-    categoryDescription.textContent = categoryText;
-}
-function containsSwearWords(text, language) {
-    var words = swearWords[language] || [];
-    var textWords = text.toLowerCase().split(/\s+/);
-    return textWords.some(word => words.includes(word));
-}
-function postMarker() {
-    var markerDescriptionTextarea = document.getElementById('marker-description');
-    var description = markerDescriptionTextarea.value;
 
-    if (containsSwearWords(description, 'de') || containsSwearWords(description, 'en')) {
-        alert("Bitte entfernen Sie unangebrachte Ausdrücke aus Ihrer Beschreibung.");
-        return;
-    }
-    if (isSpam(description)) {
-        alert("Ihr Text scheint Spam zu enthalten. Bitte überprüfen Sie ihn und versuchen Sie es erneut.");
-        return;
-    }
-    if (description.length < 15) {
-        alert("Bitte geben Sie mindestens 15 Zeichen ein.");
-        return;
-    }
-    var markerOverlay = document.getElementById('marker-overlay');
-    if (markerOverlay) {
-        markerOverlay.style.display = 'none';
-    } else {
-        return;
-    }
-    var selectedCategory = document.getElementById('marker-category').value;
-    futureMarker.category = selectedCategory;
-    futureMarker.description = description;
-    var fillColor = getCategoryColor(selectedCategory);
-    futureMarker.icon = createCursorIcon(fillColor);
-    setMapCursor();
-    document.getElementById('marker-description').value = '';
-}
+
+
+
+
 function toggleMarkerSidebar() {
     var sidebar = document.getElementById('sidebar');
     var mapElement = document.getElementById('map');
@@ -387,7 +320,6 @@ function addMarkersToOverlay(markers) {
     allMarkers = markers.filter(marker => marker.is_answer); // Filter only answer markers
     displayedMarkersCount = 0;
     filterMarkers();
-    createCategoryFilter();
     createSortFilter();
     createFullProjectFilter();
 }
@@ -482,6 +414,29 @@ function renderPage(page) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function sortMarkers(sortType) {
     if (sortType === "Neueste") {
         filteredMarkers.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -497,21 +452,51 @@ function filterByCategory(category) {
 
 function createCategoryFilter() {
     const filterDiv = document.getElementById('category-filter');
-    filterDiv.innerHTML = '';
+    if (!filterDiv) return; // Exit if no element found
+
+    filterDiv.innerHTML = ''; // Clear previous contents
+
     const select = document.createElement('select');
     select.id = 'category-select';
     select.onchange = function() {
         filterByCategory(this.value);
     };
-    const categories = ["Alle", "Transport", "Öffentliche Plätze", "Umwelt", "Verwaltung", "Kultur", "Bildung", "Gesundheit", "Sport", "Andere"];
-    categories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category;
-        option.innerText = category;
-        select.appendChild(option);
-    });
-    filterDiv.appendChild(select);
+
+    // Default option for showing all categories
+    const defaultOption = document.createElement('option');
+    defaultOption.value = 'Alle';
+    defaultOption.innerText = 'Alle';
+    select.appendChild(defaultOption);
+
+    // Fetch categories from the server
+    fetch('/get_projects')
+        .then(response => response.json())
+        .then(data => {
+            const categories = new Set(); // Using a Set to keep unique categories
+
+            data.forEach(project => {
+                if (project.category && typeof project.category === 'string' && project.is_answer) {
+                    categories.add(project.category.trim()); // Add category if it's from an answer marker
+                }
+            });
+
+            categories.forEach(category => {
+                if (category) { // Ensure category is not empty
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.innerText = category;
+                    select.appendChild(option);
+                }
+            });
+
+            filterDiv.appendChild(select);
+        })
+        .catch(error => console.error('Error loading categories:', error));
 }
+
+document.addEventListener('DOMContentLoaded', createCategoryFilter);
+
+
 
 function createSortFilter() {
     const sortDiv = document.getElementById('sort-filter');
@@ -594,7 +579,6 @@ document.getElementById('close-overlay-button').addEventListener('click', functi
     showMarkersBtn.innerText = 'Liste anzeigen';
 });
 
-createCategoryFilter();
 createSortFilter();
 createFullProjectFilter();
 renderPage(currentPage);
@@ -654,6 +638,21 @@ function getCategoryColor(category) {
     // Use cached color for question/answer categories
     return questionCategoryColors[category] || '#888'; // Default color if not found
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var categoryLayers = {};
 function logSelectedCategory() {
@@ -815,11 +814,27 @@ document.getElementById('guided-mode-button').addEventListener('click', function
     document.getElementById('guided-mode-modal').style.display = 'flex';
 });
 
+
+
 document.getElementById('start-guided-mode').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'none';
     document.getElementById('question-modal').style.display = 'flex';
-    // Additional logic to start the guided mode
+    // Assuming you have a function to start fetching questions or similar logic here
+    startGuidedMode();
 });
+
+document.getElementById('answer-question').addEventListener('click', function() {
+    // Ensure you bind the map click event or similar actions here to handle the answer logic
+    handleAnswerMode();
+});
+
+function handleAnswerMode() {
+    // Assuming you use the map click to handle answers
+    map.on('click', handleMapClick);
+    document.getElementById('question-modal').style.display = 'none';
+    // Additional code to manage state as necessary
+}
+
 
 document.getElementById('cancel-guided-mode').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'none';
@@ -830,145 +845,8 @@ document.getElementById('cancel-qa-mode').addEventListener('click', function() {
 });
 
 
-function updatePopupContent(projectId, data) {
-    var popup = markersById[projectId].getPopup();
-    var popupContentDiv = document.createElement('div');
-    popupContentDiv.innerHTML = popup.getContent();
 
-    var originalUpvoteCountElement = popupContentDiv.querySelector(`#upvote-count-${projectId}`);
-    var originalDownvoteCountElement = popupContentDiv.querySelector(`#downvote-count-${projectId}`);
-    if (originalUpvoteCountElement) originalUpvoteCountElement.innerText = data.upvote_count;
-    if (originalDownvoteCountElement) originalDownvoteCountElement.innerText = data.downvote_count;
 
-    var newUpvoteCountElement = popupContentDiv.querySelector(`#new-upvote-count-${projectId}`);
-    var newDownvoteCountElement = popupContentDiv.querySelector(`#new-downvote-count-${projectId}`);
-    if (newUpvoteCountElement) newUpvoteCountElement.innerText = data.upvote_count;
-    if (newDownvoteCountElement) newDownvoteCountElement.innerText = data.downvote_count;
-
-    popup.setContent(popupContentDiv.innerHTML);
-    markersById[projectId].bindPopup(popup).openPopup();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/get_projects_with_vote_status')
-        .then(response => response.json())
-        .then(projects => {
-            projects.forEach(project => {
-                const upvoteButton = document.querySelector(`#upvote-button-${project.id}`);
-                const downvoteButton = document.querySelector(`#downvote-button-${project.id}`);
-
-                if (upvoteButton && project.user_vote === 'upvote') {
-                    upvoteButton.classList.add('voted-upvote');
-                    console.log(`Upvote loaded: User ID ${project.user_id} has previously upvoted project ID ${project.id}, turning the circle button of upvote to color #4caf50.`);
-                } else if (downvoteButton && project.user_vote === 'downvote') {
-                    downvoteButton.classList.add('voted-downvote');
-                    console.log(`Downvote loaded: User ID ${project.user_id} has previously downvoted project ID ${project.id}, turning the circle button of downvote to color #9a031e.`);
-                }
-
-                if ((upvoteButton || downvoteButton) && project.user_vote) {
-                    console.log(`Vote loaded: User ID ${project.user_id} has previously ${project.user_vote}d project ID ${project.id}, adjusting the circle button color.`);
-                }
-            });
-        })
-        .catch(error => console.error('Error loading project votes:', error));
-});
-
-function setInitialVoteBarStyles(projectId) {
-    document.querySelectorAll('.voting-bar').forEach(votingBar => {
-        const upvoteElement = votingBar.querySelector('.upvotes');
-        const downvoteElement = votingBar.querySelector('.downvotes');
-        const upvotePercentage = parseFloat(upvoteElement.style.width);
-        const downvotePercentage = parseFloat(downvoteElement.style.width);
-        if (upvotePercentage > 0 && downvotePercentage > 0) {
-            upvoteElement.style.borderRadius = '30px 0 0 30px';
-            downvoteElement.style.borderRadius = '0 30px 30px 0';
-        } else if (upvotePercentage > 0) {
-            upvoteElement.style.borderRadius = '30px';
-            downvoteElement.style.borderRadius = '0';
-        } else if (downvotePercentage > 0) {
-            downvoteElement.style.borderRadius = '30px';
-            upvoteElement.style.borderRadius = '0';
-        }
-        upvoteElement.onclick = function() {
-            vote(projectId, 'upvote');
-        };
-        downvoteElement.onclick = function() {
-            vote(projectId, 'downvote');
-        };
-    });
-}
-document.addEventListener('DOMContentLoaded', function() {
-    setInitialVoteBarStyles();
-});
-
-function vote(projectId, voteType) {
-    if (!userLoggedIn) {
-        alert("Melden Sie sich an, um über Projekte abzustimmen.");
-        return;
-    }
-    fetch(`/vote/${projectId}/${voteType}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            'project_id': projectId,
-            'vote_type': voteType
-        })
-    }).then(response => response.json()).then(data => {
-        if (data.success) {
-            updateVotingUI(projectId, data);
-        }
-    }).catch(error => {});
-}
-
-function updateVotingUI(projectId, data) {
-    var openPopup = null;
-    map.eachLayer(function(layer) {
-        if (layer.getPopup && layer.getPopup() && layer.getPopup().isOpen()) {
-            openPopup = layer.getPopup();
-        }
-    });
-	
-    if (markersById[projectId] && markersById[projectId].getPopup().isOpen()) {
-        const popup = markersById[projectId].getPopup();
-        const popupContent = popup.getContent();
-        const parser = new DOMParser();
-        const popupDom = parser.parseFromString(popupContent, 'text/html');
-
-        const upvoteCountElement = popupDom.getElementById(`upvote-count-${projectId}`);
-        const downvoteCountElement = popupDom.getElementById(`downvote-count-${projectId}`);
-        if (upvoteCountElement) upvoteCountElement.textContent = data.upvote_count;
-        if (downvoteCountElement) downvoteCountElement.textContent = data.downvote_count;
-
-        const upvotesBar = popupDom.querySelector('.upvotes');
-        const downvotesBar = popupDom.querySelector('.downvotes');
-        if (upvotesBar && downvotesBar) {
-            const upvotePercentage = data.upvote_percentage.toFixed(1);
-            const downvotePercentage = data.downvote_percentage.toFixed(1);
-            upvotesBar.style.width = `${upvotePercentage}%`;
-            downvotesBar.style.width = `${downvotePercentage}%`;
-
-            upvotesBar.style.borderRadius = data.upvote_count > 0 && data.downvote_count > 0 ? '30px 0 0 30px' : '30px';
-            downvotesBar.style.borderRadius = data.upvote_count > 0 && data.downvote_count > 0 ? '0 30px 30px 0' : '30px';
-        }
-
-        popup.setContent(new XMLSerializer().serializeToString(popupDom.documentElement));
-    }
-    setInitialVoteBarStyles(projectId);
-}
-
-function adjustBorderRadius(upvoteElement, downvoteElement, upvoteCount, downvoteCount) {
-    if (upvoteCount > 0 && downvoteCount > 0) {
-        upvoteElement.style.borderRadius = '30px 0 0 30px';
-        downvoteElement.style.borderRadius = '0 30px 30px 0';
-    } else if (upvoteCount > 0 && downvoteCount === 0) {
-        upvoteElement.style.borderRadius = '30px';
-    } else if (upvoteCount === 0 && downvoteCount > 0) {
-        downvoteElement.style.borderRadius = '30px';
-    }
-}
 
 fetch('/get_projects').then(response => {
     if (!response.ok) {
@@ -1434,254 +1312,235 @@ document.querySelector('.register-button-cl').addEventListener('click', function
 
 
 
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
-    let currentQuestionset = null;
-    let currentQuestionIndex = 0;
-    let answers = [];
-    let tempMarker = null;
-
-    fetchQuestionSetsAndPrepare(); // Changed function name to indicate new behavior
-
-    function fetchQuestionSetsAndPrepare() {
-        fetch('/get_questionsets')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(questionsets => {
-                const select = document.getElementById('questionset-select');
-                if (!select) {
-                    console.error("Questionset select element not found.");
-                    return;
-                }
-                select.innerHTML = '';
-                questionsets.forEach(qs => {
-                    const option = document.createElement('option');
-                    option.value = qs.id;
-                    option.textContent = qs.title;
-                    select.appendChild(option);
-                });
-
-                // Log how many question sets were loaded without changing the UI
-                console.log(`GUIDED MODE: ${questionsets.length} Question sets loaded.`);
-            })
-            .catch(error => {
-                console.error("Error fetching question sets:", error);
-            });
-    }
-
-    document.getElementById('guided-mode-button').addEventListener('click', openGuidedModeModal);
-
-document.getElementById('guided-mode-button').addEventListener('click', function() {
-    const select = document.getElementById('questionset-select');
-    if (select.options.length === 1) {
-        // If only one question set is available, start guided mode immediately without showing the modal
-        startGuidedMode(select.options[0].value);
-    } else {
-        // More than one question set, show modal to allow user to select
-        document.getElementById('guided-mode-modal').style.display = 'flex';
-    }
+    setupGuidedMode();
 });
 
-    function openGuidedModeModal() {
+let currentQuestionset = null;
+let currentQuestionIndex = 0;
+let answers = [];
+
+function setupGuidedMode() {
+    fetchQuestionSetsAndPrepare();
+    attachEventListeners();
+    console.debug("Setup for Guided Mode completed.");
+}
+
+function fetchQuestionSetsAndPrepare() {
+    fetch('/get_questionsets')
+        .then(response => response.json())
+        .then(questionsets => {
+            populateQuestionSets(questionsets);
+            console.debug("Question sets loaded:", questionsets);
+        })
+        .catch(error => console.error("Error fetching question sets:", error));
+}
+
+function populateQuestionSets(questionsets) {
     const select = document.getElementById('questionset-select');
-    if (select.children.length === 1) {
-        // Automatically start guided mode with the single question set
-        startGuidedMode(select.children[0].value);
+    if (!select) {
+        console.error("Questionset select element not found.");
+        return;
+    }
+    select.innerHTML = questionsets.map(qs => `<option value="${qs.id}">${qs.title}</option>`).join('');
+}
+
+function attachEventListeners() {
+    document.getElementById('guided-mode-button').addEventListener('click', handleGuidedModeButton);
+    document.getElementById('answer-question').addEventListener('click', handleAnswerButton);
+    document.getElementById('cancel-guided-mode').addEventListener('click', closeGuidedMode);
+    document.getElementById('cancel-qa-mode').addEventListener('click', closeQuestionModal);
+    document.getElementById('next-question').addEventListener('click', handleNextQuestion);
+}
+
+function handleGuidedModeButton() {
+    const select = document.getElementById('questionset-select');
+    const modal = document.getElementById('guided-mode-modal');
+    if (select.options.length > 1) {
+        modal.style.display = 'flex';
+    } else if (select.options.length === 1) {
+        modal.style.display = 'none';
+        startGuidedMode(select.options[0].value);
     } else {
-        // More than one question set, show modal to allow selection
-        document.getElementById('guided-mode-modal').style.display = 'flex';
+        console.error("No question sets available.");
     }
 }
 
-function startGuidedMode(questionsetId) {
+function handleAnswerButton() {
+    document.getElementById('question-modal').style.display = 'none';
+    console.debug("Map click handler for answering is set.");
+}
+
+function startGuidedMode(questionsetId = null) {
+    questionsetId = questionsetId || document.getElementById('questionset-select').value;
+    if (!questionsetId) {
+        console.error("No questionset ID selected");
+        return;
+    }
+
     fetch(`/get_questionset/${questionsetId}`)
         .then(response => response.json())
         .then(questionset => {
             currentQuestionset = questionset;
             currentQuestionIndex = 0;
-            answers = [];
             showQuestionModal();
+            console.debug("Guided mode started with question set:", questionset);
         })
-        .catch(error => {
-            console.error("Error fetching questionset:", error);
-        });
+        .catch(error => console.error("Error fetching questionset:", error));
 }
-	
-	    document.getElementById('guided-mode-button').addEventListener('click', openGuidedModeModal);
-
-
 
 function showQuestionModal() {
-    if (currentQuestionIndex < currentQuestionset.questions.length) {
-        const question = currentQuestionset.questions[currentQuestionIndex];
-        document.getElementById('question-title').textContent = question.title;
-        document.getElementById('question-description').textContent = question.description;
-        document.getElementById('next-question').textContent = 'Next';
-        document.getElementById('question-modal').style.display = 'flex';
+    if (!currentQuestionset || !currentQuestionset.questions || currentQuestionIndex >= currentQuestionset.questions.length) {
+        console.error("No questions available or index out of bounds");
+        return;
+    }
+
+    const question = currentQuestionset.questions[currentQuestionIndex];
+    document.getElementById('question-title').textContent = question.title;
+    document.getElementById('question-description').textContent = question.description;
+    document.getElementById('question-modal').style.display = 'flex';
+    enableMapCursor();
+    console.debug("Showing question modal for:", question.title);
+}
+
+function enableMapCursor() {
+    var currentColor = currentQuestionset.questions[currentQuestionIndex].marker_color;
+    var cursorIconUrl = createCursorIcon(currentColor);
+    document.getElementById('map').style.cursor = `url('${cursorIconUrl}') 12 12, auto`;
+    console.debug("Cursor set to marker icon with color:", currentColor);
+
+    document.getElementById('map').addEventListener('mouseenter', function() {
+        document.getElementById('map').style.cursor = `url('${cursorIconUrl}') 12 12, auto`;
+    });
+    document.getElementById('map').addEventListener('mouseleave', resetMapCursor);
+}
+
+function createCursorIcon(fillColor) {
+    var svgCursorIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${fillColor}" /></svg>`;
+    return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgCursorIcon)))}`;
+}
+
+function resetMapCursor() {
+    document.getElementById('map').style.cursor = '';
+    console.debug("Cursor reset to default.");
+}
+
+function handleNextQuestion() {
+    if (currentQuestionIndex + 1 < currentQuestionset.questions.length) {
+        currentQuestionIndex++;
+        showQuestionModal();
     } else {
-        console.log("All questions have been answered.");
-        document.getElementById('question-title').textContent = "All questions have been answered.";
-        document.getElementById('question-description').textContent = "Press Finish to submit all answers.";
-        document.getElementById('next-question').textContent = 'Finish';
-        document.getElementById('question-modal').style.display = 'flex';
+        console.log("No more questions.");
+        document.getElementById('question-modal').style.display = 'none';
+        resetMapCursor();
     }
 }
 
-    function updateSummaryContent() {
-        const summaryContent = document.getElementById('summary-content');
-        summaryContent.innerHTML = `
-            <h2>Summary of Answers</h2>
-            <p>Amount of Questions answered: ${answers.length} / ${currentQuestionset.questions.length}</p>
-            <ul>
-                ${answers.map((answer, index) => `
-                    <li><strong>${index + 1}. ${currentQuestionset.questions.find(q => q.id === answer.question_id).title}</strong>: ${answer.answer_text}</li>
-                `).join('')}
-            </ul>
-        `;
-    }
+function closeGuidedMode() {
+    document.getElementById('guided-mode-modal').style.display = 'none';
+    resetMapCursor();
+    console.debug("Guided mode modal closed.");
+}
 
-    function handleMapClick(e) {
+function closeQuestionModal() {
+    document.getElementById('question-modal').style.display = 'none';
+    resetMapCursor();
+    console.debug("Question modal closed.");
+}
+
+function handleMapClick(e) {
+    if (currentQuestionset && currentQuestionIndex < currentQuestionset.questions.length) {
         const question = currentQuestionset.questions[currentQuestionIndex];
-        const answerText = prompt('Enter your answer:');
+        const answerText = prompt('Enter your answer for: ' + question.title);
         if (answerText) {
-            answers.push({
+            let answerData = {
                 question_id: question.id,
                 answer_text: answerText,
                 latitude: e.latlng.lat,
-                longitude: e.latlng.lng
-            });
+                longitude: e.latlng.lng,
+                is_answer: true,
+                is_mapobject: false,
+                category: question.title,
+                description: answerText
+            };
 
-            saveMarkerData(e.latlng, question.title, answerText, function(savedMarkerData) {
-                addNewMarker(e.latlng, question.title, answerText, savedMarkerData.id, question.marker_color);
-                map.off('click', handleMapClick);
-                currentQuestionIndex++;
-                showQuestionModal();
-            });
-        }
-    }
-
-    function submitAnswers() {
-        console.log("Submitting answers:", answers);
-        fetch(`/answer_questionset/${currentQuestionset.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ answers })
-        })
-        .then(response => {
-            console.log("Response status:", response.status);
-            if (!response.ok) {
-                return response.text().then(text => { throw new Error(text); });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Server response data:", data);
-            alert(data.message);
-            document.getElementById('question-modal').style.display = 'none';
-        })
-        .catch(error => {
-            console.error("Error submitting answers:", error);
-            alert("Error submitting answers: " + error.message);
-        });
-    }
-
-    document.getElementById('guided-mode-button').addEventListener('click', openGuidedModeModal);
-    document.getElementById('start-guided-mode').addEventListener('click', startGuidedMode);
-    document.getElementById('cancel-guided-mode').addEventListener('click', () => {
-        document.getElementById('guided-mode-modal').style.display = 'none';
-    });
-    document.getElementById('answer-question').addEventListener('click', () => {
-        map.on('click', handleMapClick);
-        document.getElementById('question-modal').style.display = 'none';
-    });
-    document.getElementById('next-question').addEventListener('click', () => {
-        if (currentQuestionIndex < currentQuestionset.questions.length) {
+            saveAnswer(answerData);
+            resetMapCursor(); // Reset cursor immediately after map click
             currentQuestionIndex++;
-            showQuestionModal();
-        } else {
-            console.log("No more questions to answer.");
-            document.getElementById('question-title').textContent = "All questions have been answered.";
-            document.getElementById('question-description').textContent = "Press Finish to submit all answers.";
-            document.getElementById('next-question').textContent = 'Finish';
-        }
-    });
-    document.getElementById('cancel-qa-mode').addEventListener('click', () => {
-        document.getElementById('question-modal').style.display = 'none';
-    });
-    document.getElementById('next-question').addEventListener('click', () => {
-        if (currentQuestionIndex >= currentQuestionset.questions.length) {
-            submitAnswers();
-        }
-    });
-
-    function addNewMarker(latLng, title, description, markerId, color) {
-        var fillColor = color || getCategoryColor(title);
-        var popupContent = `<div style="text-align: center;"><strong>${title}</strong><br>${description}</div>`;
-        var marker = L.marker(latLng, {
-            icon: createIcon(24, 2, fillColor, false),
-            category: title,
-            isMapObject: false,
-            isAnswer: true,
-            isFeatured: false
-        }).addTo(map);
-        marker.bindPopup(popupContent);
-        marker.markerId = markerId;
-        if (!categoryLayers[title]) {
-            categoryLayers[title] = L.layerGroup().addTo(map);
-        }
-        marker.addTo(categoryLayers[title]);
-        updateCategoryButtonText(title);
-    }
-
-    function saveMarkerData(latlng, category, description, callback) {
-        var dataToSend = {
-            lat: latlng.lat,
-            lng: latlng.lng,
-            category: category,
-            description: description,
-            is_mapobject: false,
-            is_answer: true
-        };
-        $.ajax({
-            url: '/add_marker',
-            method: 'POST',
-            data: JSON.stringify(dataToSend),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(response) {
-                if (callback) {
-                    callback(response);
-                }
-                checkMarkerLimit();
-            },
-            error: function(xhr, textStatus, errorThrown) {
-                if (xhr.status === 429) {
-                    alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
-                }
+            if (currentQuestionIndex < currentQuestionset.questions.length) {
+                showQuestionModal();
+            } else {
+                console.debug("All questions answered.");
+                submitAnswers();
             }
-        });
-    }
-
-    function updateCategoryButtonText(category) {
-        var button = document.querySelector(`button[category-name="${category}"]`);
-        if (button && categoryLayers[category]) {
-            button.innerText = `${category} (${categoryLayers[category].getLayers().length} Beiträge)`;
         }
+    } else {
+        console.log("Map clicked outside question answering mode.");
     }
+}
 
-    function addMarkersToOverlay(markers) {
-        allMarkers = markers.filter(marker => marker.is_answer); // Filter only answer markers
-        displayedMarkersCount = 0;
-        filterMarkers();
-        createCategoryFilter();
-        createSortFilter();
-        createFullProjectFilter();
-    }
+function saveAnswer(answerData) {
+    answers.push(answerData);
+    const formattedData = {
+        lat: answerData.latitude,
+        lng: answerData.longitude,
+        category: answerData.category,
+        description: answerData.description,
+        is_answer: answerData.is_answer,
+        is_mapobject: answerData.is_mapobject
+    };
 
-    console.log("Event listeners for Guided Mode have been added.");
-});;
+    fetch('/add_marker', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formattedData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to save answer');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Answer saved successfully", data);
+    })
+    .catch(error => {
+        console.error("Error saving answer:", error);
+    });
+}
+
+function submitAnswers() {
+    console.log("Submitting answers:", answers);
+    fetch(`/answer_questionset/${currentQuestionset.id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ answers })
+    })
+    .then(response => {
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Server response data:", data);
+        alert(data.message);
+        document.getElementById('question-modal').style.display = 'none';
+    })
+    .catch(error => {
+        console.error("Error submitting answers:", error);
+        alert("Error submitting answers: " + error.message);
+    });
+}
