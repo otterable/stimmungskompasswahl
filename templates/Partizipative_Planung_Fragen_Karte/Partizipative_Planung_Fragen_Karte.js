@@ -1315,10 +1315,6 @@ document.querySelector('.register-button-cl').addEventListener('click', function
 
 
 
-
-
-
-
 document.addEventListener('DOMContentLoaded', function() {
     setupGuidedMode();
 });
@@ -1406,6 +1402,7 @@ function showQuestionModal() {
     document.getElementById('question-title').textContent = question.title;
     document.getElementById('question-description').textContent = question.description;
     document.getElementById('question-modal').style.display = 'flex';
+    updateSummary(); // Ensure the summary is updated every time the question modal is shown
     enableMapCursor();
     console.debug("Showing question modal for:", question.title);
 }
@@ -1488,6 +1485,7 @@ function handleMapClick(e) {
 
 function saveAnswer(answerData) {
     answers.push(answerData);
+    updateSummary(); // Update the summary whenever a new answer is saved
     const formattedData = {
         lat: answerData.latitude,
         lng: answerData.longitude,
@@ -1543,4 +1541,20 @@ function submitAnswers() {
         console.error("Error submitting answers:", error);
         alert("Error submitting answers: " + error.message);
     });
+}
+
+function updateSummary() {
+    const summaryElement = document.getElementById('summary-content');
+    let summaryHtml = "<h2>Summary</h2>";
+
+    if (answers.length > 0) {
+        answers.forEach(answer => {
+            const question = currentQuestionset.questions.find(q => q.id === answer.question_id);
+            const questionTitle = question ? question.title : "Unknown Question";
+            summaryHtml += `<p>${questionTitle}: ${answer.answer_text}</p>`;
+        });
+    } else {
+        summaryHtml += "<p>No questions answered yet!</p>";
+    }
+    summaryElement.innerHTML = summaryHtml;
 }

@@ -1896,6 +1896,8 @@ def add_marker():
     data = request.json
     ip_address = request.remote_addr
 
+    app.logger.debug(f"Received data: {data}")
+
     # Check and update the rate limit for marker additions
     now = datetime.now()
     additions = ip_marker_additions.get(ip_address, [])

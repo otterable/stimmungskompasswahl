@@ -2426,6 +2426,7 @@ margin-bottom: 0px !important;
         width: 100%; /* Full width */
         box-sizing: border-box; /* Include padding in width calculation */
         z-index: 1050; /* Ensure it's above most other elements */
+        visibility: visible; /* Ensure visibility is forced */
     }
 }
 
@@ -2445,7 +2446,9 @@ margin-bottom: 0px !important;
         margin-top: auto; /* Ensure it stays at the bottom */
         overflow: hidden; /* Prevents child elements from overflowing */
         z-index: 10; /* Adjust z-index to ensure it's above other content */
+        visibility: visible; /* Ensure visibility is forced */
     }
+
 
     /* If there's a specific container for the footer, ensure it fills the bottom area */
     .footer-container { /* Adjust the selector based on your structure */

@@ -983,19 +983,27 @@ function adjustBorderRadius(upvoteElement, downvoteElement, upvoteCount, downvot
         downvoteElement.style.borderRadius = '30px';
     }
 }
+fetch('/get_projects')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Filter out projects where is_answer is true
+        const filteredData = data.filter(project => !project.is_answer);
+        
+        const sortedData = sortMarkersByNewest(filteredData);
+        addMarkers(sortedData);
+        createCategoryButtons();
+        updateCategoryButtonColors();
+        addMarkersToOverlay(sortedData);
+    })
+    .catch(error => {
+        console.error('Failed to fetch projects:', error);
+    });
 
-fetch('/get_projects').then(response => {
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json();
-}).then(data => {
-    const sortedData = sortMarkersByNewest(data);
-    addMarkers(sortedData);
-    createCategoryButtons();
-    updateCategoryButtonColors();
-    addMarkersToOverlay(sortedData);
-}).catch(error => {});
 
 function sortMarkersByNewest(markers) {
     return markers.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -1657,4 +1665,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     console.log("Event listeners for Guided Mode have been added.");
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to ensure footer is visible
+    function ensureFooterVisibility() {
+        var footerNav = document.querySelector('.footer-navigation');
+        if (footerNav) {
+            footerNav.style.display = 'flex'; // Ensure display is flex
+            footerNav.style.visibility = 'visible'; // Ensure visibility
+
+            // Extra check for iOS to adjust positioning if not visible
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                footerNav.style.position = 'fixed';
+                footerNav.style.bottom = '0';
+            }
+        }
+    }
+
+    // Initial check
+    ensureFooterVisibility();
+
+    // Recheck on resize to handle dynamic changes or orientation changes
+    window.addEventListener('resize', ensureFooterVisibility);
 });

@@ -1,7 +1,5 @@
  // Display the prompt
- if(/iPhone|iPad|iPod/.test(navigator.platform) && !navigator.standalone) {
-    document.getElementById('ios-install-prompt').style.display = 'block';
-}
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')
       .then(function(registration) {
@@ -10,10 +8,7 @@ if ('serviceWorker' in navigator) {
         
       });
   }
-// Close the prompt
-document.getElementById('close-prompt').addEventListener('click', function() {
-    document.getElementById('ios-install-prompt').style.display = 'none';
-});
+
 // Toggle the navigation overlay when the hamburger button is clicked
 document.getElementById('hamburger-button').addEventListener('click', function() {
     var navOverlay = document.getElementById('nav-overlay');
@@ -112,14 +107,9 @@ if ("IntersectionObserver" in window) {
 });
 
 // Display the prompt
-if(/iPhone|iPad|iPod/.test(navigator.platform) && !navigator.standalone) {
-    document.getElementById('ios-install-prompt').style.display = 'block';
-}
 
-// Close the prompt
-document.getElementById('close-prompt').addEventListener('click', function() {
-    document.getElementById('ios-install-prompt').style.display = 'none';
-});
+
+
 if ('serviceWorker' in navigator) {
 navigator.serviceWorker.register('/service-worker.js')
     .then(function(registration) {

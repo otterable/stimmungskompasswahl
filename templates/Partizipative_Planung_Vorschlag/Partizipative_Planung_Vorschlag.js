@@ -473,10 +473,8 @@ document.getElementById('downvote-count').innerHTML = `Gefällt nicht: <strong s
 }
 
 
-</script>
 
 
-<script>
     // Share on WhatsApp
     document.getElementById('share-whatsapp').addEventListener('click', function(e) {
         e.preventDefault();
@@ -486,33 +484,50 @@ document.getElementById('downvote-count').innerHTML = `Gefällt nicht: <strong s
     });
 
     // Share on Facebook
-    document.getElementById('share-facebook').addEventListener('click', function(e) {
-        e.preventDefault();
-        //console.log("Sharing to Facebook");
-        var facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
-        window.open(facebookUrl, '_blank');
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        document.getElementById('share-facebook').addEventListener('click', function(e) {
+            e.preventDefault();
+            var facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+            window.open(facebookUrl, '_blank');
+        });
+    }, 1000); // Delay attaching the event listener by 1000 milliseconds
+});
 
+document.getElementById('share-share').addEventListener('click', function(e) {
+    e.preventDefault();
 
+    // Überprüfen Sie, ob der Benutzer ein Android-Gerät verwendet
+    var isAndroid = /Android/i.test(navigator.userAgent);
 
-    // General share
-    document.getElementById('share-share').addEventListener('click', function(e) {
-        e.preventDefault();
-        //console.log("Opening general share dialog");
+    if (isAndroid) {
+        // Funktion zum Kopieren der URL in die Zwischenablage auf Android
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('URL wurde in die Zwischenablage kopiert!');
+        }).catch((error) => {
+            console.error('Fehler beim Kopieren der URL:', error);
+            alert('Fehler beim Kopieren der URL.');
+        });
+    } else {
+        // Web Share API für andere Geräte verwenden
         if (navigator.share) {
             navigator.share({
-                title: 'Project Sharing',
+                title: 'Projekt teilen',
                 url: window.location.href
             }).then(() => {
-                //console.log('Thanks for sharing!');
-            })
-            .catch();
+                console.log('Danke fürs Teilen!');
+            }).catch((error) => {
+                console.error('Fehler beim Teilen:', error);
+                alert('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+            });
         } else {
-            //console.log('Web share not supported');
-            alert('Web share not supported. Copy the URL to share.');
+            alert('Die Web-Share-Funktion wird auf diesem Gerät nicht unterstützt.');
         }
-    });
-	
+    }
+});
+
+
+
 	document.getElementById('close-overlay-btn').addEventListener('click', function() {
     document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
 });
