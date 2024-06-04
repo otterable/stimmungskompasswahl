@@ -14,12 +14,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    },
-    {
-      "src": "/static/stimmungskompass_ueber_fullsize_insert_a1_cropped.png",
-      "sizes": "800x600",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ],
   "start_url": "/",
