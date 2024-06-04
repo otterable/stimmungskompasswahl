@@ -143,11 +143,11 @@
       <div class="button-container">
          <button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Nur Projektvorschläge anzeigen</button>
       </div>
-      <div class="button-container">
+      <div class="button-container" style="display:none;">
          <button id="toggle-answer-markers-btn" class="register-button-m" style="margin-bottom: 10px;">Antwortmarkierungen ein-/ausblenden</button>
       </div>
       <h3 style="display: block; text-align: center; margin-top: 5px;"> Klicken Sie zum ein- und ausblenden. </h3>
-	        <button id="guided-mode-button" class="register-button-m">Guided Mode</button>
+	        <button id="guided-mode-button" class="register-button-m" style="display:none;">Guided Mode</button>
 			      <!-- Guided Mode Modal -->
 
 
@@ -156,7 +156,7 @@
       </div>
       <!-- Add to karte.html -->
       <a href="{{ url_for('create_questionset') }}">
-        <button class="register-button-m">Create New Question Set</button>
+        <button class="register-button-m" style="display:none;">Create New Question Set</button>
       </a>
 
 
