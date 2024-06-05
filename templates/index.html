@@ -94,7 +94,7 @@
                     </div>
                     {% endif %}
                 </div>
-        <div class="project-description">{{ project.descriptionwhy|safe }}</div>
+<div class="project-description">{{ project.descriptionwhy.split('. ')[:2]|join('. ')|clean_html|safe }}</div>
             </div>
     {% endfor %} {% else %} 
     <p style="text-align: center;">Keine hervorgehobenen Projekte gefunden.</p>

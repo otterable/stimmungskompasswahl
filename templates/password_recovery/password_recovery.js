@@ -13,17 +13,17 @@ $(document).ready(function() {
         }, 1000);
     }
 
-    $('#phone-number-form').submit(function(e) {
+    $('#identifier-form').submit(function(e) {
         e.preventDefault();
         $.ajax({
             type: 'POST',
             url: '{{ url_for("request_otp") }}',
             data: {
-                phone_number: $('#phone_number').val()
+                identifier: $('#identifier').val()
             },
             success: function(response) {
                 if (response.success) {
-                    $('#phone-form').hide();
+                    $('#identifier-form').hide();
                     $('#otp-form').show();
                     startResendOtpTimer();
                 } else {
@@ -61,7 +61,7 @@ $(document).ready(function() {
             type: 'POST',
             url: '{{ url_for("request_otp") }}',
             data: {
-                phone_number: $('#phone_number').val()  // Ensure phone number is sent
+                identifier: $('#identifier').val()  // Ensure identifier (phone/email) is sent
             },
             success: function(response) {
                 if (response.success) {

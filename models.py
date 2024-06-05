@@ -67,14 +67,15 @@ class QuestionSetAnswer(db.Model):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    phone_number = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    phone_number = db.Column(db.String(20), unique=True, nullable=True)
     password_hash = db.Column(db.String(200), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     ip_address = db.Column(db.String(100))  # Optional, set at registration
     highlight_id = db.Column(db.Integer)  # Optional, assumed to be an integer
     account_creation = db.Column(db.DateTime, default=datetime.utcnow)
-    is_admin = db.Column(db.Boolean, default=False)  # New field to indicate admin status
-    is_googleaccount = db.Column(db.Boolean, default=False)  # New field to indicate Google account
+    is_admin = db.Column(db.Boolean, default=False)
+    is_googleaccount = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

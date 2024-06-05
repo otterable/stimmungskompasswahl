@@ -15,7 +15,9 @@ from flask import (
     abort,
     g
 )
+import phonenumbers
 import re
+from flask_mail import Mail, Message
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from flask_sqlalchemy import SQLAlchemy
@@ -86,10 +88,13 @@ import threading
 from io import StringIO
 import random
 now = datetime.now()
-
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 # Twilio credentials
 account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
@@ -117,6 +122,7 @@ app.config['BAUSTELLE_IMAGE_FOLDER'] = 'static/baustellepics'
 db.init_app(app)
 migrate = Migrate(app, db)
 
+
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -130,6 +136,24 @@ ip_last_submitted_project = {}
 ip_last_added_marker = {}
 ip_marker_additions = {}  # Initialize the dictionary to track marker additions
 ip_project_submissions = {}
+
+
+
+
+
+
+
+app.config.update(
+    MAIL_SERVER='smtp.easyname.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME='office@stimmungskompass.at',
+    MAIL_PASSWORD='ottrottr123'
+)
+
+mail = Mail(app)
+
+
 
 
 APPLE_CLIENT_ID = 'com.ermine.stimmungskompass'
@@ -1660,7 +1684,20 @@ def download_images():
 
 
 
+def clean_html(text):
+    """Remove problematic HTML elements including empty <p> tags, <br> tags, extra newlines, and unnecessary spaces."""
+    # Strip <br> and <br/> tags
+    text = re.sub(r'<br\s*/?>', '', text)
+    # Strip empty or whitespace-only <p></p> tags, including non-breaking spaces
+    text = re.sub(r'<p>(\s|&nbsp;|&#160;)*</p>', '', text, flags=re.IGNORECASE)
+    # Replace multiple newlines with a single newline
+    text = re.sub(r'(\s*\n\s*)+', '\n', text)
+    # Replace multiple spaces with a single space
+    text = re.sub(r'(\s{2,})', ' ', text)
+    return text.strip()
 
+# Register the filter with Jinja
+app.jinja_env.filters['clean_html'] = clean_html
 
 @app.route("/")
 def index():
@@ -1692,7 +1729,6 @@ def index():
     mapobject_count = Project.query.filter_by(is_mapobject=True).count()
 
     metaData = g.metaData
-
 
     return render_template(
         "index.html",
@@ -1769,73 +1805,239 @@ def calculate_age(dob):
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        logging.debug("Registration attempt: %s", request.form)  # Debug: print form data
-        ip_address = request.remote_addr
-        WebsiteViews.add_view(ip_address)
-        phone_number = request.form.get("phone_number")
-        password = request.form.get("password")
-        name = request.form.get("name")
-        ip_address = request.remote_addr  # Capture IP address from request
 
-        # Check for existing user with the same Ihre Handynummer
-        existing_user = User.query.filter_by(phone_number=phone_number).first()
-        if existing_user:
-            logging.debug("Account registration failed: Ihre Handynummer already exists")
-            return jsonify({"success": False, "message": "Diese Handynummer ist bereits registriert."}), 400
 
-        # Generate OTP and handle verification
-        otp = randint(100000, 999999)
-        client = Client(account_sid, auth_token)
+
+
+
+
+
+
+
+
+def generate_otp_and_send(phone_number):
+    otp = randint(100000, 999999)
+    client = Client(account_sid, auth_token)
+    try:
         message = client.messages.create(
-            body=f"Stimmungskompass: Ihr OTP ist: {otp}. Fügen Sie hinzu, um die Registrierung abzuschließen!",
+            body=f"Stimmungskompass: Ihr OTP ist: {otp}",
             from_=twilio_number,
             to=phone_number,
         )
-        logging.debug(f"Twilio message SID: {message.sid}")
+        logging.debug(f"OTP sent: {message.sid}")
+    except Exception as e:
+        logging.error(f"Error sending OTP: {e}")
+        return None
+    return otp
 
-        # Save the user data in session temporarily
+def is_email(identifier):
+    return re.match(r"[^@]+@[^@]+\.[^@]+", identifier)
+
+def standardize_phone_number(raw_phone):
+    try:
+        phone_number = phonenumbers.parse(raw_phone, "AT")
+        if phonenumbers.is_valid_number(phone_number):
+            return phonenumbers.format_number(phone_number, phonenumbers.PhoneNumberFormat.E164)
+    except phonenumbers.NumberParseException:
+        return None
+
+
+
+
+
+
+
+def send_otp(identifier, otp):
+    if is_email(identifier):
+        try:
+            msg = Message('Stimmungskompass OTP-Sicherheitscode', sender=('Stimmungskompass', 'office@stimmungskompass.at'), recipients=[identifier])
+            msg.html = f"""
+            <div style="text-align: center;">
+                <img src="https://i.imgur.com/Ma6hYqM.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
+                <p>Sie haben kürzlich ein OTP (Einmalpasswort) von Stimmungskompass angefordert.</p>
+                <p style="font-size: 20px;">Ihr Code lautet: <b>{otp}</b></p>
+                <p>Dieser Code ist 10 Minuten gültig.</p>
+                <p>Wenn Sie diese Aktivität nicht erkennen, senden Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
+                <p>Mit freundlichen Grüßen,<br>Stimmungskompass</p>
+            </div>
+            """
+            mail.send(msg)
+            logging.debug(f"Email sent to {identifier} with OTP {otp}")
+        except Exception as e:
+            logging.error(f"Error sending OTP via email to {identifier}: {e}")
+            return None
+    else:
+        try:
+            client = Client(account_sid, auth_token)
+            message = client.messages.create(
+                body=f"Stimmungskompass: Ihr OTP ist: {otp}",
+                from_=twilio_number,
+                to=identifier,
+            )
+            logging.debug(f"OTP sent via SMS to {identifier}: {message.sid}")
+        except Exception as e:
+            logging.error(f"Error sending OTP via SMS to {identifier}: {e}")
+            return None
+    return otp
+
+
+
+
+
+
+
+
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        identifier = request.form.get("identifier")
+        password = request.form.get("password")
+        name = request.form.get("name")
+        ip_address = request.remote_addr
+
+        user = None
+        if is_email(identifier):
+            user = User.query.filter_by(email=identifier).first()
+            if user:
+                return jsonify(success=False, message="Email already registered.")
+        else:
+            standardized_phone = standardize_phone_number(identifier)
+            if not standardized_phone:
+                return jsonify(success=False, message="Invalid phone number format.")
+            user = User.query.filter_by(phone_number=standardized_phone).first()
+            if user:
+                return jsonify(success=False, message="Phone number already registered.")
+        
+        otp = randint(100000, 999999)
+        if send_otp(identifier, otp) is None:
+            return jsonify(success=False, message="Error sending OTP.")
+
         session["user_data"] = {
-            "phone_number": phone_number,
+            "identifier": identifier,
             "password": password,
             "name": name,
             "ip_address": ip_address,
             "otp": otp,
         }
+        logging.debug(f"OTP sent for verification to identifier: {identifier}")
+        return jsonify(success=True, message="OTP sent. Please verify.", next=url_for("verify_otp"))
 
-        logging.debug("OTP sent for verification to Ihre Handynummer: %s", phone_number)
-        return jsonify({"success": True, "message": "OTP wurde gesendet."})
-    metaData = g.metaData
-    return render_template("register/index.html", metaData=metaData)
+    return render_template("register/index.html")
+
+
+
+
+
+@app.route("/login_via_otp", methods=["POST"])
+def login_via_otp():
+    identifier = request.form.get("identifier")
+    otp = randint(100000, 999999)
+    session['otp'] = otp
+    session['identifier'] = identifier
+    
+    if is_email(identifier):
+        logging.info(f"OTP request received for email: {identifier}")
+        if send_otp(identifier, otp):
+            return jsonify({"success": True, "message": "OTP sent."})
+        else:
+            return jsonify({"success": False, "message": "Fehler beim Senden des OTP per E-Mail."})
+    else:
+        phone_number = standardize_phone_number(identifier)
+        if phone_number:
+            logging.info(f"OTP request received for phone number: {phone_number}")
+            client = Client(account_sid, auth_token)
+            message = client.messages.create(
+                body=f"Ihr Login-OTP: {otp}",
+                from_=twilio_number,
+                to=phone_number
+            )
+            logging.info(f"Twilio message SID: {message.sid}")
+            return jsonify({"success": True, "message": "OTP sent."})
+        else:
+            return jsonify({"success": False, "message": "Ungültige Handynummer."})
+
+
+
+
+
+
+
+@app.route("/otp_verify_login", methods=["POST"])
+def otp_verify_login():
+    user_otp = request.form.get("otp")
+    session_otp = session.get('otp')
+    identifier = session.get('identifier')
+    
+    if user_otp and session_otp and user_otp == str(session_otp) and identifier:
+        if is_email(identifier):
+            user = User.query.filter_by(email=identifier).first()
+        else:
+            user = User.query.filter_by(phone_number=identifier).first()
+        
+        if user:
+            login_user(user)  # Make sure the login_user function is correctly configured
+            logging.info("OTP verified and user logged in")
+            return jsonify(success=True, next=url_for("index"))
+    
+    logging.info("OTP verification failed")
+    return jsonify(success=False, message="OTP-Verifizierung fehlgeschlagen.")
+
 
 
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
-    # Capture 'next' parameter or set to index if not present
     next_page = request.args.get("next") or url_for("index")
-    logging.debug(
-        f"'next' parameter detected, user will be redirected to {next_page} after logging in."
-    )
-
     if request.method == "POST":
-        username_or_phone = request.form.get("username_or_phone")
+        identifier = request.form.get("identifier")
         password = request.form.get("password")
-        user = User.query.filter_by(phone_number=username_or_phone).first()
 
-        if user and user.check_password(password):
-            login_user(user)
-            logging.debug("Login successful")
-            return jsonify(success=True, next=next_page)
+        # Check if identifier and password are provided
+        if not identifier or not password:
+            logging.error("Identifier or password not provided")
+            return jsonify(success=False, message="Bitte geben Sie sowohl die E-Mail/Handynummer als auch das Passwort ein."), 400
+
+        logging.debug(f"Login attempt with identifier: {identifier}")
+
+        user = None
+        if is_email(identifier):
+            user = User.query.filter_by(email=identifier).first()
         else:
-            logging.debug("Login failed")
-            return jsonify(success=False)
-    metaData=g.metaData
-    return render_template("login/index.html", next=next_page, metaData=metaData)
+            standardized_phone = standardize_phone_number(identifier)
+            if standardized_phone:
+                user = User.query.filter_by(phone_number=standardized_phone).first()
+
+        logging.debug(f"User found: {user is not None}")
+        if user:
+            logging.debug(f"Password hash: {user.password_hash}")
+            logging.debug(f"Password provided: {password}")
+            if user.password_hash is None:
+                logging.error("User password hash is None")
+                return jsonify(success=False, message="Server error. Please contact support."), 500
+
+        try:
+            if user and user.check_password(password):
+                login_user(user)
+                logging.debug("Login successful")
+                return jsonify(success=True, next=next_page)
+            else:
+                logging.debug("Login failed: Invalid credentials")
+                return jsonify(success=False, message="Login fehlgeschlagen. Bitte überprüfen Sie Ihre E-Mail/Handynummer und Ihr Passwort."), 401
+        except Exception as e:
+            logging.error(f"Error during password check: {e}")
+            return jsonify(success=False, message="Server error. Please contact support."), 500
+
+    return render_template("login/index.html", next=next_page)
+
+
+
+
+
+
+
+
 
 
 # Function to clean up old IP addresses
@@ -2058,20 +2260,7 @@ def check_project_limit():
     return jsonify({"limit_reached": limit_reached, "reset_time": reset_time})
 
 
-def generate_otp_and_send(phone_number):
-    otp = randint(100000, 999999)
-    client = Client(account_sid, auth_token)
-    try:
-        message = client.messages.create(
-            body=f"Stimmungskompass: Ihr OTP ist: {otp}",
-            from_=twilio_number,
-            to=phone_number,
-        )
-        logging.debug(f"OTP sent: {message.sid}")
-    except Exception as e:
-        logging.error(f"Error sending OTP: {e}")
-        return None
-    return otp
+
 
 
 @app.route("/favicon.ico")
@@ -2134,41 +2323,93 @@ def Partizipative_Planung_Fragen_Karte():
     return render_template("Partizipative_Planung_Fragen_Karte/index.html", projects=projects_data, metaData=metaData)
 
 
+
+
+
+
 @app.route("/request_otp", methods=["POST"])
 def request_otp():
-    phone_number = request.form.get("phone_number")
-    user = User.query.filter_by(phone_number=phone_number).first()
+    identifier = request.form.get("identifier")
+    
+    if is_email(identifier):
+        user = User.query.filter_by(email=identifier).first()
+    else:
+        standardized_phone = standardize_phone_number(identifier)
+        user = User.query.filter_by(phone_number=standardized_phone).first()
+    
     if user:
-        otp = generate_otp_and_send(phone_number)
-        if otp:
-            session["reset_otp"] = otp
-            session["phone_number"] = phone_number
-            logging.debug(f"OTP generated and session updated for Ihre Handynummer {phone_number}")
-            return jsonify(success=True, message="OTP wurde gesendet.")
+        otp = randint(100000, 999999)
+        session["identifier"] = identifier
+        session["reset_otp"] = otp
+
+        if is_email(identifier):
+            try:
+                msg = Message('Stimmungskompass OTP-Sicherheitscode', sender=('Stimmungskompass', 'office@stimmungskompass.at'), recipients=[identifier])
+                msg.html = f"""
+                <div style="text-align: center;">
+                    <img src="https://i.imgur.com/Ma6hYqM.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
+                    <p>Sie haben kürzlich ein OTP (Einmalpasswort) von Stimmungskompass angefordert.</p>
+                    <p style="font-size: 20px;">Ihr Code lautet: <b>{otp}</b></p>
+                    <p>Dieser Code ist 10 Minuten gültig.</p>
+                    <p>Wenn Sie diese Aktivität nicht erkennen, senden Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
+                    <p>Mit freundlichen Grüßen,<br>Stimmungskompass</p>
+                </div>
+                """
+                mail.send(msg)
+                logging.debug(f"Email sent to {identifier} with OTP {otp}")
+            except Exception as e:
+                logging.error(f"Error sending OTP via email to {identifier}: {e}")
+                return jsonify({"success": False, "message": "Fehler beim Senden des OTP per E-Mail."})
         else:
-            return jsonify(success=False, message="Fehler beim Senden des OTP.")
-    logging.debug(f"Ihre Handynummer not found: {phone_number}")
-    return jsonify(success=False, message="Ihre Handynummer wurde nicht gefunden.")
+            try:
+                client = Client(account_sid, auth_token)
+                message = client.messages.create(
+                    body=f"Stimmungskompass: Ihr OTP ist: {otp}",
+                    from_=twilio_number,
+                    to=standardized_phone
+                )
+                logging.debug(f"OTP sent via SMS to {standardized_phone} with message SID: {message.sid}")
+            except Exception as e:
+                logging.error(f"Error sending OTP via SMS to {standardized_phone}: {e}")
+                return jsonify({"success": False, "message": "Fehler beim Senden des OTP per SMS."})
+
+        return jsonify({"success": True, "message": "OTP wurde gesendet."})
+    else:
+        logging.debug(f"Identifier not found: {identifier}")
+        return jsonify({"success": False, "message": "Handynummer oder E-Mail wurde nicht gefunden."}), 404
 
 
-@app.route("/reset_password", methods=["GET", "POST"])
+
+
+
+
+@app.route("/reset_password", methods=["POST"])
 def reset_password():
-    metaData = g.metaData
-    if request.method == "POST":
-        otp_entered = request.form.get("otp")
-        new_password = request.form.get("new_password")
-        phone_number = session.get("phone_number")
-        if "reset_otp" in session and session["reset_otp"] == int(otp_entered):
-            user = User.query.filter_by(phone_number=phone_number).first()
-            if user:
-                user.set_password(new_password)
-                db.session.commit()
-                logging.debug(f"Password reset for user with Ihre Handynummer {phone_number}")
-                return jsonify({"success": True, "message": "Passwort erfolgreich zurückgesetzt", "redirect_url": url_for("pwresetcon")})
+    user_otp = request.form.get("otp")
+    new_password = request.form.get("new_password")
+    session_otp = session.get('reset_otp')
+    identifier = session.get('identifier')
+
+    if user_otp and session_otp and user_otp == str(session_otp) and identifier:
+        if is_email(identifier):
+            user = User.query.filter_by(email=identifier).first()
         else:
-            logging.debug("OTP verification failed for password reset")
-            return jsonify({"success": False, "message": "Ungültiges OTP"}), 400
-    return render_template("reset_password.html", metaData=metaData)
+            user = User.query.filter_by(phone_number=standardize_phone_number(identifier)).first()
+        
+        if user:
+            user.set_password(new_password)
+            db.session.commit()
+            logging.info("Password reset successful")
+            return jsonify({"success": True, "message": "Passwort erfolgreich zurückgesetzt.", "redirect_url": url_for("index")})
+
+    logging.info("OTP verification failed for password reset")
+    return jsonify({"success": False, "message": "OTP-Verifizierung fehlgeschlagen."})
+
+
+
+
+
+
 
 
 @app.route("/Partizipative_Planung_Neuer_Projekt")
@@ -3752,7 +3993,7 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
         paginated_projects = None
         paginated_map_objects = None
         paginated_comments = None
-    metaData=g.metaData
+    metaData = g.metaData
     # Check if it's an AJAX request
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         requested_section = request.args.get("section")
@@ -3797,7 +4038,6 @@ def profil(project_page=1, map_object_page=1, comment_page=1):
         bookmarks=bookmarks,
         metaData=metaData,
     )
-
 
 @app.route("/get_user_statistics")
 @login_required
@@ -3972,114 +4212,124 @@ def delete_comment(comment_id):
         return jsonify(success=False, error="Permission denied"), 403
 
 
+
+
+
+
+
+
 @app.route("/verify_otp", methods=["GET", "POST"])
 def verify_otp():
     if request.method == "POST":
         user_otp = request.form.get("otp")
         if "user_data" in session and session["user_data"]["otp"] == int(user_otp):
-            # Handle New User Registration
             user_data = session.pop("user_data")
 
             new_user = User(
-                phone_number=user_data["phone_number"],
-                password_hash=generate_password_hash(user_data["password"]),
+                email=user_data["identifier"] if is_email(user_data["identifier"]) else None,
+                phone_number=standardize_phone_number(user_data["identifier"]) if not is_email(user_data["identifier"]) else None,
                 name=user_data["name"],
-                ip_address=user_data["ip_address"],
+                ip_address=user_data["ip_address"]
             )
+            new_user.set_password(user_data["password"])
             db.session.add(new_user)
             db.session.commit()
 
             login_user(new_user)
-            logging.debug("New user registered: %s", new_user.phone_number)
-            
-            redirect_url = url_for('registered')
-            logging.debug(f"Redirecting to: {redirect_url}")
-            
-            return jsonify({"success": True, "message": "Konto erfolgreich erstellt", "redirect_url": redirect_url})
+            logging.debug(f"New user registered: {new_user.email if new_user.email else new_user.phone_number}")
+            return jsonify({"success": True, "message": "Konto erfolgreich erstellt", "redirect_url": url_for('registered')})
 
-        elif "reset_otp" in session and session["reset_otp"] == int(user_otp):
-            # Handle Password Reset
-            phone_number = session.get("phone_number")
-            user = User.query.filter_by(phone_number=phone_number).first()
-            if user:
-                new_password = request.form.get("new_password")
-                user.set_password(new_password)
-                db.session.commit()
-                logging.debug(f"Password reset for user with phone number %s", phone_number)
-                return jsonify({"success": True, "message": "Passwort erfolgreich zurückgesetzt", "redirect_url": url_for("pwresetcon")})
-            else:
-                logging.debug("User not found for password reset.")
-                return jsonify({"success": False, "message": "Benutzer nicht gefunden."}), 404
+        logging.debug("OTP verification failed")
+        return jsonify({"success": False, "message": "Ungültiges OTP"}), 400
 
-        else:
-            logging.debug("OTP verification failed")
-            return jsonify({"success": False, "message": "Ungültiges OTP"}), 400
+    return render_template("verify_otp/index.html")
 
-    metaData = g.metaData
-    return render_template("verify_otp/index.html", metaData=metaData)
+
+
+
+
+
 
 
 @app.route("/resend_otp", methods=["POST"])
 def resend_otp():
     if "user_data" in session:
         user_data = session["user_data"]
-        phone_number = user_data["phone_number"]
+        identifier = user_data["identifier"]
 
-        # Generate new OTP and update the session
         otp = randint(100000, 999999)
         user_data["otp"] = otp
         session["user_data"] = user_data
 
-        client = Client(account_sid, auth_token)
-        message = client.messages.create(
-            body=f"Stimmungskompass: Ihr OTP ist: {otp}. Fügen Sie hinzu, um die Registrierung abzuschließen!",
-            from_=twilio_number,
-            to=phone_number,
-        )
-        logging.debug(f"New OTP sent to: {phone_number}, Twilio message SID: {message.sid}")
-        return jsonify({"success": True, "message": "OTP wurde erneut gesendet."})
-    elif "phone_number" in session:
-        phone_number = session["phone_number"]
+        if send_otp(identifier, otp) is None:
+            return jsonify({"success": False, "message": "Error resending OTP."})
 
-        # Generate new OTP and update the session
-        otp = randint(100000, 999999)
-        session["reset_otp"] = otp
-
-        client = Client(account_sid, auth_token)
-        message = client.messages.create(
-            body=f"Stimmungskompass: Ihr OTP ist: {otp}. Fügen Sie hinzu, um die Passwort-Zurücksetzung abzuschließen!",
-            from_=twilio_number,
-            to=phone_number,
-        )
-        logging.debug(f"New OTP sent to: {phone_number}, Twilio message SID: {message.sid}")
+        logging.debug(f"New OTP sent to: {identifier}")
         return jsonify({"success": True, "message": "OTP wurde erneut gesendet."})
-    else:
-        logging.debug("No user data in session for OTP resend.")
-        return jsonify({"success": False, "message": "Fehler beim Senden des OTP."}), 400
+
+    logging.debug("No user data in session for OTP resend.")
+    return jsonify({"success": False, "message": "Fehler beim Senden des OTP."}), 400
+
 
 
 
 @app.route("/password_recovery", methods=["GET", "POST"])
 def password_recovery():
     if request.method == "POST":
-        phone_number = request.form["phone_number"]
-        user = User.query.filter_by(phone_number=phone_number).first()
+        identifier = request.form["identifier"]
+        if is_email(identifier):
+            user = User.query.filter_by(email=identifier).first()
+        else:
+            standardized_phone = standardize_phone_number(identifier)
+            user = User.query.filter_by(phone_number=standardized_phone).first()
+        
         if user:
             otp = randint(100000, 999999)
-            client = Client(account_sid, auth_token)
-            client.messages.create(
-                body=f"Stimmungskompass: Ihr OTP ist: {otp}",
-                from_=twilio_number,
-                to=phone_number,
-            )
-            session["phone_number"] = phone_number
+            session["identifier"] = identifier
             session["reset_otp"] = otp
-            return redirect(url_for("verify_otp"))
+
+            if is_email(identifier):
+                try:
+                    msg = Message('Your OTP Code', sender=('Stimmungskompass', 'office@stimmungskompass.at'), recipients=[identifier])
+                    msg.html = f"""
+                    <div style="text-align: center;">
+                        <img src="https://i.imgur.com/Ma6hYqM.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
+                        <p>Sie haben kürzlich ein OTP (Einmalpasswort) von Stimmungskompass angefordert.</p>
+                        <p style="font-size: 20px;">Ihr Code lautet: <b>{otp}</b></p>
+                        <p>Dieser Code ist 10 Minuten gültig.</p>
+                        <p>Wenn Sie diese Aktivität nicht erkennen, senden Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
+                        <p>Mit freundlichen Grüßen,<br>Stimmungskompass</p>
+                    </div>
+                    """
+                    mail.send(msg)
+                    logging.debug(f"Email sent to {identifier} with OTP {otp}")
+                except Exception as e:
+                    logging.error(f"Error sending OTP via email to {identifier}: {e}")
+                    return jsonify({"success": False, "message": "Fehler beim Senden des OTP per E-Mail."})
+            else:
+                try:
+                    client = Client(account_sid, auth_token)
+                    message = client.messages.create(
+                        body=f"Stimmungskompass: Ihr OTP ist: {otp}",
+                        from_=twilio_number,
+                        to=standardized_phone
+                    )
+                    logging.debug(f"OTP sent via SMS to {standardized_phone} with message SID: {message.sid}")
+                except Exception as e:
+                    logging.error(f"Error sending OTP via SMS to {standardized_phone}: {e}")
+                    return jsonify({"success": False, "message": "Fehler beim Senden des OTP per SMS."})
+
+            return jsonify({"success": True, "message": "OTP wurde gesendet."})
         else:
-            logging.debug(f"Ihre Handynummer not found: {phone_number}")
-            return jsonify({"success": False, "message": "Ihre Handynummer wurde nicht gefunden."}), 404
-    metaData = g.metaData
-    return render_template("password_recovery/index.html", metaData=metaData)
+            logging.debug(f"Identifier not found: {identifier}")
+            return jsonify({"success": False, "message": "Handynummer oder E-Mail wurde nicht gefunden."}), 404
+    return render_template("password_recovery/index.html")
+
+
+
+
+
+
 
 
 @app.route("/download_data")

@@ -1,8 +1,15 @@
  
+ body, html {
+    width: 100%;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
  
  
- 
- 
+ .form-container, .otp-form {
+    width: 100%; /* Adjust this to control the width of your forms */
+    max-width: 500px; /* Or whatever maximum width you prefer */
+    margin: 0 auto; /* Center align the container */
+}
  
  ::-webkit-scrollbar {
      width: 12px;
@@ -214,6 +221,7 @@ border-radius: 0px;
     text-align: center; /* Centers content horizontally */
     /* Add other styling as needed */
 }
+
   
 
 .stat-box {

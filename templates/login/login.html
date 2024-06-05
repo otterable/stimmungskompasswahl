@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='utility.css') }}">
     <meta name="google-signin-client_id" content="695509729214-orede17jk35rvnou5ttbk4d6oi7oph2i.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+    <script src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js" async defer></script>
 </head>
 <body>
 <div class="edge">
@@ -16,18 +16,32 @@
             <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
         </div>
         <div class="login-section">
-            <div style="text-align: center !important; margin-top: 10px;">
-                <h3>Melden Sie sich ein, um Beiträge und Kommentare zu posten.</h3>
-            </div>
-            <a href="{{ url_for('google_login') }}" class="button" style="display:block">Mit Google anmelden</a>
-            <button id="custom-apple-signin-button" class="button" style="margin-top: 15px; color: white; display:none;">Mit Apple anmelden</button>
-            <button id="toggle-form-btn" class="register-button" style="font-weight:bold">Mit Handynummer anmelden</button>
+            <h3>Melden Sie sich ein, um Beiträge und Kommentare zu posten.</h3>
+            <a href="{{ url_for('google_login') }}" class="button">Mit Google anmelden</a>
+            <button id="toggle-form-btn" class="register-button">Anmelden mit Handynummer oder E-Mail</button>
             <div class="login-form" id="login-form" style="display: none;">
                 <form action="{{ url_for('login', next=next) }}" method="post">
-                    <input type="text" name="username_or_phone" placeholder="Ihre Handynummer" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
+                    <input type="text" name="identifier" placeholder="E-Mail oder Handynummer" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
                     <input type="password" name="password" placeholder="Passwort" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
-                    <button type="submit" class="register-button" style="font-weight: bold; margin-top: 0px;">Anmelden</button>
+               
+                    <button type="submit" class="register-button">Anmelden</button>
                 </form>
+            </div>
+            <button id="toggle-otp-btn" class="register-button">Anmelden mit OTP</button>
+            <div class="otp-form" id="otp-form" style="display: none;">
+                <form id="otp-request-form" method="post">
+                    <input type="text" id="identifier_input" name="identifier" placeholder="Ihre Handynummer oder E-Mail" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
+                    <button type="submit" id="send-otp-button" class="register-button">OTP senden</button>
+                </form>
+                <div id="otp-entry" style="display: none;">
+                    <form id="otp-verify-form">
+                        <input type="text" name="otp" placeholder="Geben Sie Ihr OTP ein" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
+      
+                        <button type="submit" class="register-button">Anmelden</button>
+                    </form>
+                    <button id="resend-otp" class="register-button" disabled>OTP erneut senden (30s)</button>
+                    <button id="change-identifier" class="register-button">Nummer/email ändern</button>
+                </div>
             </div>
             <a href="/register" class="register-button">Registrieren</a>
             <a href="{{ url_for('password_recovery') }}" class="register-button">Passwort zurücksetzen</a>
@@ -39,15 +53,23 @@
         </div>
     </div>
 </div>
-<script type="text/javascript">
-    AppleID.auth.init({
-        clientId: 'com.ermine.stimmungskompass',
-        scope: 'name email',
-        redirectURI: '{{ url_for("authorize_apple", _external=True) }}',
-        state: 'state',
-        usePopup: true
-    });
-</script>
-<script src="{{ url_for('static', filename='login.js') }}"></script>
+    <script>
+        function toggleForm(formId) {
+            const allForms = ['login-form', 'otp-form'];
+            const allButtons = ['toggle-form-btn', 'toggle-otp-btn'];
+
+            allForms.forEach(f => {
+                const form = document.getElementById(f);
+                const button = document.getElementById(allButtons[allForms.indexOf(f)]);
+                if (f === formId) {
+                    form.classList.toggle('show');
+                    button.classList.toggle('selected');
+                } else {
+                    form.classList.remove('show');
+                    button.classList.remove('selected');
+                }
+            });
+        }
+    </script>
 </body>
 </html>
