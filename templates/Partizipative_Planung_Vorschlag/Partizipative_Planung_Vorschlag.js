@@ -180,7 +180,7 @@ var interval = setInterval(function() {
 
     if (distance < 0) {
         clearInterval(interval);
-        element.innerText = "Kommentar absenden";
+        element.innerText = "Kommentar abschicken";
         element.disabled = false;
     }
 }, 1000);

@@ -3,12 +3,12 @@ $(document).ready(function() {
         $('#resend-otp').prop('disabled', true);
         let countdown = 30;
         const countdownInterval = setInterval(() => {
-            $('#resend-otp').text(`OTP erneut senden (${countdown}s)`);
+            $('#resend-otp').text(`OTP erneut schicken (${countdown}s)`);
             countdown -= 1;
             if (countdown < 0) {
                 clearInterval(countdownInterval);
                 $('#resend-otp').prop('disabled', false);
-                $('#resend-otp').text("OTP erneut senden");
+                $('#resend-otp').text("OTP erneut schicken");
             }
         }, 1000);
     }

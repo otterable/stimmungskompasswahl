@@ -1853,11 +1853,11 @@ def send_otp(identifier, otp):
             msg = Message('Stimmungskompass OTP-Sicherheitscode', sender=('Stimmungskompass', 'office@stimmungskompass.at'), recipients=[identifier])
             msg.html = f"""
             <div style="text-align: center;">
-                <img src="https://i.imgur.com/Ma6hYqM.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
+                <img src="https://i.imgur.com/YboW7bj.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
                 <p>Sie haben kürzlich ein OTP (Einmalpasswort) von Stimmungskompass angefordert.</p>
                 <p style="font-size: 20px;">Ihr Code lautet: <b>{otp}</b></p>
                 <p>Dieser Code ist 10 Minuten gültig.</p>
-                <p>Wenn Sie diese Aktivität nicht erkennen, senden Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
+                <p>Wenn Sie diese Aktivität nicht erkennen, schicken Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
                 <p>Mit freundlichen Grüßen,<br>Stimmungskompass</p>
             </div>
             """
@@ -1941,7 +1941,7 @@ def login_via_otp():
         if send_otp(identifier, otp):
             return jsonify({"success": True, "message": "OTP sent."})
         else:
-            return jsonify({"success": False, "message": "Fehler beim Senden des OTP per E-Mail."})
+            return jsonify({"success": False, "message": "Fehler beim schicken des OTP per E-Mail."})
     else:
         phone_number = standardize_phone_number(identifier)
         if phone_number:
@@ -2347,11 +2347,11 @@ def request_otp():
                 msg = Message('Stimmungskompass OTP-Sicherheitscode', sender=('Stimmungskompass', 'office@stimmungskompass.at'), recipients=[identifier])
                 msg.html = f"""
                 <div style="text-align: center;">
-                    <img src="https://i.imgur.com/Ma6hYqM.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
+                    <img src="https://i.imgur.com/YboW7bj.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
                     <p>Sie haben kürzlich ein OTP (Einmalpasswort) von Stimmungskompass angefordert.</p>
                     <p style="font-size: 20px;">Ihr Code lautet: <b>{otp}</b></p>
                     <p>Dieser Code ist 10 Minuten gültig.</p>
-                    <p>Wenn Sie diese Aktivität nicht erkennen, senden Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
+                    <p>Wenn Sie diese Aktivität nicht erkennen, schicken Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
                     <p>Mit freundlichen Grüßen,<br>Stimmungskompass</p>
                 </div>
                 """
@@ -2359,7 +2359,7 @@ def request_otp():
                 logging.debug(f"Email sent to {identifier} with OTP {otp}")
             except Exception as e:
                 logging.error(f"Error sending OTP via email to {identifier}: {e}")
-                return jsonify({"success": False, "message": "Fehler beim Senden des OTP per E-Mail."})
+                return jsonify({"success": False, "message": "Fehler beim schicken des OTP per E-Mail."})
         else:
             try:
                 client = Client(account_sid, auth_token)
@@ -2371,7 +2371,7 @@ def request_otp():
                 logging.debug(f"OTP sent via SMS to {standardized_phone} with message SID: {message.sid}")
             except Exception as e:
                 logging.error(f"Error sending OTP via SMS to {standardized_phone}: {e}")
-                return jsonify({"success": False, "message": "Fehler beim Senden des OTP per SMS."})
+                return jsonify({"success": False, "message": "Fehler beim schicken des OTP per SMS."})
 
         return jsonify({"success": True, "message": "OTP wurde gesendet."})
     else:
@@ -4268,7 +4268,7 @@ def resend_otp():
         return jsonify({"success": True, "message": "OTP wurde erneut gesendet."})
 
     logging.debug("No user data in session for OTP resend.")
-    return jsonify({"success": False, "message": "Fehler beim Senden des OTP."}), 400
+    return jsonify({"success": False, "message": "Fehler beim schicken des OTP."}), 400
 
 
 
@@ -4293,11 +4293,11 @@ def password_recovery():
                     msg = Message('Your OTP Code', sender=('Stimmungskompass', 'office@stimmungskompass.at'), recipients=[identifier])
                     msg.html = f"""
                     <div style="text-align: center;">
-                        <img src="https://i.imgur.com/Ma6hYqM.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
+                        <img src="https://i.imgur.com/YboW7bj.png" alt="Stimmungskompass Logo" style="width: 400px; height: auto;">
                         <p>Sie haben kürzlich ein OTP (Einmalpasswort) von Stimmungskompass angefordert.</p>
                         <p style="font-size: 20px;">Ihr Code lautet: <b>{otp}</b></p>
                         <p>Dieser Code ist 10 Minuten gültig.</p>
-                        <p>Wenn Sie diese Aktivität nicht erkennen, senden Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
+                        <p>Wenn Sie diese Aktivität nicht erkennen, schicken Sie eine E-Mail an office@stimmungskompass.at, um den Vorfall zu melden.</p>
                         <p>Mit freundlichen Grüßen,<br>Stimmungskompass</p>
                     </div>
                     """
@@ -4305,7 +4305,7 @@ def password_recovery():
                     logging.debug(f"Email sent to {identifier} with OTP {otp}")
                 except Exception as e:
                     logging.error(f"Error sending OTP via email to {identifier}: {e}")
-                    return jsonify({"success": False, "message": "Fehler beim Senden des OTP per E-Mail."})
+                    return jsonify({"success": False, "message": "Fehler beim schicken des OTP per E-Mail."})
             else:
                 try:
                     client = Client(account_sid, auth_token)
@@ -4317,7 +4317,7 @@ def password_recovery():
                     logging.debug(f"OTP sent via SMS to {standardized_phone} with message SID: {message.sid}")
                 except Exception as e:
                     logging.error(f"Error sending OTP via SMS to {standardized_phone}: {e}")
-                    return jsonify({"success": False, "message": "Fehler beim Senden des OTP per SMS."})
+                    return jsonify({"success": False, "message": "Fehler beim schicken des OTP per SMS."})
 
             return jsonify({"success": True, "message": "OTP wurde gesendet."})
         else:

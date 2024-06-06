@@ -863,29 +863,6 @@ function updatePopupContent(projectId, data) {
     markersById[projectId].bindPopup(popup).openPopup();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/get_projects_with_vote_status')
-        .then(response => response.json())
-        .then(projects => {
-            projects.forEach(project => {
-                const upvoteButton = document.querySelector(`#upvote-button-${project.id}`);
-                const downvoteButton = document.querySelector(`#downvote-button-${project.id}`);
-
-                if (upvoteButton && project.user_vote === 'upvote') {
-                    upvoteButton.classList.add('voted-upvote');
-                    console.log(`Upvote loaded: User ID ${project.user_id} has previously upvoted project ID ${project.id}, turning the circle button of upvote to color #4caf50.`);
-                } else if (downvoteButton && project.user_vote === 'downvote') {
-                    downvoteButton.classList.add('voted-downvote');
-                    console.log(`Downvote loaded: User ID ${project.user_id} has previously downvoted project ID ${project.id}, turning the circle button of downvote to color #9a031e.`);
-                }
-
-                if ((upvoteButton || downvoteButton) && project.user_vote) {
-                    console.log(`Vote loaded: User ID ${project.user_id} has previously ${project.user_vote}d project ID ${project.id}, adjusting the circle button color.`);
-                }
-            });
-        })
-        .catch(error => console.error('Error loading project votes:', error));
-});
 
 function setInitialVoteBarStyles(projectId) {
     document.querySelectorAll('.voting-bar').forEach(votingBar => {

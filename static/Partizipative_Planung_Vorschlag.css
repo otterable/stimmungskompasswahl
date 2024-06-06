@@ -165,16 +165,14 @@ input[type="file"] {
 
 
 .button {
-  border-radius: 30px;
-  padding: 10px;
-  background-color: white;
-  font-weight: bold;
-  color: black;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  /* Smooth transition for background color */
-}
+     border-radius: 30px;
+     padding: 10px;
+     background-color: white;
+     font-weight: bold;
+     color: black;
+     border: none;
+     cursor: pointer;
+   }
 
 .centered-title a {
   color: #003056;
@@ -1275,14 +1273,28 @@ width: 100%; /* Full width */
     color: black;
     margin-top: 10px;
   }
+}
 
-  @media only screen and (max-width: 1445px) {
+.login-button {
+    border-radius: 30px;
+    padding: 10px;
+    font-size: 18px;
+    background-color: white;
+    font-weight: bold;
+    margin-top: 2px;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: width 0.3s ease;
+}
+
+@media only screen and (max-width: 1445px) {
     .top-bar a button {
-      transition: width 0.3s ease !important;
-      border-radius: 30px;
-      padding: 7px !important;
+        transition: width 0.3s ease;
+        border-radius: 30px;
+        padding: 7px;
     }
-  }
+}
 }
 
 #hamburger-button {
@@ -1295,10 +1307,7 @@ width: 100%; /* Full width */
     font-size: 12px !important;
     /* Smaller font size */
   }
-   .top-bar a button {
-    font-size: 18px !important;
-      padding: 7px !important;
-    }
+ 
   .form-container h2 {
 	  	  font-size: 20px !important;
   }
@@ -1414,6 +1423,11 @@ border-radius: 0px;
         align-items: center;
         margin-top: 10px;
     }
+	
+    .login-button {
+        padding: 20px !important;
+    }
+
 	
 	    .voting-buttons-container .button {
         flex-grow: 1; /* Allow buttons to grow and fill the container */
