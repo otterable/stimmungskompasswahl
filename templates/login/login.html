@@ -21,7 +21,7 @@
             <button id="toggle-form-btn" class="register-button">Mit Nummer / E-Mail anmelden</button>
             <div class="login-form" id="login-form" style="display: none;">
                 <form action="{{ url_for('login', next=next) }}" method="post">
-					<p>Ihre Handynummer oder E-Mail.</p>
+					<p>Handynummer oder E-Mail.</p>
                     <input type="text" name="identifier" placeholder="Handynummer oder E-Mail" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
                     <p>Ihr Passwort.</p>
 					<input type="password" name="password" placeholder="Passwort" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
@@ -34,7 +34,7 @@
                	<p>Ein Code wird an Ihre Nummer oder E-Mail gesendet.</p>
 				 <p>Geben Sie ihn hier ein.</p>
                 <form id="otp-request-form" method="post">
-                    <input type="text" id="identifier_input" name="identifier" placeholder="Ihre Handynummer oder E-Mail" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
+                    <input type="text" id="identifier_input" name="identifier" placeholder="Handynummer oder E-Mail" style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;" required>
                     <button type="submit" id="send-otp-button" class="register-button">OTP schicken</button>
                 </form>
                 <div id="otp-entry" style="display: none;">
