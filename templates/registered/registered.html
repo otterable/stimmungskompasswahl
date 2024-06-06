@@ -1,58 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stimmungskompass</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='utility.css') }}">
-  <head>
-  <div class="form-container2">
-  <div class="logo-container" onclick="window.location.href='/'">
-  <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
-</div></div>
-
-          <div class="stats-container">
-
-<div class="project-thumbnail" style="background-color: #faf6eb;">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stimmungskompass</title>
 </head>
 <body>
+<div class="edge">
 
-      <h2>Ihre Registrierung ist abgeschlossen!</h2>
-      <p>Sie können nun neue Projektvorschläge oder Notizen einreichen oder Fragen zu einer Baustelle stellen.</p>
-      <h3>Es gibt verschiedene Arten von Beiträgen, die Sie machen können:</h3>
-	  </div>
-	  	  </div>
+<div class="form-container">
+    <div class="logo-container" onclick="window.location.href='/'">
+        <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
+    </div>
 
-          <div class="stats-container">
+        <div class="login-section">
+        <h3>Ihre Registrierung ist abgeschlossen!</h3>
+		<p>Erfahren Sie mehr über die verschiedenen Arten von Beiträgen, die Sie einreichen können.</p>
 
-<div class="project-thumbnail" style="background-color: #f5f1e4;">
+    </div>
 
- 	  <h2 style="margin-top:10px;">Projektvorschläge:</h2>
-      <p>Eine ausgearbeitete Idee für neue Investitionen der Gemeinde in Infrastruktur, Parks, Dienstleistungen, Öffi, Radwege, kulturelle Veranstaltungen usw.</p>
-      <p>Die Menschen können über Projektvorschläge abstimmen und kommentieren. Die Gemeinde kann aus den erfolgreichsten Projekten wählen!</p>
-	  </div>
-<div class="project-thumbnail" style="background-color: #faf6eb;">
-	
-	<h2 style="margin-top:10px;">Notizen:</h2>
-      <p>Eine einfache Möglichkeit, Ihre Gemeinde und andere Menschen darüber zu informieren, wie Sie über verschiedene Orte der Stadt denken. Notizen sind anonym.</p>
-	
-	  </div>
-<div class="project-thumbnail" style="background-color: #f5f1e4;">
-	<h2 style="margin-top:10px;">Fragen zu Baustellen stellen:</h2>
-      <p>Stellen Sie Fragen zu geplanten Investitionen der Gemeinde! Sie können Input dazu geben, wie z.B. eine Straße revitalisiert werden sollte, was Ihnen in einem öffentlichen Raum wichtig ist usw.</p>
-	  </div>
-
-	  	  </div>
-		            <div class="stats-container" style="margin-bottom:20px;">
-
-		    <div class="logo-container" onclick="window.location.href='/'">
-
-	  <a href="/" class="register-button" style="background-color: none!important;">OK!</a>
+        <button  id="toggle-proposals-btn" style="margin-top:10px;" class="register-button">Projektvorschläge</button>
+        <div class="section-content" id="proposals-section" style="display: none;">
+            <p>Ausgearbeitete Ideen für neue Investitionen der Gemeinde in Infrastruktur, Parks, Dienstleistungen, Öffi, Radwege, kulturelle Veranstaltungen usw.</p>
+            <p>Die Menschen können über Projektvorschläge abstimmen und kommentieren. Die Gemeinde kann aus den erfolgreichsten Projekten wählen!</p>
+        </div>
+        <button id="toggle-notes-btn" style="margin-top:10px;" class="register-button">Notizen</button>
+        <div class="section-content" id="notes-section" style="display: none;">
+            <p>Eine einfache Möglichkeit, Ihre Gemeinde und andere Menschen darüber zu informieren, wie Sie über verschiedene Orte der Stadt denken. Notizen sind anonym.</p>
+        </div>
+        <button  id="toggle-questions-btn" style="margin-top:10px;" class="register-button">Fragen zu Bauprojekten stellen:</button>
+        <div class="section-content" id="questions-section" style="display: none;">
+            <p>Stellen Sie Fragen zu geplanten Investitionen der Gemeinde! Sie können Input dazu geben, wie z.B. eine Straße revitalisiert werden sollte, was Ihnen in einem öffentlichen Raum wichtig ist usw.</p>
+        </div>
 </div>
 </div>
 
+<div class="stats-container" style="margin-bottom:20px;">
+        <a href="/" class="register-button" style="background-color: none!important; width: 30%;">OK!</a>
 </div>
+
+<script src="{{ url_for('static', filename='registered.js') }}"></script>
 </body>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var backgroundNumber = Math.floor(Math.random() * 12) + 1; // Generates a random number between 1 and 12
-    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
-  });
-</script>
+</html>

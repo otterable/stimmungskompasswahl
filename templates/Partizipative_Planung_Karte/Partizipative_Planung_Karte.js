@@ -81,27 +81,25 @@ L.rectangle(bounds, {
     weight: 2,
     fill: false
 }).addTo(map);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    minZoom: 15,
-    attribution: '| © OpenStreetMap contributors'
-}).addTo(map);
-var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    minZoom: 15,
-    attribution: '....'
-});
-var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    minZoom: 15,
-    attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, GIS User Community'
-});
+
+var mapboxAccessToken = 'pk.eyJ1Ijoib3R0ZXJhYmxlIiwiYSI6ImNscmhueWFtcjAxMmEybHMwc3V4dnBpdGQifQ.9lMt-_1Pv7IKtdnlM7GQIw';
+
+var mapboxLayers = {
+    "Freiluft": L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
+        minZoom: 15,
+        attribution: '&copy; Mapbox'
+    }),
+    "Licht": L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
+        minZoom: 15,
+        attribution: '&copy; Mapbox'
+    }),
+    "Dunkel": L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
+        minZoom: 15,
+        attribution: '&copy; Mapbox'
+    })
+};
+
 var thunderforestLayers = {
-    "Atlas": L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-        minZoom: 15,
-        attribution: 'Tiles © Thunderforest, ....'
-    }),
-    "Neighbourhood": L.tileLayer('https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-        minZoom: 15,
-        attribution: 'Tiles © Thunderforest, ....'
-    }),
     "Transport": L.tileLayer('https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
         minZoom: 15,
         attribution: 'Tiles © Thunderforest, ....'
@@ -113,32 +111,24 @@ var thunderforestLayers = {
     "Mobile_Atlas": L.tileLayer('https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
         minZoom: 15,
         attribution: 'Tiles © Thunderforest, ....'
-    }),
-    "Pioneer": L.tileLayer('https://tile.thunderforest.com/pioneer/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-        minZoom: 15,
-        attribution: 'Tiles © Thunderforest, ....'
-    }),
-};
-var basemapLayers = {
-    "GeolandBasemap": L.tileLayer('http://maps.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png', {
-        minZoom: 15,
-        attribution: 'Basemap.at, ....'
-    }),
-    "BmapGrau": L.tileLayer('http://maps.wien.gv.at/basemap/bmapgrau/normal/google3857/{z}/{y}/{x}.png', {
-        minZoom: 15,
-        attribution: 'Basemap.at, ....'
     })
 };
+
+var esriSatelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    minZoom: 15,
+    attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+
 var baseLayers = {
-    "Standardkarte": osmLayer,
-    "Satellit": satelliteLayer,
-    "Klar": thunderforestLayers.Atlas,
+    "Standardkarte": mapboxLayers.Freiluft,
+    "Satellit": esriSatelliteLayer,
     "Öffi": thunderforestLayers.Transport,
     "Radwege": thunderforestLayers.Cycle,
-    "Grau": basemapLayers.BmapGrau,
-    "Kontrast": thunderforestLayers.Mobile_Atlas,
-    "Papyrus": thunderforestLayers.Pioneer,
+    "Hell": mapboxLayers.Licht,
+    "Dunkel": mapboxLayers.Dunkel,
+    "Kontrast": thunderforestLayers.Mobile_Atlas
 };
+
 baseLayers["Standardkarte"].addTo(map);
 map.on('baselayerchange', function(e) {
     currentBaseLayer = e.name;

@@ -6,14 +6,22 @@
 
 
 // Initialize the map
+var mapboxAccessToken = 'pk.eyJ1Ijoib3R0ZXJhYmxlIiwiYSI6ImNscmhueWFtcjAxMmEybHMwc3V4dnBpdGQifQ.9lMt-_1Pv7IKtdnlM7GQIw';
+
+document.addEventListener('DOMContentLoaded', function() {
+    var backgroundNumber = Math.floor(Math.random() * 14) + 1; // Generates a random number between 1 and 14
+    document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
+});
+
+// Initialize the map
 var map = L.map('map', {
     minZoom: 15
 }).setView([48.4102, 15.6022], 15);
 
-// Load and display tile layer on the map
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// Load and display the Mapbox Freiluft layer on the map
+L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
     maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
+    attribution: '&copy; Mapbox'
 }).addTo(map);
 
 // Define the boundaries for the grey area

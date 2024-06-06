@@ -1,32 +1,33 @@
-// var centerPoint = map.project([48.4102, 15.6022], map.getZoom());
 var map = L.map('map', {
-    minZoom: 16
-}).setView([48.40875, 15.61142], 17);  // Updated center coordinates
+    minZoom: 17
+}).setView([48.40875, 15.61142], 18);  // Updated center coordinates
+
 var currentDrawnLayer = null;
 var selectedToolButton = null;
-// Track the current base layer
 var currentBaseLayer = 'Standardkarte'; // Default layer
-// Calculate the offset for boundaries
+
 var horizontalOffset = 1000; // 1.0225 km on each side, total 2.25 km
 var verticalOffset = 1000; // 0.59375 km on each side, total 1.02875 km
-// Define the boundaries
+
 var centerPoint = map.project([48.40875, 15.61142], map.getZoom()); // Updated coordinates
 var southWest = map.unproject(centerPoint.subtract([horizontalOffset, verticalOffset]), map.getZoom());
 var northEast = map.unproject(centerPoint.add([horizontalOffset, verticalOffset]), map.getZoom());
 var bounds = L.latLngBounds(southWest, northEast);
-// Calculate extended bounds for 10 km buffer
+
 var extendedHorizontalOffset = horizontalOffset + 200; // Add 10 km
 var extendedVerticalOffset = verticalOffset + 200; // Add 10 km
 var extendedSouthWest = map.unproject(centerPoint.subtract([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
 var extendedNorthEast = map.unproject(centerPoint.add([extendedHorizontalOffset, extendedVerticalOffset]), map.getZoom());
 var extendedBounds = L.latLngBounds(extendedSouthWest, extendedNorthEast);
-// Set the max bounds to restrict dragging beyond 10 km from the original boundary
+
 map.setMaxBounds(extendedBounds);
-// Debugging: Log when the user reaches the edge of the draggable area
+
 map.on('drag', function() {
-    if (!extendedBounds.contains(map.getCenter())) {}
+    if (!extendedBounds.contains(map.getCenter())) {
+        // Additional logic if needed
+    }
 });
-// Define the coordinates for a very large outer rectangle
+
 var outerBounds = [
     L.latLng(-90, -180),
     L.latLng(90, -180),
@@ -34,7 +35,7 @@ var outerBounds = [
     L.latLng(-90, 180),
     L.latLng(-90, -180)
 ];
-// Define the coordinates for the inner rectangle (the boundary)
+
 var innerBounds = [
     bounds.getSouthWest(),
     bounds.getNorthWest(),
@@ -42,41 +43,41 @@ var innerBounds = [
     bounds.getSouthEast(),
     bounds.getSouthWest()
 ];
+
 var boundary = L.latLngBounds(innerBounds);
-// Create a polygon with a hole (inverted polygon)
+
 var invertedPolygon = L.polygon([outerBounds, innerBounds], {
     color: 'grey',
     fillColor: 'grey',
     fillOpacity: 0.5
 }).addTo(map);
-// Draw the boundary rectangle
+
 L.rectangle(bounds, {
     color: "#808080",
     weight: 2,
     fill: false
 }).addTo(map);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    minZoom: 15,
-    attribution: '| © OpenStreetMap contributors'
-}).addTo(map);
-// Map layers
-var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    minZoom: 15,
-    attribution: '....'
-});
-var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    minZoom: 15,
-    attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, GIS User Community'
-});
+
+
+
+var mapboxAccessToken = 'pk.eyJ1Ijoib3R0ZXJhYmxlIiwiYSI6ImNscmhueWFtcjAxMmEybHMwc3V4dnBpdGQifQ.9lMt-_1Pv7IKtdnlM7GQIw';
+
+var mapboxLayers = {
+    "Freiluft": L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
+        minZoom: 15,
+        attribution: '&copy; Mapbox'
+    }),
+    "Licht": L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
+        minZoom: 15,
+        attribution: '&copy; Mapbox'
+    }),
+    "Dunkel": L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=${mapboxAccessToken}`, {
+        minZoom: 15,
+        attribution: '&copy; Mapbox'
+    })
+};
+
 var thunderforestLayers = {
-    "Atlas": L.tileLayer('https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-        minZoom: 15,
-        attribution: 'Tiles © Thunderforest, ....'
-    }),
-    "Neighbourhood": L.tileLayer('https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-        minZoom: 15,
-        attribution: 'Tiles © Thunderforest, ....'
-    }),
     "Transport": L.tileLayer('https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
         minZoom: 15,
         attribution: 'Tiles © Thunderforest, ....'
@@ -88,40 +89,33 @@ var thunderforestLayers = {
     "Mobile_Atlas": L.tileLayer('https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
         minZoom: 15,
         attribution: 'Tiles © Thunderforest, ....'
-    }),
-    "Pioneer": L.tileLayer('https://tile.thunderforest.com/pioneer/{z}/{x}/{y}.png?apikey=5c57f95ca93348f1a37f6572742a5b48', {
-        minZoom: 15,
-        attribution: 'Tiles © Thunderforest, ....'
-    }),
-};
-// basemap.at layers
-var basemapLayers = {
-    "GeolandBasemap": L.tileLayer('http://maps.wien.gv.at/basemap/geolandbasemap/normal/google3857/{z}/{y}/{x}.png', {
-        minZoom: 13,
-        attribution: 'Basemap.at, ....'
-    }),
-    "BmapGrau": L.tileLayer('http://maps.wien.gv.at/basemap/bmapgrau/normal/google3857/{z}/{y}/{x}.png', {
-        minZoom: 13,
-        attribution: 'Basemap.at, ....'
     })
 };
+
+var esriSatelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    minZoom: 15,
+    attribution: '&copy; Esri &mdash; Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+});
+
 var baseLayers = {
-    "Standardkarte": osmLayer,
-    "Satellit": satelliteLayer,
-    "Klar": thunderforestLayers.Atlas,
+    "Standardkarte": mapboxLayers.Freiluft,
+    "Satellit": esriSatelliteLayer,
     "Öffi": thunderforestLayers.Transport,
     "Radwege": thunderforestLayers.Cycle,
-    "Grau": basemapLayers.BmapGrau,
-    "Kontrast": thunderforestLayers.Mobile_Atlas,
-    "Papyrus": thunderforestLayers.Pioneer,
+    "Hell": mapboxLayers.Licht,
+    "Dunkel": mapboxLayers.Dunkel,
+    "Kontrast": thunderforestLayers.Mobile_Atlas
 };
-// Add default layer to map
+
+
 baseLayers["Standardkarte"].addTo(map);
+
 map.on('baselayerchange', function(e) {
     currentBaseLayer = e.name;
 });
+
 L.control.layers(baseLayers).addTo(map);
-// Function to create a colored circle icon
+
 function createIcon(fillColor) {
     var svgIcon = `
         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
@@ -135,8 +129,9 @@ function createIcon(fillColor) {
         popupAnchor: [0, -20]
     });
 }
+
 var markersById = {};
-// Function to bind popups to GeoJSON objects
+
 function bindPopups(feature, layer) {
     if (feature.properties && feature.properties.customDescription) {
         var popupContent = `<div class='popup-content'>${feature.properties.customDescription}</div>`;
@@ -150,19 +145,23 @@ function bindPopups(feature, layer) {
         className: 'custom-popup'
     });
 }
-var gisData = {{ baustelle.gis_data | tojson | safe}};
+
+var gisData = {{ baustelle.gis_data | tojson | safe }};
+
 L.geoJSON(gisData, {
     pointToLayer: pointToLayer,
     onEachFeature: bindPopups
 }).addTo(map);
+
 console.log("Map loaded with GeoJSON files:", gisData ? gisData.features.length : 0);
-// Custom pointToLayer function to use our custom icon
+
 function pointToLayer(feature, latlng) {
     var fillColor = feature.properties.color || "#ff7800";
     return L.marker(latlng, {
         icon: createIcon(fillColor)
     });
 }
+
 function defaultStyle(feature) {
     return {
         fillColor: feature.properties.color || "#ff7800",
@@ -172,7 +171,7 @@ function defaultStyle(feature) {
         fillOpacity: 0.7
     };
 }
-// Add the GeoJSON data
+
 if (gisData) {
     L.geoJSON(gisData, {
         pointToLayer: pointToLayer,
@@ -183,8 +182,9 @@ if (gisData) {
 } else {
     console.log("No GeoJSON data to load.");
 }
+
 var geojsonLayers = {};
-// Example function to load GeoJSON data onto the map
+
 function loadGeoJSONToMap(data, fileName) {
     var geojsonLayer = L.geoJSON(data, {
         pointToLayer: pointToLayer,
@@ -194,7 +194,7 @@ function loadGeoJSONToMap(data, fileName) {
     geojsonLayers[layerId] = geojsonLayer;
     addGeoJSONToList(fileName, layerId);
 }
-// loadGeoJSONToMap(data, "Example GeoJSON");
+
 function addGeoJSONToList(fileName, layerId) {
     var list = document.getElementById('loadedFiles');
     var listItem = document.createElement('li');
@@ -233,6 +233,7 @@ function addGeoJSONToList(fileName, layerId) {
     listItem.appendChild(visibilityButton);
     list.appendChild(listItem);
 }
+
 function changeLayerColor(layerId, color) {
     var layer = geojsonLayers[layerId];
     if (layer) {
@@ -242,6 +243,7 @@ function changeLayerColor(layerId, color) {
         });
     }
 }
+
 function toggleLayerVisibility(layerId) {
     var layer = geojsonLayers[layerId];
     if (map.hasLayer(layer)) {
@@ -250,9 +252,11 @@ function toggleLayerVisibility(layerId) {
         map.addLayer(layer);
     }
 }
+
 window.closePopup = function() {
     map.closePopup();
 };
+
 window.submitQuestion = function(lat, lng) {
     const questionText = document.getElementById('question-text').value;
     const baustelleId = window.location.pathname.split("/").pop();
@@ -282,6 +286,7 @@ window.submitQuestion = function(lat, lng) {
         fetchQuestions();
     }).catch(error => console.error('Error:', error));
 };
+
 window.submitAnswer = function(questionId, lat, lng) {
     const answerText = document.getElementById(`answer-text-${questionId}`).value;
     if (!answerText.trim()) {
@@ -307,6 +312,7 @@ window.submitAnswer = function(questionId, lat, lng) {
         fetchQuestions();
     }).catch(error => console.error('Error:', error));
 };
+
 function createCustomIcon(answered) {
     const iconUrl = answered ? '/static/baustelle_questionanswered.png' : '/static/baustelle_questionpending.png';
     return L.icon({
@@ -316,9 +322,11 @@ function createCustomIcon(answered) {
         popupAnchor: [0, -20]
     });
 }
+
 var isAdmin = JSON.parse('{{ is_admin | tojson }}');
 var userId = JSON.parse('{{ user_id | tojson }}');
 console.log(`User with ID ${userId} entered the page. User is_admin=${isAdmin}.`);
+
 function generatePopupContent(question) {
     const questionDate = new Date(question.date);
     const formattedQuestionDate = formatDate(questionDate);
@@ -341,6 +349,7 @@ function generatePopupContent(question) {
     }
     return popupContent;
 }
+
 function fetchQuestions() {
     return new Promise((resolve, reject) => {
         const baustelleId = window.location.pathname.split("/").pop();
@@ -385,6 +394,7 @@ function fetchQuestions() {
         });
     });
 }
+
 function centerMapOnMarker(markerId) {
     const marker = markersById[markerId];
     if (marker) {
@@ -394,6 +404,7 @@ function centerMapOnMarker(markerId) {
         console.error(`Marker with ID ${markerId} not found.`);
     }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const centerOnMarkerId = urlParams.get('centerOnMarker');
@@ -403,6 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
 map.on('click', function(e) {
     console.log("Map clicked at:", e.latlng);
     if (bounds.contains(e.latlng)) {
@@ -437,6 +449,7 @@ map.on('click', function(e) {
         console.log("Click outside the designated area: No popup created.");
     }
 });
+
 function closePopup() {
     console.log("Closing popup");
     if (window.innerWidth <= 768) {
@@ -448,10 +461,12 @@ function closePopup() {
     }
     map.closePopup();
 }
+
 function handleAbbrechenClick() {
     console.log("Abbrechen button clicked");
     closePopup();
 }
+
 function submitQuestion(lat, lng) {
     console.log("Submitting question at:", lat, lng);
     const questionText = document.getElementById('question-text').value;
@@ -491,6 +506,7 @@ function submitQuestion(lat, lng) {
         closePopup();
     }).catch(error => console.error('Error:', error));
 }
+
 document.addEventListener("DOMContentLoaded", function() {
     console.log("Title Loaded:", document.getElementById("baustelle-title").textContent);
     console.log("Quill Description Loaded:", document.getElementById("baustelle-description").innerHTML);
@@ -506,6 +522,7 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log("No image found");
     }
 });
+
 document.addEventListener('DOMContentLoaded', function() {
     const editButton = document.querySelector('#edit-baustelle-button');
     const editForm = document.querySelector('#edit-baustelle-form');
@@ -515,6 +532,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
 document.addEventListener("DOMContentLoaded", function() {
     const showMarkersBtns = document.querySelectorAll('#show-markers-btn');
     showMarkersBtns.forEach(btn => {
@@ -532,6 +550,7 @@ document.addEventListener("DOMContentLoaded", function() {
         loadQuestions();
     });
 });
+
 function toggleMarkersListOverlay() {
     var markersListOverlay = document.getElementById('markers-list-overlay');
     var isDisplayed = markersListOverlay.style.display === 'block';
@@ -540,6 +559,7 @@ function toggleMarkersListOverlay() {
         loadQuestions();
     }
 }
+
 function loadQuestions() {
     const baustelleId = window.location.pathname.split('/').pop();
     fetch(`/get_questions/${baustelleId}`).then(response => {
@@ -562,6 +582,7 @@ function loadQuestions() {
         renderQuestions(filteredData);
     }).catch(error => console.error('Error fetching questions:', error));
 }
+
 function renderQuestions(questions) {
     const markersList = document.getElementById('markers-list');
     markersList.innerHTML = '';
@@ -584,6 +605,7 @@ function renderQuestions(questions) {
         markersList.appendChild(item);
     });
 }
+
 function formatQuestionListItem(question) {
     return `
         <div style="border-bottom: 1px solid #ccc; padding: 10px;">
@@ -604,6 +626,7 @@ function formatQuestionListItem(question) {
             </p>` : ''}
         </div>`;
 }
+
 function formatDate(utcDateString) {
     let utcDate = new Date(utcDateString);
     let localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
@@ -616,19 +639,23 @@ function formatDate(utcDateString) {
     let year = targetDate.getFullYear();
     return `${day}.${month}.${year}`;
 }
+
 function isDST(date) {
     let jan = new Date(date.getFullYear(), 0, 1);
     let jul = new Date(date.getFullYear(), 6, 1);
     return date.getTimezoneOffset() < Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
 }
+
 Date.prototype.stdTimezoneOffset = function() {
     const jan = new Date(this.getFullYear(), 0, 1);
     const jul = new Date(this.getFullYear(), 6, 1);
     return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
 }
+
 document.getElementById('close-overlay-button').addEventListener('click', function() {
     document.getElementById('markers-list-overlay').style.display = 'none';
 });
+
 document.addEventListener("DOMContentLoaded", function() {
     const showMarkersBtn = document.getElementById('show-markers-btn');
     const markersListOverlay = document.getElementById('markers-list-overlay');
@@ -649,6 +676,7 @@ document.addEventListener("DOMContentLoaded", function() {
         showMarkersBtn.innerText = 'Liste anzeigen';
     });
 });
+
 function adjustOverlayDisplayForDevice() {
     const navOverlay = document.getElementById('nav-overlay');
     const screenWidth = window.innerWidth;
@@ -658,20 +686,24 @@ function adjustOverlayDisplayForDevice() {
         navOverlay.style.display = 'none';
     }
 }
+
 const closeOverlayButton = document.getElementById('close-overlay-button');
 if (closeOverlayButton) {
     closeOverlayButton.addEventListener('click', function() {
         document.getElementById('markers-list-overlay').style.display = 'none';
     });
 }
+
 const closeOverlayBtn = document.getElementById('close-overlay-btn');
 if (closeOverlayBtn) {
     closeOverlayBtn.addEventListener('click', function() {
         document.getElementById('nav-overlay').style.display = 'none';
     });
 }
+
 adjustOverlayDisplayForDevice();
 window.addEventListener('resize', adjustOverlayDisplayForDevice);
+
 function toggleNavOverlay() {
     var navOverlay = document.getElementById('nav-overlay');
     if (navOverlay.style.display === 'block') {
@@ -680,12 +712,15 @@ function toggleNavOverlay() {
         navOverlay.style.display = 'block';
     }
 }
+
 document.getElementById('nav-overlay').addEventListener('click', function(event) {
     if (window.innerWidth <= 1080 && !event.target.closest('button, a')) {
         toggleNavOverlay();
     }
 });
+
 document.getElementById('hamburger-button').addEventListener('click', toggleNavOverlay);
+
 window.addEventListener('resize', function() {
     var navOverlay = document.getElementById('nav-overlay');
     if (window.innerWidth > 1080) {
@@ -694,6 +729,7 @@ window.addEventListener('resize', function() {
         navOverlay.style.display = 'none';
     }
 });
+
 window.onload = function() {
     var navOverlay = document.getElementById('nav-overlay');
     if (window.innerWidth > 1080) {
@@ -702,6 +738,7 @@ window.onload = function() {
         navOverlay.style.display = 'none';
     }
 };
+
 document.getElementById('close-overlay-btn').addEventListener('click', function() {
     document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
 });
