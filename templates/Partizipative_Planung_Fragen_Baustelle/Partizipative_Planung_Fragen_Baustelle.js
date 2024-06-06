@@ -534,6 +534,29 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener("DOMContentLoaded", function() {
+    const showMarkersBtnMobile = document.getElementById('show-markers-btn-mobile');
+    const showMarkersBtnDesktop = document.getElementById('show-markers-btn-desktop');
+    const markersListOverlay = document.getElementById('markers-list-overlay');
+    const closeOverlayButton = document.getElementById('close-overlay-button');
+
+
+    closeOverlayButton.addEventListener('click', function() {
+        markersListOverlay.style.display = 'none';
+      
+    });
+
+    function toggleMarkersListOverlay() {
+        if (markersListOverlay.style.display === 'block') {
+            markersListOverlay.style.display = 'none';
+           
+        } else {
+            markersListOverlay.style.display = 'block';
+        
+        }
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
     const showMarkersBtns = document.querySelectorAll('#show-markers-btn');
     showMarkersBtns.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -656,25 +679,15 @@ document.getElementById('close-overlay-button').addEventListener('click', functi
     document.getElementById('markers-list-overlay').style.display = 'none';
 });
 
-document.addEventListener("DOMContentLoaded", function() {
-    const showMarkersBtn = document.getElementById('show-markers-btn');
-    const markersListOverlay = document.getElementById('markers-list-overlay');
-    function toggleMarkersListOverlay() {
-        if (window.innerWidth <= 1080) {
-            if (markersListOverlay.style.display === 'block') {
-                markersListOverlay.style.display = 'none';
-                showMarkersBtn.innerText = 'Liste anzeigen';
-            } else {
-                markersListOverlay.style.display = 'block';
-                showMarkersBtn.innerText = 'Liste ausblenden';
-            }
-        }
-    }
-    showMarkersBtn.addEventListener('click', toggleMarkersListOverlay);
-    document.getElementById('close-overlay-button').addEventListener('click', function() {
-        markersListOverlay.style.display = 'none';
-        showMarkersBtn.innerText = 'Liste anzeigen';
-    });
+
+
+
+document.getElementById('close-overlay-button').addEventListener('click', function() {
+    var markersListOverlay = document.getElementById('markers-list-overlay');
+    var showMarkersBtn = document.getElementById('show-markers-btn');
+    markersListOverlay.style.display = 'none';
+    showMarkersBtn.innerText = 'Liste anzeigen';
+    console.debug("Close overlay button clicked");
 });
 
 function adjustOverlayDisplayForDevice() {

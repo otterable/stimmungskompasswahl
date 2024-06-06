@@ -2987,6 +2987,11 @@ a {
     text-align: left;
 }
 
+h2 {
+margin-bottom: 0px;
+}
+
+
 .markers-list p {
     margin-top: 2px;
     margin-bottom: 2px;

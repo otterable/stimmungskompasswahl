@@ -8,10 +8,12 @@ if (typeof isSpam === 'undefined') {
 let questionCategoryColors = {};
 
 function fetchQuestionCategoryColors() {
+    console.debug("Fetching question category colors");
     fetch('/get_all_question_category_colors')
         .then(response => response.json())
         .then(data => {
             questionCategoryColors = data;
+            console.debug("Fetched question category colors", questionCategoryColors);
             updateCategoryButtonColors();
         })
         .catch(error => console.error('Error fetching question category colors:', error));
@@ -26,15 +28,18 @@ var swearWords = {
 
 // Function to load swear words from filter.json
 function loadSwearWords() {
+    console.debug("Loading swear words from filter.json");
     fetch('/static/filter.json').then(response => response.json()).then(data => {
         swearWords = data;
-    }).catch(error => {});
+        console.debug("Loaded swear words", swearWords);
+    }).catch(error => console.error('Error loading swear words:', error));
 }
 
 // Call this function when the page loads
 loadSwearWords();
 
 var userLoggedIn = {{ 'true' if current_user.is_authenticated else 'false' }};
+console.debug("User logged in status:", userLoggedIn);
 
 // Initialize the map
 var map = L.map('map').setView([48.4102, 15.6022], 15);
@@ -132,14 +137,17 @@ var baseLayers = {
 baseLayers["Standardkarte"].addTo(map);
 map.on('baselayerchange', function(e) {
     currentBaseLayer = e.name;
+    console.debug("Base layer changed to:", currentBaseLayer);
     updateMarkerIcons();
 });
 L.control.layers(baseLayers).addTo(map);
+
 let futureMarker = {
     icon: null,
     category: '',
     description: ''
 };
+
 function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
     var adjustedPinSize = currentBaseLayer === 'Satellit' ? pinSize * 2.5 : pinSize * 1.5;
     var strokeColor = currentBaseLayer === 'Satellit' ? 'white' : fillColor;
@@ -162,16 +170,20 @@ function createIcon(pinSize, outlineSize, fillColor, isFeatured) {
         popupAnchor: [0, -adjustedPinSize / 2]
     });
 }
+
 function createCursorIcon(fillColor) {
     var svgCursorIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="${fillColor}" /></svg>`;
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgCursorIcon)))}`;
 }
+
 var isMarkerCreationActive = false;
 function setMapCursor() {
     var cursorIconUrl = futureMarker.icon;
     document.getElementById('map').style.cursor = `url('${cursorIconUrl}') 12 12, auto`;
     isMarkerCreationActive = true;
+    console.debug("Map cursor set for marker creation");
 }
+
 function handleMapClick(e) {
     if (isMarkerCreationActive) {
         if (boundary.contains(e.latlng)) {
@@ -184,6 +196,7 @@ function handleMapClick(e) {
     }
 }
 map.on('click', handleMapClick);
+
 function showCustomConfirm(latlng, tempMarker) {
     var confirmDiv = document.getElementById('custom-confirm');
     confirmDiv.style.display = 'block';
@@ -251,7 +264,9 @@ function showCustomConfirm(latlng, tempMarker) {
 function resetMapCursor() {
     document.getElementById('map').style.cursor = '';
     isMarkerCreationActive = false;
+    console.debug("Map cursor reset after marker creation");
 }
+
 function openMarkerOverlay(event) {
     var overlay = document.getElementById('marker-overlay');
     if (overlay) {
@@ -265,8 +280,10 @@ function openMarkerOverlay(event) {
         event.stopPropagation();
     }
 }
+
 function initializeEventListeners() {
     document.getElementById('marker-description').addEventListener('click', function() {});
+    console.debug("Event listeners initialized");
 }
 initializeEventListeners();
 
@@ -308,12 +325,15 @@ function updateMarkerCategoryDescription() {
             break;
     }
     categoryDescription.textContent = categoryText;
+    console.debug("Marker category description updated to:", categoryText);
 }
+
 function containsSwearWords(text, language) {
     var words = swearWords[language] || [];
     var textWords = text.toLowerCase().split(/\s+/);
     return textWords.some(word => words.includes(word));
 }
+
 function postMarker() {
     var markerDescriptionTextarea = document.getElementById('marker-description');
     var description = markerDescriptionTextarea.value;
@@ -343,7 +363,9 @@ function postMarker() {
     futureMarker.icon = createCursorIcon(fillColor);
     setMapCursor();
     document.getElementById('marker-description').value = '';
+    console.debug("Marker posted with description:", description);
 }
+
 function toggleMarkerSidebar() {
     var sidebar = document.getElementById('sidebar');
     var mapElement = document.getElementById('map');
@@ -354,7 +376,9 @@ function toggleMarkerSidebar() {
         sidebar.style.display = 'none';
         mapElement.classList.remove('sidebar-visible');
     }
+    console.debug("Marker sidebar toggled");
 }
+
 var allMarkers = [];
 var filteredMarkers = [];
 var displayedMarkersCount = 0;
@@ -380,6 +404,7 @@ function addMarkersToOverlay(markers) {
     createCategoryFilter();
     createSortFilter();
     createFullProjectFilter();
+    console.debug("Markers added to overlay:", allMarkers);
 }
 
 function filterMarkers() {
@@ -396,6 +421,7 @@ function filterMarkers() {
     renderPage(1);
     updateShowMoreButton();
     updateMapMarkers();
+    console.debug("Markers filtered:", filteredMarkers);
 }
 
 function updateMapMarkers() {
@@ -408,6 +434,7 @@ function updateMapMarkers() {
             }
         });
     }
+    console.debug("Map markers updated");
 }
 
 function updateShowMoreButton() {
@@ -417,6 +444,7 @@ function updateShowMoreButton() {
     } else {
         showMoreButton.style.display = 'block';
     }
+    console.debug("Show more button updated");
 }
 
 function loadMoreMarkers() {
@@ -454,9 +482,8 @@ function loadMoreMarkers() {
     displayedMarkersCount += paginatedMarkers.length;
     currentPage++;
     updateShowMoreButton();
+    console.debug("More markers loaded");
 }
-
-
 
 function paginateMarkers(page, markersPerPage) {
     const startIndex = (page - 1) * markersPerPage;
@@ -470,6 +497,7 @@ function renderPage(page) {
     list.innerHTML = '';
     displayedMarkersCount = 0;
     loadMoreMarkers();
+    console.debug("Page rendered:", page);
 }
 
 function sortMarkers(sortType) {
@@ -479,10 +507,12 @@ function sortMarkers(sortType) {
         filteredMarkers.sort((a, b) => new Date(a.date) - new Date(b.date));
     }
     renderPage(1);
+    console.debug("Markers sorted by:", sortType);
 }
 
 function filterByCategory(category) {
     filterMarkers();
+    console.debug("Filtered by category:", category);
 }
 
 function createCategoryFilter() {
@@ -501,6 +531,7 @@ function createCategoryFilter() {
         select.appendChild(option);
     });
     filterDiv.appendChild(select);
+    console.debug("Category filter created");
 }
 
 function createSortFilter() {
@@ -519,6 +550,7 @@ function createSortFilter() {
         select.appendChild(optionElement);
     });
     sortDiv.appendChild(select);
+    console.debug("Sort filter created");
 }
 
 function createFullProjectFilter() {
@@ -533,12 +565,14 @@ function createFullProjectFilter() {
         syncFullProjectFilterButtons();
     });
     filterDiv.appendChild(filterButton);
+    console.debug("Full project filter created");
 }
 
 function toggleFullProjectFilter() {
     showFullProjectsOnly = !showFullProjectsOnly;
     filterMarkers();
     updateFullProjectFilterButtonText();
+    console.debug("Full project filter toggled, showFullProjectsOnly:", showFullProjectsOnly);
 }
 
 function updateFullProjectFilterButtonText() {
@@ -561,6 +595,7 @@ function syncFullProjectFilterButtons() {
 
 window.addEventListener('resize', function() {
     renderPage(currentPage);
+    console.debug("Window resized, page rendered");
 });
 
 document.getElementById('show-markers-btn').addEventListener('click', function() {
@@ -575,6 +610,7 @@ document.getElementById('show-markers-btn').addEventListener('click', function()
         renderPage(1);
         showMarkersBtn.innerText = 'Liste ausblenden';
     }
+    console.debug("Show markers button clicked");
 });
 
 document.getElementById('close-overlay-button').addEventListener('click', function() {
@@ -582,6 +618,7 @@ document.getElementById('close-overlay-button').addEventListener('click', functi
     var showMarkersBtn = document.getElementById('show-markers-btn');
     markersListOverlay.style.display = 'none';
     showMarkersBtn.innerText = 'Liste anzeigen';
+    console.debug("Close overlay button clicked");
 });
 
 createCategoryFilter();
@@ -600,7 +637,9 @@ function updateMarkerIcons() {
             marker.setIcon(newIcon);
         });
     }
+    console.debug("Marker icons updated");
 }
+
 document.addEventListener('click', function(event) {
     if (event.target.closest('.voting-bar, .upvotes, .downvotes')) {
         return;
@@ -648,6 +687,7 @@ function getCategoryColor(category) {
 var categoryLayers = {};
 function logSelectedCategory() {
     var selectedCategory = document.getElementById('marker-category').value;
+    console.debug("Selected category:", selectedCategory);
 }
 var markersById = {};
 
@@ -756,26 +796,27 @@ function addMarkers(projects) {
                         <div class="downvotes" style="width: ${downvotePercentage}%;"></div>
                     </div>
                 `;
-                popupContent = `
-                    <div style="text-align: center; z-index:1000 !important">
-                        <span style="color: grey;">${formattedDate}</span><br>
-                        <strong style="color: ${fillColor};">${project.category}</strong><br>
-                        <b>${project.name}</b>
-                        <br>
-                        <img src="/static/usersubmissions/${project.image_file}" style="width:500px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
-                        ${votingDetailsHtml}
-                        ${votingBarHtml}
-                        <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
-                            <button onmouseover="this.style.backgroundColor='#66c46a'" onmouseout="this.style.backgroundColor='#4caf50'" onclick="vote(${project.id}, 'upvote')" id="upvote-button-${project.id}" class="vote-button circle-btn upvote" style="${upvoteButtonStyle}">👍</button>
-                            <span id="upvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.upvotes}</span>
-                            <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" class="button-hover-effect" style="font-size: 16px; font-weight: bold; color:white !important; text-decoration: none; background-color: #1a1a1a; border-radius: 30px; display: flex; flex-grow: 1; justify-content: center; align-items: center; padding: 10px; margin: 0 10px; transition: transform 0.3s ease, background-color 0.3s ease;">
-                                Details
-                            </a>
-                            <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
-                            <button onmouseover="this.style.backgroundColor='#cc5045'" onmouseout="this.style.backgroundColor='#9A031E'" onclick="vote(${project.id}, 'downvote')" id="downvote-button-${project.id}" class="vote-button circle-btn downvote" style="${downvoteButtonStyle}">👎</button>
-                        </div>
-                    </div>
-                `;
+               popupContent = `
+    <div style="text-align: center; z-index:2000 !important">
+        <span style="color: grey;">${formattedDate}</span><br>
+        <strong style="color: ${fillColor};">${project.category}</strong><br>
+        <b>${project.name}</b>
+        <br>
+        <img src="/static/usersubmissions/${project.image_file}" style="width:500px; height:auto; object-fit: contain; display: block; margin: 10px auto; border-radius: 30px;">
+        ${votingDetailsHtml}
+        ${votingBarHtml}
+        <div style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px;">
+            <button onmouseover="this.style.backgroundColor='#66c46a'" onmouseout="this.style.backgroundColor='#4caf50'" onclick="vote(${project.id}, 'upvote')" id="upvote-button-${project.id}" class="vote-button circle-btn upvote" style="background-color: #4caf50; ${upvoteButtonStyle}">👍</button>
+            <span id="upvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.upvotes}</span>
+            <a href="/Partizipative_Planung_Vorschlag/${project.id}" target="_blank" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" class="button-hover-effect" style="font-size: 16px; font-weight: bold; color:white !important; text-decoration: none; background-color: #1a1a1a; border-radius: 30px; display: flex; flex-grow: 1; justify-content: center; align-items: center; padding: 10px; margin: 0 10px; transition: transform 0.3s ease, background-color 0.3s ease;">
+                Details
+            </a>
+            <span id="downvote-count-${project.id}" style="font-weight: bold; margin: 0 10px;">${project.downvotes}</span>
+            <button onmouseover="this.style.backgroundColor='#cc5045'" onmouseout="this.style.backgroundColor='#9A031E'" onclick="vote(${project.id}, 'downvote')" id="downvote-button-${project.id}" class="vote-button circle-btn downvote" style="background-color: #9A031E; ${downvoteButtonStyle}">👎</button>
+        </div>
+    </div>
+`;
+
             }
 
             var marker = L.marker(latLng, {
@@ -817,22 +858,25 @@ function addMarkers(projects) {
 
 document.getElementById('guided-mode-button').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'flex';
+    console.debug("Guided mode modal opened");
 });
 
 document.getElementById('start-guided-mode').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'none';
     document.getElementById('question-modal').style.display = 'flex';
+    console.debug("Guided mode started");
     // Additional logic to start the guided mode
 });
 
 document.getElementById('cancel-guided-mode').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'none';
+    console.debug("Guided mode cancelled");
 });
 
 document.getElementById('cancel-qa-mode').addEventListener('click', function() {
     document.getElementById('question-modal').style.display = 'none';
+    console.debug("QA mode cancelled");
 });
-
 
 function updatePopupContent(projectId, data) {
     var popup = markersById[projectId].getPopup();
@@ -852,7 +896,6 @@ function updatePopupContent(projectId, data) {
     popup.setContent(popupContentDiv.innerHTML);
     markersById[projectId].bindPopup(popup).openPopup();
 }
-
 
 function setInitialVoteBarStyles(projectId) {
     document.querySelectorAll('.voting-bar').forEach(votingBar => {
@@ -880,6 +923,7 @@ function setInitialVoteBarStyles(projectId) {
 }
 document.addEventListener('DOMContentLoaded', function() {
     setInitialVoteBarStyles();
+    console.debug("Initial vote bar styles set");
 });
 
 function vote(projectId, voteType) {
@@ -900,8 +944,9 @@ function vote(projectId, voteType) {
     }).then(response => response.json()).then(data => {
         if (data.success) {
             updateVotingUI(projectId, data);
+            console.debug("Vote registered for project:", projectId, "vote type:", voteType);
         }
-    }).catch(error => {});
+    }).catch(error => console.error('Error during voting:', error));
 }
 
 function updateVotingUI(projectId, data) {
@@ -938,6 +983,7 @@ function updateVotingUI(projectId, data) {
         popup.setContent(new XMLSerializer().serializeToString(popupDom.documentElement));
     }
     setInitialVoteBarStyles(projectId);
+    console.debug("Voting UI updated for project:", projectId);
 }
 
 function adjustBorderRadius(upvoteElement, downvoteElement, upvoteCount, downvoteCount) {
@@ -950,6 +996,7 @@ function adjustBorderRadius(upvoteElement, downvoteElement, upvoteCount, downvot
         downvoteElement.style.borderRadius = '30px';
     }
 }
+
 fetch('/get_projects')
     .then(response => {
         if (!response.ok) {
@@ -966,11 +1013,11 @@ fetch('/get_projects')
         createCategoryButtons();
         updateCategoryButtonColors();
         addMarkersToOverlay(sortedData);
+        console.debug("Projects fetched and processed");
     })
     .catch(error => {
         console.error('Failed to fetch projects:', error);
     });
-
 
 function sortMarkersByNewest(markers) {
     return markers.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -989,37 +1036,62 @@ function centerMapOnMarker(markerId) {
         var markerLatLng = marker.getLatLng();
         var popup = marker.getPopup();
 
-        var wasPopupOpen = map.hasLayer(popup);
-        if (!wasPopupOpen) {
-            popup.setLatLng(new L.LatLng(-90, -180));
-            popup.openOn(map);
-        }
+        // Calculate popup size based on predefined dimensions
+        var popupWidth = window.innerWidth <= 1080 ? 300 : 500; // 300px for mobile, 500px for desktop
+        var popupHeight = popupWidth * (3 / 4); // Maintain 4:3 aspect ratio
+        popupHeight += 40; // Adding extra pixels for margins and other elements
 
-        var popupWidth = popup.getElement() ? popup.getElement().clientWidth : 300;
-        var popupHeight = popup.getElement() ? popup.getElement().clientHeight : 200;
+        console.debug(`Popup clicked, popup size ${popupWidth} x ${popupHeight} px expected, image size ${popupWidth} x ${popupHeight * 3 / 4} expected.`);
 
-        if (!wasPopupOpen) {
-            map.closePopup(popup);
-        }
+        // Get the map container dimensions
+        var mapDiv = document.getElementById('map');
+        var mapWidth = mapDiv.clientWidth;
+        var mapHeight = mapDiv.clientHeight;
 
+        console.debug(`Map div is currently ${mapWidth} px wide and ${mapHeight} px high on this device.`);
+
+        // Calculate marker position within the map container
+        var markerPoint = map.latLngToContainerPoint(markerLatLng);
+        var markerFromTop = markerPoint.y;
+        var markerFromLeft = markerPoint.x;
+        var markerFromRight = mapWidth - markerPoint.x;
+        var markerFromBottom = mapHeight - markerPoint.y;
+
+        console.debug(`Marker is currently within ${markerFromTop} px from the top border of "map" div, ${markerFromLeft} px from the left border, ${markerFromRight} px from right border, and ${markerFromBottom} px from bottom border.`);
+
+        // Adjust offsets to ensure the popup fits within the map view
         var xOffset = 0;
         var yOffset = 0;
-        if (window.innerWidth <= 1080) {
-            xOffset = 0;
-            yOffset = popupHeight / 4 + 20;
-        } else {
-            yOffset = 20;
+
+        if (markerFromTop < popupHeight / 2 + 10) { // Popup height / 2 + some margin
+            yOffset = popupHeight / 2 + 10 - markerFromTop;
+        }
+        if (markerFromBottom < popupHeight / 2 + 10) {
+            yOffset = -(popupHeight / 2 + 10 - markerFromBottom);
         }
 
+        if (markerFromLeft < popupWidth / 2 + 10) {
+            xOffset = popupWidth / 2 + 10 - markerFromLeft;
+        }
+        if (markerFromRight < popupWidth / 2 + 10) {
+            xOffset = -(popupWidth / 2 + 10 - markerFromRight);
+        }
+
+        console.debug(`Centering marker so that the whole popup fits within the map div of the device. Offsets calculated: xOffset = ${xOffset}, yOffset = ${yOffset}.`);
+
+        // Calculate the new center of the map
         var point = map.project(markerLatLng, map.getZoom()).subtract([xOffset, yOffset]);
         var newCenter = map.unproject(point, map.getZoom());
 
+        // Set the map view to the new position
         map.setView(newCenter, map.getZoom());
 
+        // Open the popup after a short delay to allow the map to finish moving
         setTimeout(function() {
             marker.openPopup();
-        }, 00);
+        }, 00); // 300 milliseconds delay
 
+        // Close the markers list overlay on mobile and tablet, and update button text
         if (window.innerWidth <= 1080) {
             var sidebar = document.getElementById('markers-list-overlay');
             sidebar.style.display = 'none';
@@ -1072,6 +1144,7 @@ function createCategoryButtons() {
         wrapperDiv.appendChild(button);
         container.appendChild(wrapperDiv);
     }
+    console.debug("Category buttons created");
 }
 
 function setButtonState(button, category) {
@@ -1102,6 +1175,7 @@ function toggleCategory(categoryName) {
             }
         }
     }
+    console.debug("Category toggled:", categoryName);
 }
 
 function updateCategoryButtonColors() {
@@ -1115,6 +1189,7 @@ function updateCategoryButtonColors() {
             button.style.backgroundColor = color;
         }
     });
+    console.debug("Category button colors updated");
 }
 updateCategoryButtonColors();
 
@@ -1142,11 +1217,13 @@ function saveMarkerData(latlng, category, description, callback) {
                 callback(response);
             }
             checkMarkerLimit();
+            console.debug("Marker data saved:", response);
         },
         error: function(xhr, textStatus, errorThrown) {
             if (xhr.status === 429) {
                 alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
             }
+            console.error('Error saving marker data:', errorThrown);
         }
     });
 }
@@ -1162,9 +1239,11 @@ function checkMarkerLimit() {
         } else {
             const markersRemaining = data.max_limit - data.current_count;
         }
+        console.debug("Marker limit checked:", data);
     }).catch(error => {
         const limitInfoElement = document.getElementById('limit-info');
         limitInfoElement.textContent = "Fehler beim Abrufen der Marker-Limit-Informationen.";
+        console.error('Error checking marker limit:', error);
     });
 }
 document.addEventListener('DOMContentLoaded', function() {
@@ -1192,6 +1271,7 @@ function startTimer(expiryTime) {
             overlayButton.disabled = false;
         }
     }, 1000);
+    console.debug("Timer started for marker limit reset:", expiryTime);
 }
 function updateTextareaCharCountFeedback(textareaElement, feedbackElement, minLimit, maxLimit) {
     var charCount = textareaElement.value.length;
@@ -1205,6 +1285,7 @@ function updateTextareaCharCountFeedback(textareaElement, feedbackElement, minLi
         textareaElement.value = textareaElement.value.substring(0, maxLimit);
     }
     feedbackElement.style.color = '#003056';
+    console.debug("Textarea character count feedback updated");
 }
 var markerDescriptionTextarea = document.getElementById('marker-description');
 var markerDescriptionFeedback = document.createElement('div');
@@ -1221,11 +1302,13 @@ const closeOverlayBtns = document.querySelectorAll("[onclick^='closeVideoOverlay
             e.preventDefault();
             const overlayId = this.getAttribute('onclick').match(/'([^']+)'/)[1];
             document.getElementById(overlayId).style.display = 'none';
+            console.debug("Video overlay closed:", overlayId);
         });
     });
 
 document.getElementById('close-overlay-button').addEventListener('click', function() {
     document.getElementById('markers-list-overlay').style.display = 'none';
+    console.debug("Markers list overlay closed");
 });
 
 function adjustOverlayDisplayForDevice() {
@@ -1254,6 +1337,7 @@ function adjustOverlayDisplayForDevice() {
 
     adjustOverlayDisplayForDevice();
     window.addEventListener('resize', adjustOverlayDisplayForDevice);
+    console.debug("Overlay display adjusted for device");
 
 function toggleNavOverlay() {
     var navOverlay = document.getElementById('nav-overlay');
@@ -1262,6 +1346,7 @@ function toggleNavOverlay() {
     } else {
         navOverlay.style.display = 'block';
     }
+    console.debug("Nav overlay toggled");
 }
 
 document.getElementById('nav-overlay').addEventListener('click', function(event) {
@@ -1293,6 +1378,7 @@ window.onload = function() {
 document.addEventListener('DOMContentLoaded', function() {
     var submitButton = document.getElementById('add-marker-button');
     submitButton.addEventListener('click', validateMarkerDescription);
+    console.debug("Submit button event listener added");
 });
 
 function validateMarkerDescription(event) {
@@ -1301,15 +1387,18 @@ function validateMarkerDescription(event) {
         event.preventDefault();
         return false;
     }
+    console.debug("Marker description validated");
 }
 
 document.getElementById('info-link').addEventListener('click', function(e) {
     e.preventDefault();
     handleMobileRedirectOrOverlay('youtube-iframe', 'video-overlay', 'aXB8KE_gpm8', 'V7EjnHuLZjI');
+    console.debug("Info link clicked");
 });
 document.getElementById('info-link2').addEventListener('click', function(e) {
     e.preventDefault();
     handleMobileRedirectOrOverlay('youtube-iframe-2', 'video-overlay-2', '9-bWivUusZ4', '9xEXWG8TybY');
+    console.debug("Info link 2 clicked");
 });
 
 function handleMobileRedirectOrOverlay(iframeId, overlayId, desktopVideoId, mobileVideoId) {
@@ -1326,7 +1415,7 @@ function handleMobileRedirectOrOverlay(iframeId, overlayId, desktopVideoId, mobi
     } else {
         iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&mute=1&enablejsapi=1';
         document.getElementById(overlayId).style.display = 'flex';
-        console.log('Video overlay opened for desktop.');
+        console.debug('Video overlay opened for desktop.');
     }
 }
 
@@ -1336,7 +1425,7 @@ function closeVideoOverlay(iframeId, overlayId) {
         iframe.src = '';
     }
     document.getElementById(overlayId).style.display = 'none';
-    console.log('Video overlay closed');
+    console.debug('Video overlay closed:', overlayId);
 }
 
 var tag = document.createElement('script');
@@ -1359,6 +1448,7 @@ function onYouTubeIframeAPIReady() {
             'onStateChange': onPlayerStateChange2
         }
     });
+    console.debug("YouTube Iframe API ready");
 }
 
 function onPlayerStateChange(event) {
@@ -1386,6 +1476,7 @@ function showReplayImage(iframeId, containerId) {
     });
     replayContainer.innerHTML = '';
     replayContainer.appendChild(replayImg);
+    console.debug("Replay image shown for:", iframeId);
 }
 
 function replayVideo(iframeId, containerId) {
@@ -1396,6 +1487,7 @@ function replayVideo(iframeId, containerId) {
     var playerToUse = iframeId === 'youtube-iframe' ? player : player2;
     playerToUse.seekTo(0);
     playerToUse.playVideo();
+    console.debug("Video replayed for:", iframeId);
 }
 
 document.getElementById('video-overlay').addEventListener('click', function(event) {
@@ -1419,9 +1511,6 @@ document.querySelector('.register-button-cl').addEventListener('click', function
     toggleFullProjectFilter();
     syncFullProjectFilterButtons();
 });
-
-
-
 
 document.addEventListener('DOMContentLoaded', function() {
     let currentQuestionset = null;
@@ -1593,6 +1682,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         marker.addTo(categoryLayers[title]);
         updateCategoryButtonText(title);
+        console.debug("New marker added for question:", title);
     }
 
     function saveMarkerData(latlng, category, description, callback) {
@@ -1615,11 +1705,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     callback(response);
                 }
                 checkMarkerLimit();
+                console.debug("Marker data saved:", response);
             },
             error: function(xhr, textStatus, errorThrown) {
                 if (xhr.status === 429) {
                     alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
                 }
+                console.error('Error saving marker data:', errorThrown);
             }
         });
     }
@@ -1633,7 +1725,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log("Event listeners for Guided Mode have been added.");
 });
-
 
 document.addEventListener('DOMContentLoaded', function() {
     // Function to ensure footer is visible
@@ -1656,4 +1747,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Recheck on resize to handle dynamic changes or orientation changes
     window.addEventListener('resize', ensureFooterVisibility);
+    console.debug("Footer visibility ensured");
 });

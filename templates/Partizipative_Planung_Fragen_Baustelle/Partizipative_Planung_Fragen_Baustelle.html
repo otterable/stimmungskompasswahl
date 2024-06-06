@@ -40,10 +40,10 @@
     <!-- Expandable Sidebar -->
 <div id="sidebar" class="sidebar-visible">
         <button id="expand-sidebar-btn" class="expand-button">☰</button> <!-- Button to expand the sidebar -->
-        <h2 id="baustelle-title">{{ baustelle.name }}</h2> <!-- Visible by default -->
+        <h2 id="baustelle-title" style="font-size: 28px;">{{ baustelle.name }}</h2> <!-- Visible by default -->
 				  <div class="mobile-only-content">
 
-        <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px; margin: auto;">Liste</button> <!-- Also visible by default -->
+        <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px !important; margin: auto;">Liste anzeigen</button> <!-- Also visible by default -->
 		</div>
 		  <div class="desktop-only-content">
         {% if is_admin %}
@@ -54,7 +54,7 @@
         {% if baustelle.image %}
             <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%; margin-top:20px;">
         {% endif %}
-		        <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px;">Liste</button> <!-- Also visible by default -->
+		        <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px;">Fragenliste</button> <!-- Also visible by default -->
         <div id="baustelle-description">{{ baustelle.description | safe }}</div>
         <div id="geojsonFilesList" style="margin-bottom: 20px;">
             <ul id="loadedFiles"></ul>
