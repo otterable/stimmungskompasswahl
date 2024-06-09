@@ -256,7 +256,6 @@ def get_questions(baustelle_id):
     return jsonify(questions_data)
 
 
-
 @app.route('/login/apple')
 def apple_login():
     redirect_uri = url_for('authorize_apple', _external=True)
@@ -426,6 +425,49 @@ def Partizipative_Planung_Fragen_Baustelle(baustelle_id):
     # Retrieve all questions associated with this Baustelle
     questions = Question.query.filter_by(baustelle_id=baustelle_id).all()
     return render_template('Partizipative_Planung_Fragen_Baustelle/index.html', baustelle=baustelle, is_admin=is_admin, user_id=user_id, questions=questions,gisfile=gisfile, gis_data=gis_data, metaData=g.metaData)
+
+
+
+
+@app.route("/Partizipative_Planung_Fragen_Karte_AiO/<int:baustelle_id>")
+def Partizipative_Planung_Fragen_Karte_AiO(baustelle_id):
+    ip_address = request.remote_addr
+    WebsiteViews.add_view(ip_address)
+    projects = Project.query.all()
+    for project in projects:
+        project.upvoted_by_user = False
+        project.downvoted_by_user = False
+        if current_user.is_authenticated:
+            user_vote = Vote.query.filter_by(user_id=current_user.id, project_id=project.id).first()
+            if user_vote:
+                if user_vote.upvote:
+                    project.upvoted_by_user = True
+                elif user_vote.downvote:
+                    project.downvoted_by_user = True
+    projects_data = [project.to_dict() for project in projects]
+    for project_data, project in zip(projects_data, projects):
+        project_data['upvoted_by_user'] = project.upvoted_by_user
+        project_data['downvoted_by_user'] = project.downvoted_by_user
+
+    baustelle = Baustelle.query.get_or_404(baustelle_id)
+    questions = Question.query.filter_by(baustelle_id=baustelle.id).all()
+    baustelle_data = {
+        'id': baustelle.id,
+        'name': baustelle.name,
+        'description': baustelle.description,
+        'gis_data': baustelle.gis_data,
+        'gisfile': baustelle.gisfile,
+        'image': baustelle.image,
+        'questions': [question.to_dict() for question in questions]
+    }
+    metaData = g.metaData
+    is_admin = current_user.is_authenticated and current_user.is_admin or False
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    return render_template("Partizipative_Planung_Fragen_Karte_AiO/index.html", projects=projects_data, baustelle=baustelle_data, metaData=metaData, is_admin=is_admin, user_id=user_id)
+
+
+
 
 
 

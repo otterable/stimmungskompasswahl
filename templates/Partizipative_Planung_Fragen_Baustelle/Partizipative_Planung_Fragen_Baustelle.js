@@ -153,7 +153,6 @@ L.geoJSON(gisData, {
     onEachFeature: bindPopups
 }).addTo(map);
 
-console.log("Map loaded with GeoJSON files:", gisData ? gisData.features.length : 0);
 
 function pointToLayer(feature, latlng) {
     var fillColor = feature.properties.color || "#ff7800";

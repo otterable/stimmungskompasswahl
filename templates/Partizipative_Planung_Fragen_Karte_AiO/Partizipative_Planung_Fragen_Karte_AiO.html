@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div id="landscape-blocker" style="display: none;">
+   <p>Der Stimmungskompass ist nur im Hochformat verfügbar.</p>
+   <img id="anti-rotate-image" src="static/antirotate.png" alt="Rotate Device" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
+</div>
+<div id="portrait-blocker" style="display: none;">
+   <p>Der Stimmungskompass ist nur im Querformat verfügbar.</p>
+   <img id="anti-rotate-image" src="static/antirotate_ipad.png" alt="Rotate Device" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
+</div>
+<div id="video-overlay" class="video-overlay" style="display:none;">
+   <iframe id="youtube-iframe" width="560" height="315" src="https://www.youtube.com/embed/9-bWivUusZ4" frameborder="0" allowfullscreen></iframe>
+   <div id="replay-container" style="display: none;"></div>
+   <!-- Container for replay image -->
+   <button onclick="closeVideoOverlay()">Schließen</button>
+</div>
+<!-- Video Overlay 2 -->
+<div id="video-overlay-2" class="video-overlay" style="display:none;">
+   <iframe id="youtube-iframe-2" width="560" height="315" src="https://www.youtube.com/embed/aoqu_9iibPo" frameborder="0" allowfullscreen></iframe>
+   <div id="replay-container-2" style="display: none;"></div>
+   <!-- Container for replay image -->
+   <button onclick="closeVideoOverlay2()">Schließen</button>
+</div>
+
+<!-- Custom Confirmation Dialog -->
+<div id="custom-confirm" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.0); z-index: 10000; text-align: center;">
+   <div id="mobile-confirm" class="mobile-confirm">
+      <p class="p-mobile-confirm">Möchten Sie die Notiz hier platzieren?</p>
+      <button id="confirm-yes" class="register-button-c" style="background-color: #0e3a3a !important;">Ja</button>
+      <button id="confirm-tryagain" class="register-button-c" style="background-color: #ffa500 !important; margin-top: 10px !important;">Erneut versuchen</button>
+      <button id="confirm-no" class="register-button-c" style="background-color: #de3a3a !important; margin-top: 10px !important;">Stornieren</button>
+   </div>
+</div>
+<!-- Overlay for displaying the list of markers -->
+<div id="markers-list-overlay" class="markers-sidebar">
+    <!-- Fixed top section for filters -->
+    <div class="header-container">
+	
+	
+	
+	 <div class="header-navigation">
+	 <h3 style="margin-bottom:5px;">Fragen sortieren:</h3>
+                <select id="question-status-filter" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                    <option value="all">Alle Fragen anzeigen</option>
+                    <option value="answered">Beantwortete Fragen</option>
+                    <option value="unanswered">Unbeantwortete Fragen</option>
+                </select>
+                <!-- Sort by time -->
+                <select id="question-time-sort" style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
+                    <option value="newest">Neueste</option>
+                    <option value="oldest">Älteste</option>
+                </select>
+            </div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+        <div class="header-navigation">
+			 <h3 style="margin-bottom:5px;">Notizen/Projektvorschläge sortieren:</h3>
+            <div id="category-filter"></div>
+            <div id="sort-filter"></div>
+            <div id="full-project-filter"></div>
+        </div>
+    </div>
+
+    <!-- Scrollable list section -->
+    <div class="scrollable-list">
+        <ul id="markers-list" style="margin-bottom:20px;">
+            <!-- Marker items will be added here dynamically -->
+        </ul>
+    </div>
+
+    <!-- Always visible footer section -->
+    <div class="footer-container">
+        <div class="footer-navigation">
+            <button id="show-more-markers" class="register-button-cl" onclick="loadMoreMarkers()" style="display: none;">Mehr anzeigen</button>
+            <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-cl">Schließen</button>
+        </div>
+    </div>
+</div>
+
+<!-- Marker Placing Overlay -->
+<div id="marker-overlay">
+   <div id="overlay-content">
+      <div class="title-button-container">
+         <h2 class="title-imagebutton" style="font-size: 26px !important;">Notiz hinzufügen</h2>
+         <a href="#" id="info-link">
+         <img src="{{ url_for('serve_image', filename='infobutton.png') }}" alt="Info" class="info-image">
+         </a>
+      </div>
+
+      <!-- Wrapper div for the select and the textarea -->
+      <div style="width: 100%; box-sizing: border-box; text-align: center;">
+         <h2 style="font-size: 21px;">1. Kategorie auswählen:</h2>
+         <select id="marker-category" onchange="updateMarkerCategoryDescription()" style="width: 100%; box-sizing: border-box; text-align: center; border: 1px solid black;">
+            <option value="Transport">Transport</option>
+            <option value="Öffentliche Plätze">Öffentliche Plätze</option>
+            <option value="Umwelt">Umwelt</option>
+            <option value="Verwaltung">Verwaltung</option>
+            <option value="Kultur">Kultur</option>
+            <option value="Bildung">Bildung</option>
+            <option value="Gesundheit">Gesundheit</option>
+            <option value="Sport">Sport</option>
+            <option value="Andere">Andere</option>
+         </select>
+         <br>
+         <br>
+         <h2 style="font-size: 21px;">Diese Kategorie betrifft Themen wie:</h2>
+         <h3 id="marker-category-description" style="color:#003056; font-size: 18px !important; font-weight: normal;"></h3>
+         <!-- Description will appear here -->
+         <h2 style="font-size: 21px;">2. Beschreiben Sie die Umstände:</h2>
+         <textarea id="marker-description" rows="7" style="width: 100%; box-sizing: border-box; text-align: left; border: 1px solid black; font-size: 18px; font-family: 'Roboto', sans-serif; font-weight: bold;" placeholder="Was beschäftigt Sie?"></textarea>
+      </div>
+      <br>
+      <h3 style="font-size: 16px;">
+         <a href="/Partizipative_Planung_Neuer_Projekt" style="color: #003056; text-decoration: underline; font-size: 18px !important; font-weight: normal">Sie möchten einen Projektvorschlag posten?</a>
+      </h3>
+      <h3 style="font-size: 16px; display:none !important;" id="limit-info">limit info here</h3>
+      <div class="button-container">
+         <button id="add-marker-button" onclick="postMarker()" class="register-button">Hinzufügen</button>
+      </div>
+   </div>
+</div>
+<div>
+   <div id="mobileCategoryOverlay"></div>
+   <div id="sidebar-mobileheader" style="display: none;">
+      <h3 class="appear-on-mobiledisabled resistant-h3" style="display: none; color: white; text-align: center; margin-top: 5px;"> Wie stehen Sie zu den Orten in Ihrer Gemeinde? </h3>
+      <h3 class="appear-on-mobiledisabled resistant-h3" style="display: none; color: white; text-align: center; margin-top: -12px; margin-bottom: 7px"> Lassen Sie es uns auf dieser Karte wissen! </h3>
+   </div>
+   <div id="map">
+      <a href="#" id="info-link2">
+      <img src="{{ url_for('serve_image', filename='infobutton2.png') }}" alt="Info" class="info-image2" style="z-index: 1002 !important;">
+      </a>
+      <!-- Inside the map div -->
+   </div>
+   <?php MAP END ?> 
+   <?php SIDEBAR BODY START ?> 
+   <div id="sidebar">
+   
+   
+   
+   
+   
+   
+   
+        <button id="expand-sidebar-btn" class="expand-button">☰</button> <!-- Button to expand the sidebar -->
+        <h2 id="baustelle-title" style="font-size: 28px;">{{ baustelle.name }}</h2> <!-- Visible by default -->
+				  <div class="mobile-only-content">
+
+        <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px !important; margin: auto; display:none !important;">Liste anzeigen</button> <!-- Also visible by default -->
+		</div>
+		  <div class="desktop-only-content">
+        {% if is_admin %}
+            <div class="button-container">
+                <a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m" style="margin-bottom: 10px">Inhalte bearbeiten</a>
+            </div>
+        {% endif %}
+        {% if baustelle.image %}
+            <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%; margin-top:20px;">
+        {% endif %}
+        <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+        <div id="geojsonFilesList" style="margin-bottom: 20px;">
+            <ul id="loadedFiles"></ul>
+        </div>
+    </div>
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+      <h3 class="hide-on-mobile resistant-h3" style="display: none; text-align: center; margin-top: 5px;"> Wie stehen Sie zu den Orten in Ihrer Gemeinde? </h3>
+      <h3 class="hide-on-mobile resistant-h3" style="display: none; text-align: center; margin-top: -12px; margin-bottom: 7px"> Lassen Sie es uns auf dieser Karte wissen! </h3>
+      <?php WEBSITE DESCRIPTION END ?>
+      <!-- SMALL OPTIONS MENU TOP START -->
+      <div class="smalloptionsmenutop" style="display: flex; align-items: center; justify-content: center;">
+         <div class="left-container">
+            <!-- This button shows the user a list of existing pins -->
+         </div>
+         <div class="button-s" id="buttonS" onclick="addAndRemoveClass()" style="width: auto; height: auto; padding: 15px; display:none;">
+            <h3> Wie funktioniert's? </h3>
+         </div>
+      </div>
+      <?php CITY LOGO START ?> 
+      <?php CITY LOGO END ?> 
+      <div class="button-container">
+         <button id="open-overlay" class="register-button-m" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
+      </div>
+      <div class="button-container">
+         <button id="show-markers-btn" class="register-button-m" style="margin-right: 5px;">Liste anzeigen</button>
+		 	        <button id="guided-mode-button" class="register-button-m">Guided Mode</button>
+
+      </div>
+      <div class="button-container">
+         <button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Nur Projektvorschläge anzeigen</button>
+      </div>
+      <div class="button-container" style="display:none;">
+         <button id="toggle-answer-markers-btn" class="register-button-m" style="margin-bottom: 10px;">Antwortmarkierungen ein-/ausblenden</button>
+      </div>
+      <h3 style="display: block; text-align: center; margin-top: 5px;"> Klicken Sie zum ein- und ausblenden. </h3>
+			      <!-- Guided Mode Modal -->
+
+
+      <div id="category-toggle-buttons">
+         <!-- Buttons will be added here dynamically -->
+      </div>
+      <!-- Add to karte.html -->
+      <a href="{{ url_for('create_questionset') }}">
+        <button class="register-button-m" style="display:none;">Create New Question Set</button>
+      </a>
+
+
+   </div>
+   <?php CATEGORIES PULL END ?>
+
+<!-- Guided Mode Modal -->
+<div id="guided-mode-modal" class="overlay">
+    <div class="overlay-content">
+        <h2>Select a set of questions</h2>
+        <select id="questionset-select"></select>
+        <button id="start-guided-mode" class="overlay-button">Start</button>
+        <button id="cancel-guided-mode" class="overlay-button">Cancel</button>
+    </div>
+</div>
+
+<!-- Question Modal -->
+<div id="question-modal" class="overlay">
+    <div class="overlay-content">
+        <h2 id="question-title" data-question-id=""></h2>
+        <p id="question-description"></p>
+        <button id="answer-question" class="overlay-button">Answer</button>
+        <button id="next-question" class="overlay-button">Next</button>
+        <button id="cancel-qa-mode" class="overlay-button">Cancel</button>
+        <div id="summary-content">
+            <h2>Summary</h2>
+            <p>No questions answered yet!</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+<?php SIDEBAR BODY END ?>
+</body>
+</html>
