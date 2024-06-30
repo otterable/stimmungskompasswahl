@@ -41,7 +41,8 @@ from models import (
     QuestionSetQuestion,
     QuestionSetAnswer,
     Petition,
-    SignedPetition
+    SignedPetition,
+    PetitionVote
 )
 from flask_login import (
     LoginManager,
@@ -458,25 +459,6 @@ def docusign_callback():
 
 
 
-@app.route("/add_comment", methods=["POST"])
-def add_comment():
-    comment_text = request.form.get("comment")
-    target_id = request.form.get("target_id")
-    target_type = request.form.get("target_type")  # "project" or "petition"
-
-    if target_type == "project":
-        new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=target_id)
-    elif target_type == "petition":
-        new_comment = Comment(text=comment_text, user_id=current_user.id, petition_id=target_id)
-    else:
-        return jsonify({"error": "Invalid target type"}), 400
-
-    db.session.add(new_comment)
-    db.session.commit()
-    return redirect(url_for("view_project_or_petition", id=target_id))
-
-
-
 
 
 
@@ -563,40 +545,142 @@ def Partizipative_Planung_Neuer_Petition():
 
     return render_template("Partizipative_Planung_Neuer_Petition.html")
 
+
+
+
+@app.route('/vote/petition/<int:petition_id>/count', methods=['GET'])
+def get_petition_votes(petition_id):
+    upvotes = PetitionVote.query.filter_by(petition_id=petition_id, upvote=True).count()
+    downvotes = PetitionVote.query.filter_by(petition_id=petition_id, downvote=True).count()
+    total_votes = upvotes + downvotes
+    upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
+    downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
+
+    return jsonify(success=True, upvote_count=upvotes, downvote_count=downvotes, upvote_percentage=upvote_percentage, downvote_percentage=downvote_percentage)
+
+
+
+@app.route('/vote/petition/<int:petition_id>/<string:vote_type>', methods=['POST'])
+def vote_on_petition(petition_id, vote_type):
+    if not current_user.is_authenticated:
+        return jsonify(success=False, message="User not authenticated")
+
+    # Retrieve the existing vote if any
+    existing_vote = PetitionVote.query.filter_by(petition_id=petition_id, user_id=current_user.id).first()
+
+    if vote_type == 'upvote':
+        if existing_vote:
+            if existing_vote.upvote:
+                existing_vote.upvote = False  # Toggle off if already upvoted
+            else:
+                existing_vote.upvote = True
+                existing_vote.downvote = False  # Ensure no double voting
+        else:
+            new_vote = PetitionVote(petition_id=petition_id, user_id=current_user.id, upvote=True)
+            db.session.add(new_vote)
+    elif vote_type == 'downvote':
+        if existing_vote:
+            if existing_vote.downvote:
+                existing_vote.downvote = False  # Toggle off if already downvoted
+            else:
+                existing_vote.downvote = True
+                existing_vote.upvote = False  # Ensure no double voting
+        else:
+            new_vote = PetitionVote(petition_id=petition_id, user_id=current_user.id, downvote=True)
+            db.session.add(new_vote)
+
+    db.session.commit()
+
+    # Recalculate vote counts and percentages
+    upvotes = PetitionVote.query.filter_by(petition_id=petition_id, upvote=True).count()
+    downvotes = PetitionVote.query.filter_by(petition_id=petition_id, downvote=True).count()
+    total_votes = upvotes + downvotes
+    upvote_percentage = (upvotes / total_votes * 100) if total_votes > 0 else 0
+    downvote_percentage = (downvotes / total_votes * 100) if total_votes > 0 else 0
+
+    return jsonify(success=True, upvote_count=upvotes, downvote_count=downvotes, upvote_percentage=upvote_percentage, downvote_percentage=downvote_percentage)
+
+
+
+
+
+
+
+
 @app.route("/Partizipative_Planung_Petition/<int:petition_id>", methods=["GET", "POST"])
 def Partizipative_Planung_Petition(petition_id):
-    try:
-        petition = Petition.query.get(petition_id)
-        signed_status = False
-        if current_user.is_authenticated:
-            signed_status = user_has_signed(petition_id, current_user.id)
+    petition = Petition.query.get(petition_id)
+    signed_status = False
+    if current_user.is_authenticated:
+        signed_status = user_has_signed(petition_id, current_user.id)
+    
+    if request.method == "POST" and current_user.is_authenticated and not signed_status:
+        return redirect(f"/docusign/{petition_id}")
+    
+    prev_petition = Petition.query.filter(Petition.id < petition_id).order_by(Petition.id.desc()).first()
+    next_petition = Petition.query.filter(Petition.id > petition_id).order_by(Petition.id.asc()).first()
 
-        prev_petition = (
-            Petition.query.filter(Petition.id < petition_id)
-            .order_by(Petition.id.desc())
-            .first()
-        )
-        next_petition = (
-            Petition.query.filter(Petition.id > petition_id)
-            .order_by(Petition.id.asc())
-            .first()
-        )
+    return render_template("Partizipative_Planung_Petition/index.html", 
+                           petition=petition, 
+                           petition_id=petition_id, 
+                           signed_status=signed_status,
+                           user_has_signed=user_has_signed,
+                           prev_petition_id=prev_petition.id if prev_petition else None,
+                           next_petition_id=next_petition.id if next_petition else None)
 
-        if request.method == "POST" and current_user.is_authenticated and not signed_status:
-            # Redirect to DocuSign page for signing
-            return redirect(f"/docusign/{petition_id}")
-        
-        return render_template("Partizipative_Planung_Petition/index.html", 
-                               petition=petition, 
-                               petition_id=petition_id,
-                               signed_status=signed_status,
-                               user_has_signed=user_has_signed,
-                               prev_petition_id=prev_petition.id if prev_petition else None,
-                               next_petition_id=next_petition.id if next_petition else None)
 
-    except Exception as e:
-        app.logger.error(f"Error in Partizipative_Planung_Petition route: {str(e)}")
-        return str(e)  # Or redirect to a generic error page
+
+@app.route("/vote/petition/<int:petition_id>/<string:vote_type>", methods=["POST"])
+@login_required
+def vote_petition(petition_id, vote_type):
+    petition = Petition.query.get_or_404(petition_id)
+    existing_vote = PetitionVote.query.filter_by(user_id=current_user.id, petition_id=petition_id).first()
+
+    if existing_vote:
+        if ((vote_type == "upvote" and existing_vote.upvote) or
+            (vote_type == "downvote" and existing_vote.downvote)):
+            db.session.delete(existing_vote)
+            vote_action = "removed"
+        else:
+            existing_vote.upvote = (vote_type == "upvote")
+            existing_vote.downvote = (vote_type == "downvote")
+            vote_action = "changed"
+    else:
+        new_vote = PetitionVote(user_id=current_user.id, petition_id=petition_id,
+                                upvote=(vote_type == "upvote"), downvote=(vote_type == "downvote"))
+        db.session.add(new_vote)
+        vote_action = "added"
+
+    db.session.commit()
+
+    # Recalculate vote counts
+    upvote_count = PetitionVote.query.filter_by(petition_id=petition_id, upvote=True).count()
+    downvote_count = PetitionVote.query.filter_by(petition_id=petition_id, downvote=True).count()
+
+    return jsonify({
+        "success": True,
+        "vote_action": vote_action,
+        "upvote_count": upvote_count,
+        "downvote_count": downvote_count
+    })
+
+@app.route("/add_comment", methods=["POST"])
+def add_comment():
+    comment_text = request.form.get("comment")
+    target_id = request.form.get("target_id")
+    target_type = request.form.get("target_type")  # "project" or "petition"
+
+    if target_type == "project":
+        new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=target_id)
+    elif target_type == "petition":
+        new_comment = Comment(text=comment_text, user_id=current_user.id, petition_id=target_id)
+    else:
+        return jsonify({"error": "Invalid target type"}), 400
+
+    db.session.add(new_comment)
+    db.session.commit()
+    return redirect(url_for("view_project_or_petition", id=target_id))
+
 
 @app.route("/docusign/<int:petition_id>")
 @login_required

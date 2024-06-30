@@ -534,3 +534,31 @@ document.getElementById('share-share').addEventListener('click', function(e) {
     document.getElementById('nav-overlay').classList.remove('nav-overlay-active');
 });
 	
+	
+	
+document.addEventListener("DOMContentLoaded", function() {
+  function adjustBottomBar() {
+    const screenHeight = window.innerHeight;
+    const formContainer = document.querySelector('.form-container');
+
+    // Check if formContainer exists on the page
+    if (formContainer) {
+      const formHeight = formContainer.offsetHeight;
+      const bottomBar = document.querySelector('.bottom-bar');
+
+      if (formHeight < screenHeight) {
+        // If the form container is shorter than the screen height
+        bottomBar.classList.remove('relative');
+        bottomBar.classList.add('fixed');
+      } else {
+        // If the form container is taller than the screen height
+        bottomBar.classList.remove('fixed');
+        bottomBar.classList.add('relative');
+      }
+    }
+  }
+
+  // Call the function on load and on resize
+  adjustBottomBar();
+  window.addEventListener('resize', adjustBottomBar);
+});

@@ -5,20 +5,66 @@
         flex-direction: column;
     }
 
-    .bottom-bar {
-        position: fixed; /* Fix position to the bottom of the viewport */
-        bottom: 0; /* Align to the bottom */
-        left: 0; /* Align to the left */
-        right: 0; /* Align to the right */
-        margin-top: 0; /* Remove any margin top */
-        z-index: 100; /* Make sure it's above most other items */
+
+}
+
+.bottom-bar {
+  background-color: #003056; /* Dark blue background */
+  color: white; /* White text color */
+  text-align: center; /* Center align text */
+  padding: 1px 0; /* Padding on top and bottom */
+  width: 100%; /* Full width */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+@media only screen and (min-width: 1081px) {
+  .bottom-bar.fixed {
+    position: fixed; /* Fix position to the bottom of the viewport */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100; /* Ensure it's above most other items */
+  }
+
+  .bottom-bar.relative {
+    position: relative; /* Normal flow of the document */
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the body takes at least the height of the viewport */
+  }
+}
+
+
+@media only screen and (max-width: 1080px) {
+    body {
+        padding-bottom: 50px; /* Adjust this to match the height of your bottom bar */
     }
 
-    .content-wrapper {
-        flex: 1 0 auto; /* Flexibility to occupy available space */
-        padding-bottom: 60px; /* Space at the bottom to avoid overlap with the fixed bottom bar */
+    .bottom-bar {
+        position: fixed; /* Keeps the bottom bar fixed at the bottom */
+        bottom: 0; /* Aligns the bottom bar at the bottom of the viewport */
+        left: 0; /* Aligns the bottom bar to the left edge of the viewport */
+        right: 0; /* Aligns the bottom bar to the right edge of the viewport */
+        width: 100%; /* Ensures the bottom bar spans the full width of the viewport */
+        z-index: 1000; /* Keeps the bottom bar above most other content */
+        padding: 10px 0; /* Padding for visual comfort */
+        background-color: #003056; /* Background color for visibility */
+        color: white; /* Text color for contrast */
+        text-align: center; /* Centers the content within the bottom bar */
+    }
+
+    .form-container {
+        box-shadow: none !important;
+        padding: 15px; /* Reduces padding for smaller screens */
+        margin: 0 10px; /* Adds a small horizontal margin */
     }
 }
+
+
+
 @media only screen and (max-width: 1080px) {
     /* Mobile-specific adjustments if needed */
     .bottom-bar {
@@ -41,15 +87,16 @@
 				padding-right: 0px !important;
 				padding-left: 0px !important;
 	}
+	.comment-form {
+		margin-bottom: 40px;
+	}
 }
-.bottom-bar {
-    position: fixed; /* Fix position to the bottom of the viewport */
-    bottom: 0; /* Align to the bottom */
-    left: 0; /* Align to the left */
-    right: 0; /* Align to the right */
-    z-index: 100; /* Make sure it's above most other items */
-    width: 100%; /* Ensure it spans the full width */
+
+
+.project-map {
+	z-index: 10 !important;
 }
+
 
 body {
   font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;

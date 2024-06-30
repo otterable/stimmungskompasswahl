@@ -167,7 +167,24 @@ class Petition(db.Model):
     comments = db.relationship('Comment', backref='petition', lazy=True, cascade="all, delete-orphan")
 
 
+class PetitionVote(db.Model):
+    __tablename__ = 'petition_vote'  # Explicitly define the table name
+    id = db.Column(db.Integer, primary_key=True)
+    petition_id = db.Column(db.Integer, db.ForeignKey('petition.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    upvote = db.Column(db.Boolean, default=False)  # Indicates if it's an upvote
+    downvote = db.Column(db.Boolean, default=False)  # Indicates if it's a downvote
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "petition_id": self.petition_id,
+            "user_id": self.user_id,
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "upvote": self.upvote,
+            "downvote": self.downvote
+        }
 
 
        
