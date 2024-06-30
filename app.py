@@ -543,9 +543,9 @@ def Partizipative_Planung_Neuer_Petition():
     if petition_id:
         petition = Petition.query.get(petition_id)
         image_files = [getattr(petition, f"image_file{i}") for i in range(1, 11)]
-        return render_template("Partizipative_Planung_Neuer_Petition.html", petition=petition, image_files=image_files)
+        return render_template("Partizipative_Planung_Neuer_Petition/index.html", petition=petition, image_files=image_files)
 
-    return render_template("Partizipative_Planung_Neuer_Petition.html", petition=None, image_files=[None]*10)
+    return render_template("Partizipative_Planung_Neuer_Petition/index.html", petition=None, image_files=[None]*10)
 
 
 
