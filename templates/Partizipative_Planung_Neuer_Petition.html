@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Neue Petition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='utility.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Neue Petition einreichen</h1>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="input-field">
+                <label for="name">Titel der Petition</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="input-field">
+                <label for="category">Kategorie</label>
+                <select id="category" name="category" required>
+                    <option value="Transport">Transport</option>
+                    <option value="Öffentliche Plätze">Öffentliche Plätze</option>
+                    <option value="Umwelt">Umwelt</option>
+                    <option value="Verwaltung">Verwaltung</option>
+                    <option value="Kultur">Kultur</option>
+                    <option value="Bildung">Bildung</option>
+                    <option value="Gesundheit">Gesundheit</option>
+                    <option value="Sport">Sport</option>
+                    <option value="Andere">Andere</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <label for="introduction">Einführung</label>
+                <textarea id="introduction" name="introduction" required></textarea>
+            </div>
+            <div class="input-field">
+                <label for="description1">Beschreibung 1</label>
+                <textarea id="description1" name="description1" required></textarea>
+            </div>
+            <div class="input-field">
+                <label for="description2">Beschreibung 2</label>
+                <textarea id="description2" name="description2"></textarea>
+            </div>
+            <div class="input-field">
+                <label for="description3">Beschreibung 3</label>
+                <textarea id="description3" name="description3"></textarea>
+            </div>
+            <div class="input-field">
+                <label for="public_benefit">Öffentlicher Nutzen</label>
+                <textarea id="public_benefit" name="public_benefit" required></textarea>
+            </div>
+            <div class="input-field">
+                <label for="image_file1">Bild 1</label>
+                <input type="file" id="image_file1" name="image_file1" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file2">Bild 2</label>
+                <input type="file" id="image_file2" name="image_file2" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file3">Bild 3</label>
+                <input type="file" id="image_file3" name="image_file3" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file4">Bild 4</label>
+                <input type="file" id="image_file4" name="image_file4" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file5">Bild 5</label>
+                <input type="file" id="image_file5" name="image_file5" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file6">Bild 6</label>
+                <input type="file" id="image_file6" name="image_file6" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file7">Bild 7</label>
+                <input type="file" id="image_file7" name="image_file7" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file8">Bild 8</label>
+                <input type="file" id="image_file8" name="image_file8" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file9">Bild 9</label>
+                <input type="file" id="image_file9" name="image_file9" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="image_file10">Bild 10</label>
+                <input type="file" id="image_file10" name="image_file10" accept="image/*">
+            </div>
+            <div class="input-field">
+                <label for="geoloc">Geolokation</label>
+                <input type="text" id="geoloc" name="geoloc">
+            </div>
+            <button type="submit" class="button publish-button">Veröffentlichen</button>
+        </form>
+    </div>
+</body>
+</html>

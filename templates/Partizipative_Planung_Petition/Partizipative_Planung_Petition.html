@@ -1,0 +1,63 @@
+<div class="form-container">
+       <h2 class="centered-title">{{ petition.name }}</h2>
+          <p class="centered-title" style="margin-bottom: 20px;">Rubrik: {{ petition.category }}</p>
+        <p><strong>Einführung:</strong></p>
+        <p>{{ petition.introduction }}</p>
+        <p><strong>Beschreibung 1:</strong></p>
+        <p>{{ petition.description1 }}</p>
+        {% if petition.description2 %}
+        <p><strong>Beschreibung 2:</strong></p>
+        <p>{{ petition.description2 }}</p>
+        {% endif %}
+        {% if petition.description3 %}
+        <p><strong>Beschreibung 3:</strong></p>
+        <p>{{ petition.description3 }}</p>
+        {% endif %}
+        <p><strong>Öffentlicher Nutzen:</strong></p>
+        <p>{{ petition.public_benefit }}</p>
+       
+
+<div class="petition-status">
+    {% if current_user.is_authenticated %}
+        {% if not current_user.email %}
+            <p style="color: red;">An E-mail is required to sign petitions. Please assign a valid e-mail with your account.</p>
+<a href="{{ url_for('verify_email', petition_id=petition_id) }}" class="verify-email-button">Verify Email</a>
+        {% elif signed_status %}
+            <p style="color: green;">SIGNED</p>
+        {% else %}
+            <form method="POST" action="{{ url_for('Partizipative_Planung_Petition', petition_id=petition.id) }}">
+                <button type="submit" class="button comment-button">Unterschreiben 💬</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p style="color: red;">You must be logged in to sign petitions.</p>
+    {% endif %}
+</div>
+
+    </div>
+
+<!-- Navigation for Desktop -->
+{% if prev_petition_id %}
+<a href="{{ url_for('Partizipative_Planung_Petition', petition_id=prev_petition_id) }}" class="arrow-desktop">
+    <img src="{{ url_for('serve_image', filename='arrowleft.png') }}" alt="Previous" class="arrow-left">
+</a>
+{% endif %}
+{% if next_petition_id %}
+<a href="{{ url_for('Partizipative_Planung_Petition', petition_id=next_petition_id) }}" class="arrow-desktop">
+    <img src="{{ url_for('serve_image', filename='arrowright.png') }}" alt="Next" class="arrow-right">
+</a>
+{% endif %}
+
+<!-- Conditional rendering for mobile devices -->
+<div class="footer-navigation">
+    {% if prev_petition_id %}
+    <a href="{{ url_for('Partizipative_Planung_Petition', petition_id=prev_petition_id) }}" class="navigation-left">
+        Vorheriges Projekt
+    </a>
+    {% endif %}
+    {% if next_petition_id %}
+    <a href="{{ url_for('Partizipative_Planung_Petition', petition_id=next_petition_id) }}" class="navigation-right">
+        Nächstes Projekt
+    </a>
+    {% endif %}
+</div>

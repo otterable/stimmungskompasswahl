@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Email</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='utility.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            console.debug("Initial Debug: Document Ready");
+
+            function startResendOtpTimer() {
+                let countdown = 30;
+                $('#resend-otp').prop('disabled', true).text(`OTP erneut schicken (${countdown}s)`);
+                var countdownInterval = setInterval(function() {
+                    countdown -= 1;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        $('#resend-otp').prop('disabled', false).text("OTP erneut schicken");
+                    } else {
+                        $('#resend-otp').text(`OTP erneut schicken (${countdown}s)`);
+                    }
+                }, 1000);
+            }
+
+            $("form").submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                console.debug("Form Data Prepared: ", formData);
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url_for('verify_email') }}",
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response) {
+                        console.debug("AJAX Success: Response Received: ", response);
+                        if (response.success) {
+                            if (response.redirect_url) {
+                                console.debug("Success with redirect URL: ", response.redirect_url);
+                                window.location.href = response.redirect_url;
+                            } else if (response.stage === 'otp') {
+                                console.debug("OTP stage response handling - no dynamic HTML insertion needed");
+                                window.location.reload(); // Reload the page to fetch the OTP form
+                            }
+                        } else {
+                            console.debug("Error response received with message: ", response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error: Status: ", status, "Error: ", error);
+                        console.debug("AJAX Error Response: ", xhr.responseText);
+                    }
+                });
+            });
+
+            $('#resend-otp').click(function() {
+                $.post("{{ url_for('verify_email') }}", {resend: true}, function(data) {
+                    console.debug("Resend OTP: Server Response: ", data);
+                    if (data.success) {
+                        startResendOtpTimer();
+                    }
+                }, 'json');
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var backgroundNumber = Math.floor(Math.random() * 12) + 1;
+            document.body.style.backgroundImage = 'url(/static/background' + backgroundNumber + '.png)';
+        });
+
+        function redirectToIndex() {
+            window.location.href = '/';
+        }
+    </script>
+</head>
+<body>
+<div class="edge">
+    <div id="form-container" class="form-container">
+        <div class="logo-container" onclick="redirectToIndex()">
+            <img src="{{ url_for('serve_image', filename='logo.png') }}" alt="Logo" class="logo">
+        </div>
+        <h1>E-Mail verifizieren</h1>
+        <p>Für das Unterzeichnen von Petitionen ist Ihre E-Mail erforderlich.</p>
+        {% if stage == 'email' %}
+            <form method="POST">
+                <input type="hidden" name="petition_id" value="{{ petition_id }}">
+                <label for="email"><h3>E-Mail</h3></label>
+                <p>Ein Code wird an Ihre E-Mail geschickt.</p>
+                <input type="email" name="email" id="email" placeholder="Ihre E-Mail" required style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;">
+                <button type="submit" class="register-button" style="font-weight: bold;">OTP Schicken</button>
+            </form>
+        {% elif stage == 'otp' %}
+            <form method="POST">
+                <input type="hidden" name="petition_id" value="{{ petition_id }}">
+                <label for="otp"><h3>OTP</h3></label>
+                <input type="text" name="otp" id="otp" placeholder="Geben Sie die OTP ein" required style="border-radius: 30px; padding: 15px; background-color: white; font-weight: bold; color: black; border: 1px solid #003056; cursor: pointer; width: 100%; box-sizing: border-box;">
+                <button type="submit" class="register-button" style="font-weight: bold;">Verifizieren</button>
+            </form>
+            <button id="resend-otp" type="button" class="register-button" style="font-weight: bold;">OTP erneut schicken (30s)</button>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>

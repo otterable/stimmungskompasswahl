@@ -39,7 +39,9 @@ from models import (
     Post,
     QuestionSet,
     QuestionSetQuestion,
-    QuestionSetAnswer
+    QuestionSetAnswer,
+    Petition,
+    SignedPetition
 )
 from flask_login import (
     LoginManager,
@@ -92,6 +94,26 @@ from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
+from threading import Timer
+import atexit
+from apscheduler.schedulers.background import BackgroundScheduler
+
+
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import io
+import base64
+import docusign_esign as docusign
+from docusign_esign.client.api_exception import ApiException
+from docusign_esign import ApiClient, EnvelopesApi, EnvelopeDefinition, Document, Signer, SignHere, Tabs, Recipients, RecipientViewRequest
+from jwt_helper import get_jwt_token, create_api_client, get_private_key
+import requests
+from jwt_config import DS_JWT
+from consts import demo_docs_path
+from os import path
+import urllib.parse
+
+scheduler = BackgroundScheduler()
 
 load_dotenv()
 
@@ -143,12 +165,17 @@ ip_project_submissions = {}
 
 
 
+
+
+
+
+
 app.config.update(
     MAIL_SERVER='smtp.easyname.com',
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
     MAIL_USERNAME='office@stimmungskompass.at',
-    MAIL_PASSWORD='ottrottr123'
+    MAIL_PASSWORD='.75sq6oao1ar'
 )
 
 mail = Mail(app)
@@ -235,6 +262,561 @@ def before_request():
         'og_description': 'Eine Plattform zur Bürgerbeteiligung. Engagiere dich für eine bessere Stadt!',
         'og_image': 'https://www.stimmungskompass.at/static/facebook_card.png'
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/verify_email", methods=["GET", "POST"])
+@login_required
+def verify_email():
+    petition_id = request.args.get('petition_id') or request.form.get('petition_id')
+    if not petition_id:
+        logging.error("No petition_id in session or URL parameters when accessing verify_email.")
+        flash("Invalid access state. Please try again.", category='error')
+        return redirect(url_for('index'))
+
+    if request.method == "POST":
+        if 'email' in request.form:
+            email = request.form.get("email")
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                return jsonify({"success": False, "message": "An e-mail is already associated with another account. Please use a different one."})
+
+            otp = randint(100000, 999999)
+            session['email_verification'] = {'email': email, 'otp': otp, 'otp_sent_time': datetime.utcnow()}
+            send_otp(email, otp)
+            return jsonify({"success": True, "message": "OTP sent successfully.", "stage": "otp"})
+
+        elif 'otp' in request.form:
+            otp = request.form.get("otp")
+            email_verification = session.get('email_verification')
+            if not email_verification:
+                return jsonify({"success": False, "message": "Invalid session state. Please try again."})
+
+            if email_verification['otp'] == int(otp):
+                current_user.email = email_verification['email']
+                db.session.commit()
+                session.pop('email_verification', None)
+                return jsonify({
+                    "success": True,
+                    "message": "Email verified and updated successfully.",
+                    "redirect_url": url_for('Partizipative_Planung_Petition', petition_id=petition_id)
+                })
+            else:
+                return jsonify({"success": False, "message": "Invalid OTP. Please try again."})
+
+        elif 'resend' in request.form:
+            email_verification = session.get('email_verification')
+            if email_verification:
+                last_sent = email_verification.get('otp_sent_time')
+                if last_sent and (datetime.utcnow() - last_sent).total_seconds() < 30:
+                    return jsonify({"success": False, "message": "You can only resend OTP every 30 seconds. Please wait."})
+
+                otp = randint(100000, 999999)
+                session['email_verification']['otp'] = otp
+                session['email_verification']['otp_sent_time'] = datetime.utcnow()
+                send_otp(email_verification['email'], otp)
+                return jsonify({"success": True, "message": "OTP resent successfully."})
+
+    stage = 'otp' if 'email_verification' in session else 'email'
+    return render_template("verify_email/index.html", stage=stage, petition_id=petition_id)
+
+
+
+
+
+
+
+
+
+
+
+
+
+def user_has_signed(petition_id, user_id):
+    """ Check if a user has already signed a specific petition. """
+    return SignedPetition.query.filter_by(petition_id=petition_id, user_id=user_id).count() > 0
+
+def update_petition_signing_status(petition_id, user_id, signed):
+    """ Update the signing status for a petition and a user. """
+    if signed:
+        if not user_has_signed(petition_id, user_id):
+            signed_petition = SignedPetition(user_id=user_id, petition_id=petition_id)
+            db.session.add(signed_petition)
+            db.session.commit()
+            flash("Petition signing recorded successfully.", category='success')
+        else:
+            flash("You have already signed this petition.", category='info')
+    else:
+        flash("Unable to record the signing of the petition.", category='error')
+
+
+app.config['DS_JWT'] = {
+    'ds_client_id': '049f5ae5-5db2-410f-874a-e1466dd8d4d1',
+    'ds_client_secret': '4627f57b-a0b1-499d-bb3d-3e76ec0189f6',
+    'authorization_server': 'https://account-d.docusign.com',
+    'private_key_file': '.private_pkcs8.key',
+    'account_id': '534f34d2-3524-4977-8c1e-a237c2969951',
+    'ds_impersonated_user_id': '548b740e-59b2-414c-a0db-b591643b65f2'  # The id of the user.
+}
+
+def initiate_docusign_session(envelope_id, user_id):
+    access_token = get_docusign_access_token()
+    if access_token:
+        # Construct the email-style session URL
+        # Adjust these parameters to match your application's needs
+        session_url = f"https://demo.docusign.net/Signing/EmailStart.aspx?a={envelope_id}&etti=24&acct={app.config['DS_JWT']['account_id']}&er=64c15bf2-24f6-4e3b-88e8-0b4e2ea444ea&espei={envelope_id}"
+        
+        # Log the complete URL for debugging
+        logging.debug(f"Redirecting to DocuSign session URL: {session_url}")
+        
+        # Redirect to the DocuSign session
+        return redirect(session_url)
+    else:
+        logging.error("Failed to obtain a valid access token.")
+        flash("Could not start DocuSign session. Please try again.", category='error')
+        return redirect(url_for('error_page'))
+
+
+
+# Make sure logging is set up to capture debug level logs
+logging.basicConfig(level=logging.DEBUG)
+
+
+
+
+
+@app.route('/docusign/consent')
+def docusign_consent():
+    # Construct the consent URL
+    base_url = "https://account-d.docusign.com/oauth/auth"
+    query_params = {
+        "response_type": "code",
+        "scope": "signature impersonation",
+        "client_id": DS_JWT['ds_client_id'],
+        "redirect_uri": "http://localhost:3000/ds/callback"  # Updated to the new redirect URI
+    }
+    consent_url = f"{base_url}?{urllib.parse.urlencode(query_params)}"
+
+    # Redirect the user to the consent page
+    return redirect(consent_url)
+
+@app.route('/ds/callback')
+def ds_callback():
+    code = request.args.get('code')
+    if not code:
+        flash('Authorization failed: No code received from DocuSign.')
+        return redirect(url_for('index'))  # Or wherever you want to redirect
+
+    # Here you would typically exchange the code for an access token
+    # For now, just logging or displaying the code might be a diagnostic step
+    flash(f'DocuSign code received: {code}')
+    return redirect(url_for('index'))  # Redirect to a page of your choice
+
+@app.route("/docusign_callback", methods=["GET", "POST"])
+def docusign_callback():
+    event = request.args.get('event')
+    petition_id = request.args.get('petition_id')  # Ensure this is passed from DocuSign
+
+    logging.debug(f"docusign_callback: event={event}, petition_id={petition_id}")
+
+    if not petition_id:
+        logging.error("No petition_id provided in the callback")
+        flash("Invalid petition ID.", category='error')
+        return redirect(url_for('index'))  # Redirect to home or another appropriate page
+
+    if event == 'signing_complete':
+        update_petition_signing_status(petition_id, current_user.id, signed=True)
+        logging.debug(f"User {current_user.id} has successfully signed petition {petition_id}")
+        logging.debug(f"E-Mail confirmation sent to {current_user.email}")
+        flash("You have successfully signed the petition!", category='success')
+    else:
+        logging.debug(f"DocuSign event not handled: {event}")
+        flash("Signing not completed. Please try again.", category='error')
+
+    return redirect(url_for('Partizipative_Planung_Petition', petition_id=petition_id))
+
+
+
+
+@app.route("/add_comment", methods=["POST"])
+def add_comment():
+    comment_text = request.form.get("comment")
+    target_id = request.form.get("target_id")
+    target_type = request.form.get("target_type")  # "project" or "petition"
+
+    if target_type == "project":
+        new_comment = Comment(text=comment_text, user_id=current_user.id, project_id=target_id)
+    elif target_type == "petition":
+        new_comment = Comment(text=comment_text, user_id=current_user.id, petition_id=target_id)
+    else:
+        return jsonify({"error": "Invalid target type"}), 400
+
+    db.session.add(new_comment)
+    db.session.commit()
+    return redirect(url_for("view_project_or_petition", id=target_id))
+
+
+
+
+
+
+
+
+def get_private_key(private_key_path):
+    """Reads the private key from a given file path and logs its contents (partially for security)."""
+    private_key_file = path.abspath(private_key_path)
+    logging.debug(f"Attempting to read the private key from: {private_key_file}")
+
+    if path.isfile(private_key_file):
+        with open(private_key_file, 'r') as file:
+            private_key = file.read()
+            logging.debug(f"Private key read successfully: {private_key[:50]}... (truncated)")
+            return private_key
+    else:
+        logging.error(f"Private key file not found at: {private_key_file}")
+        raise FileNotFoundError(f"No private key file at {private_key_file}")
+
+
+def jinja2_getattr(obj, attr):
+    return getattr(obj, attr, None)
+
+app.jinja_env.filters['getattr'] = jinja2_getattr
+
+@app.route("/Partizipative_Planung_Neuer_Petition", methods=["GET", "POST"])
+@login_required
+def Partizipative_Planung_Neuer_Petition():
+    if request.method == "POST":
+        # Extract form data
+        name = request.form.get("name")
+        category = request.form.get("category")
+        introduction = request.form.get("introduction")
+        description1 = request.form.get("description1")
+        description2 = request.form.get("description2")
+        description3 = request.form.get("description3")
+        public_benefit = request.form.get("public_benefit")
+        images = []
+        for i in range(1, 11):
+            image = request.files.get(f"image_file{i}")
+            if image:
+                image_filename = secure_filename(image.filename)
+                image_path = os.path.join(app.config["UPLOAD_FOLDER"], image_filename)
+                image.save(image_path)
+                images.append(image_filename)
+            else:
+                images.append(None)
+        geoloc = request.form.get("geoloc")
+        is_featured = False
+        demo_mode = False
+
+        # Create new petition
+        current_time = datetime.now(pytz.utc) + timedelta(hours=1)
+        new_petition = Petition(
+            name=name,
+            category=category,
+            introduction=introduction,
+            description1=description1,
+            description2=description2,
+            description3=description3,
+            public_benefit=public_benefit,
+            image_file1=images[0],
+            image_file2=images[1],
+            image_file3=images[2],
+            image_file4=images[3],
+            image_file5=images[4],
+            image_file6=images[5],
+            image_file7=images[6],
+            image_file8=images[7],
+            image_file9=images[8],
+            image_file10=images[9],
+            geoloc=geoloc,
+            date=current_time,
+            author=current_user.id,
+            is_featured=is_featured,
+            demo_mode=demo_mode,
+        )
+
+        db.session.add(new_petition)
+        db.session.commit()
+
+        # Redirect to the petition view page
+        return redirect(url_for("Partizipative_Planung_Petition", petition_id=new_petition.id))
+
+    return render_template("Partizipative_Planung_Neuer_Petition.html")
+
+@app.route("/Partizipative_Planung_Petition/<int:petition_id>", methods=["GET", "POST"])
+def Partizipative_Planung_Petition(petition_id):
+    try:
+        petition = Petition.query.get(petition_id)
+        signed_status = False
+        if current_user.is_authenticated:
+            signed_status = user_has_signed(petition_id, current_user.id)
+
+        prev_petition = (
+            Petition.query.filter(Petition.id < petition_id)
+            .order_by(Petition.id.desc())
+            .first()
+        )
+        next_petition = (
+            Petition.query.filter(Petition.id > petition_id)
+            .order_by(Petition.id.asc())
+            .first()
+        )
+
+        if request.method == "POST" and current_user.is_authenticated and not signed_status:
+            # Redirect to DocuSign page for signing
+            return redirect(f"/docusign/{petition_id}")
+        
+        return render_template("Partizipative_Planung_Petition/index.html", 
+                               petition=petition, 
+                               petition_id=petition_id,
+                               signed_status=signed_status,
+                               user_has_signed=user_has_signed,
+                               prev_petition_id=prev_petition.id if prev_petition else None,
+                               next_petition_id=next_petition.id if next_petition else None)
+
+    except Exception as e:
+        app.logger.error(f"Error in Partizipative_Planung_Petition route: {str(e)}")
+        return str(e)  # Or redirect to a generic error page
+
+@app.route("/docusign/<int:petition_id>")
+@login_required
+def docusign(petition_id):
+    petition = Petition.query.get(petition_id)
+    user = current_user
+
+    if not user.email:
+        logging.error(f"No recipient email provided for user {user.name}")
+        session['petition_id'] = petition_id  # Set petition_id in session
+        flash("An E-mail is required to sign petitions. Please assign a valid e-mail with your account.", category='error')
+        return redirect(url_for('verify_email', petition_id=petition_id))
+
+    envelope_id, signing_url = create_docusign_envelope(petition, user)
+
+    if signing_url:
+        logging.debug(f"Redirecting user to DocuSign signing URL: {signing_url}")
+        return redirect(signing_url)
+    else:
+        logging.error("Failed to create DocuSign envelope or obtain signing URL.")
+        flash("Failed to create DocuSign envelope or obtain signing URL. Please try again later.", category='error')
+        return redirect(url_for('Partizipative_Planung_Petition', petition_id=petition_id))
+
+
+
+
+
+
+
+
+
+
+@app.route("/submit_docusign/<int:petition_id>", methods=["POST"])
+def submit_docusign(petition_id):
+    # After successful signing, redirect back to petition page with success message
+    flash(f"You have successfully signed the petition title '{Petition.query.get(petition_id).name}'!")
+    return redirect(url_for("Partizipative_Planung_Petition", petition_id=petition_id))
+
+def create_petition_pdf(petition):
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    p.drawString(100, height - 50, "Petition Title: " + petition.name)
+    p.drawString(100, height - 70, "Category: " + petition.category)
+    p.drawString(100, height - 90, "Introduction: " + petition.introduction)
+    p.drawString(100, height - 110, "Description 1: " + petition.description1)
+    if petition.description2:
+        p.drawString(100, height - 130, "Description 2: " + petition.description2)
+    if petition.description3:
+        p.drawString(100, height - 150, "Description 3: " + petition.description3)
+    p.drawString(100, height - 170, "Public Benefit: " + petition.public_benefit)
+
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    return buffer
+
+def get_docusign_access_token():
+    try:
+        logging.debug("Reading private key")
+        private_key = get_private_key(DS_JWT['private_key_file'])
+        logging.debug("Private key obtained, requesting JWT token")
+        
+        response = get_jwt_token(
+            private_key=private_key,
+            scopes=["signature", "impersonation"],
+            auth_server=DS_JWT['authorization_server'],
+            client_id=DS_JWT['ds_client_id'],
+            impersonated_user_id=DS_JWT['ds_impersonated_user_id']
+        )
+        logging.debug("JWT token obtained successfully")
+        return response.access_token
+    except Exception as e:
+        logging.error("Failed to obtain JWT token", exc_info=True)
+        raise
+
+def create_docusign_envelope(petition, user):
+    logging.debug("Creating DocuSign envelope")
+    try:
+        access_token = get_docusign_access_token()
+        if access_token is None:
+            logging.error("Failed to obtain access token")
+            return None, None
+
+        api_client = ApiClient()
+        api_client.host = "https://demo.docusign.net/restapi"
+        api_client.set_default_header("Authorization", "Bearer " + access_token)
+
+        envelopes_api = EnvelopesApi(api_client)
+        envelope_definition = EnvelopeDefinition(
+            email_subject="Please sign the petition",
+            status="sent"
+        )
+
+        # Create petition PDF
+        petition_pdf = create_petition_pdf(petition)
+        document_base64 = base64.b64encode(petition_pdf.read()).decode('utf-8')
+        document = Document(
+            document_base64=document_base64,
+            name="Petition",
+            file_extension="pdf",
+            document_id="1"
+        )
+
+        # Create signer
+        signer = Signer(
+            email=user.email,
+            name=user.name,
+            recipient_id="1",
+            routing_order="1",
+            client_user_id=str(user.id)  # Ensure this is a string
+        )
+        sign_here = SignHere(
+            document_id="1",
+            page_number="1",
+            recipient_id="1",
+            tab_label="SignHereTab",
+            x_position="200",
+            y_position="700"
+        )
+        tabs = Tabs(sign_here_tabs=[sign_here])
+        signer.tabs = tabs
+
+        # Set recipients and documents
+        envelope_definition.recipients = Recipients(signers=[signer])
+        envelope_definition.documents = [document]
+
+        # Create the envelope
+        results = envelopes_api.create_envelope(
+            account_id=app.config['DS_JWT']['account_id'],
+            envelope_definition=envelope_definition
+        )
+        logging.debug(f"Envelope created with ID: {results.envelope_id}")
+
+        # Generate the recipient view (signing URL)
+        recipient_view_request = RecipientViewRequest(
+            authentication_method='none',
+            client_user_id=str(user.id),
+            recipient_id='1',
+            return_url=url_for('docusign_callback', petition_id=petition.id, _external=True),
+            user_name=user.name,
+            email=user.email
+        )
+        view_result = envelopes_api.create_recipient_view(
+            account_id=app.config['DS_JWT']['account_id'],
+            envelope_id=results.envelope_id,
+            recipient_view_request=recipient_view_request
+        )
+        logging.debug(f"Recipient view URL obtained: {view_result.url}")
+
+        return results.envelope_id, view_result.url
+    except ApiException as e:
+        logging.error(f"DocuSign API exception: {e}")
+        if e.body:
+            logging.error(f"API Error Response Body: {e.body}")
+        return None, None
+    except Exception as e:
+        logging.error("Error creating envelope or generating recipient view URL:", exc_info=True)
+        return None, None
+
+
+
+
+
+
+
+
+def refresh_docusign_access_token():
+    """Refresh the access token using DocuSign's refresh token if available."""
+    refresh_token = get_refresh_token()  # You need to implement this function
+    if not refresh_token:
+        logging.error("No refresh token available.")
+        return None
+
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    data = {
+        'grant_type': 'refresh_token',
+        'refresh_token': refresh_token
+    }
+    try:
+        response = requests.post('https://account-d.docusign.com/oauth/token', headers=headers, data=data)
+        if response.status_code == 200:
+            new_tokens = response.json()
+            store_new_tokens(new_tokens['access_token'], new_tokens['refresh_token'])  # Implement storing logic
+            return new_tokens['access_token']
+        else:
+            logging.error(f"Failed to refresh token: {response.text}")
+    except Exception as e:
+        logging.error("Exception occurred while refreshing token", exc_info=True)
+
+    return None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -449,6 +1031,10 @@ def Partizipative_Planung_Fragen_Karte_AiO(baustelle_id):
         project_data['upvoted_by_user'] = project.upvoted_by_user
         project_data['downvoted_by_user'] = project.downvoted_by_user
 
+
+
+    
+        
     baustelle = Baustelle.query.get_or_404(baustelle_id)
     questions = Question.query.filter_by(baustelle_id=baustelle.id).all()
     baustelle_data = {
@@ -464,7 +1050,416 @@ def Partizipative_Planung_Fragen_Karte_AiO(baustelle_id):
     is_admin = current_user.is_authenticated and current_user.is_admin or False
     user_id = current_user.id if current_user.is_authenticated else None
 
-    return render_template("Partizipative_Planung_Fragen_Karte_AiO/index.html", projects=projects_data, baustelle=baustelle_data, metaData=metaData, is_admin=is_admin, user_id=user_id)
+
+    users = User.query.all()
+    for user in users:
+        user.project_count = Project.query.filter_by(
+            author=user.id, is_mapobject=False
+        ).count()
+        user.map_object_count = Project.query.filter_by(
+            author=user.id, is_mapobject=True
+        ).count()
+        user.comment_count = Comment.query.filter_by(user_id=user.id).count()
+
+    comments = Comment.query.all()
+    for comment in comments:
+        project = Project.query.get(comment.project_id)
+        user = User.query.get(comment.user_id)
+        comment.project_name = project.name if project else "Unknown Project"
+        comment.author_name = user.name if user else "Unknown Author"
+        comment.author_id = user.id if user else "Unknown ID"
+
+    top_viewed_projects = (
+        Project.query.order_by(Project.view_count.desc()).limit(5).all()
+    )
+    top_rated_projects = (
+        db.session.query(
+            Project.id, Project.name, func.count(Vote.id).label("upvote_count")
+        )
+        .join(Vote, Project.id == Vote.project_id)
+        .filter(Vote.upvote == True)
+        .group_by(Project.id)
+        .order_by(desc("upvote_count"))
+        .limit(5)
+        .all()
+    )
+
+    top_commented_projects_query = (
+        db.session.query(
+            Project.id, Project.name, func.count(Comment.id).label("comments_count")
+        )
+        .join(Comment, Project.id == Comment.project_id)
+        .group_by(Project.id)
+        .order_by(func.count(Comment.id).desc())
+        .limit(5)
+        .all()
+    )
+
+    top_commented_projects = [
+        {"id": project_id, "name": project_name, "comments_count": comments_count}
+        for project_id, project_name, comments_count in top_commented_projects_query
+    ]
+
+    # Top categories
+    category_counts = Counter(
+        [project.category for project in Project.query.all()]
+    ).most_common(5)
+
+    # Top active accounts
+    active_users = (
+        User.query.outerjoin(Project, User.id == Project.author)
+        .group_by(User.id)
+        .order_by(func.count(Project.id).desc())
+        .limit(5)
+        .all()
+    )
+
+    app.logger.debug("Top statistics calculated for admin tools")
+
+    # POST request handling
+    if request.method == "POST":
+        project_id = request.form.get("project_id")
+
+        if "unmark_important" in request.form:
+            project = Project.query.get(project_id)
+            if project:
+                project.is_important = False
+                db.session.commit()
+                print("Project unmarked as important", "success")
+            else:
+                print("Project not found for unmarking as important", "error")
+
+        elif "unmark_featured" in request.form:
+            project = Project.query.get(project_id)
+            if project:
+                project.is_featured = False
+                db.session.commit()
+                print("Project unmarked as featured", "success")
+            else:
+                print("Project not found for unmarking as featured", "error")
+
+        elif "remove_reports" in request.form:
+            project_id = request.form.get("project_id")
+            project = Project.query.get(project_id)
+
+            if project:
+                # Remove all reports associated with the project
+                Report.query.filter_by(project_id=project_id).delete()
+
+                # Commit the changes to the database
+                db.session.commit()
+
+                print(
+                    "Reports have been removed from the project successfully.",
+                    "success",
+                )
+            else:
+                print("Project not found for removing reports.", "error")
+
+        elif "delete_project" in request.form:
+            project = Project.query.get(project_id)
+            if project:
+                db.session.delete(project)
+                db.session.commit()
+                print(f"Project {project_id} successfully deleted.", "success")
+            else:
+                print(f"Project {project_id} not found for deletion.", "error")
+
+        return redirect(url_for("admintools"))
+
+    if request.method == "POST":
+        if "answer_question" in request.form:
+            question_id = request.form.get("question_id")
+            answer_text = request.form.get("answer_text")
+            if question_id and answer_text:
+                question = Question.query.get(question_id)
+                if question:
+                    question.answer_text = answer_text
+                    question.answered = True
+                    question.answer_date = datetime.now(pytz.utc)  # Set the answer date to now
+                    db.session.commit()
+                    print("Question answered successfully.", "success")
+                else:
+                    print("Question not found.", "error")
+            else:
+                print("Answer text is required.", "warning")
+            return redirect(url_for("admintools"))
+
+    # Load questions and other data for GET requests and for rendering after POST
+    questions = Question.query.all()
+    answered_questions_count = Question.query.filter_by(answered=True).count()
+    unanswered_questions_count = Question.query.filter_by(answered=False).count()
+    print(f"Loaded {len(questions)} questions")  # Console debug log
+    
+    questions = Question.query.order_by(Question.date.desc()).all()  # Default: newest first
+    question_sort = request.args.get('question_sort', 'newest')
+    if question_sort == 'oldest':
+        questions = Question.query.order_by(Question.date).all()
+    elif question_sort == 'unanswered':
+        questions = Question.query.filter_by(answered=False).order_by(Question.date.desc()).all()
+    elif question_sort == 'answered':
+        questions = Question.query.filter_by(answered=True).order_by(Question.date.desc()).all()
+    
+    
+    # GET request logic with pagination and sorting
+    sort = request.args.get("sort", "score_desc")
+    search_query = request.args.get("search", "")
+    page = request.args.get("page", 1, type=int)
+    per_page = 50
+
+    map_object_page = request.args.get("map_object_page", 1, type=int)
+    map_object_per_page = 50  # Define the number of Notizens per page
+
+    comment_page = request.args.get("comment_page", 1, type=int)
+    comment_per_page = 50  # Adjust the number of comments per page as needed
+
+    user_page = request.args.get("user_page", 1, type=int)
+    user_per_page = 50  # Define the number of users per page
+
+    search_user_id = request.args.get("searchUserById", type=int)
+    search_user_name = request.args.get("searchUserByName", "")
+    search_comment_query = request.args.get("searchComment", "")
+    search_map_object_query = request.args.get("searchMapObject", "")
+
+    categories = db.session.query(Project.category).distinct().all()
+    categories = [
+        category[0] for category in db.session.query(Project.category.distinct()).all()
+    ]
+
+    app.logger.debug(f"Found categories: {categories}")
+
+    # Query Notizens with the search filter
+    map_object_query = Project.query.filter_by(is_mapobject=True)
+    if search_map_object_query:
+        map_object_query = map_object_query.filter(
+            Project.descriptionwhy.ilike(f"%{search_map_object_query}%")
+        )
+
+    search_comment_by_user_id = request.args.get("searchCommentByUserId")
+    search_comment_query = request.args.get("searchComment")
+    comment_query = Comment.query
+
+    if search_comment_by_user_id:
+        comment_query = comment_query.filter(
+            Comment.user_id == int(search_comment_by_user_id)
+        )
+    if search_comment_query:
+        comment_query = comment_query.filter(
+            Comment.text.ilike(f"%{search_comment_query}%")
+        )
+
+    comment_sort = request.args.get(
+        "comment_sort", "newest"
+    )  # Default sorting is by newest
+
+    # Sorting logic
+    if comment_sort == "oldest":
+        comment_query = comment_query.order_by(Comment.timestamp)
+    elif comment_sort == "newest":
+        comment_query = comment_query.order_by(Comment.timestamp.desc())
+
+    query = Project.query.filter(
+        Project.is_mapobject == False
+    )  # Filtern for non-mapobject projects
+
+    if search_query:
+        query = query.filter(Project.name.contains(search_query))
+    # User query with optional search
+    user_query = User.query
+    if search_user_id:
+        user_query = user_query.filter(User.id == search_user_id)
+    if search_user_name:
+        user_query = user_query.filter(User.name.ilike(f"%{search_user_name}%"))
+
+    # Adjust the sorting logic
+    if sort == "comments":
+        comments_subquery = (
+            db.session.query(
+                Comment.project_id, func.count("*").label("comments_count")
+            )
+            .group_by(Comment.project_id)
+            .subquery()
+        )
+        query = query.outerjoin(
+            comments_subquery, Project.id == comments_subquery.c.project_id
+        ).order_by(desc(comments_subquery.c.comments_count))
+
+    elif sort == "oldest":
+        query = query.order_by(Project.date)
+    elif sort == "newest":
+        query = query.order_by(desc(Project.date))
+    elif sort == "category":
+        query = query.order_by(Project.category)
+    elif sort == "user_id":
+        query = query.order_by(Project.author)
+    elif sort == "upvotes":
+        query = (
+            query.outerjoin(Vote, Project.id == Vote.project_id)
+            .group_by(Project.id)
+            .order_by(func.sum(Vote.upvote).desc())
+        )
+    elif sort == "downvotes":
+        query = (
+            query.outerjoin(Vote, Project.id == Vote.project_id)
+            .group_by(Project.id)
+            .order_by(func.sum(Vote.downvote).desc())
+        )
+    elif sort == "alpha_asc":
+        query = query.order_by(asc(Project.name))
+    elif sort == "alpha_desc":
+        query = query.order_by(desc(Project.name))
+    else:
+        query = (
+            query.outerjoin(Vote, Project.id == Vote.project_id)
+            .group_by(Project.id)
+            .order_by(func.sum(Vote.upvote - Vote.downvote).desc())
+        )
+
+    paginated_users = user_query.paginate(
+        page=user_page, per_page=user_per_page, error_out=False
+    )
+    paginated_comments = comment_query.paginate(
+        page=comment_page, per_page=comment_per_page, error_out=False
+    )
+    paginated_map_objects = map_object_query.paginate(
+        page=map_object_page, per_page=map_object_per_page, error_out=False
+    )
+    paginated_projects = query.paginate(page=page, per_page=per_page, error_out=False)
+    print("Total items:", paginated_projects.total)
+    
+    metaData=g.metaData
+    print("Total pages:", paginated_projects.pages)
+
+    # Calculate upvotes and downvotes for each project
+    for project in paginated_projects.items:
+        upvotes = Vote.query.filter_by(project_id=project.id, upvote=True).count()
+        downvotes = Vote.query.filter_by(project_id=project.id, downvote=True).count()
+
+        project.upvotes = upvotes
+        project.downvotes = downvotes
+
+        total_votes = upvotes + downvotes
+        if total_votes > 0:
+            project.upvote_percentage = (upvotes / total_votes) * 100
+            project.downvote_percentage = (downvotes / total_votes) * 100
+        else:
+            project.upvote_percentage = 0
+            project.downvote_percentage = 0
+
+    # Updating user statistics for all users
+    users = User.query.all()
+    for user in users:
+        user.project_count = Project.query.filter_by(
+            author=user.id, is_mapobject=False
+        ).count()
+        user.map_object_count = Project.query.filter_by(
+            author=user.id, is_mapobject=True
+        ).count()
+        user.comment_count = Comment.query.filter_by(user_id=user.id).count()
+
+    # Updating comment information
+    comments = Comment.query.all()
+    for comment in comments:
+        project = Project.query.get(comment.project_id)
+        user = User.query.get(comment.user_id)
+        comment.project_name = project.name if project else "Unknown Project"
+        comment.author_name = user.name if user else "Unknown Author"
+        comment.author_id = user.id if user else "Unknown ID"
+
+    # Prepare lists of important and featured projects
+    important_projects = [
+        project for project in paginated_projects.items if project.is_important
+    ]
+    featured_projects = [
+        project for project in paginated_projects.items if project.is_featured
+    ]
+    reported_projects = [
+        project
+        for project in paginated_projects.items
+        if Report.query.filter_by(project_id=project.id).first()
+    ]
+       
+    Partizipative_Planung_Fragen_Baustelle = Baustelle.query.all()  # Retrieve all Partizipative_Planung_Fragen_Baustelle from the database
+    user_count = User.query.count()
+    comment_count = Comment.query.count()
+    project_count = Project.query.filter_by(is_mapobject=False).count()
+    mapobject_count = Project.query.filter_by(is_mapobject=True).count()
+    bookmark_count = Bookmark.query.count()
+    users_with_projektvorschlage = Project.query.with_entities(Project.author).distinct().count()
+    unique_comment_users_count = db.session.query(Comment.user_id).distinct().count()
+    mapobjects_without_registration_count = Project.query.filter_by(is_mapobject=True, author='0').count()
+    unique_mapobject_users_count = db.session.query(func.count(func.distinct(Project.author))).filter(Project.is_mapobject==True, Project.author!='0').scalar()
+    total_questions = Question.query.count()
+    answered_questions = Question.query.filter(Question.answered == True).count()
+    unanswered_questions = total_questions - answered_questions
+    
+    questions_stats = {
+        "answered": answered_questions,
+        "unanswered": unanswered_questions,
+    }
+
+    if total_questions > 0:
+        answered_percentage = (answered_questions / total_questions) * 100
+    else:
+        answered_percentage = 0
+        
+    baustelle_ids = [b.id for b in Baustelle.query.order_by(Baustelle.id.desc()).all()]
+    newest_baustelle_id = baustelle_ids[0] if baustelle_ids else None
+
+    # Check if it's an AJAX request
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        request_type = request.args.get("request_type")
+        if request_type == "map_object":
+            return render_template(
+                "partials/mapobject_list_section.html",
+                paginated_map_objects=paginated_map_objects, metaData=metaData,
+            )
+        elif request_type == "project":
+            return render_template(
+                "partials/project_list_section.html",
+                paginated_projects=paginated_projects, 
+                sort=sort,
+                search_query=search_query, metaData=metaData,
+            )
+        elif request_type == "comment":
+            return render_template(
+                "partials/comments_section.html", paginated_comments=paginated_comments,  metaData=metaData
+            ) 
+        elif request_type == "user":
+            return render_template(
+                "partials/user_list_section.html", paginated_users=paginated_users, metaData=metaData,
+            )
+    # Normal request
+    def get_earliest_date(*queries):
+        dates = [query.scalar() for query in queries if query.scalar() is not None]
+        return min(dates) if dates else datetime.now()
+
+    # Use the helper function to find the earliest dates
+    earliest_post_date = get_earliest_date(db.session.query(func.min(Post.date_posted)))
+    earliest_interaction_date = get_earliest_date(
+        db.session.query(func.min(Vote.timestamp)),
+        db.session.query(func.min(Comment.timestamp)),
+        db.session.query(func.min(Report.timestamp)),
+        db.session.query(func.min(Bookmark.timestamp))
+    )
+    earliest_project_view_date = get_earliest_date(db.session.query(func.min(Project.date)))
+    earliest_website_view_date = get_earliest_date(db.session.query(func.min(WebsiteViews.view_date)))
+
+    # Convert the dates to strings for JavaScript
+    date_str_format = "%Y-%m-%d"
+    earliest_post_date_str = earliest_post_date.strftime(date_str_format)
+    earliest_interaction_date_str = earliest_interaction_date.strftime(date_str_format)
+    earliest_project_view_date_str = earliest_project_view_date.strftime(date_str_format)
+    earliest_website_view_date_str = earliest_website_view_date.strftime(date_str_format)
+
+
+    
+    return render_template("Partizipative_Planung_Fragen_Karte_AiO/index.html", projects=projects_data, baustelle=baustelle_data, metaData=metaData, is_admin=is_admin, user_id=user_id,
+    top_viewed_projects=top_viewed_projects,
+    top_rated_projects=top_rated_projects,
+    top_commented_projects=top_commented_projects,
+    category_counts=category_counts,
+    active_users=active_users)
 
 
 
@@ -2135,6 +3130,11 @@ def check_marker_limit():
     )
 
 
+
+
+
+        
+        
 @app.route("/add_marker", methods=["POST"])
 def add_marker():
     data = request.json
@@ -2142,33 +3142,24 @@ def add_marker():
 
     app.logger.debug(f"Received data: {data}")
 
-    # Check and update the rate limit for marker additions
+    # Rate limit check
     now = datetime.now()
     additions = ip_marker_additions.get(ip_address, [])
-    # Filter additions within the last 24 hours
     additions = [time for time in additions if now - time < timedelta(days=1)]
+    if len(additions) >= 300:
+        app.logger.warning(f"IP {ip_address} blocked from adding new markers due to rate limit")
+        return jsonify({"error": "Rate limit exceeded. You can only add 300 markers every 24 hours"}), 429
 
-    if len(additions) >= 300:  # Assuming a limit of 300 markers per day
-        app.logger.warning(
-            f"IP {ip_address} blocked from adding new markers due to rate limit"
-        )
-        return (
-            jsonify(
-                {
-                    "error": "Rate limit exceeded. You can only add 300 markers every 24 hours"
-                }
-            ),
-            429,
-        )
-
+    # Marker creation
     try:
         author_id = current_user.id if current_user.is_authenticated else 0
         public_benefit = data.get("public_benefit", "-")
         image_file = data.get("image_file", "keinbild.jpg")
-
         is_answer = data.get("is_answer", False)
         is_mapobject = data.get("is_mapobject", False)
+        questionset_id = data.get('questionset_id', None)
 
+        demo_mode = is_demo_questionset(questionset_id)
         new_project = Project(
             name="Notiz" if is_mapobject else data.get("name", "Projektvorschlag"),
             category=data["category"],
@@ -2178,25 +3169,66 @@ def add_marker():
             geoloc=f"{data['lat']}, {data['lng']}",
             author=author_id,
             is_mapobject=is_mapobject,
-            is_answer=is_answer
+            is_answer=is_answer,
+            demo_mode=demo_mode
         )
-
         db.session.add(new_project)
         db.session.commit()
 
-        # Update IP tracking dictionary
         additions.append(now)
         ip_marker_additions[ip_address] = additions
 
-        app.logger.info(f"IP {ip_address} recorded for posting a marker")
-        return (
-            jsonify({"message": "Marker added successfully", "id": new_project.id}),
-            200,
-        )
+        # Schedule deletion if demo_mode
+        if demo_mode:
+            schedule_marker_deletion(new_project.id)
+            expiration_time = datetime.utcnow() + timedelta(hours=1)
+            app.logger.debug(f"QUESTION MARKER CREATED: Marker ID {new_project.id} created at {datetime.utcnow()}, in connection with QuestionSet ID {questionset_id}. QuestionSet is demo set. Marker will be deleted at {expiration_time}, in 60 minutes.")
+
+        return jsonify({"message": "Marker added successfully", "id": new_project.id}), 200
 
     except Exception as e:
         app.logger.error(f"Error saving marker: {e}")
         return jsonify({"error": str(e)}), 500
+
+def is_demo_questionset(questionset_id):
+    if not questionset_id:
+        return False
+    questionset = QuestionSet.query.get(questionset_id)
+    return questionset.demo_mode if questionset else False
+
+def schedule_marker_deletion(marker_id):
+    expiration_time = datetime.now() + timedelta(hours=1)
+    Timer(3600, delete_marker, args=[marker_id]).start()
+
+def delete_marker(marker_id):
+    project = Project.query.get(marker_id)
+    if project:
+        db.session.delete(project)
+        db.session.commit()
+        app.logger.debug(f"MARKER DELETED: Marker ID {marker_id} deleted from the database after expiring.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/get_all_question_category_colors')
@@ -2536,6 +3568,84 @@ def service_worker():
     return app.send_static_file('service-worker.js')
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route("/list")
 @app.route("/list/pages/<int:page>")
 def list_view(page=1):
@@ -2796,6 +3906,44 @@ def Partizipative_Planung_Vorschlag(project_id):
     except Exception as e:
         app.logger.error("Error in Partizipative_Planung_Vorschlag route: %s", str(e))
         return str(e)  # Or redirect to a generic error page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route("/report/<int:project_id>", methods=["POST"])
@@ -3561,6 +4709,15 @@ def delete_my_data():
         # Delete user's comments
         Comment.query.filter_by(user_id=user_id).delete()
 
+        # Delete user's signed petitions
+        SignedPetition.query.filter_by(user_id=user_id).delete()
+
+        # Delete user's bookmarks
+        Bookmark.query.filter_by(user_id=user_id).delete()
+
+        # Delete user's reports
+        Report.query.filter_by(user_id=user_id).delete()
+
         # Delete user's projects and associated files
         projects = Project.query.filter_by(author=user_id).all()
         for project in projects:
@@ -3599,6 +4756,7 @@ def delete_my_data():
     except Exception as e:
         logging.error(f"Error in delete_my_data: {e}")
         return jsonify({"success": False, "message": "An error occurred while deleting your data."}), 500
+
 
 
 
@@ -3691,34 +4849,57 @@ def downvote(project_id):
     return redirect(url_for("list_view"))
 
 
+
+
+
+
+
+
 @app.route('/create_questionset', methods=['GET', 'POST'])
 def create_questionset():
-    metaData = g.metaData
-    if not (current_user.is_admin or current_user.id == 1):
-        abort(403)
     if request.method == 'POST':
-        data = request.json
-        title = data.get('title')
-        description = data.get('description')
-        questions = data.get('questions')
-
+        title = request.form['title']
+        description = request.form['description']
         questionset = QuestionSet(title=title, description=description)
         db.session.add(questionset)
         db.session.commit()
 
-        for question in questions:
-            questionset_question = QuestionSetQuestion(
+        i = 0
+        while f'questions[{i}][title]' in request.form:
+            title = request.form[f'questions[{i}][title]']
+            description = request.form[f'questions[{i}][description]']
+            marker_color = request.form[f'questions[{i}][marker_color]']
+            image = request.files.get(f'questions[{i}][image]')
+            
+            if image:
+                filename = secure_filename(image.filename)
+                image_path = os.path.join('static', filename)
+                image.save(image_path)
+                image_url = f'/static/{filename}'
+            else:
+                image_url = None
+
+            new_question = QuestionSetQuestion(
                 questionset_id=questionset.id,
-                title=question['title'],
-                description=question['description'],
-                marker_color=question['marker_color']
+                title=title,
+                description=description,
+                marker_color=marker_color,
+                image_url=image_url
             )
-            db.session.add(questionset_question)
+            db.session.add(new_question)
+            app.logger.debug(f"CREATE_QUESTIONSET: Image name {filename} has been saved for question ID {new_question.id} from questionset {questionset.id}. It was the {i+1} question of the set.")
+            i += 1
+        
         db.session.commit()
-
         return jsonify({'message': 'Question set created successfully'}), 200
+    else:
+        # GET request: serve the form to create a new question set
+        return render_template("create_questionset/index.html")
 
-    return render_template("create_questionset/index.html", metaData=metaData)
+
+
+
+
 
 
 @app.route("/answer_questionset/<int:questionset_id>", methods=["POST"])
@@ -4538,4 +5719,6 @@ def update_project_data(project_id):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     app.run(debug=True)
+

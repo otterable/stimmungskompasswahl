@@ -12,6 +12,7 @@ class QuestionSet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
+    demo_mode = db.Column(db.Boolean, default=False)  # New field for demo mode
     questions = db.relationship('QuestionSetQuestion', backref='questionset', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
@@ -19,6 +20,7 @@ class QuestionSet(db.Model):
             "id": self.id,
             "title": self.title,
             "description": self.description,
+            "demo_mode": self.demo_mode,
             "questions": [question.to_dict() for question in self.questions]
         }
 
@@ -29,6 +31,7 @@ class QuestionSetQuestion(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     marker_color = db.Column(db.String(7), nullable=False)
+    image_url = db.Column(db.String(255))  # Added to store the URL of the cropped image
 
     def to_dict(self):
         return {
@@ -36,8 +39,10 @@ class QuestionSetQuestion(db.Model):
             "questionset_id": self.questionset_id,
             "title": self.title,
             "description": self.description,
-            "marker_color": self.marker_color
+            "marker_color": self.marker_color,
+            "image_url": self.image_url
         }
+
 
 class QuestionSetAnswer(db.Model):
     __tablename__ = 'question_set_answer'
@@ -122,47 +127,93 @@ class Report(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-   
-class Project(db.Model):
+
+
+
+class SignedPetition(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    petition_id = db.Column(db.Integer, db.ForeignKey('petition.id'), nullable=False)
+    signed_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('signed_petitions', lazy=True))
+    petition = db.relationship('Petition', backref=db.backref('signed_by', lazy=True))
+
+
+class Petition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(100), nullable=False)
-    descriptionwhy = db.Column(db.String(300), nullable=False)
-    public_benefit = db.Column(db.String(300), nullable=False)
-    image_file = db.Column(db.String(100), nullable=False)
-    geoloc = db.Column(db.String(100))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-    author = db.Column(db.String(100), nullable=False)
-    is_important = db.Column(db.Boolean, default=False)
-    p_reports = db.Column(db.Integer, default=0)
-    is_featured = db.Column(db.Boolean, default=False)  # New field
-    is_mapobject = db.Column(db.Boolean, default=False)
-    is_global = db.Column(db.Boolean, default=False)
-    view_count = db.Column(db.Integer, default=0)  # New field for view count
-    is_answer = db.Column(db.Boolean, default=False)  # Ensure this property is set correctly
+    category = db.Column(db.String(50), nullable=False)
+    introduction = db.Column(db.Text, nullable=False)
+    description1 = db.Column(db.Text, nullable=False)
+    description2 = db.Column(db.Text, nullable=True)
+    description3 = db.Column(db.Text, nullable=True)
+    public_benefit = db.Column(db.Text, nullable=False)
+    image_file1 = db.Column(db.String(200), nullable=True)
+    image_file2 = db.Column(db.String(200), nullable=True)
+    image_file3 = db.Column(db.String(200), nullable=True)
+    image_file4 = db.Column(db.String(200), nullable=True)
+    image_file5 = db.Column(db.String(200), nullable=True)
+    image_file6 = db.Column(db.String(200), nullable=True)
+    image_file7 = db.Column(db.String(200), nullable=True)
+    image_file8 = db.Column(db.String(200), nullable=True)
+    image_file9 = db.Column(db.String(200), nullable=True)
+    image_file10 = db.Column(db.String(200), nullable=True)
+    geoloc = db.Column(db.String(50), nullable=True)
+    date = db.Column(db.DateTime, nullable=False)
+    author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_featured = db.Column(db.Boolean, default=False)
+    demo_mode = db.Column(db.Boolean, default=False)
+    comments = db.relationship('Comment', backref='petition', lazy=True, cascade="all, delete-orphan")
 
-    # Relationships
-    votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
-    comments = db.relationship('Comment', backref='project', lazy=True, cascade="all, delete-orphan")
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "category": self.category,
-            "descriptionwhy": self.descriptionwhy,
-            "public_benefit": self.public_benefit,
-            "image_file": self.image_file,
-            "geoloc": self.geoloc,
-            "date": self.date.strftime("%Y-%m-%d %H:%M:%S") if self.date else None,
-            "author": self.author,
-            "is_important": self.is_important,
-            "p_reports": self.p_reports,
-            "view_count": self.view_count,
-            "is_featured": self.is_featured,
-            "is_mapobject": self.is_mapobject,
-            "is_answer": self.is_answer  # Ensure this property is included in the dict
-        }
+
+
+
+       
+class Project(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        name = db.Column(db.String(100), nullable=False)
+        category = db.Column(db.String(100), nullable=False)
+        descriptionwhy = db.Column(db.String(300), nullable=False)
+        public_benefit = db.Column(db.String(300), nullable=False)
+        image_file = db.Column(db.String(100), nullable=False)
+        geoloc = db.Column(db.String(100))
+        date = db.Column(db.DateTime, default=datetime.utcnow)
+        author = db.Column(db.String(100), nullable=False)
+        is_important = db.Column(db.Boolean, default=False)
+        p_reports = db.Column(db.Integer, default=0)
+        is_featured = db.Column(db.Boolean, default=False)  # New field
+        is_mapobject = db.Column(db.Boolean, default=False)
+        is_global = db.Column(db.Boolean, default=False)
+        view_count = db.Column(db.Integer, default=0)  # New field for view count
+        is_answer = db.Column(db.Boolean, default=False)  # Ensure this property is set correctly
+        demo_mode = db.Column(db.Boolean, default=False)  # New field for demo mode
+
+        # Relationships
+        votes = db.relationship('Vote', backref='project', lazy=True, cascade="all, delete-orphan")
+        comments = db.relationship('Comment', backref='project', lazy=True, cascade="all, delete-orphan")
+
+        def to_dict(self):
+            return {
+                "id": self.id,
+                "name": self.name,
+                "category": self.category,
+                "descriptionwhy": self.descriptionwhy,
+                "public_benefit": self.public_benefit,
+                "image_file": self.image_file,
+                "geoloc": self.geoloc,
+                "date": self.date.strftime("%Y-%m-%d %H:%M:%S") if self.date else None,
+                "author": self.author,
+                "is_important": self.is_important,
+                "p_reports": self.p_reports,
+                "view_count": self.view_count,
+                "is_featured": self.is_featured,
+                "is_mapobject": self.is_mapobject,
+                "is_answer": self.is_answer,  # Ensure this property is included in the dict
+                "demo_mode": self.demo_mode  # Include the demo_mode in the to_dict method
+
+            }
 
 class WebsiteViews(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -256,17 +307,19 @@ class Vote(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(300), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)
+    petition_id = db.Column(db.Integer, db.ForeignKey('petition.id'), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    c_reports = db.Column(db.Integer, default=0)  # New field to store report counts
+    c_reports = db.Column(db.Integer, default=0)  # Store report counts
 
     def to_dict(self):
         return {
             "id": self.id,
             "text": self.text,
             "project_id": self.project_id,
+            "petition_id": self.petition_id,
             "user_id": self.user_id,
             "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-            "c_reports": self.c_reports  # Include the new field in the dictionary
+            "c_reports": self.c_reports
         }

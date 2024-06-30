@@ -1,3 +1,8 @@
+
+var enableMapClick = true;
+let isInteractiveModeEnabled = true;
+
+
 // Ensure isSpam function is defined
 if (typeof isSpam === 'undefined') {
     window.isSpam = function() {
@@ -185,7 +190,32 @@ function setMapCursor() {
     console.debug("Map cursor set for marker creation");
 }
 
+
+
+
+
+
+
+function disableMapInteraction() {
+    isInteractiveModeEnabled = false;
+}
+
+// Function to enable map interaction
+function enableMapInteraction() {
+    isInteractiveModeEnabled = true;
+}
+
+
+
+
+
+// Modified map click handler
 function handleMapClick(e) {
+    if (!isInteractiveModeEnabled) {
+        console.log("Map interaction is currently disabled.");
+        return;
+    }
+
     if (isMarkerCreationActive) {
         if (boundary.contains(e.latlng)) {
             selectedLatLng = e.latlng;
@@ -351,6 +381,10 @@ function postMarker() {
         alert("Bitte geben Sie mindestens 15 Zeichen ein.");
         return;
     }
+
+    // Disable map click events during marker creation
+    enableMapClick = false;
+
     var markerOverlay = document.getElementById('marker-overlay');
     if (markerOverlay) {
         markerOverlay.style.display = 'none';
@@ -364,8 +398,12 @@ function postMarker() {
     futureMarker.icon = createCursorIcon(fillColor);
     setMapCursor();
     document.getElementById('marker-description').value = '';
+
+    // Re-enable map click events after marker creation
+    enableMapClick = true;
     console.debug("Marker posted with description:", description);
 }
+
 
 
 function toggleMarkerSidebar() {
@@ -685,18 +723,49 @@ document.getElementById('close-overlay-button').addEventListener('click', functi
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var categoryLayers = {};
 let showAnswersOnly = false;
 var answerMarkers = [];
 var nonAnswerMarkers = [];
+var questionMarkers = [];
 var markersListOverlay = document.getElementById('markers-list-overlay');
 var markersById = {};
 var showFullProjectsOnly = false;
 var currentPage = 1;
+var filterMode = 'all'; // new variable to keep track of filter mode
 createCategoryFilter();
 createSortFilter();
 createFullProjectFilter();
 renderPage(currentPage);
-
 
 // Add event listeners to both buttons in karte.html
 document.getElementById('hideNonMapMarkers').addEventListener('click', function() {
@@ -709,6 +778,10 @@ document.querySelector('.register-button-cl').addEventListener('click', function
     syncFullProjectFilterButtons();
 });
 
+function logSelectedCategory() {
+    var selectedCategory = document.getElementById('marker-category').value;
+    console.debug("Selected category:", selectedCategory);
+}
 
 function addMarkersToOverlay(markers) {
     allMarkers = markers;
@@ -727,9 +800,36 @@ function filterMarkers() {
     if (selectedCategory !== "Alle") {
         tempMarkers = tempMarkers.filter(marker => marker.category === selectedCategory);
     }
-    if (showFullProjectsOnly) {
-        tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject);
+
+    const hiddenMarkers = [];
+
+    if (filterMode === 'notizen') {
+        hiddenMarkers.push(...tempMarkers.filter(marker => !(marker.is_mapobject && !marker.is_answer)));
+        tempMarkers = tempMarkers.filter(marker => marker.is_mapobject && !marker.is_answer);
+        console.debug(`Option Nur Notizen selected, hiding the following markers:`);
+    } else if (filterMode === 'projektvorschläge') {
+        hiddenMarkers.push(...tempMarkers.filter(marker => !(!marker.is_mapobject && !marker.is_answer)));
+        tempMarkers = tempMarkers.filter(marker => !marker.is_mapobject && !marker.is_answer);
+        console.debug(`Option Nur Projektvorschläge selected, hiding the following markers:`);
+    } else if (filterMode === 'is_answer') {
+        hiddenMarkers.push(...tempMarkers.filter(marker => !(marker.is_answer && !marker.is_mapobject)));
+        tempMarkers = tempMarkers.filter(marker => marker.is_answer && !marker.is_mapobject);
+        console.debug(`Option Nur GuidedMode selected, hiding the following markers:`);
+    } else if (filterMode === 'fragen') {
+        hiddenMarkers.push(...tempMarkers.filter(marker => marker.className !== 'Question'));
+        tempMarkers = tempMarkers.filter(marker => marker.className === 'Question');
+        console.debug(`Option Nur Fragen&Antworten anzeigen selected, hiding the following markers:`);
     }
+
+    hiddenMarkers.forEach(marker => {
+        if (marker.className === 'Question') {
+            console.debug(`Class: Question, Subcategory: ${marker.options.isAnswer}, ID: ${marker.id}`);
+        } else {
+            const subcategory = marker.is_mapobject ? 'Notiz' : (marker.is_answer ? 'is_answer=true' : 'Projektvorschlag');
+            console.debug(`Class: Project, Subcategory: ${subcategory}, ID: ${marker.id}`);
+        }
+    });
+
     filteredMarkers = tempMarkers.slice().sort((a, b) => b.id - a.id); // Sort by newest
     renderPage(1);
     updateShowMoreButton();
@@ -740,16 +840,34 @@ function filterMarkers() {
 function updateMapMarkers() {
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
-            if (showFullProjectsOnly && marker.options.isMapObject) {
-                map.removeLayer(marker);
-            } else if (!map.hasLayer(marker)) {
-                map.addLayer(marker);
+            if (shouldDisplayMarker(marker)) {
+                if (!map.hasLayer(marker)) {
+                    map.addLayer(marker);
+                }
+            } else {
+                if (map.hasLayer(marker)) {
+                    map.removeLayer(marker);
+                }
             }
         });
     }
     console.debug("Map markers updated");
 }
 
+function shouldDisplayMarker(marker) {
+    if (filterMode === 'all') {
+        return true;
+    } else if (filterMode === 'notizen') {
+        return marker.options.isMapObject && !marker.options.isAnswer;
+    } else if (filterMode === 'projektvorschläge') {
+        return !marker.options.isMapObject && !marker.options.isAnswer;
+    } else if (filterMode === 'is_answer') {
+        return marker.options.isAnswer && !marker.options.isMapObject;
+    } else if (filterMode === 'fragen') {
+        return marker.options.className === 'Question';
+    }
+    return false;
+}
 
 function createFullProjectFilter() {
     const filterDiv = document.getElementById('full-project-filter');
@@ -757,7 +875,7 @@ function createFullProjectFilter() {
     const filterButton = document.createElement('button');
     filterButton.id = 'full-project-filter-button';
     filterButton.className = 'register-button-cl';
-    filterButton.textContent = 'Nur Projektvorschläge anzeigen';
+    filterButton.textContent = 'Nur Projektvorschläge';
     filterButton.addEventListener('click', function() {
         toggleFullProjectFilter();
         syncFullProjectFilterButtons();
@@ -767,16 +885,34 @@ function createFullProjectFilter() {
 }
 
 function toggleFullProjectFilter() {
-    showFullProjectsOnly = !showFullProjectsOnly;
+    const filters = ['all', 'notizen', 'projektvorschläge', 'is_answer', 'fragen'];
+    const currentIndex = filters.indexOf(filterMode);
+    filterMode = filters[(currentIndex + 1) % filters.length];
     filterMarkers();
     updateFullProjectFilterButtonText();
-    console.debug("Full project filter toggled, showFullProjectsOnly:", showFullProjectsOnly);
+    console.debug("Full project filter toggled, filterMode:", filterMode);
 }
 
 function updateFullProjectFilterButtonText() {
     const filterButton = document.getElementById('full-project-filter-button');
     if (filterButton) {
-        filterButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
+        switch (filterMode) {
+            case 'all':
+                filterButton.textContent = 'Alles Beiträge';
+                break;
+            case 'notizen':
+                filterButton.textContent = 'Nur Notizen';
+                break;
+            case 'projektvorschläge':
+                filterButton.textContent = 'Nur Projektvorschläge';
+                break;
+            case 'is_answer':
+                filterButton.textContent = 'Nur GuidedMode';
+                break;
+            case 'fragen':
+                filterButton.textContent = 'Nur Fragen&Antworten';
+                break;
+        }
     }
 }
 
@@ -784,18 +920,48 @@ function syncFullProjectFilterButtons() {
     const mapButton = document.getElementById('hideNonMapMarkers');
     const overlayButton = document.getElementById('full-project-filter-button');
     if (mapButton) {
-        mapButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
+        switch (filterMode) {
+            case 'all':
+                mapButton.textContent = 'Alle Beiträge';
+                break;
+            case 'notizen':
+                mapButton.textContent = 'Nur Notizen';
+                break;
+            case 'projektvorschläge':
+                mapButton.textContent = 'Nur Projektvorschläge';
+                break;
+            case 'is_answer':
+                mapButton.textContent = 'Nur GuidedMode';
+                break;
+            case 'fragen':
+                mapButton.textContent = 'Nur Fragen&Antworten';
+                break;
+        }
     }
     if (overlayButton) {
-        overlayButton.textContent = showFullProjectsOnly ? 'Alles anzeigen' : 'Nur Projektvorschläge anzeigen';
+        switch (filterMode) {
+            case 'all':
+                overlayButton.textContent = 'Alle Beiträge';
+                break;
+            case 'notizen':
+                overlayButton.textContent = 'Nur Notizen';
+                break;
+            case 'projektvorschläge':
+                overlayButton.textContent = 'Nur Projektvorschläge';
+                break;
+            case 'is_answer':
+                overlayButton.textContent = 'Nur GuidedMode';
+                break;
+            case 'fragen':
+                overlayButton.textContent = 'Nur Fragen&Antworten';
+                break;
+        }
     }
 }
-
 
 function sortMarkersByNewest(markers) {
     return markers.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
-
 
 function loadQuestions() {
     const baustelleId = window.location.pathname.split('/').pop();
@@ -830,7 +996,8 @@ function fetchQuestions() {
             questions.forEach(question => {
                 const icon = createCustomIcon(question.answered);
                 const marker = L.marker([question.latitude, question.longitude], {
-                    icon: icon
+                    icon: icon,
+                    className: 'Question' // Add class name to differentiate question markers
                 }).addTo(map);
                 const questionDate = new Date(question.date);
                 const formattedQuestionDate = formatDate(questionDate);
@@ -856,6 +1023,8 @@ function fetchQuestions() {
                     console.log(`Popup for question marker id ${question.id} opened`);
                 });
                 markersById[question.id.toString()] = marker;
+                questionMarkers.push(marker); // Add marker to questionMarkers array
+                console.debug(`Question marker loaded into the map: ${question.text} (ID: ${question.id}), answer status: ${question.answered}`);
             });
             resolve();
         }).catch(error => {
@@ -886,7 +1055,6 @@ fetch('/get_projects')
     });
 
 document.addEventListener('DOMContentLoaded', function() {
-
     // Add event listener for the toggle button
     document.getElementById('toggle-answer-markers-btn').addEventListener('click', function() {
         toggleAnswerMarkers();
@@ -932,6 +1100,7 @@ function logMarkerCounts() {
     let notizenCount = 0;
     let projektvorschlageCount = 0;
     let answerCount = 0;
+    let questionCount = 0;
 
     for (let id in markersById) {
         const marker = markersById[id];
@@ -939,13 +1108,57 @@ function logMarkerCounts() {
             answerCount++;
         } else if (marker.options.isMapObject) {
             notizenCount++;
+        } else if (marker.options.className === 'Question') {
+            questionCount++;
         } else {
             projektvorschlageCount++;
         }
     }
 
-    console.debug(`${Object.keys(markersById).length} markers have been loaded. ${notizenCount} are Notizen, ${projektvorschlageCount} are Projektvorschläge, ${answerCount} are answer markers.`);
+    console.debug(`${Object.keys(markersById).length} markers have been loaded. ${notizenCount} are Notizen, ${projektvorschlageCount} are Projektvorschläge, ${answerCount} are answer markers, ${questionCount} are question markers.`);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1079,6 +1292,14 @@ function addMarkers(projects) {
     logMarkerCounts();
 }
 
+
+
+
+
+
+
+
+
 function updateMarkerIcons() {
     for (var category in categoryLayers) {
         categoryLayers[category].eachLayer(function(marker) {
@@ -1137,7 +1358,6 @@ function getCategoryColor(category) {
     return questionCategoryColors[category] || '#888'; // Default color if not found
 }
 
-var categoryLayers = {};
 function logSelectedCategory() {
     var selectedCategory = document.getElementById('marker-category').value;
     console.debug("Selected category:", selectedCategory);
@@ -1382,22 +1602,6 @@ function generatePopupContent(question) {
     return popupContent;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function centerMapOnMarker(markerId) {
     const marker = markersById[markerId];
     if (marker) {
@@ -1420,15 +1624,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
+// Define the event listener for map clicks
 map.on('click', function(e) {
+    // Check if interactive mode is enabled
+    if (!isInteractiveModeEnabled) {
+        console.log("Interactive mode is disabled. Map click ignored.");
+        return;
+    }
+
+    // Check if marker creation is active
+    if (isMarkerCreationActive) {
+        console.log("Marker creation in progress. Map click for questions disabled.");
+        return;
+    }
+
     console.log("Map clicked at:", e.latlng);
+    // Check if the click is within designated bounds
     if (bounds.contains(e.latlng)) {
         console.log("Click within bounds");
+        // Special handling for mobile devices
         if (window.innerWidth <= 768) {
             console.log("Mobile device detected");
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('map').style.bottom = '15px';
         }
+
+        // Constructing the content for the popup
         const popupContent = `
             <div id="question-form" style="text-align: center;">
                 <h3>Schreiben Sie eine Frage oder ein Feedback. Es wird für alle anderen sichtbar sein.</h3>
@@ -1438,7 +1659,11 @@ map.on('click', function(e) {
                     <button onclick="handleAbbrechenClick()" class="button" style="background-color: #9a031e; color: white; margin-left: 5px; font-weight: bold; font-size: 18px;">Abbrechen</button>
                 </div>
             </div>`;
+        
+        // Creating and displaying the popup
         const popup = L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
+
+        // Event listener for when the popup closes
         map.on('popupclose', function() {
             if (window.innerWidth <= 768) {
                 console.log("Restoring sidebar and map dimensions for mobile");
@@ -1448,12 +1673,24 @@ map.on('click', function(e) {
                 document.getElementById('map').style.left = '';
             }
             console.log("Popup closed event triggered");
-            closePopup();
         });
     } else {
         console.log("Click outside the designated area: No popup created.");
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function closePopup() {
     console.log("Closing popup");
@@ -1618,8 +1855,11 @@ document.getElementById('close-overlay-button').addEventListener('click', functi
 // Make sure to add `isAnswer` property to your markers in addMarkers function
 
 
+
+// Attach event listeners to buttons that open/close modals
 document.getElementById('guided-mode-button').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'flex';
+    disableMapInteraction();
     console.debug("Guided mode modal opened");
 });
 
@@ -1632,13 +1872,16 @@ document.getElementById('start-guided-mode').addEventListener('click', function(
 
 document.getElementById('cancel-guided-mode').addEventListener('click', function() {
     document.getElementById('guided-mode-modal').style.display = 'none';
+    enableMapInteraction();
     console.debug("Guided mode cancelled");
 });
 
 document.getElementById('cancel-qa-mode').addEventListener('click', function() {
     document.getElementById('question-modal').style.display = 'none';
+    enableMapInteraction();
     console.debug("QA mode cancelled");
 });
+
 
 function updatePopupContent(projectId, data) {
     var popup = markersById[projectId].getPopup();
@@ -1941,7 +2184,8 @@ function saveMarkerData(latlng, category, description, callback) {
         description: description,
         isAnonymous: !isAuthenticated,
         is_mapobject: category !== 'Answer',
-        is_answer: category === 'Answer'
+        is_answer: category === 'Answer',
+        demo_mode: true  // Assume all markers in this context are temporary
     };
     $.ajax({
         url: '/add_marker',
@@ -1953,17 +2197,16 @@ function saveMarkerData(latlng, category, description, callback) {
             if (callback) {
                 callback(response);
             }
+            var expiresAt = new Date(new Date().getTime() + 3600000);
+            console.debug(`Marker ID ${response.id} created, expires at ${expiresAt}. At ${expiresAt} (time), it will be deleted from the database.`);
             checkMarkerLimit();
-            console.debug("Marker data saved:", response);
         },
         error: function(xhr, textStatus, errorThrown) {
-            if (xhr.status === 429) {
-                alert("Sie haben Ihr Tageslimit für das Hinzufügen von Markierungen erreicht. Versuchen Sie es später noch einmal.");
-            }
             console.error('Error saving marker data:', errorThrown);
         }
     });
 }
+
 
 function checkMarkerLimit() {
     fetch('/check_marker_limit').then(response => response.json()).then(data => {
@@ -2240,6 +2483,14 @@ document.getElementById('video-overlay-2').addEventListener('click', function(ev
 
 
 
+
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     let currentQuestionset = null;
     let currentQuestionIndex = 0;
@@ -2287,28 +2538,38 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showQuestionModal() {
-        if (currentQuestionIndex < currentQuestionset.questions.length) {
-            const question = currentQuestionset.questions[currentQuestionIndex];
-            document.getElementById('question-title').textContent = question.title;
-            document.getElementById('question-description').textContent = question.description;
-            document.getElementById('next-question').textContent = 'Next';
-            document.getElementById('question-modal').style.display = 'flex';
-            updateSummaryContent();
+    if (currentQuestionIndex < currentQuestionset.questions.length) {
+        const question = currentQuestionset.questions[currentQuestionIndex];
+        document.getElementById('question-title').textContent = question.title;
+        document.getElementById('question-description').textContent = question.description;
+        document.getElementById('next-question').textContent = 'Next';
+
+        // Update the src of the img element and display it if the image_url is not null or empty
+        const questionImage = document.getElementById('question-image');
+        if (question.image_url) {
+            questionImage.src = question.image_url;
+            questionImage.style.display = 'block'; // Show the image element
         } else {
-            console.log("All questions have been answered.");
-            document.getElementById('question-title').textContent = "All questions have been answered.";
-            document.getElementById('question-description').textContent = "Press Finish to submit all answers.";
-            document.getElementById('next-question').textContent = 'Finish';
-            document.getElementById('question-modal').style.display = 'flex';
-            updateSummaryContent();
+            questionImage.style.display = 'none'; // Hide the image element if no image is available
         }
+
+        document.getElementById('question-modal').style.display = 'flex';
+        updateSummaryContent();
+    } else {
+        console.log("All questions have been answered.");
+        document.getElementById('question-title').textContent = "All questions have been answered.";
+        document.getElementById('question-description').textContent = "Press Finish to submit all answers.";
+        document.getElementById('next-question').textContent = 'Finish';
+        document.getElementById('question-modal').style.display = 'flex';
+        updateSummaryContent();
     }
+}
 
     function updateSummaryContent() {
         const summaryContent = document.getElementById('summary-content');
         summaryContent.innerHTML = `
-            <h2>Summary of Answers</h2>
-            <p>Amount of Questions answered: ${answers.length} / ${currentQuestionset.questions.length}</p>
+            <h2>Zusammenfassung</h2>
+            <p>Beantwortete Fragen: <strong>${answers.length} / ${currentQuestionset.questions.length}</strong></p>
             <ul>
                 ${answers.map((answer, index) => `
                     <li><strong>${index + 1}. ${currentQuestionset.questions.find(q => q.id === answer.question_id).title}</strong>: ${answer.answer_text}</li>
@@ -2319,7 +2580,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleMapClick(e) {
         const question = currentQuestionset.questions[currentQuestionIndex];
-        const answerText = prompt('Enter your answer:');
+        const answerText = prompt('Ihre Antwort:');
         if (answerText) {
             answers.push({
                 question_id: question.id,
@@ -2357,6 +2618,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("Server response data:", data);
             alert(data.message);
             document.getElementById('question-modal').style.display = 'none';
+            enableMapInteraction();
         })
         .catch(error => {
             console.error("Error submitting answers:", error);
@@ -2379,9 +2641,9 @@ document.addEventListener('DOMContentLoaded', function() {
             showQuestionModal();
         } else {
             console.log("No more questions to answer.");
-            document.getElementById('question-title').textContent = "All questions have been answered.";
-            document.getElementById('question-description').textContent = "Press Finish to submit all answers.";
-            document.getElementById('next-question').textContent = 'Finish';
+            document.getElementById('question-title').textContent = "Alle Fragen wurden beantwortet.";
+            document.getElementById('question-description').textContent = "Drücken Sie Speichern, um alle Antworten abzuschicken.";
+            document.getElementById('next-question').textContent = 'Speichern';
         }
     });
     document.getElementById('cancel-qa-mode').addEventListener('click', () => {
@@ -2392,6 +2654,8 @@ document.addEventListener('DOMContentLoaded', function() {
             submitAnswers();
         }
     });
+});
+
 
     function addNewMarker(latLng, title, description, markerId, color) {
         var fillColor = color || getCategoryColor(title);
@@ -2410,10 +2674,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         marker.addTo(categoryLayers[title]);
         updateCategoryButtonText(title);
-        console.debug("New marker added for question:", title);
+        console.debug("QUESTION MARKER: New marker added for question:", title);
     }
 
-    function saveMarkerData(latlng, category, description, callback) {
+function saveMarkerData(latlng, category, description, callback) {
         var dataToSend = {
             lat: latlng.lat,
             lng: latlng.lng,
@@ -2433,7 +2697,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     callback(response);
                 }
                 checkMarkerLimit();
-                console.debug("Marker data saved:", response);
+                console.debug("QUESTION MARKER: Marker data saved:", response);
             },
             error: function(xhr, textStatus, errorThrown) {
                 if (xhr.status === 429) {
@@ -2452,7 +2716,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     console.log("Event listeners for Guided Mode have been added.");
-});
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Function to ensure footer is visible
@@ -2477,3 +2765,53 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', ensureFooterVisibility);
     console.debug("Footer visibility ensured");
 });
+
+
+function toggleExpandableSection() {
+    var content = document.getElementById('expandable-section');
+    var button = document.getElementById('toggle-description');
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        button.textContent = 'Schließen';
+    } else {
+        content.style.display = 'none';
+        button.textContent = 'Mehr erfahren';
+    }
+}
+
+document.getElementById('toggle-description').addEventListener('click', function() {
+    toggleExpandableSection();
+});
+
+document.getElementById('baustelle-title-main').addEventListener('click', function() {
+    toggleExpandableSection();  // This will toggle the expanded section when the title is clicked
+});
+
+function toggleSidebar() {
+    var expandedSidebar = document.getElementById('expanded-sidebar');
+    if (expandedSidebar.style.display === 'none' || expandedSidebar.style.display === '') {
+        expandedSidebar.style.display = 'block';
+    } else {
+        expandedSidebar.style.display = 'none';
+    }
+}
+
+
+
+
+
+function toggleAdminToolsCSS(add) {
+    var head = document.head;
+    var link = document.getElementById('admintools-css');
+
+    if (add && !link) {
+        link = document.createElement('link');
+        link.id = 'admintools-css';
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = '/static/admintools.css';
+        head.appendChild(link);
+    } else if (!add && link) {
+        head.removeChild(link);
+    }
+}

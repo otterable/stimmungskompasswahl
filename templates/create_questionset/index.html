@@ -2,7 +2,9 @@
 
 {% block head_section %}
 <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-
+<link rel="stylesheet" href="{{ url_for('serve_image', filename='create_questionset.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"/>
 <title>Stimmungskompass</title>
 
 {% endblock %}
@@ -21,3 +23,6 @@
 {% endblock %}
 
 
+{% block scripts %}
+{% include 'create_questionset/create_questionset.js' %}
+{% endblock %}

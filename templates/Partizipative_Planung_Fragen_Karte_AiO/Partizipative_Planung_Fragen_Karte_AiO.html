@@ -4,6 +4,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+<div id="expanded-sidebar" class="expanded-sidebar" style="display: none;">
+        <button onclick="toggleSidebar()" class="close-button">X</button> <!-- Close button -->
+        {% if is_admin %}
+        <div class="button-container">
+            <a href="{{ url_for('edit_baustelle', baustelle_id=baustelle.id) }}" class="register-button-m" style="margin-bottom: 10px">Inhalte bearbeiten</a>
+        </div>
+        {% endif %}
+		        <h2 id="baustelle-title" style="font-size: 28px; margin-bottom: 10px;">{{ baustelle.name }}</h2> <!-- Visible by default -->
+
+        {% if baustelle.image %}
+        <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%;">
+        {% endif %}
+		
+        <div id="baustelle-description">{{ baustelle.description | safe }}</div>
+       
+    </div>
 <div id="landscape-blocker" style="display: none;">
    <p>Der Stimmungskompass ist nur im Hochformat verfügbar.</p>
    <img id="anti-rotate-image" src="static/antirotate.png" alt="Rotate Device" style="max-width: 30%; height: auto; display: block; margin: 0 auto;">
@@ -30,9 +46,9 @@
 <div id="custom-confirm" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.0); z-index: 10000; text-align: center;">
    <div id="mobile-confirm" class="mobile-confirm">
       <p class="p-mobile-confirm">Möchten Sie die Notiz hier platzieren?</p>
-      <button id="confirm-yes" class="register-button-c" style="background-color: #0e3a3a !important;">Ja</button>
-      <button id="confirm-tryagain" class="register-button-c" style="background-color: #ffa500 !important; margin-top: 10px !important;">Erneut versuchen</button>
-      <button id="confirm-no" class="register-button-c" style="background-color: #de3a3a !important; margin-top: 10px !important;">Stornieren</button>
+      <button id="confirm-yes" class="register-button-m" style="background-color: #0e3a3a !important;">Ja</button>
+      <button id="confirm-tryagain" class="register-button-m" style="background-color: #ffa500 !important; margin-top: 10px !important;">Erneut versuchen</button>
+      <button id="confirm-no" class="register-button-m" style="background-color: #de3a3a !important; margin-top: 10px !important;">Stornieren</button>
    </div>
 </div>
 <!-- Overlay for displaying the list of markers -->
@@ -83,8 +99,8 @@
     <!-- Always visible footer section -->
     <div class="footer-container">
         <div class="footer-navigation">
-            <button id="show-more-markers" class="register-button-cl" onclick="loadMoreMarkers()" style="display: none;">Mehr anzeigen</button>
-            <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-cl">Schließen</button>
+            <button id="show-more-markers" class="register-button-ml" onclick="loadMoreMarkers()" style="display: none;">Mehr anzeigen</button>
+            <button onclick="document.getElementById('markers-list-overlay').style.display='none'" id="close-overlay-button" class="register-button-ml">Schließen</button>
         </div>
     </div>
 </div>
@@ -131,12 +147,14 @@
       </div>
    </div>
 </div>
+
 <div>
    <div id="mobileCategoryOverlay"></div>
    <div id="sidebar-mobileheader" style="display: none;">
       <h3 class="appear-on-mobiledisabled resistant-h3" style="display: none; color: white; text-align: center; margin-top: 5px;"> Wie stehen Sie zu den Orten in Ihrer Gemeinde? </h3>
       <h3 class="appear-on-mobiledisabled resistant-h3" style="display: none; color: white; text-align: center; margin-top: -12px; margin-bottom: 7px"> Lassen Sie es uns auf dieser Karte wissen! </h3>
    </div>
+   
    <div id="map">
       <a href="#" id="info-link2">
       <img src="{{ url_for('serve_image', filename='infobutton2.png') }}" alt="Info" class="info-image2" style="z-index: 1002 !important;">
@@ -149,12 +167,12 @@
    
    
    
+
    
    
    
-   
-        <button id="expand-sidebar-btn" class="expand-button">☰</button> <!-- Button to expand the sidebar -->
-        <h2 id="baustelle-title" style="font-size: 28px;">{{ baustelle.name }}</h2> <!-- Visible by default -->
+		
+    <h2 id="baustelle-title-main" style="font-size: 28px;">{{ baustelle.name }}</h2> <!-- Changed ID for main content title -->
 				  <div class="mobile-only-content">
 
         <button id="show-markers-btn" class="register-button-m appear-on-mobile" style="margin-top:10px !important; margin: auto; display:none !important;">Liste anzeigen</button> <!-- Also visible by default -->
@@ -168,10 +186,16 @@
         {% if baustelle.image %}
             <img id="baustelle-image" class="baustelle-image" src="{{ url_for('static', filename='baustellepics/' + baustelle.image) }}" alt="Baustelle Image" style="max-width: 100%; margin-top:20px;">
         {% endif %}
-        <div id="baustelle-description">{{ baustelle.description | safe }}</div>
-        <div id="geojsonFilesList" style="margin-bottom: 20px;">
-            <ul id="loadedFiles"></ul>
+ <div id="baustelle-description">
+        <div id="was-section" style="margin-bottom: 10px;">
+            {{ baustelle.description.split('<h2><strong>Wie?</strong></h2>')[0] | safe }}
         </div>
+		 <div class="button-container" style="margin-bottom: 0px !important;">
+		</div>
+        <div id="expandable-section" style="display: none; margin-top: 10px;">
+            {{ baustelle.description.split('<h2><strong>Wie?</strong></h2>')[1] | safe }}
+        </div>
+    </div>        
     </div>
    
    
@@ -203,7 +227,9 @@
       <?php CITY LOGO START ?> 
       <?php CITY LOGO END ?> 
       <div class="button-container">
-         <button id="open-overlay" class="register-button-m" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Hinzufügen</button>
+<button class="register-button-m" id="toggle-description" style="margin-bottom: 10px; margin-right: 5px;">Mehr erfahren</button>
+
+         <button id="open-overlay" class="register-button-m" onclick="openMarkerOverlay(event)" style="margin-bottom: 10px">Markieren</button>
       </div>
       <div class="button-container">
          <button id="show-markers-btn" class="register-button-m" style="margin-right: 5px;">Liste anzeigen</button>
@@ -211,7 +237,7 @@
 
       </div>
       <div class="button-container">
-         <button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Nur Projektvorschläge anzeigen</button>
+         <button id="hideNonMapMarkers" class="register-button-m" style="margin-bottom: 10px; margin-top: 10px !important;">Alle Beiträge</button>
       </div>
       <div class="button-container" style="display:none;">
          <button id="toggle-answer-markers-btn" class="register-button-m" style="margin-bottom: 10px;">Antwortmarkierungen ein-/ausblenden</button>
@@ -225,7 +251,7 @@
       </div>
       <!-- Add to karte.html -->
       <a href="{{ url_for('create_questionset') }}">
-        <button class="register-button-m" style="display:none;">Create New Question Set</button>
+        <button class="register-button-m">Create New Question Set</button>
       </a>
 
 
@@ -233,39 +259,157 @@
    <?php CATEGORIES PULL END ?>
 
 <!-- Guided Mode Modal -->
-<div id="guided-mode-modal" class="overlay">
+<div id="guided-mode-modal" class="overlay" style="justify-content: center;">
     <div class="overlay-content">
-        <h2>Select a set of questions</h2>
+        <h2 style="margin-bottom: 20px;">Willkommen im GuidedMode!</h2>
+		<h3>Im GuidedMode werden Ihnen Fragen zu öffentlichen Plätzen in Ihrer Gemeinde oder zu einem bestimmten Projekt gestellt.</h3>
+		<p>Es könnte mehrere laufende Projekte geben.</p>
+		<p>Wählen Sie ein Projekt aus, um Ihr Feedback dazu abzugeben!</p>
         <select id="questionset-select"></select>
-        <button id="start-guided-mode" class="overlay-button">Start</button>
-        <button id="cancel-guided-mode" class="overlay-button">Cancel</button>
-    </div>
-</div>
-
-<!-- Question Modal -->
-<div id="question-modal" class="overlay">
-    <div class="overlay-content">
-        <h2 id="question-title" data-question-id=""></h2>
-        <p id="question-description"></p>
-        <button id="answer-question" class="overlay-button">Answer</button>
-        <button id="next-question" class="overlay-button">Next</button>
-        <button id="cancel-qa-mode" class="overlay-button">Cancel</button>
-        <div id="summary-content">
-            <h2>Summary</h2>
-            <p>No questions answered yet!</p>
+       <div class="button-container" style="margin-top: 15px;"> <!-- Container for the buttons -->
+            <button id="start-guided-mode" class="register-button-m" style="margin: 2px;">Start</button>
+            <button id="cancel-guided-mode" class="register-button-m" style="margin: 2px;">Abbrechen</button>
         </div>
     </div>
 </div>
 
+<!-- Question Modal -->
+<div id="question-modal" class="overlay" style="justify-content: center;">
+    <div class="overlay-content">
+        <h2 id="question-title" data-question-id=""></h2>
+        <p id="question-description"></p>
+        <!-- Image container where the question image will be displayed -->
+        <div id="question-image-container">
+            <img id="question-image" src="" alt="Question Image" style="max-width: 100%; display: none;"> <!-- Initially hidden -->
+        </div>
+		       <div class="button-container" style="margin-top: 15px;"> <!-- Container for the buttons -->
+
+        <button id="answer-question" class="register-button-m" style="margin: 2px;">Antworten</button>
+        <button id="next-question" class="register-button-m" style="margin: 2px;">Nächste Frage</button>
+        <button id="cancel-qa-mode" class="register-button-m" style="margin: 2px;">Abbrechen</button>
+		        </div>
+
+        <div id="summary-content">
+            <h2>Zusammenfassung</h2>
+            <p>Noch keine Fragen beantwortet!</p>
+        </div>
+    </div>
+</div>
+
+    <div id="deleteAllProjectsSection" class="deleteAllProjectsSection" style="display: none;">
+
+    <div class="stats-container">
+	
+	
+	
+		
+		  
+		
+		
+		
+		
+        <div class="project-thumbnail" style="background-color: #b8d5ff !important">
+          <h2>Top 5 Häufigste Kategorien</h2>
+          <ul> {% for category, count in category_counts %} <li>
+              <h3>
+                <strong>{{ category }}</strong> mit <strong>{{ count }}</strong> Projekten
+              </h3>
+            </li> {% endfor %} </ul>
+        </div>
 
 
-
-
-
+		<div class="project-thumbnail" style="background-color: #f5f1e43c3 !important">
+          <h2>Top 5 Meistgesehene Projekte</h2>
+          <ul> {% for project in top_viewed_projects %} {% if project.view_count > 0 %} <li>
+              <h3>
+                <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=project.id) }}">
+                  <strong>{{ project.name }}</strong>
+                </a> mit <strong>{{ project.view_count }}</strong> Aufrufen
+              </h3>
+            </li> {% endif %} {% endfor %} </ul>
+        </div>
+		
+		
+		 <div class="project-thumbnail" style="background-color: #ffd6a8 !important">
+          <h2>Top 5 Bewertete Projekte</h2>
+          <ul> {% for project in top_rated_projects %} <li>
+              <h3>
+                <a href="{{ url_for('Partizipative_Planung_Vorschlag',project_id=project.id) }}">
+                  <strong>{{ project.name }}</strong>
+                </a> mit <strong>{{ project.upvote_count }}</strong> Stimmen
+              </h3>
+            </li> {% endfor %} </ul>
+        </div>
+		
+		
+       
+		
+        <div class="project-thumbnail" style="background-color: #b9ea9b !important">
+          <h2>Top 5 Aktivste Benutzerkonten</h2>
+          <ul> {% for user in active_users %} <li>
+              <h3>
+                <strong> {{ user.name }}</strong> mit <strong>{{ user.project_count }}</strong> Projekten, <strong>{{ user.map_object_count }}</strong> Kartenobjekten und <strong>{{ user.comment_count }}</strong> Kommentaren
+              </h3>
+            </li> {% endfor %} </ul>
+        </div>
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+    </div>
+</div>
 
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statsButton = document.getElementById('toggle-stats-btn');
+    const statsContainer = document.getElementById('deleteAllProjectsSection');
+
+    statsButton.addEventListener('click', function() {
+        const isDisplayed = statsContainer.style.display !== 'none';
+        statsContainer.style.display = isDisplayed ? 'none' : 'block'; // Toggle display
+        statsButton.textContent = isDisplayed ? 'Show Statistics' : 'Hide Statistics'; // Update button text
+    });
+});
+</script>
+
+
 
 
 <?php SIDEBAR BODY END ?>
 </body>
 </html>
+
+
+
+<script>
+
+</script>

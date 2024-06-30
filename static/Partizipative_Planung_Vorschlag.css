@@ -1,3 +1,56 @@
+@media only screen and (min-width: 1081px) {
+    body {
+        min-height: 100vh; /* Ensure the body takes at least the height of the viewport */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .bottom-bar {
+        position: fixed; /* Fix position to the bottom of the viewport */
+        bottom: 0; /* Align to the bottom */
+        left: 0; /* Align to the left */
+        right: 0; /* Align to the right */
+        margin-top: 0; /* Remove any margin top */
+        z-index: 100; /* Make sure it's above most other items */
+    }
+
+    .content-wrapper {
+        flex: 1 0 auto; /* Flexibility to occupy available space */
+        padding-bottom: 60px; /* Space at the bottom to avoid overlap with the fixed bottom bar */
+    }
+}
+@media only screen and (max-width: 1080px) {
+    /* Mobile-specific adjustments if needed */
+    .bottom-bar {
+        padding: 10px 0; /* Adjust padding for mobile, modify as needed */
+    }
+    body {
+        padding-bottom: 50px; /* Adjust the bottom padding to fit the mobile bottom bar height */
+        /* Use the CSS variable for the background image */
+        background-image: none !important;
+    }
+	.form-container {
+		box-shadow: none !important;
+}
+    .navigation-left {
+		margin: none !important;
+	}
+	.navigation-left {
+				margin: none !important;
+				padding-right: none !important;
+				padding-right: 0px !important;
+				padding-left: 0px !important;
+	}
+}
+.bottom-bar {
+    position: fixed; /* Fix position to the bottom of the viewport */
+    bottom: 0; /* Align to the bottom */
+    left: 0; /* Align to the left */
+    right: 0; /* Align to the right */
+    z-index: 100; /* Make sure it's above most other items */
+    width: 100%; /* Ensure it spans the full width */
+}
+
 body {
   font-family: Roboto, MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   background-color: #f5f1e4;

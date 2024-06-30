@@ -11,7 +11,8 @@
 </a> {% endif %}
 <!-- Next Project Arrow for Mobile --> {% if next_project_id %} <a href="{{ url_for('Partizipative_Planung_Vorschlag', project_id=next_project_id) }}" class="arrow-mobile-right">
   <img src="{{ url_for('serve_image', filename='arrowcircle-right.png') }}" alt="Next">
-</a> {% endif %} <div class="form-container">
+</a> {% endif %}
+ <div class="form-container">
   <h2 class="centered-title">{{ project.name }}</h2>
   <p class="centered-title"><strong style="color: #003056;">{{ project.date.strftime('%d.%m.%Y') }}</strong>, Ansichten: <strong style="color: #003056;">{{ project.view_count }}</strong>
   </p>

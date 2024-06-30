@@ -1,3 +1,316 @@
+
+
+
+
+@media only screen and (max-width: 1080px) {
+
+
+.info-text-field3-c {
+	background-color: #none;
+	/* Light grey background */
+
+	padding: 0px;
+	box-sizing: border-box;
+	/* Include padding in width calculation */
+}
+
+
+}
+
+
+
+
+
+ input[type="date"] {
+    width: auto; /* Adjust width as needed */
+    padding: 8px 12px; /* Comfortable padding */
+        margin: 8px 0; /* Add some margin for external spacing */
+        display: inline-block; /* Ensuring the input behaves as a block-level element */
+        border: 1px solid #ccc; /* Standard border color */
+        border-radius: 4px; /* Rounded corners for modern look */
+        box-sizing: border-box; /* Handles the padding and border inside of the box's dimensions */
+        font-size: 16px; /* Larger font size for better readability */
+        background-color: white; /* Background color white */
+        color: #444; /* Text color to something darker for contrast */
+        font-family: Arial, sans-serif; /* Modern font family */
+        transition: border-color 0.3s; /* Smooth transition for interactions */
+    }
+
+    input[type="date"]:hover {
+        border-color: #888; /* Change border color on hover for visual feedback */
+    }
+
+    input[type="date"]:focus {
+        border-color: #0056b3; /* Highlight color when the element is focused */
+        outline: none; /* Remove the default focus outline */
+    }
+
+
+select {
+    width: auto; /* Adjust width as needed */
+	min-width: 100px;
+    padding: 8px 12px; /* Comfortable padding */
+    font-size: 16px; /* Legible font size */
+    border: 1px solid #ccc; /* Subtle border */
+    border-radius: 10px; /* Rounded corners for a modern look */
+    appearance: none; /* Remove default system appearance */
+ background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>'); /* Custom dropdown arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px center; /* Position for the arrow icon */
+    background-color: #fff; /* Background color */	
+    cursor: pointer; /* Pointer cursor on hover */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Soft shadow for depth */
+    margin-bottom: 10px; /* Spacing below the dropdown */
+}
+
+select:hover {
+    border-color: #888; /* Darker border on hover */
+}
+
+select:focus {
+    outline: none;
+    border-color: #0056b3; /* Focus color */
+}
+
+
+.project-thumbnail {
+  background-color: #e5e2d5;
+  border-radius: 30px;
+  margin: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  transition: width 0.3s ease, box-shadow 0.3s ease-out;
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+   /* Hover effect for project thumbnails */
+   .project-thumbnail:hover {
+     transform: scale(1.005);
+     transition: width 0.3s ease;
+	     box-shadow: 0 10px 15px rgba(0,0,0,0.1); /* Example shadow */
+
+   }
+
+   /* Image style within project thumbnails */
+   .project-thumbnail img {
+     width: 90%;
+     margin-top: 20px;
+     height: 400px;
+     /* Fixed height for images */
+     object-fit: cover;
+     border-radius: 30px;
+   }
+
+   /* Text style inside project thumbnails */
+   .project-thumbnail h2,
+   .project-thumbnail p {
+     margin: 0;
+     padding: 5px 0;
+     width: 100%;
+     /* Adjust the width to match the image */
+     text-align: center !important;
+     /* Center the text */
+   }
+
+   /* Remove absolute positioning from the description */
+   .project-thumbnail p {
+     position: relative;
+     /* Changed from absolute to relative */
+     bottom: auto;
+     /* Remove bottom positioning */
+     overflow: visible;
+     /* Ensure text is not clipped */
+   }
+
+   /* Desktop screens (larger than 1200px) */
+   @media (min-width: 1445px) {
+     .project-thumbnail {
+       width: calc(33.333% - 20px);
+       /* Three items per row */
+       height: auto;
+       /* Height adjusts based on content */
+     }
+   }
+
+@media (min-width: 768px) and (max-width: 1444px) {
+    .project-thumbnail {
+        width: calc(50% - 20px);
+        /* Two items per row */
+        height: auto;
+        /* Height adjusts based on content */
+    }
+}
+
+
+@media (max-width: 767px) {
+    .project-thumbnail {
+        width: calc(100% - 20px);
+        /* One item per row */
+        height: auto;
+        /* Height adjusts based on content */
+    }
+
+  
+     .project-thumbnail img {
+       height: auto;
+       /* Adjust image height for mobile */
+     }
+   }
+
+
+
+
+
+.admin-tools-container {
+z-index: 2000 !important;
+}
+
+
+
+
+
+
+
+.stats-container {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center; /* Center align items vertically */
+  justify-content: center;
+  z-index: 2000;
+  height: auto; /* Start with auto height, JavaScript will adjust it */
+}
+)
+
+
+.stat-box {
+	background-color: #e5e2d5;
+	/* Example background color */
+	margin: 5px;
+	padding: 5px;
+	border-radius: 30px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	flex-basis: calc(30% - 0px);
+	/* For desktop */
+	max-width: calc(30% - 0px);
+}
+
+
+.stat-box3 {
+	background-color: #e5e2d5;
+	/* Example background color */
+	margin: 5px;
+	padding: 5px;
+	border-radius: 30px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	flex-basis: calc(33.333% - 20px);
+	/* For desktop */
+}
+
+
+
+
+@media (min-width: 1080px) and (max-width: 1445px) {
+	.stat-box {
+		flex-basis: calc(50% - 10px) !important;
+		/* For tablet */
+		max-width: calc(50% - 20px) !important;
+
+	}
+}
+
+@media (max-width: 1080px) {
+	.stat-box {
+		flex-basis: 100% !important;
+		/* For mobile */
+		max-width: 100% !important;
+border-radius: 0px;
+margin: 0px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+
+	}
+
+.stats-container {
+	margin-top: 0px;
+	}
+}
+
+
+
+
+
+
+.register-button-c {
+    display: block; /* Each button takes the full width */
+    width: calc(100% - 20px); /* Adjust width based on padding */
+    padding: 10px 15px;
+    background-color: #003056;
+    color: white;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer;
+    margin: 5px 0; /* Adjust top and bottom margins as needed */
+    transition: background-color 0.3s;
+}
+
+.register-button-c, .register-button-c-link {
+    display: inline-block !important; /* Ensures the element is only as wide as its content */
+    padding: 10px 15px; /* Padding around the text */
+    background-color: #003056; /* Button background color */
+    color: white; /* Button text color */
+    text-align: center; /* Center-aligns the text inside the button */
+    font-size: 16px; /* Text size inside the button */
+    font-weight: bold; /* Makes the text bold */
+	width: auto !important;
+    border: none; /* Removes the border */
+    border-radius: 10px; /* Rounds the corners of the button */
+    text-decoration: none !important; /* Removes the underline from links */
+    cursor: pointer; /* Changes the cursor to a pointer to indicate it's clickable */
+    margin: 5px; /* Adds margin around the button */
+    transition: background-color 0.3s; /* Animates the background color change on hover */
+    line-height: 1.5; /* Adjusts the line height */
+    font-family: inherit; /* Inherits the font family from the parent */
+    vertical-align: middle; /* Aligns the button vertically */
+    box-sizing: border-box !important; /* Includes padding and border in the element's size */
+}
+
+.register-button-c:hover, .register-button-c-link:hover {
+    background-color: #004680; /* Changes the background color on hover */
+}
+
+.register-button-c:active, .register-button-c-link:active {
+    transform: translateY(1px); /* Moves the button down slightly to simulate a press */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a shadow to simulate depth */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .overlay-button {
 border-radius: 30px;
 padding: 15px;
@@ -13,42 +326,7 @@ transition: background-color 0.3s ease;
 
 
 
-
-
-
- .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 10000;
-        }
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-        }
-        .dropdown-content a:hover {background-color: #f1f1f1;}
-        .show {display: block;}
-
-}
-
-
-
-
-
-
-
-
-
-
-
+/* Base styles for the overlays */
 .overlay {
 	display:none;
 position: absolute;
@@ -63,31 +341,39 @@ background: var(--sidebar-bg);
 /* Use variable for background */
 }
 
-@media (max-width: 768px) {
-    .overlay {
+
+   #guided-mode-modal {
         display: none;
-        position: absolute;
-        top: 40px;
-        word-wrap: break-word;
-        width: auto;
-        min-width: calc(100% - 30px);
-        height: auto;
-        padding: 20px;
-        box-sizing: border-box;
-        display: none;
-        left: 0;
-        right: 0;
-        background-color: #f5f1e4;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        border-radius: 30px;
-        margin-top: 7.5px !important;
-        z-index: 1055;
-        overflow: auto;
+        /* Other styles */
     }
+
+@media (max-width: 768px) {
+.overlay {
+		display:none;
+
+	position: absolute; /* Changed from fixed to absolute */
+top: 40px; /* Estimate based on viewport height and gap */
+word-wrap: break-word; /* Break long words to prevent horizontal overflow */
+width: auto; /* Allow width to adjust to left and right margins */
+min-width: calc(100% - 30px); /* Ensure it takes at least the width minus margins */
+height: auto; /* Adjust height automatically */
+padding: 20px;
+box-sizing: border-box; /* Include padding in width/height */
+display: none;
+left: 0;
+right: 0;
+        background-color: #f5f1e4;
+
+flex-direction: column;
+justify-content: center; /* Vertically center content */
+align-items: center; /* Horizontally center content */
+border-radius: 30px;
+margin-top: 7.5px !important;
+z-index: 1055;
+overflow: auto; /* Enables scrolling if content is larger than the overlay */
 }
 }
+
 
 @media (min-width: 768px) and (max-width: 1080px) {
 .overlay {
@@ -104,6 +390,29 @@ background: var(--sidebar-bg);
     }
 }
 
+@media (max-width: 768px) {
+    #baustelle-title {
+        margin-bottom: 10px !important;
+    }
+	.register-button-m-e {
+	display:none !Important;
+}
+}
+
+	
+@media (max-width: 768px) {
+    #baustelle-title-main {
+        margin-bottom: 6px !important;
+		margin-top: 3px !important;
+    }
+}
+
+*,
+*:before,
+*:after {
+box-sizing: inherit;
+/* Inherit box-sizing */
+}
 .circle-btn {
     border-radius: 50%;
     width: 40px; /* Adjust based on your preference */
@@ -139,6 +448,11 @@ background: var(--sidebar-bg);
 }
 
 @media only screen and (min-width: 768px) {
+	.expanded-sidebar {
+	display:none;
+}
+
+
 #marker-overlay {
 display: none;
 position: fixed;
@@ -657,9 +971,10 @@ width: 500px;
 
 
 
+
 /* Media Query for Mobile Devices */
 @media only screen and (max-width: 1080px) {
-.button-container .register-button-m,
+.button-container .register-button-m, .register-button-m-e, 
 button[onclick*="markers-list-overlay"].register-button,
 #add-marker-button.register-button {
 font-size: 18px;
@@ -704,10 +1019,10 @@ h3 {
 
 /* Media Query for Devices Between 1080px and 1400px */
 @media only screen and (min-width: 1081px) and (max-width: 1500px) {
-.button-container .register-button-m,
-button[onclick*="markers-list-overlay"].register-button,
+.button-container .register-button-m, .register-button-m-e, 
+button[onclick*="markers-list-overlay"].register-button, 
 #add-marker-button.register-button {
-font-size: 16px;
+font-size: 18px;
 /* Slightly larger font size for tablet devices */
 padding: 12px 18px;
 /* Adjust padding to fit the larger text */
@@ -1619,7 +1934,7 @@ right: 15px;
 border-radius: 30px;
 margin-bottom: 15px;
 margin-top: 7.5px !important;
-z-index: 500 !important;
+z-index: 500;
 }
 
  #map {
@@ -1644,22 +1959,25 @@ overflow-y: auto;
 background: var(--sidebar-bg);
 /* Use variable for background */
 }
-    .expanded-sidebar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        top: 0;
-        background: var(--sidebar-bg);
-        overflow-y: auto;
-        padding: 20px;
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        z-index: 20000;
-    }
+.expanded-sidebar {
+    position: fixed;
+    top: 0; /* Ensure it starts right at the top of the viewport */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--sidebar-bg); /* Make sure you have this variable defined or replace it with a direct color value */
+    overflow-y: auto; /* Allow scrolling */
+    padding: 20px;
+	padding-top: 100px;
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000; /* Adjusted for better layer control, make sure it's high enough to be on top */
+    box-sizing: border-box; /* Includes padding in width and height calculations */
+}
 
     .close-button, .expand-button {
+		
         font-size: 20px;
         border: none;
         background: none;
@@ -1759,7 +2077,7 @@ display: block !important;
     }
 
     .expanded-sidebar {
-        display: block; /* Always show the full sidebar on desktop */
+        display: none; /* Always show the full sidebar on desktop */
         position: static; /* Normal flow, not fixed */
         width: auto;
         border-radius: 0;
@@ -1776,6 +2094,8 @@ display: block !important;
         overflow-y: auto; /* Enable scrolling if needed */
     }
 }
+
+
 .title-button-container {
 display: flex;
 justify-content: center;
@@ -1967,6 +2287,8 @@ max-width: 60%;
         cursor: pointer; /* Pointer cursor for better UX */
     }
    .close-button {
+	   	margin-top: 80px;
+
         background-color: white; /* White background */
         color: black; /* Black text/icon color */
         border-radius: 50%; /* Circular shape */
@@ -1987,9 +2309,9 @@ max-width: 60%;
     }
     /* Positioning the open button */
     .expand-button {
-        left: 50%; /* Center horizontally */
+        left: 50% !important; /* Center horizontally */
         transform: translateX(-50%); /* Precise centering */
-        bottom: 20px; /* Positioned at the bottom with a margin */
+        bottom: 0px !important; /* Positioned at the bottom with a margin */
     }
 
     /* Positioning the close button */
@@ -2252,6 +2574,32 @@ width: 97%;
 box-sizing: border-box;
 /* Include padding in width */
 }
+
+.register-button-m-e {
+background-color: #003056;
+/* Example color */
+color: white;
+border: none;
+/* Remove the border */
+outline: none;
+/* Remove the outline */
+box-shadow: none;
+/* Remove any shadow that might appear as an outline */
+border-radius: 30px;
+padding: 5px 10px;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+font-weight: bold;
+font-size: 24px;
+margin: auto;
+margin-top: 0px;
+margin-bottom: 0px;
+cursor: pointer;
+width: 97%;
+box-sizing: border-box;
+/* Include padding in width */
+}
 .register-button-f {
 background-color: #003056;
 /* Example color */
@@ -2309,6 +2657,13 @@ transition: width transform 0.3s ease;
 /* Smooth transition for transform and border */
 }
 .register-button-m:hover {
+transform: scale(1.005);
+/* Scale up on hover */
+filter: brightness(110%);
+/* Increase brightness by 10% */
+}
+
+.register-button-m-e:hover {
 transform: scale(1.005);
 /* Scale up on hover */
 filter: brightness(110%);
@@ -2896,7 +3251,7 @@ color: #333;
 z-index: 1056 !important;
 
 }
-.register-button-m {
+.register-button-m, .register-button-m-e {
 width: calc(100% - 10px);
 /* Full width minus the left and right margins */
 margin-left: 5px;
