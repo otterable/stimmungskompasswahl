@@ -6,121 +6,117 @@
     <p class="centered-title" style="margin-bottom: 20px;">
         Rubrik: <a href="{{ url_for('list_view', search='', category=petition.category) }}" class="category-link">
             <strong style="color: #003056;">{{ petition.category }}</strong>
-        </a>, Von: <strong style="color: #003056;">{{ petition.author_name }}</strong>
+        </a>, Von: <strong style="color: #003056;">{{ author_name }}</strong>
     </p>
 
-
   <div class="left-column">
-        <img src="{{ url_for('serve_image', filename='usersubmissions/' + petition.image_file1) }}" alt="{{ petition.name }}">
+        <img src="{{ url_for('serve_image', filename='usersubmissions/' + (petition.image_file1 or 'default_image.jpg')) }}" alt="{{ petition.name or 'Petition Image' }}">
         <div style="text-align: center;">
             {% if current_user.is_authenticated %}
                 {% set user_is_author = current_user.id|string == petition.author|string %}
                 {% set user_is_admin = current_user.is_admin %}
                 {% if user_is_author or user_is_admin %}
-                    <a href="{{ url_for('Partizipative_Planung_Neuer_Projekt', petition_id=petition.id) }}" class="comment-button" style="border-radius: 30px; display: block; margin-bottom: 20px; margin-top: 12px; text-align: center; text-decoration: none;">Bearbeiten</a>
+                    <a href="{{ url_for('Partizipative_Planung_Neuer_Petition', petition_id=petition.id) }}" class="comment-button" style="border-radius: 30px; display: block; margin-bottom: 20px; margin-top: 12px; text-align: center; text-decoration: none;">Bearbeiten</a>
                 {% endif %}
             {% endif %}
         </div>
-<!-- Voting Section -->
-<div class="voting-bar" style="margin-top: 10px; overflow: hidden; border-radius: 15px;">
-    <div class="upvotes" style="width: {{ upvote_percentage }}%; background-color: #4caf50; border-radius: 15px 0 0 15px;"></div>
-    <div class="downvotes" style="width: {{ downvote_percentage }}%; background-color: #9a031e; border-radius: 0 15px 15px 0;"></div>
-</div>
-<input type="hidden" id="petition-id" value="{{ petition.id }}">
-
-<!-- Voting Buttons and Counts -->
-<div class="vote-counts">
-    <div class="upvotes-info">
-        <p id="upvote-count">Gefällt: <strong>{{ upvote_count }}</strong></p>
-    </div>
-    <div class="downvotes-info">
-        <p id="downvote-count">Gefällt nicht: <strong>{{ downvote_count }}</strong></p>
-    </div>
-</div>
-{% if current_user.is_authenticated %}
-    <div class="voting-buttons-container">
-        <button onclick="votePetition({{ petition.id }}, 'upvote')" class="button upvote-button">Gefällt mir!</button>
-        <button onclick="votePetition({{ petition.id }}, 'downvote')" class="button downvote-button">Gefällt mir nicht</button>
-    </div>
-{% else %}
-    <div class="voting-login-prompt">
-        <p>Melden Sie sich an, um über Petitionen abzustimmen.</p>
-    </div>
-{% endif %}
-
-    </div>
-	    <div class="share-section">
-      <div class="share-buttons" style="margin-top:10px;">
-        <a href="#" id="share-whatsapp">
-          <img src="{{ url_for('serve_image', filename='icon_wh.png') }}" alt="WhatsApp">
-        </a>
-        <a href="#" id="share-facebook">
-          <img src="{{ url_for('serve_image', filename='icon_fb.png') }}" alt="Facebook">
-        </a>
-        <a href="#" id="share-share">
-          <img src="{{ url_for('serve_image', filename='icon_sh.png') }}" alt="Share">
-        </a>
-      </div>
-    </div>
-	
-	<div class="right-column" style="text-align: left">
-    <div class="text-section">
-        <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Einführung</h2>
-        <p class="text-content">{{ petition.introduction }}</p>
-    </div>
-    <div class="text-section">
-        <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Beschreibung 1</h2>
-        <p class="text-content">{{ petition.description1 }}</p>
-    </div>
-    
-    {% if petition.description2 %}
-    <div class="text-section">
-        <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Beschreibung 2</h2>
-        <p class="text-content">{{ petition.description2 }}</p>
-    </div>
-    {% endif %}
-    
-    {% if petition.description3 %}
-    <div class="text-section">
-        <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Beschreibung 3</h2>
-        <p class="text-content">{{ petition.description3 }}</p>
-    </div>
-    {% endif %}
-    
-    <div class="text-section">
-        <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Öffentlicher Nutzen</h2>
-        <p class="text-content">{{ petition.public_benefit }}</p>
-    </div>
-    </div>
-
- 
-<!-- Kommentarbereich -->
-<div class="comments">
-    <h2 class="centered-title">Kommentare</h2>
-    {% if current_user.is_authenticated %}
-    <div class="comment-form">
-        <form action="{{ url_for('add_comment', target_type='petition', target_id=petition.id) }}" method="POST">
-            <textarea name="comment" class="full-width-textarea" required minlength="20" maxlength="500" placeholder="Schreiben Sie hier Ihren Kommentar..."></textarea>
-            <div id="charCountFeedback" style="text-align: center; color: #003056;"></div>
-            <button type="submit" class="button comment-button">Kommentar posten 💬</button>
-        </form>
-    </div>
-    {% else %}
-    <p>Bitte melden Sie sich an, um Kommentare zu posten.</p>
-    {% endif %}
-
-    <!-- Bereich für vorhandene Kommentare -->
-    <div class="existing-comments">
-        {% for comment in comments %}
-        <div class="comment">
-            <p>"{{ comment.text }}"</p>
-            <small>Gepostet von {{ comment.user.username }} am {{ comment.timestamp }}</small>
+        <!-- Voting Section -->
+        <div class="voting-bar" style="margin-top: 10px; overflow: hidden; border-radius: 15px;">
+            <div class="upvotes" style="width: {{ upvote_percentage }}%; background-color: #4caf50; border-radius: 15px 0 0 15px;"></div>
+            <div class="downvotes" style="width: {{ downvote_percentage }}%; background-color: #9a031e; border-radius: 0 15px 15px 0;"></div>
         </div>
-        {% endfor %}
-    </div>
-</div> 
-</div>
+        <input type="hidden" id="petition-id" value="{{ petition.id }}">
 
+        <!-- Voting Buttons and Counts -->
+        <div class="vote-counts">
+            <div class="upvotes-info">
+                <p id="upvote-count">Gefällt: <strong>{{ upvote_count }}</strong></p>
+            </div>
+            <div class="downvotes-info">
+                <p id="downvote-count">Gefällt nicht: <strong>{{ downvote_count }}</strong></p>
+            </div>
+        </div>
+        {% if current_user.is_authenticated %}
+            <div class="voting-buttons-container">
+                <button onclick="votePetition({{ petition.id }}, 'upvote')" class="button upvote-button">Gefällt mir!</button>
+                <button onclick="votePetition({{ petition.id }}, 'downvote')" class="button downvote-button">Gefällt mir nicht</button>
+            </div>
+        {% else %}
+            <div class="voting-login-prompt">
+                <p>Melden Sie sich an, um über Petitionen abzustimmen.</p>
+            </div>
+        {% endif %}
+    </div>
+    <div class="share-section">
+        <div class="share-buttons" style="margin-top:10px;">
+            <a href="#" id="share-whatsapp">
+                <img src="{{ url_for('serve_image', filename='icon_wh.png') }}" alt="WhatsApp">
+            </a>
+            <a href="#" id="share-facebook">
+                <img src="{{ url_for('serve_image', filename='icon_fb.png') }}" alt="Facebook">
+            </a>
+            <a href="#" id="share-share">
+                <img src="{{ url_for('serve_image', filename='icon_sh.png') }}" alt="Share">
+            </a>
+        </div>
+    </div>
+
+    <div class="right-column" style="text-align: left">
+        <div class="text-section">
+            <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Einführung</h2>
+            <p class="text-content">{{ petition.introduction }}</p>
+        </div>
+        <div class="text-section">
+            <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Beschreibung 1</h2>
+            <p class="text-content">{{ petition.description1 }}</p>
+        </div>
+        
+        {% if petition.description2 %}
+        <div class="text-section">
+            <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Beschreibung 2</h2>
+            <p class="text-content">{{ petition.description2 }}</p>
+        </div>
+        {% endif %}
+        
+        {% if petition.description3 %}
+        <div class="text-section">
+            <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Beschreibung 3</h2>
+            <p class="text-content">{{ petition.description3 }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="text-section">
+            <h2 class="centered-title section-title" style="margin-top: 30px; margin-bottom: 10px">Öffentlicher Nutzen</h2>
+            <p class="text-content">{{ petition.public_benefit }}</p>
+        </div>
+    </div>
+
+    <!-- Kommentarbereich -->
+    <div class="comments">
+        <h2 class="centered-title">Kommentare</h2>
+        {% if current_user.is_authenticated %}
+        <div class="comment-form">
+            <form action="{{ url_for('add_comment', target_type='petition', target_id=petition.id) }}" method="POST">
+                <textarea name="comment" class="full-width-textarea" required minlength="20" maxlength="500" placeholder="Schreiben Sie hier Ihren Kommentar..."></textarea>
+                <div id="charCountFeedback" style="text-align: center; color: #003056;"></div>
+                <button type="submit" class="button comment-button">Kommentar posten 💬</button>
+            </form>
+        </div>
+        {% else %}
+        <p>Bitte melden Sie sich an, um Kommentare zu posten.</p>
+        {% endif %}
+
+        <!-- Bereich für vorhandene Kommentare -->
+        <div class="existing-comments">
+            {% for comment in comments %}
+            <div class="comment">
+                <p>"{{ comment.text }}"</p>
+                <small>Gepostet von {{ comment.author_name }} am {{ comment.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 
 <!-- Navigationspfeile -->
 {% if prev_petition_id %}

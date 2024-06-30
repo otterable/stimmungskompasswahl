@@ -103,14 +103,17 @@ class Post(db.Model):
         
 class ProjectView(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=True)  # Allow project_id to be nullable
+    petition_id = db.Column(db.Integer, nullable=True)
     ip_address = db.Column(db.String(100))
     last_viewed = db.Column(db.DateTime)
+
 
 class Bookmark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    petition_id = db.Column(db.Integer, nullable=True)  # New field for petition_id
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -118,6 +121,7 @@ class Bookmark(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             "project_id": self.project_id,
+            "petition_id": self.petition_id,
             "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S")
         }
 
@@ -125,8 +129,8 @@ class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    petition_id = db.Column(db.Integer, nullable=True)  # New field for petition_id
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
 
 
 
@@ -164,6 +168,7 @@ class Petition(db.Model):
     author = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     is_featured = db.Column(db.Boolean, default=False)
     demo_mode = db.Column(db.Boolean, default=False)
+    view_count = db.Column(db.Integer, default=0)  # New field for view count
     comments = db.relationship('Comment', backref='petition', lazy=True, cascade="all, delete-orphan")
 
 

@@ -488,14 +488,22 @@ app.jinja_env.filters['getattr'] = jinja2_getattr
 @login_required
 def Partizipative_Planung_Neuer_Petition():
     if request.method == "POST":
+        petition_id = request.form.get("petition_id")
+        if petition_id:
+            petition = Petition.query.get(petition_id)
+            if petition.author != current_user.id and not current_user.is_admin:
+                return redirect(url_for("index"))  # Unauthorized access
+        else:
+            petition = Petition()
+
         # Extract form data
-        name = request.form.get("name")
-        category = request.form.get("category")
-        introduction = request.form.get("introduction")
-        description1 = request.form.get("description1")
-        description2 = request.form.get("description2")
-        description3 = request.form.get("description3")
-        public_benefit = request.form.get("public_benefit")
+        petition.name = request.form.get("name")
+        petition.category = request.form.get("category")
+        petition.introduction = request.form.get("introduction")
+        petition.description1 = request.form.get("description1")
+        petition.description2 = request.form.get("description2")
+        petition.description3 = request.form.get("description3")
+        petition.public_benefit = request.form.get("public_benefit")
         images = []
         for i in range(1, 11):
             image = request.files.get(f"image_file{i}")
@@ -506,44 +514,38 @@ def Partizipative_Planung_Neuer_Petition():
                 images.append(image_filename)
             else:
                 images.append(None)
-        geoloc = request.form.get("geoloc")
-        is_featured = False
-        demo_mode = False
+        
+        petition.image_file1 = images[0]
+        petition.image_file2 = images[1]
+        petition.image_file3 = images[2]
+        petition.image_file4 = images[3]
+        petition.image_file5 = images[4]
+        petition.image_file6 = images[5]
+        petition.image_file7 = images[6]
+        petition.image_file8 = images[7]
+        petition.image_file9 = images[8]
+        petition.image_file10 = images[9]
+        petition.geoloc = request.form.get("geoloc")
+        petition.date = datetime.now(pytz.utc) + timedelta(hours=1)
+        petition.author = current_user.id
+        petition.is_featured = False
+        petition.demo_mode = False
 
-        # Create new petition
-        current_time = datetime.now(pytz.utc) + timedelta(hours=1)
-        new_petition = Petition(
-            name=name,
-            category=category,
-            introduction=introduction,
-            description1=description1,
-            description2=description2,
-            description3=description3,
-            public_benefit=public_benefit,
-            image_file1=images[0],
-            image_file2=images[1],
-            image_file3=images[2],
-            image_file4=images[3],
-            image_file5=images[4],
-            image_file6=images[5],
-            image_file7=images[6],
-            image_file8=images[7],
-            image_file9=images[8],
-            image_file10=images[9],
-            geoloc=geoloc,
-            date=current_time,
-            author=current_user.id,
-            is_featured=is_featured,
-            demo_mode=demo_mode,
-        )
-
-        db.session.add(new_petition)
+        db.session.add(petition)
         db.session.commit()
 
-        # Redirect to the petition view page
-        return redirect(url_for("Partizipative_Planung_Petition", petition_id=new_petition.id))
+        logging.debug(f"Petition {petition.id} saved by user {current_user.id}")
 
-    return render_template("Partizipative_Planung_Neuer_Petition.html")
+        # Redirect to the petition view page
+        return redirect(url_for("Partizipative_Planung_Petition", petition_id=petition.id))
+
+    petition_id = request.args.get("petition_id")
+    if petition_id:
+        petition = Petition.query.get(petition_id)
+        image_files = [getattr(petition, f"image_file{i}") for i in range(1, 11)]
+        return render_template("Partizipative_Planung_Neuer_Petition.html", petition=petition, image_files=image_files)
+
+    return render_template("Partizipative_Planung_Neuer_Petition.html", petition=None, image_files=[None]*10)
 
 
 
@@ -602,34 +604,115 @@ def vote_on_petition(petition_id, vote_type):
 
 
 
-
-
-
-
-
-@app.route("/Partizipative_Planung_Petition/<int:petition_id>", methods=["GET", "POST"])
+@app.route("/Partizipative_Planung_Petition/<int:petition_id>")
 def Partizipative_Planung_Petition(petition_id):
-    petition = Petition.query.get(petition_id)
-    signed_status = False
-    if current_user.is_authenticated:
-        signed_status = user_has_signed(petition_id, current_user.id)
+    try:
+        petition = Petition.query.get(petition_id)
+        comments = Comment.query.filter_by(petition_id=petition_id).all()
+        is_bookmarked = (
+            Bookmark.query.filter_by(user_id=current_user.id, petition_id=petition_id).first()
+            is not None if current_user.is_authenticated else False
+        )
+        is_reported = (
+            Report.query.filter_by(user_id=current_user.id, petition_id=petition_id).first()
+            is not None if current_user.is_authenticated else False
+        )
+
+        ip_address = request.remote_addr
+        WebsiteViews.add_view(ip_address)
+        user_ip = request.remote_addr
+        current_time = datetime.now(pytz.utc)
+        last_view = ProjectView.query.filter(
+            and_(ProjectView.petition_id == petition_id, ProjectView.ip_address == user_ip)
+        ).first()
+
+        ip_address = request.remote_addr
+        last_view = ProjectView.query.filter_by(petition_id=petition_id, ip_address=ip_address)\
+            .order_by(ProjectView.last_viewed.desc()).first()
+
+        if last_view is None or (
+            datetime.now(pytz.utc) - last_view.last_viewed.replace(tzinfo=pytz.utc) > timedelta(hours=24)
+        ):
+            new_view = ProjectView(
+                petition_id=petition_id,
+                ip_address=ip_address,
+                last_viewed=datetime.now(pytz.utc),
+            )
+            db.session.add(new_view)
+            if petition.view_count is None:
+                petition.view_count = 0
+            petition.view_count += 1
+            db.session.commit()
+            logging.debug(f"Petition viewed by user {current_user.id if current_user.is_authenticated else 'Anonymous'} from IP {ip_address}, adding one more view. Current number of views: {petition.view_count}.")
+        else:
+            logging.debug(f"Petition viewed by user {current_user.id if current_user.is_authenticated else 'Anonymous'} from IP {ip_address}, user has however already viewed this petition during the last 24 hours. Not adding a view. Current number of views: {petition.view_count}.")
+
+        votes = PetitionVote.query.filter_by(petition_id=petition_id).all()
+        upvote_count = sum(vote.upvote for vote in votes)
+        downvote_count = sum(vote.downvote for vote in votes)
+        total_votes = upvote_count + downvote_count
+        upvote_percentage = (upvote_count / total_votes * 100) if total_votes > 0 else 0
+        downvote_percentage = (downvote_count / total_votes * 100) if total_votes > 0 else 0
+
+        prev_petition = Petition.query.filter(Petition.id < petition_id)\
+            .order_by(Petition.id.desc()).first()
+        next_petition = Petition.query.filter(Petition.id > petition_id)\
+            .order_by(Petition.id.asc()).first()
+
+        prev_petition_id = prev_petition.id if prev_petition else None
+        next_petition_id = next_petition.id if next_petition else None
+
+        petition_author = User.query.get(petition.author)
+        author_name = petition_author.name if petition_author else "Unknown"
+        comments_with_authors = [
+            {"text": comment.text, "timestamp": comment.timestamp,
+             "author_name": User.query.get(comment.user_id).name if User.query.get(comment.user_id) else "Unknown"}
+            for comment in comments
+        ]
+
+        return render_template(
+            "Partizipative_Planung_Petition/index.html",
+            petition=petition,
+            prev_petition_id=prev_petition_id,
+            next_petition_id=next_petition_id,
+            upvote_percentage=upvote_percentage,
+            downvote_percentage=downvote_percentage,
+            upvote_count=upvote_count,
+            downvote_count=downvote_count,
+            current_user=current_user,
+            author_name=author_name,
+            comments=comments_with_authors,
+            is_bookmarked=is_bookmarked,
+            is_reported=is_reported
+        )
+    except Exception as e:
+        app.logger.error("Error in Partizipative_Planung_Petition route: %s", str(e))
+        return str(e)
+
+
+@app.route("/get_petition_data/<int:petition_id>")
+@login_required
+def get_petition_data(petition_id):
+    petition = Petition.query.get_or_404(petition_id)
+    if petition.author != current_user.id and not current_user.is_admin:
+        return jsonify({"error": "Unauthorized access"}), 403
+
+    petition_data = {
+        "name": petition.name,
+        "category": petition.category,
+        "introduction": petition.introduction,
+        "description1": petition.description1,
+        "description2": petition.description2,
+        "description3": petition.description3,
+        "public_benefit": petition.public_benefit,
+        "geoloc": petition.geoloc,
+    }
+    for i in range(1, 11):
+        petition_data[f"image_file{i}"] = getattr(petition, f"image_file{i}")
+
+    return jsonify(petition_data)
     
-    if request.method == "POST" and current_user.is_authenticated and not signed_status:
-        return redirect(f"/docusign/{petition_id}")
     
-    prev_petition = Petition.query.filter(Petition.id < petition_id).order_by(Petition.id.desc()).first()
-    next_petition = Petition.query.filter(Petition.id > petition_id).order_by(Petition.id.asc()).first()
-
-    return render_template("Partizipative_Planung_Petition/index.html", 
-                           petition=petition, 
-                           petition_id=petition_id, 
-                           signed_status=signed_status,
-                           user_has_signed=user_has_signed,
-                           prev_petition_id=prev_petition.id if prev_petition else None,
-                           next_petition_id=next_petition.id if next_petition else None)
-
-
-
 @app.route("/vote/petition/<int:petition_id>/<string:vote_type>", methods=["POST"])
 @login_required
 def vote_petition(petition_id, vote_type):
